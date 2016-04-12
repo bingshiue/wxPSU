@@ -2,10 +2,12 @@
  * @file MainFrame.cpp
  */
 
+#include "CommonDef.h"
 #include "MainFrame.h"
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
 #include "PMBUSCommand.h"
+#include "sample.xpm"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -18,6 +20,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_hbox->Add(this->m_SendButton, 1, wxEXPAND | wxALL, 1);
 	this->m_topLevelSizer->Add(this->m_hbox, 1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	this->m_parent->SetSizer(this->m_topLevelSizer, true);
+
+	// Setup Icon
+	SetIcon(sample_xpm);
 
 	wxMenu *menuFile = new wxMenu;
 	menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",

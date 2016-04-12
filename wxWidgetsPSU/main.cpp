@@ -16,21 +16,28 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
+	BOOL ret;
+	
 	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(450, 340));
 	mainFrame->Show(true);
 
-	//Initial Serial Port
-	OpenSerialPort(3);
+	// Initial Serial Port
+	ret = OpenSerialPort(3);
 
-	// Create SerialReadThread
-	SerialReadThread* sprt = new SerialReadThread();
+	// If Open Serial Port Success
+	if (ret==EXIT_SUCCESS){
 
-	if (sprt->Create() != wxTHREAD_NO_ERROR)
-	{
-		wxLogError(wxT("Can't create thread!"));
+		// Create SerialReadThread
+		SerialReadThread* sprt = new SerialReadThread();
+
+		// If Create Thread Success
+		if (sprt->Create() != wxTHREAD_NO_ERROR){
+			wxLogError(wxT("Can't create thread!"));
+		}
+		else{
+			sprt->Run();
+		}
 	}
-
-	sprt->Run();
 
 	return true;
 }
