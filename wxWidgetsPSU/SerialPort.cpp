@@ -78,7 +78,7 @@ int OpenSerialPort(int PortNum)
 	return ret;
 }
 
-int SerialSendData(char* buff, int size){
+int SerialSendData(unsigned char* buff, unsigned int size){
 
 	BOOL Status;
 	DWORD  dNoOfBytesWritten = 0;
@@ -115,6 +115,11 @@ int SerialSendData(char* buff, int size){
 		}
 		else{
 			PSU_DEBUG_PRINT("send_suu = %d \n",send_suu);
+			PSU_DEBUG_PRINT("%s:Send :",__FUNCTION__);
+			for (unsigned int idx = 0; idx < size; idx++){
+				PSU_DEBUG_PRINT(" %2x ",buff[idx]);
+			}
+			PSU_DEBUG_PRINT("\n")
 			ResetEvent(g_ol.hEvent);
 			CloseHandle(g_ol.hEvent);
 		}
@@ -140,11 +145,11 @@ int SerialSendData(char* buff, int size){
     return dNoOfBytesWritten;
 }
 
-int SerialReadData(char* buff){
+int SerialReadData(unsigned char* buff){
 	BOOL  Status;                          // Status of the various operations 
 	DWORD dwEventMask;                     // Event mask to trigger
-	unsigned char  TempChar[1024] = { 0 };                  // Temperory Character
-	char  SerialBuffer[256];               // Buffer Containing Rxed Data
+	unsigned char  TempChar[1024] = { 0 }; // Temperory Character
+	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
 	int i = 0;
@@ -179,44 +184,39 @@ int SerialReadData(char* buff){
 	else //If  WaitCommEvent()==True Read the RXed data using ReadFile();
 	{
 		PSU_DEBUG_PRINT("\n Characters Received");
-		//do
-		//{
-			Status = ReadFile(hComm, &TempChar, 10, &NoBytesRead, &g_ol);
-			if (GetLastError() == ERROR_IO_PENDING){
-				//
-				endtime = GetTickCount() + 10000;
-				//
-				while (GetOverlappedResult(hComm, &g_ol, &NoBytesRead, TRUE) == 0){
-					if (GetTickCount() > endtime)
-					{
-						PSU_DEBUG_PRINT("Receive Data Timeout ]n");
-						break;
-					}
+
+		Status = ReadFile(hComm, &TempChar, 10, &NoBytesRead, &g_ol);
+		if (GetLastError() == ERROR_IO_PENDING){
+			//
+			endtime = GetTickCount() + 10000;
+			//
+			while (GetOverlappedResult(hComm, &g_ol, &NoBytesRead, TRUE) == 0){
+				if (GetTickCount() > endtime)
+				{
+					PSU_DEBUG_PRINT("Receive Data Timeout ]n");
+					break;
 				}
 			}
-			else{
-				PSU_DEBUG_PRINT("\n\n ReadFile Occurs Unkonwn Error");
-			}
+		}
+		else{
+			PSU_DEBUG_PRINT("\n\n ReadFile Occurs Unkonwn Error");
+		}
 
-			if (NoBytesRead > 0){
-				/*------------Printing the RXed Data to Console----------------------*/
-				PSU_DEBUG_PRINT("Get %d Bytes From SerialPort \n", NoBytesRead);
+		if (NoBytesRead > 0){
+			/*------------Printing the RXed Data to Console----------------------*/
+			PSU_DEBUG_PRINT("Get %d Bytes From SerialPort :", NoBytesRead);
 				
-				int j = 0;
-				for (j = 0; j < NoBytesRead; j++)		// j < i-1 to remove the dupliated last character
-					PSU_DEBUG_PRINT("%x", TempChar[j]);
+			for (unsigned int idx = 0; idx < NoBytesRead; idx++){
+				PSU_DEBUG_PRINT(" %2x ", TempChar[idx]);
 			}
-
-			//SerialBuffer[i] = TempChar;
-			//i++;
-		//} 
-	    //while (NoBytesRead > 0);
+			PSU_DEBUG_PRINT("\n");
+		}
 
 		ResetEvent(g_ol.hEvent);
 		CloseHandle(g_ol.hEvent);
 	}
 
-	return i;// Return how many bytes data readed
+	return NoBytesRead;// Return how many bytes data readed
 }
 
 

@@ -5,6 +5,7 @@
 #include "MainFrame.h"
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
+#include "PMBUSCommand.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -60,18 +61,23 @@ void MainFrame::OnHello(wxCommandEvent& event)
 void MainFrame::OnSend(wxCommandEvent& event)
 {
 	wxLogMessage("On Send");
-	char data[10] = {
-		0x41, // 0x41
-		0x44, // 0x44
-		0xb6, // 0xb6
-		0x01, // 0x01
-		0x0d, // 0x0d
-		0x0a, // 0x0a
-		0xb7, // 0xb7
-		0x02, // 0x02
-		0x0d, // 0x0d
-		0x0a  // 0x0a
-	};
-	SerialSendData(data, 10);
+	int loop = 0;
 
+	while (loop < 2) {
+		Sleep(500);// Sleep 500ms
+		wxLogMessage("loop=%d \n",loop);
+		// Send 2 Commands in turn For Loop Test
+		switch (loop%2){
+		case 0:
+			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
+			break;
+
+		case 1:
+			SerialSendData(pmbusCommand[1].mData, CMD_DATA_SIZE);
+			break;
+
+		};
+
+		loop++;
+	};
 }

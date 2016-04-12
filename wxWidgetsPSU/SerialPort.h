@@ -23,13 +23,13 @@ int OpenSerialPort(int PortNum);
 /**
  * @brief Serial Port Send Data
  */
-int SerialSendData(char* buff,int size);
+int SerialSendData(unsigned char* buff,unsigned int size);
 
 
 /**
  * @brief Serial Port Read Data
  */
-int SerialReadData(char* buff);
+int SerialReadData(unsigned char* buff);
 
 /**
  * @brief Close Serial Port

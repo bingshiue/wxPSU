@@ -11,7 +11,7 @@ SerialReadThread::~SerialReadThread() { }
 
 wxThread::ExitCode SerialReadThread::Entry()
 {
-	char buffer[256];
+	unsigned char buffer[256];
 
 	wxLogMessage("Thread started (priority = %u).", GetPriority());
 
