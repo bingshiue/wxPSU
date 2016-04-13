@@ -14,7 +14,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 {
 	//this->m_parent = new wxPanel(this, wxID_ANY);
-	this->m_SendButton = new wxButton(this, CID_SEND_BUTTON, L"Send");
 	this->m_topVeriticalSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
 
@@ -89,9 +88,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
 	Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
-	Connect(CID_SEND_BUTTON, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrame::OnSend));
 
-	this->m_hbox->Add(this->m_SendButton, wxSizerFlags(1).Expand());//1, wxEXPAND | wxALL, 1);
 	this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	this->m_topVeriticalSizer->Add(this->m_grid, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
@@ -160,39 +157,6 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	// Work Around for txtctrl can't be focus
 	this->m_txtctrl->SetFocus();
 
-}
-
-void MainFrame::OnSend(wxCommandEvent& event)
-{
-	wxLogMessage("On Send");
-	int loop = 0;
-	int ret;
-
-	while (loop < 2) {
-		Sleep(500);// Sleep 500ms
-		wxLogMessage("loop=%d",loop);
-		// Send 2 Commands in turn For Loop Test
-		switch (loop%2){
-		case 0:
-			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
-			break;
-
-		case 1:
-			SerialSendData(pmbusCommand[1].mData, CMD_DATA_SIZE);
-			break;
-
-		};
-
-		loop++;
-		// Semaphore Wait for Read Thread Complete.
-		ret = m_rxTxSemaphore.WaitTimeout(1000);
-		if (ret != wxSEMA_NO_ERROR){
-			PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs",__FUNCTIONW__);
-		}
-	};
-
-	// Work Around for txtctrl can't be focus
-	this->m_txtctrl->SetFocus();
 }
 
 void MainFrame::DoLogLine(wxTextCtrl *text,

@@ -24,7 +24,6 @@ public:
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
 	wxSizer* m_hbox;/**< Horizontal Sizer */
-	wxButton* m_SendButton;/**< Send Button */
 
 	//
 	wxGrid *m_grid;
@@ -53,7 +52,7 @@ private:
 	void OnMonitor(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
-	void OnSend(wxCommandEvent& event);
+
 	// logging helper
 	void DoLogLine(wxTextCtrl *text,
 		const wxString& timestr,
