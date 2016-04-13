@@ -7,6 +7,7 @@
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
 #include "PMBUSCommand.h"
+#include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -61,6 +62,29 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_txtctrl->SetFont(font);
 	m_txtctrl->SetFocus();
 
+	//
+	m_grid = new wxGrid(this, wxID_ANY);
+	m_table = new PMBusCMDGridTable();
+	m_table->SetAttrProvider(new MyGridCellAttrProvider);
+	m_grid->SetTable(m_table, true);
+
+	wxGridCellAttr *attrRO = new wxGridCellAttr,
+		*attrRangeEditor = new wxGridCellAttr,
+		*attrCombo = new wxGridCellAttr;
+
+	attrRO->SetReadOnly();
+	attrRangeEditor->SetEditor(new wxGridCellNumberEditor(1, 5));
+	attrCombo->SetEditor(new wxGridCellChoiceEditor(WXSIZEOF(severities),
+		severities));
+
+	m_grid->SetColAttr(Col_Id, attrRO);
+	m_grid->SetColAttr(Col_Priority, attrRangeEditor);
+	m_grid->SetColAttr(Col_Severity, attrCombo);
+
+	m_grid->Fit();
+	SetClientSize(m_grid->GetSize());
+	//
+
 	Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
 	Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
@@ -69,6 +93,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_hbox->Add(this->m_SendButton, wxSizerFlags(1).Expand());//1, wxEXPAND | wxALL, 1);
 	this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
+	this->m_topVeriticalSizer->Add(this->m_grid, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
 	this->m_topVeriticalSizer->Add(this->m_txtctrl, wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);

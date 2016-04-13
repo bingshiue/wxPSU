@@ -9,6 +9,16 @@
 #include <wx/wx.h>
 #endif
 
+#include "wx/colordlg.h"
+#include "wx/fontdlg.h"
+#include "wx/numdlg.h"
+#include "wx/aboutdlg.h"
+
+#include "wx/grid.h"
+#include "wx/headerctrl.h"
+#include "wx/generic/gridctrl.h"
+#include "wx/generic/grideditors.h"
+
 class MyApp : public wxApp
 {
 public:

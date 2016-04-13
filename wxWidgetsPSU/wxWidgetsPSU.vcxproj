@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
+    <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SerialPortReadThread.cpp" />
   </ItemGroup>
@@ -90,6 +91,7 @@
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
+    <ClInclude Include="PMBusCMDGridTable.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="SerialPortReadThread.h" />

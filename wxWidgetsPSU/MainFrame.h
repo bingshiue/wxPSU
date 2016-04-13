@@ -26,6 +26,11 @@ public:
 	wxSizer* m_hbox;/**< Horizontal Sizer */
 	wxButton* m_SendButton;/**< Send Button */
 
+	//
+	wxGrid *m_grid;
+	wxGridTableBase *m_table;
+	//
+
 	// just some place to put our messages in
 	wxTextCtrl *m_txtctrl;
 
