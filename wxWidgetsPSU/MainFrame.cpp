@@ -28,10 +28,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		"Help string shown in status bar for this menu item");
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
+
+	wxMenu *menuRun = new wxMenu;
+	menuRun->Append(ID_Monitor, "&Monitor...\tCtrl-M",
+		"Start Monitor");
+
 	wxMenu *menuHelp = new wxMenu;
 	menuHelp->Append(wxID_ABOUT);
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menuFile, "&File");
+	menuBar->Append(menuRun,  "&Run" );
 	menuBar->Append(menuHelp, "&Help");
 	SetMenuBar(menuBar);
 	CreateStatusBar();
@@ -56,6 +62,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_txtctrl->SetFocus();
 
 	Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
+	Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
 	Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
 	Connect(CID_SEND_BUTTON, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrame::OnSend));
@@ -93,6 +100,41 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 void MainFrame::OnHello(wxCommandEvent& event)
 {
 	wxLogMessage("Hello world from wxWidgets!");
+}
+
+void MainFrame::OnMonitor(wxCommandEvent& event){
+	
+	PSU_DEBUG_PRINT("On Monitor");
+
+	int loop = 0;
+	int ret;
+
+	while (loop < 2) {
+		Sleep(500);// Sleep 500ms
+		wxLogMessage("loop=%d", loop);
+		// Send 2 Commands in turn For Loop Test
+		switch (loop % 2){
+		case 0:
+			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
+			break;
+
+		case 1:
+			SerialSendData(pmbusCommand[1].mData, CMD_DATA_SIZE);
+			break;
+
+		};
+
+		loop++;
+		// Semaphore Wait for Read Thread Complete.
+		ret = m_rxTxSemaphore.WaitTimeout(1000);
+		if (ret != wxSEMA_NO_ERROR){
+			PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs", __FUNCTIONW__);
+		}
+	};
+
+	// Work Around for txtctrl can't be focus
+	this->m_txtctrl->SetFocus();
+
 }
 
 void MainFrame::OnSend(wxCommandEvent& event)

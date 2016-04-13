@@ -12,7 +12,8 @@ enum {
 
 enum
 {
-	ID_Hello = 1
+	ID_Hello = 1,
+	ID_Monitor
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -44,6 +45,7 @@ protected:
 
 private:
 	void OnHello(wxCommandEvent& event);
+	void OnMonitor(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnSend(wxCommandEvent& event);
