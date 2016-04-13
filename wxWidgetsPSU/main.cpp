@@ -17,7 +17,7 @@ wxIMPLEMENT_APP(MyApp);
 bool MyApp::OnInit()
 {
 	BOOL ret;
-	
+
 	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(450, 340));
 	mainFrame->Show(true);
 
@@ -28,7 +28,7 @@ bool MyApp::OnInit()
 	if (ret==EXIT_SUCCESS){
 
 		// Create SerialReadThread
-		SerialReadThread* sprt = new SerialReadThread();
+		SerialReadThread* sprt = new SerialReadThread(&mainFrame->m_rxTxSemaphore);
 
 		// If Create Thread Success
 		if (sprt->Create() != wxTHREAD_NO_ERROR){

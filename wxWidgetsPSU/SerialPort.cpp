@@ -26,11 +26,11 @@ int OpenSerialPort(int PortNum)
 		NULL);                             // Null for Comm Devices
 
 	if (hComm == INVALID_HANDLE_VALUE){
-		PSU_DEBUG_PRINT("Error! Port %s can't be opened \n", ComPortName);
+		PSU_DEBUG_PRINT("Error! Port %s can't be opened", ComPortName);
 		return EXIT_FAILURE;
 	}
 	else{
-		PSU_DEBUG_PRINT("Port %s Opened \n", ComPortName);
+		PSU_DEBUG_PRINT("Port %s Opened", ComPortName);
 	}
 
 	/*------------------------------- Setting the Parameters for the SerialPort ------------------------------*/
@@ -39,7 +39,7 @@ int OpenSerialPort(int PortNum)
 	Status = GetCommState(hComm, &dcbSerialParams);     //retreives the current settings
 
 	if (Status == FALSE){
-		PSU_DEBUG_PRINT("Error! in GetCommState() \n");
+		PSU_DEBUG_PRINT("Error! in GetCommState()");
 		return EXIT_FAILURE;
 	}
 
@@ -52,16 +52,16 @@ int OpenSerialPort(int PortNum)
 
 	if (Status == FALSE)
 	{
-		PSU_DEBUG_PRINT("Error! in Setting DCB Structure \n");
+		PSU_DEBUG_PRINT("Error! in Setting DCB Structure");
 		return EXIT_FAILURE;
 	}
 	else
 	{
-		PSU_DEBUG_PRINT("Setting DCB Structure Successfull \n");
-		PSU_DEBUG_PRINT("Baudrate = %d \n", dcbSerialParams.BaudRate);
-		PSU_DEBUG_PRINT("ByteSize = %d \n", dcbSerialParams.ByteSize);
-		PSU_DEBUG_PRINT("StopBits = %d \n", dcbSerialParams.StopBits);
-		PSU_DEBUG_PRINT("Parity   = %d \n", dcbSerialParams.Parity);
+		PSU_DEBUG_PRINT("Setting DCB Structure Successfull");
+		PSU_DEBUG_PRINT("Baudrate = %d", dcbSerialParams.BaudRate);
+		PSU_DEBUG_PRINT("ByteSize = %d", dcbSerialParams.ByteSize);
+		PSU_DEBUG_PRINT("StopBits = %d", dcbSerialParams.StopBits);
+		PSU_DEBUG_PRINT("Parity   = %d", dcbSerialParams.Parity);
 	}
 
 	/*------------------------------------ Setting Timeouts --------------------------------------------------*/
@@ -75,11 +75,11 @@ int OpenSerialPort(int PortNum)
 	timeouts.WriteTotalTimeoutMultiplier = 10;
 
 	if (SetCommTimeouts(hComm, &timeouts) == FALSE){
-		PSU_DEBUG_PRINT("Error! in Setting Time Outs \n");
+		PSU_DEBUG_PRINT("Error! in Setting Time Outs");
 		return EXIT_FAILURE;
 	}
 	else{
-		PSU_DEBUG_PRINT("Setting Serial Port Timeouts Successfull \n");
+		PSU_DEBUG_PRINT("Setting Serial Port Timeouts Successfull");
 	}
 
 	return ret;
@@ -87,6 +87,7 @@ int OpenSerialPort(int PortNum)
 
 int SerialSendData(unsigned char* buff, unsigned int size){
 
+	wxString outputMsg("");
 	BOOL Status;
 	DWORD  dNoOfBytesWritten = 0;
 	OVERLAPPED g_ol;/**< Overlapped Sructure */
@@ -114,26 +115,28 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	send_err = GetLastError();
 	if (send_err == ERROR_IO_PENDING)
 	{
-		PSU_DEBUG_PRINT("%s:IO_PENDING \n",__FUNCTION__);
+		PSU_DEBUG_PRINT("%s:IO_PENDING",__FUNCTION__);
 		while (!GetOverlappedResult(hComm, &g_ol, &send_suu, FALSE));
 		if (send_suu != send_suu2){
-			PSU_DEBUG_PRINT("send_suu != send_suu2 \n");
+			PSU_DEBUG_PRINT("send_suu != send_suu2");
 			return 2;
 		}
 		else{
-			PSU_DEBUG_PRINT("send_suu = %d \n",send_suu);
-			PSU_DEBUG_PRINT("%s:Send :",__FUNCTION__);
+			PSU_DEBUG_PRINT("Serial Port Send Data Length (send_suu) = %d",send_suu);
+			outputMsg += wxString::Format("%s:Send :", __FUNCTION__);
 			for (unsigned int idx = 0; idx < size; idx++){
-				PSU_DEBUG_PRINT(" %2x ",buff[idx]);
+				outputMsg += wxString::Format(" %02x ", buff[idx]);
 			}
-			PSU_DEBUG_PRINT("\n")
+
+			PSU_DEBUG_PRINT(outputMsg.c_str());
+
 			ResetEvent(g_ol.hEvent);
 			CloseHandle(g_ol.hEvent);
 		}
 	}
 	else
 	{
-		PSU_DEBUG_PRINT("ERROR in Send \n");
+		PSU_DEBUG_PRINT("ERROR in Send");
 		ClearCommError(hComm, &lpErrorsCH1, &lpStatCH1);
 		//ClearCommError(hCom1, &lpErrorsCH1, &lpStatCH1);
 		//lpErrorsCH1_lach |= lpErrorsCH1;
@@ -144,15 +147,17 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 }
 
 int SerialReadData(unsigned char* buff){
+	wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations 
 	DWORD dwEventMask;                     // Event mask to trigger
 	unsigned char  TempChar[1024] = { 0 }; // Temperory Character
 	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
+	OVERLAPPED g_ol;                       // Overlapped Sructure */
 	int i = 0;
-	OVERLAPPED g_ol;                       /**< Overlapped Sructure */
 
+	//
 	memset(&g_ol, 0, sizeof(OVERLAPPED));
 	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
@@ -161,15 +166,15 @@ int SerialReadData(unsigned char* buff){
 	Status = SetCommMask(hComm, EV_RXCHAR); //Configure Windows to Monitor the serial device for Character Reception
 
 	if (Status == FALSE){
-		PSU_DEBUG_PRINT("Error! in Setting CommMask \n");
+		PSU_DEBUG_PRINT("Error! in Setting CommMask");
 	}
 	else{
-		PSU_DEBUG_PRINT("Setting CommMask successfull \n");
+		PSU_DEBUG_PRINT("Setting CommMask successfull");
 	}
 
 	/*------------------------------------ Setting WaitComm() Event   ----------------------------------------*/
 
-	PSU_DEBUG_PRINT("Waiting for Data Reception \n");
+	PSU_DEBUG_PRINT("Waiting for Data Reception");
 
 	Status = WaitCommEvent(hComm, &dwEventMask, NULL); //Wait for the character to be received
 
@@ -177,11 +182,11 @@ int SerialReadData(unsigned char* buff){
 
 	if (Status == FALSE)
 	{
-		PSU_DEBUG_PRINT("Error! in Setting WaitCommEvent() \n");
+		PSU_DEBUG_PRINT("Error! in Setting WaitCommEvent()");
 	}
-	else //If  WaitCommEvent()==True Read the RXed data using ReadFile();
+	else //If WaitCommEvent()==True Read the RXed data using ReadFile();
 	{
-		PSU_DEBUG_PRINT("Characters Received \n");
+		PSU_DEBUG_PRINT("Characters Received");
 
 		Status = ReadFile(hComm, &TempChar, 10, &NoBytesRead, &g_ol);
 		if (GetLastError() == ERROR_IO_PENDING){
@@ -191,23 +196,24 @@ int SerialReadData(unsigned char* buff){
 			while (GetOverlappedResult(hComm, &g_ol, &NoBytesRead, FALSE) == 0){
 				if (GetTickCount() > endtime)
 				{
-					PSU_DEBUG_PRINT("Receive Data Timeout \n");
+					PSU_DEBUG_PRINT("Receive Data Timeout");
 					break;
 				}
 			}
 		}
 		else{
-			PSU_DEBUG_PRINT("ReadFile Occurs Unkonwn Error : %d \n", GetLastError());
+			PSU_DEBUG_PRINT("ReadFile Occurs Unkonwn Error : %d", GetLastError());
 		}
 
 		if (NoBytesRead > 0){
 			/*------------Printing the RXed Data to Console----------------------*/
-			PSU_DEBUG_PRINT("Get %d Bytes From SerialPort :", NoBytesRead);
+			outputMsg += wxString::Format("Read %d Bytes Data From SerialPort :", NoBytesRead);
 				
 			for (unsigned int idx = 0; idx < NoBytesRead; idx++){
-				PSU_DEBUG_PRINT(" %2x ", TempChar[idx]);
+				outputMsg += wxString::Format(" %02x ", TempChar[idx]);
 			}
-			PSU_DEBUG_PRINT("\n");
+
+			PSU_DEBUG_PRINT(outputMsg.c_str());
 		}
 
 		ResetEvent(g_ol.hEvent);
@@ -221,7 +227,7 @@ int SerialReadData(unsigned char* buff){
 int CloseSerialPort(void){
 	int ret = SUCCESS;
 
-	PSU_DEBUG_PRINT("Close Serial Port %p \n",hComm);
+	PSU_DEBUG_PRINT("Close Serial Port %p",hComm);
 	CloseHandle(hComm);//Closing the Serial Port
 
 	return ret;

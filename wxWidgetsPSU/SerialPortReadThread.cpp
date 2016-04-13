@@ -5,7 +5,9 @@
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
 
-SerialReadThread::SerialReadThread(){ }
+SerialReadThread::SerialReadThread(wxSemaphore* semaphore){ 
+	this->m_rxTxSemaphore = semaphore;
+}
 
 SerialReadThread::~SerialReadThread() { }
 
@@ -17,13 +19,16 @@ wxThread::ExitCode SerialReadThread::Entry()
 
 	while (true){
 
-		wxLogMessage("Read Data From Serisl Port");
+		wxLogMessage("Prepare To Read Data From Serisl Port :");
 
 		// wxSleep() can't be called from non-GUI thread!
 		wxThread::Sleep(1000);
 
 		// Read Data From Serial Port
 		SerialReadData(buffer);
+
+		// Semaphore Post
+		this->m_rxTxSemaphore->Post();
 
 	};
 

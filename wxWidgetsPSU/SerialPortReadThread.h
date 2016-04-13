@@ -16,8 +16,10 @@
 */
 class SerialReadThread : public wxThread{
 public:
-	SerialReadThread();
+	SerialReadThread(wxSemaphore* semaphore);
 	virtual ~SerialReadThread();
+
+	wxSemaphore* m_rxTxSemaphore;
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;
