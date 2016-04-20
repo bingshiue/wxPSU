@@ -5,6 +5,7 @@
 #define _MAINFRAME_H_
 
 #include "main.h"
+#include "PMBusDataViewListModel.h"
 
 enum {
 	CID_SEND_BUTTON = 101,
@@ -13,7 +14,9 @@ enum {
 enum
 {
 	ID_Hello = 1,
-	ID_Monitor
+	ID_Monitor,
+
+	ID_ATTR_CTRL = 51
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -26,9 +29,17 @@ public:
 	wxSizer* m_hbox;/**< Horizontal Sizer */
 
 	//
+#if 0
 	wxGrid *m_grid;
 	wxGridTableBase *m_table;
+#endif
 	//
+
+	//
+	wxDataViewCtrl *m_dataViewCtrl;
+	wxObjectDataPtr<MyListModel> m_list_model;
+
+	wxDataViewColumn* m_attributes;
 
 	// just some place to put our messages in
 	wxTextCtrl *m_txtctrl;
@@ -40,7 +51,7 @@ public:
 	/**
 	* @brief Semaphore used for synchronize RX/TX.
 	*/
-	wxSemaphore m_rxTxSemaphore;
+	wxSemaphore *m_rxTxSemaphore;
 
 protected:
 	virtual void DoLogRecord(wxLogLevel level,
@@ -53,15 +64,17 @@ private:
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 
+	void OnValueChanged(wxDataViewEvent &event);
+
 	// logging helper
 	void DoLogLine(wxTextCtrl *text,
 		const wxString& timestr,
 		const wxString& threadstr,
 		const wxString& msg);
 
-#if 0
+//#if 0
 	wxDECLARE_EVENT_TABLE();
-#endif
+//#endif
 };
 
 #if 0

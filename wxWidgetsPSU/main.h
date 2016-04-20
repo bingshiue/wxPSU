@@ -14,6 +14,17 @@
 #include "wx/numdlg.h"
 #include "wx/aboutdlg.h"
 
+#include "wx/dataview.h"
+#include "wx/datetime.h"
+#include "wx/splitter.h"
+#include "wx/aboutdlg.h"
+#include "wx/colordlg.h"
+#include "wx/choicdlg.h"
+#include "wx/numdlg.h"
+#include "wx/spinctrl.h"
+#include "wx/imaglist.h"
+#include "wx/notebook.h"
+
 #include "wx/grid.h"
 #include "wx/headerctrl.h"
 #include "wx/generic/gridctrl.h"

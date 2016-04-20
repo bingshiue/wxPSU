@@ -2,17 +2,21 @@
  * @file MainFrame.cpp
  */
 
-#include "CommonDef.h"
 #include "MainFrame.h"
+#include "CommonDef.h"
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
+#include "MyListStoreDerivedModel.h"
 #include "PMBUSCommand.h"
 #include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
-{
+{	
+	// Initializa Semaphore
+	this->m_rxTxSemaphore = new wxSemaphore(0,0);
+	
 	//this->m_parent = new wxPanel(this, wxID_ANY);
 	this->m_topVeriticalSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -62,6 +66,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_txtctrl->SetFocus();
 
 	//
+#if 0 /**< Grid */
 	m_grid = new wxGrid(this, wxID_ANY);
 	m_table = new PMBusCMDGridTable();
 	m_table->SetAttrProvider(new MyGridCellAttrProvider);
@@ -81,26 +86,87 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_grid->SetColAttr(Col_Severity, attrCombo);
 
 	m_grid->Fit();
-	SetClientSize(m_grid->GetSize());
-	//
+	//SetClientSize(m_grid->GetSize());
+#endif
 
-	Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
-	Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
-	Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
-	Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
+	//
+	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
+	this->m_dataViewCtrl = new wxDataViewCtrl(this, ID_ATTR_CTRL, wxDefaultPosition,
+		wxDefaultSize, 0);
+
+	m_list_model = new MyListModel();
+	this->m_dataViewCtrl->AssociateModel(m_list_model.get());
+
+	// the various columns
+	this->m_dataViewCtrl->AppendToggleColumn("Enable",
+		MyListModel::Col_Toggle,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxDVC_TOGGLE_DEFAULT_WIDTH * 3,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_RESIZABLE
+		);
+
+	this->m_dataViewCtrl->AppendTextColumn("Register",
+		MyListModel::Col_EditableText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendIconTextColumn("icon",
+		MyListModel::Col_IconText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendDateColumn("date",
+		MyListModel::Col_Date);
+	m_attributes =
+		new wxDataViewColumn("attributes",
+		new wxDataViewTextRenderer,
+		MyListModel::Col_TextWithAttr,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_RIGHT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
+	this->m_dataViewCtrl->AppendColumn(m_attributes);
+
+	this->m_dataViewCtrl->AppendColumn(
+		new wxDataViewColumn("custom renderer",
+		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
+		MyListModel::Col_Custom)
+		);
+
+	//
+	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
+	//Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
+	//Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
+	//Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
 
 	this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
-	this->m_topVeriticalSizer->Add(this->m_grid, wxSizerFlags(1).Expand());
+	this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
 	this->m_topVeriticalSizer->Add(this->m_txtctrl, wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);
+
 	SetSizer(this->m_topVeriticalSizer);
+	//SetSizerAndFit(this->m_topVeriticalSizer);
+
+	Centre();
 
 #if 0
 	// Log : Set Active Target 
 	/wxLog::SetActiveTarget(new wxLogStderr());
 #endif
 }
+
+wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
+EVT_MENU(ID_Hello, MainFrame::OnHello)
+EVT_MENU(ID_Monitor, MainFrame::OnMonitor)
+EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
+EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
+wxEND_EVENT_TABLE()
 
 MainFrame::~MainFrame()
 {
@@ -131,13 +197,15 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	int loop = 0;
 	int ret;
 
+	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
+
 	while (loop < 2) {
-		Sleep(500);// Sleep 500ms
+		Sleep(SERIAL_PORT_SEND_POLLING_INTERVAL-SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
 		wxLogMessage("loop=%d", loop);
 		// Send 2 Commands in turn For Loop Test
 		switch (loop % 2){
 		case 0:
-			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
+ 			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
 			break;
 
 		case 1:
@@ -148,9 +216,10 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 		loop++;
 		// Semaphore Wait for Read Thread Complete.
-		ret = m_rxTxSemaphore.WaitTimeout(1000);
+		PSU_DEBUG_PRINT("Semaphore WaitTimeout : %d", m_rxTxSemaphore->IsOk());
+		ret = m_rxTxSemaphore->WaitTimeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 		if (ret != wxSEMA_NO_ERROR){
-			PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs", __FUNCTIONW__);
+			PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs : error = %d", __FUNCTIONW__,ret);
 		}
 	};
 
@@ -190,4 +259,11 @@ const wxLogRecordInfo& info)
 		: wxString::Format("%lx", info.threadId),
 		msg + "\n"
 		);
+}
+
+void MainFrame::OnValueChanged(wxDataViewEvent &event)
+{
+	/*wxString title*/ unsigned int row = m_list_model->GetRow(event.GetItem());//GetTitle(event.GetItem());
+	wxLogMessage("wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
+		//title, event.GetColumn());
 }

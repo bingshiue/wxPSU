@@ -18,7 +18,7 @@ bool MyApp::OnInit()
 {
 	BOOL ret;
 
-	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(450, 340));
+	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(800, 600));
 	mainFrame->Show(true);
 
 	// Initial Serial Port
@@ -28,7 +28,7 @@ bool MyApp::OnInit()
 	if (ret==EXIT_SUCCESS){
 
 		// Create SerialReadThread
-		SerialReadThread* sprt = new SerialReadThread(&mainFrame->m_rxTxSemaphore);
+		SerialReadThread* sprt = new SerialReadThread(mainFrame->m_rxTxSemaphore);
 
 		// If Create Thread Success
 		if (sprt->Create() != wxTHREAD_NO_ERROR){

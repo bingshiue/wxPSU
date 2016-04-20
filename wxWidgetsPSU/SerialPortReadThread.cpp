@@ -22,11 +22,12 @@ wxThread::ExitCode SerialReadThread::Entry()
 		wxLogMessage("Prepare To Read Data From Serisl Port :");
 
 		// wxSleep() can't be called from non-GUI thread!
-		wxThread::Sleep(1000);
+		//wxThread::Sleep(1000);
 
 		// Read Data From Serial Port
 		SerialReadData(buffer);
 
+		wxLogMessage("Semaphore Post");
 		// Semaphore Post
 		this->m_rxTxSemaphore->Post();
 
