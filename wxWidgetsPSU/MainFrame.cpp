@@ -92,7 +92,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//
 	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
 	this->m_dataViewCtrl = new wxDataViewCtrl(this, ID_ATTR_CTRL, wxDefaultPosition,
-		wxDefaultSize, 0);
+		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	m_list_model = new MyListModel();
 	this->m_dataViewCtrl->AssociateModel(m_list_model.get());

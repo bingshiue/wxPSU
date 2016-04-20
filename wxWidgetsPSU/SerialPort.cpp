@@ -146,6 +146,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
     return dNoOfBytesWritten;
 }
 
+#define NUMBER_OF_BYTES_TO_READ  8/**< Number of Bytes To Read */
 int SerialReadData(unsigned char* buff){
 	wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations 
@@ -188,7 +189,7 @@ int SerialReadData(unsigned char* buff){
 	{
 		PSU_DEBUG_PRINT("Characters Received");
 
-		Status = ReadFile(hComm, &TempChar, 10, &NoBytesRead, &g_ol);
+		Status = ReadFile(hComm, &TempChar, NUMBER_OF_BYTES_TO_READ, &NoBytesRead, &g_ol);
 		if (GetLastError() == ERROR_IO_PENDING){
 			//
 			endtime = GetTickCount() + 50000;

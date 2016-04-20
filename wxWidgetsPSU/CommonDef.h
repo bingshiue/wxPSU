@@ -20,7 +20,7 @@
 #endif
 
 #define SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT  20/**< Timeout of Serial Port Send Semaphore */
-#define SERIAL_PORT_SEND_POLLING_INTERVAL      100/**< Interval of Serial Port Send Polling (Miliseconds) */
+#define SERIAL_PORT_SEND_POLLING_INTERVAL       30/**< Interval of Serial Port Send Polling (Miliseconds) */
 
 enum {
 	FAILURE = 0,/**< FAILURE */
