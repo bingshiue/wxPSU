@@ -32,10 +32,11 @@ public:
 			wxRect(dc->GetTextExtent(m_value)).CentreIn(rect),
 			dc,
 			state);
+
 		return true;
 	}
 
-		virtual bool ActivateCell(const wxRect& WXUNUSED(cell),
+	virtual bool ActivateCell(const wxRect& WXUNUSED(cell),
 		wxDataViewModel *WXUNUSED(model),
 		const wxDataViewItem &WXUNUSED(item),
 		unsigned int WXUNUSED(col),
@@ -50,12 +51,12 @@ public:
 		return false;
 	}
 
-		virtual wxSize GetSize() const wxOVERRIDE
+	virtual wxSize GetSize() const wxOVERRIDE
 	{
 		return wxSize(60, 20);
 	}
 
-		virtual bool SetValue(const wxVariant &value) wxOVERRIDE
+	virtual bool SetValue(const wxVariant &value) wxOVERRIDE
 	{
 		m_value = value.GetString();
 		return true;
@@ -65,22 +66,22 @@ public:
 
 	virtual bool HasEditorCtrl() const wxOVERRIDE{ return true; }
 
-		virtual wxWindow*
-		CreateEditorCtrl(wxWindow* parent,
-		wxRect labelRect,
-		const wxVariant& value) wxOVERRIDE
+	virtual wxWindow* CreateEditorCtrl(wxWindow* parent,wxRect labelRect,const wxVariant& value) wxOVERRIDE
 	{
-		wxTextCtrl* text = new wxTextCtrl(parent, wxID_ANY, value,
+		//wxTextCtrl* text = new wxTextCtrl(parent, wxID_ANY, value,
+		wxCheckBox* checkbox = new wxCheckBox(parent, wxID_ANY, value,
 		labelRect.GetPosition(),
 		labelRect.GetSize(),
 		wxTE_PROCESS_ENTER);
-		text->SetInsertionPointEnd();
+		
+		//text->SetInsertionPointEnd();
 
-		return text;
+		//return text;
+
+		return checkbox;
 	}
 
-		virtual bool
-		GetValueFromEditorCtrl(wxWindow* ctrl, wxVariant& value) wxOVERRIDE
+	virtual bool GetValueFromEditorCtrl(wxWindow* ctrl, wxVariant& value) wxOVERRIDE
 	{
 		wxTextCtrl* text = wxDynamicCast(ctrl, wxTextCtrl);
 		if (!text)
@@ -100,21 +101,25 @@ WX_DECLARE_HASH_MAP(unsigned, wxString, wxIntegerHash, wxIntegerEqual,
 
 #define DATAVIEW_LIST_SIZE 20/**< Size of DataView List */
 
-class MyListModel : public wxDataViewVirtualListModel
+class PSUDataViewListModel : public wxDataViewVirtualListModel
 {
 public:
 	enum
 	{
 		Col_Toggle,
-		Col_EditableText,
 		Col_IconText,
+		Col_NameText,
+		Col_AccessText,
+		Col_QueryText,
+		Col_CookText,
+		Col_RawText,
 		Col_Date,
 		Col_TextWithAttr,
 		Col_Custom,
 		Col_Max
 	};
 
-	MyListModel();
+	PSUDataViewListModel();
 
 	// helper methods to change the model
 
@@ -142,12 +147,11 @@ public:
 		return wxT("string");
 	}
 
-		virtual void GetValueByRow(wxVariant &variant,
-		unsigned int row, unsigned int col) const wxOVERRIDE;
-	virtual bool GetAttrByRow(unsigned int row, unsigned int col,
-		wxDataViewItemAttr &attr) const wxOVERRIDE;
-	virtual bool SetValueByRow(const wxVariant &variant,
-		unsigned int row, unsigned int col) wxOVERRIDE;
+	virtual void GetValueByRow(wxVariant &variant,unsigned int row, unsigned int col) const wxOVERRIDE;
+	
+	virtual bool GetAttrByRow(unsigned int row, unsigned int col,wxDataViewItemAttr &attr) const wxOVERRIDE;
+	
+	virtual bool SetValueByRow(const wxVariant &variant,unsigned int row, unsigned int col) wxOVERRIDE;
 
 	bool* getAvailable(void);
 
@@ -155,6 +159,7 @@ private:
 	bool             m_available[DATAVIEW_LIST_SIZE];
 	wxArrayString    m_textColValues;
 	wxArrayString    m_iconColValues;
+	wxArrayString    m_accessColValues;
 	IntToStringMap   m_customColValues;
 	wxIcon           m_icon[2];
 };

@@ -6,6 +6,8 @@
 
 #include "null.xpm"
 #include "wx_small.xpm"
+#include "green.xpm"
+#include "red.xpm"
 
 static int my_sort_reverse(int *v1, int *v2)
 {
@@ -17,9 +19,9 @@ static int my_sort(int *v1, int *v2)
 	return *v1 - *v2;
 }
 
-#define INITIAL_NUMBER_OF_ITEMS 20
+#define INITIAL_NUMBER_OF_ITEMS  2
 
-MyListModel::MyListModel() :
+PSUDataViewListModel::PSUDataViewListModel() :
 wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
 {
 	// Init m_available[]
@@ -32,25 +34,27 @@ wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
 	static const unsigned NUMBER_REAL_ITEMS = DATAVIEW_LIST_SIZE;
 
 	m_textColValues.reserve(NUMBER_REAL_ITEMS);
-	m_textColValues.push_back("first row with long label to test ellipsization");
+	m_textColValues.push_back(wxT("PAGE"));
 	for (unsigned int i = 1; i < NUMBER_REAL_ITEMS; i++)
 	{
-		m_textColValues.push_back(wxString::Format("real row %d", i));
+		m_textColValues.push_back(wxT("OPERATION"));//wxString::Format("real row %d", i));
 	}
 
-	m_iconColValues.assign(NUMBER_REAL_ITEMS, "test");
+	m_accessColValues.assign(NUMBER_REAL_ITEMS, "R/W");
 
-	m_icon[0] = wxIcon(null_xpm);
-	m_icon[1] = wxIcon(wx_small_xpm);
+	m_iconColValues.assign(NUMBER_REAL_ITEMS, "00H");
+
+	m_icon[0] = wxIcon(red_xpm);
+	m_icon[1] = wxIcon(green_xpm);
 }
 
-void MyListModel::Prepend(const wxString &text)
+void PSUDataViewListModel::Prepend(const wxString &text)
 {
 	m_textColValues.Insert(text, 0);
 	RowPrepended();
 }
 
-void MyListModel::DeleteItem(const wxDataViewItem &item)
+void PSUDataViewListModel::DeleteItem(const wxDataViewItem &item)
 {
 	unsigned int row = GetRow(item);
 
@@ -61,7 +65,7 @@ void MyListModel::DeleteItem(const wxDataViewItem &item)
 	RowDeleted(row);
 }
 
-void MyListModel::DeleteItems(const wxDataViewItemArray &items)
+void PSUDataViewListModel::DeleteItems(const wxDataViewItemArray &items)
 {
 	unsigned i;
 	wxArrayInt rows;
@@ -94,12 +98,15 @@ void MyListModel::DeleteItems(const wxDataViewItemArray &items)
 	RowsDeleted(rows);
 }
 
-void MyListModel::AddMany()
+void PSUDataViewListModel::AddMany()
 {
 	Reset(GetCount() + 1000);
 }
 
-void MyListModel::GetValueByRow(wxVariant &variant,
+ /**
+  * @brief Get Value By Row.
+  */
+void PSUDataViewListModel::GetValueByRow(wxVariant &variant,
 	unsigned int row, unsigned int col) const
 {
 	switch (col)
@@ -112,13 +119,6 @@ void MyListModel::GetValueByRow(wxVariant &variant,
 			variant = true;
 		}
 		break;
-	case Col_EditableText:
-		if (row >= m_textColValues.GetCount())
-			variant = wxString::Format("virtual row %d", row);
-		else
-			variant = m_textColValues[row];
-		break;
-
 	case Col_IconText:
 	{
 		wxString text;
@@ -127,9 +127,40 @@ void MyListModel::GetValueByRow(wxVariant &variant,
 		else
 			text = m_iconColValues[row];
 
-		variant << wxDataViewIconText(text, m_icon[row % 2]);
+		//variant << wxDataViewIconText(text, m_icon[row % 2]);
+		if (this->m_available[row] == false){
+			variant << wxDataViewIconText(text, m_icon[0]);
+		}
+		else{
+			variant << wxDataViewIconText(text, m_icon[1]);
+		}
+
 	}
 	break;
+	case Col_NameText:
+		if (row >= m_textColValues.GetCount())
+			variant = wxString::Format("virtual row %d", row);
+		else
+			variant = m_textColValues[row];
+		break;
+
+	case Col_AccessText:
+		if (row >= m_textColValues.GetCount())
+			variant = wxString::Format("virtual access %d", row);
+		else
+			variant = m_accessColValues[row];
+		break;
+
+	case Col_QueryText:
+
+		break;
+	case Col_CookText:
+
+		break;
+
+	case Col_RawText:
+
+		break;
 
 	case Col_Date:
 		variant = wxDateTime(1, wxDateTime::Jan, 2000).Add(wxTimeSpan(row));
@@ -161,24 +192,30 @@ void MyListModel::GetValueByRow(wxVariant &variant,
 	}
 }
 
-bool MyListModel::GetAttrByRow(unsigned int row, unsigned int col,
+bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	wxDataViewItemAttr &attr) const
 {
 	switch (col)
 	{
 	case Col_Toggle:
-		
-		break;
-
-	case Col_EditableText:
-	case Col_Date:
 		return false;
-
+		break;
 	case Col_IconText:
 		if (!(row % 2))
 			return false;
 		attr.SetColour(*wxLIGHT_GREY);
 		break;
+
+	case Col_NameText:
+	case Col_AccessText:
+	case Col_QueryText:
+	case Col_CookText:
+	case Col_RawText: 
+		return false;
+		break;
+
+	case Col_Date:
+		return false;
 
 	case Col_TextWithAttr:
 	case Col_Custom:
@@ -214,7 +251,7 @@ bool MyListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	return true;
 }
 
-bool MyListModel::SetValueByRow(const wxVariant &variant,
+bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,
 	unsigned int row, unsigned int col)
 {
 	switch (col)
@@ -224,8 +261,8 @@ bool MyListModel::SetValueByRow(const wxVariant &variant,
 		this->m_available[row] = variant.GetBool();
 		return true;
 
-	case Col_EditableText:
 	case Col_IconText:
+	case Col_NameText:
 		if (row >= m_textColValues.GetCount())
 		{
 			// the item is not in the range of the items
@@ -235,7 +272,7 @@ bool MyListModel::SetValueByRow(const wxVariant &variant,
 			return false;
 		}
 
-		if (col == Col_EditableText)
+		if (col == Col_NameText)
 		{
 			m_textColValues[row] = variant.GetString();
 		}
@@ -246,6 +283,21 @@ bool MyListModel::SetValueByRow(const wxVariant &variant,
 			m_iconColValues[row] = iconText.GetText();
 		}
 		return true;
+
+		break;
+
+	case Col_AccessText:
+
+		break;
+	case Col_QueryText:
+
+		break;
+	case Col_CookText:
+
+		break;
+	case Col_RawText:
+
+		break;
 
 	case Col_Date:
 	case Col_TextWithAttr:
@@ -263,6 +315,6 @@ bool MyListModel::SetValueByRow(const wxVariant &variant,
 	return false;
 }
 
-bool* MyListModel::getAvailable(void){
+bool* PSUDataViewListModel::getAvailable(void){
 	return m_available;
 }

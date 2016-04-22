@@ -86,6 +86,7 @@
     <ClCompile Include="MyListStoreDerivedModel.cpp" />
     <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="PMBusDataViewListModel.cpp" />
+    <ClCompile Include="PSUStatusBar.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SerialPortReadThread.cpp" />
   </ItemGroup>
@@ -97,8 +98,13 @@
     <ClInclude Include="PMBusCMDGridTable.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
+    <ClInclude Include="PSUStatusBar.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="SerialPortReadThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

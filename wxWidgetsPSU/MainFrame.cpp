@@ -11,6 +11,8 @@
 #include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
+static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
+
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
@@ -21,31 +23,23 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_topVeriticalSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
 
-	//
-	m_oldLogger = wxLog::GetActiveTarget();
-	
 	// Setup Icon
 	SetIcon(sample_xpm);
 
-	wxMenu *menuFile = new wxMenu;
-	menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
-		"Help string shown in status bar for this menu item");
-	menuFile->AppendSeparator();
-	menuFile->Append(wxID_EXIT);
+	// Get old logger
+	m_oldLogger = wxLog::GetActiveTarget();
+	
+	// Setup Menu
+	SetupMenuBar();
 
-	wxMenu *menuRun = new wxMenu;
-	menuRun->Append(ID_Monitor, "&Monitor...\tCtrl-M",
-		"Start Monitor");
+	// Setup ToolBar
+	SetupToolBar();
 
-	wxMenu *menuHelp = new wxMenu;
-	menuHelp->Append(wxID_ABOUT);
-	wxMenuBar *menuBar = new wxMenuBar;
-	menuBar->Append(menuFile, "&File");
-	menuBar->Append(menuRun,  "&Run" );
-	menuBar->Append(menuHelp, "&Help");
-	SetMenuBar(menuBar);
-	CreateStatusBar();
-	SetStatusText("PSU Tool");
+	// Setup StatusBar
+	SetupStatusBar();
+
+	//CreateStatusBar();
+	//SetStatusText("PSU Tool");
 
 	// create the logging text control and a header showing the meaning of the
 	// different columns
@@ -88,62 +82,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_grid->Fit();
 	//SetClientSize(m_grid->GetSize());
 #endif
-
-	//
-	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
-	this->m_dataViewCtrl = new wxDataViewCtrl(this, ID_ATTR_CTRL, wxDefaultPosition,
-		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
-
-	m_list_model = new MyListModel();
-	this->m_dataViewCtrl->AssociateModel(m_list_model.get());
-
-	// the various columns
-	this->m_dataViewCtrl->AppendToggleColumn("Enable",
-		MyListModel::Col_Toggle,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxDVC_TOGGLE_DEFAULT_WIDTH * 3,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_RESIZABLE
-		);
-
-	this->m_dataViewCtrl->AppendTextColumn("Register",
-		MyListModel::Col_EditableText,
-		wxDATAVIEW_CELL_EDITABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_SORTABLE);
-
-	this->m_dataViewCtrl->AppendIconTextColumn("icon",
-		MyListModel::Col_IconText,
-		wxDATAVIEW_CELL_EDITABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
-
-	this->m_dataViewCtrl->AppendDateColumn("date",
-		MyListModel::Col_Date);
-	m_attributes =
-		new wxDataViewColumn("attributes",
-		new wxDataViewTextRenderer,
-		MyListModel::Col_TextWithAttr,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_RIGHT,
-		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
-	this->m_dataViewCtrl->AppendColumn(m_attributes);
-
-	this->m_dataViewCtrl->AppendColumn(
-		new wxDataViewColumn("custom renderer",
-		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
-		MyListModel::Col_Custom)
-		);
-
-	//
+	
+	SetupPSUDataView();
+	
 	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
 	//Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	//Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
 	//Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
 
-	this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
+	//this->m_topVeriticalSizer->Add(this->m_toolbar);
+	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
 	this->m_topVeriticalSizer->Add(this->m_txtctrl, wxSizerFlags(1).Expand());
@@ -152,7 +100,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	SetSizer(this->m_topVeriticalSizer);
 	//SetSizerAndFit(this->m_topVeriticalSizer);
 
+	// Put Window in Center
 	Centre();
+
+	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
 #if 0
 	// Log : Set Active Target 
@@ -192,7 +143,7 @@ void MainFrame::OnHello(wxCommandEvent& event)
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
-	PSU_DEBUG_PRINT("On Monitor");
+	PSU_DEBUG_PRINT("On Monitor : Polling Time = %d", this->m_polling_time);
 
 	int loop = 0;
 	int ret;
@@ -200,7 +151,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
 
 	while (loop < 2) {
-		Sleep(SERIAL_PORT_SEND_POLLING_INTERVAL-SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
+		Sleep(this->m_polling_time - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
 		wxLogMessage("loop=%d", loop);
 		// Send 2 Commands in turn For Loop Test
 		switch (loop % 2){
@@ -266,4 +217,178 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 	/*wxString title*/ unsigned int row = m_list_model->GetRow(event.GetItem());//GetTitle(event.GetItem());
 	wxLogMessage("wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
 		//title, event.GetColumn());
+}
+
+void MainFrame::SetupMenuBar(void){
+	wxMenu *menuFile = new wxMenu;
+	menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
+		"Help string shown in status bar for this menu item");
+	menuFile->AppendSeparator();
+	menuFile->Append(wxID_EXIT);
+
+	wxMenu *menuRun = new wxMenu;
+	menuRun->Append(ID_Monitor, "&Monitor...\tCtrl-M",
+		"Start Monitor");
+
+	wxMenu *menuPSU = new wxMenu;
+
+	wxMenu *menuOption = new wxMenu;
+
+	wxMenu *menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT);
+	wxMenuBar *menuBar = new wxMenuBar;
+	menuBar->Append(menuFile,   "&File");
+	menuBar->Append(menuRun,    "&Run");
+	menuBar->Append(menuPSU,    wxT("PSU"));
+	menuBar->Append(menuOption, wxT("Option"));
+	menuBar->Append(menuHelp,   "&Help");
+	SetMenuBar(menuBar);
+}
+
+void MainFrame::SetupToolBar(void){
+	// Setup Tool Bar
+	long style = TOOLBAR_STYLE;
+	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
+
+	// Create Tool Bar Instance
+	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
+
+	// Append Exit Button
+	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP(EXIT), wxT("Exit Program"), wxITEM_NORMAL);
+
+	// Append Separator
+	m_toolbar->AddSeparator();
+
+	// Append Interation
+	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
+	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
+
+	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
+	m_iteration_input->SetLabel(wxT("100"));
+	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
+
+	// Append Polling Time
+	m_polling_time_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Polling Time(ms)"));
+	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
+
+	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_polling_time_combobox->Append(wxT("  20"));
+	m_polling_time_combobox->Append(wxT("  50"));
+	m_polling_time_combobox->Append(wxT(" 100"));
+	m_polling_time_combobox->Append(wxT(" 200"));
+	m_polling_time_combobox->Append(wxT(" 300"));
+	m_polling_time_combobox->Append(wxT(" 500"));
+	m_polling_time_combobox->Append(wxT("1000"));
+	m_polling_time_combobox->Append(wxT("1500"));
+
+	m_polling_time_combobox->SetSelection(0);
+	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
+
+	// Append Address 
+	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Address"));
+	m_toolbar->AddControl(m_address_text, wxEmptyString);
+
+	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
+	m_address_input->SetLabel(wxT("B0"));
+	m_toolbar->AddControl(m_address_input, wxEmptyString);
+
+	// Append A2 A1 A0 Check Box
+	m_a2_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A2, wxT("A2"), wxDefaultPosition, wxDefaultSize);
+	m_toolbar->AddControl(m_a2_chkbox, wxEmptyString);
+
+	m_a1_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A1, wxT("A1"), wxDefaultPosition, wxDefaultSize);
+	m_toolbar->AddControl(m_a1_chkbox, wxEmptyString);
+
+	m_a0_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A0, wxT("A0"), wxDefaultPosition, wxDefaultSize);
+	m_toolbar->AddControl(m_a0_chkbox, wxEmptyString);
+
+	m_toolbar->Realize();
+}
+
+void MainFrame::SetupStatusBar(void){
+	this->m_status_bar = new PSUStatusBar(this);
+
+	SetStatusBar(this->m_status_bar);
+
+	PositionStatusBar();
+
+}
+
+void MainFrame::SetupPSUDataView(void){
+	
+	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
+	this->m_dataViewCtrl = new wxDataViewCtrl(this, ID_ATTR_CTRL, wxDefaultPosition,
+		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
+
+	m_list_model = new PSUDataViewListModel();
+	this->m_dataViewCtrl->AssociateModel(m_list_model.get());
+
+	// the various columns
+	this->m_dataViewCtrl->AppendToggleColumn("",
+		PSUDataViewListModel::Col_Toggle,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxDVC_TOGGLE_DEFAULT_WIDTH,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_RESIZABLE
+		);
+
+	this->m_dataViewCtrl->AppendIconTextColumn("Register",
+		PSUDataViewListModel::Col_IconText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendTextColumn("Name",
+		PSUDataViewListModel::Col_NameText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendTextColumn("Access",
+		PSUDataViewListModel::Col_AccessText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendTextColumn("Query",
+		PSUDataViewListModel::Col_QueryText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendTextColumn("Cook",
+		PSUDataViewListModel::Col_CookText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendTextColumn("Raw",
+		PSUDataViewListModel::Col_RawText,
+		wxDATAVIEW_CELL_EDITABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_dataViewCtrl->AppendDateColumn("date",
+		PSUDataViewListModel::Col_Date);
+
+	m_attributes =
+		new wxDataViewColumn("attributes",
+		new wxDataViewTextRenderer,
+		PSUDataViewListModel::Col_TextWithAttr,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_RIGHT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
+	this->m_dataViewCtrl->AppendColumn(m_attributes);
+
+	this->m_dataViewCtrl->AppendColumn(
+		new wxDataViewColumn("custom renderer",
+		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
+		PSUDataViewListModel::Col_Custom)
+		);
 }

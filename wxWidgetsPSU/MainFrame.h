@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "PMBusDataViewListModel.h"
+#include "PSUStatusBar.h"
 
 enum {
 	CID_SEND_BUTTON = 101,
@@ -16,7 +17,14 @@ enum
 	ID_Hello = 1,
 	ID_Monitor,
 
-	ID_ATTR_CTRL = 51
+	ID_ATTR_CTRL = 51,
+
+	ID_TOOLBAR = 500,
+	CID_CHECKBOX_A2,
+	CID_CHECKBOX_A1,
+	CID_CHECKBOX_A0,
+
+	ID_COMBO = 1000
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -37,12 +45,32 @@ public:
 
 	//
 	wxDataViewCtrl *m_dataViewCtrl;
-	wxObjectDataPtr<MyListModel> m_list_model;
+	wxObjectDataPtr<PSUDataViewListModel> m_list_model;
 
 	wxDataViewColumn* m_attributes;
 
 	// just some place to put our messages in
 	wxTextCtrl *m_txtctrl;
+
+	// Tool Bar
+	wxToolBar *m_toolbar;
+
+	wxStaticText *m_iteration_text;
+	wxTextCtrl   *m_iteration_input;
+
+	wxStaticText *m_address_text;
+	wxTextCtrl   *m_address_input;
+
+	wxStaticText *m_polling_time_text;
+	// Combo Box
+	wxComboBox   *m_polling_time_combobox;
+
+	wxCheckBox   *m_a2_chkbox;
+	wxCheckBox   *m_a1_chkbox;
+	wxCheckBox   *m_a0_chkbox;
+
+	// Status Bar
+	PSUStatusBar  *m_status_bar;
 
 	// old log target, we replace it with one using m_txtctrl during this
 	// frame life time
@@ -59,6 +87,14 @@ protected:
 		const wxLogRecordInfo& info) wxOVERRIDE;
 
 private:
+
+	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
+
+	void SetupMenuBar(void);
+	void SetupToolBar(void);
+	void SetupStatusBar(void);
+	void SetupPSUDataView(void);
+
 	void OnHello(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
@@ -72,17 +108,8 @@ private:
 		const wxString& threadstr,
 		const wxString& msg);
 
-//#if 0
 	wxDECLARE_EVENT_TABLE();
-//#endif
-};
 
-#if 0
-wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
-EVT_MENU(ID_Hello, MyFrame::OnHello)
-EVT_MENU(wxID_EXIT, MyFrame::OnExit)
-EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
-wxEND_EVENT_TABLE()
-#endif
+};
 
 #endif
