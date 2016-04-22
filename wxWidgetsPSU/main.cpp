@@ -18,7 +18,7 @@ bool MyApp::OnInit()
 {
 	BOOL ret;
 
-	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(800, 600));
+	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 	mainFrame->Show(true);
 
 	// Initial Serial Port

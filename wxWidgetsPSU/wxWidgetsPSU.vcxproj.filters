@@ -68,10 +68,10 @@
     <ClInclude Include="PMBusDataViewListModel.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="PSUStatusBar.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="PSUStatusBar.h">
+    <ClInclude Include="SerialPortSendThread.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

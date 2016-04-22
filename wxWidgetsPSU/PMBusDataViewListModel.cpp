@@ -42,7 +42,8 @@ wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
 
 	m_accessColValues.assign(NUMBER_REAL_ITEMS, "R/W");
 
-	m_iconColValues.assign(NUMBER_REAL_ITEMS, "00H");
+	m_iconColValues.push_back("00H");
+	m_iconColValues.push_back("01H");
 
 	m_icon[0] = wxIcon(red_xpm);
 	m_icon[1] = wxIcon(green_xpm);
@@ -201,9 +202,10 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 		return false;
 		break;
 	case Col_IconText:
-		if (!(row % 2))
-			return false;
-		attr.SetColour(*wxLIGHT_GREY);
+		//if (!(row % 2))
+			//return false;
+		attr.SetColour(*wxBLUE);
+
 		break;
 
 	case Col_NameText:

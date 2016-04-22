@@ -8,6 +8,9 @@
 #include "PMBusDataViewListModel.h"
 #include "PSUStatusBar.h"
 
+#define DEFAULT_WINDOW_WIDTH   864
+#define DEFAULT_WINDOW_HEIGHT  660
+
 enum {
 	CID_SEND_BUTTON = 101,
 };
@@ -25,6 +28,12 @@ enum
 	CID_CHECKBOX_A0,
 
 	ID_COMBO = 1000
+};
+
+enum RUNMODE {
+	RunMode_Iteration = 0,
+	RunMode_Continally,
+	RunMode_StopAnError
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -52,8 +61,24 @@ public:
 	// just some place to put our messages in
 	wxTextCtrl *m_txtctrl;
 
+	// Note Book
+	wxNotebook *m_notebook;
+	wxNotebook *m_subNotebook;
+
+	// Panel
+	wxPanel    *GeneralPanel;
+	wxPanel    *PMBusStatusPanel;
+	wxPanel    *PMBusMFR;
+	wxPanel    *VerificationPanel;
+	wxPanel    *STATUSPanel;
+
+	wxPanel    *STDPanel;
+	wxPanel    *ReadPanel;
+	wxPanel    *WritePanel;
+
+
 	// Tool Bar
-	wxToolBar *m_toolbar;
+	wxToolBar  *m_toolbar;
 
 	wxStaticText *m_iteration_text;
 	wxTextCtrl   *m_iteration_input;
@@ -93,7 +118,7 @@ private:
 	void SetupMenuBar(void);
 	void SetupToolBar(void);
 	void SetupStatusBar(void);
-	void SetupPSUDataView(void);
+	void SetupPSUDataView(wxPanel* parent);
 
 	void OnHello(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);

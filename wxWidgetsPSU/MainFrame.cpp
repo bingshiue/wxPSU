@@ -82,9 +82,28 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_grid->Fit();
 	//SetClientSize(m_grid->GetSize());
 #endif
+
+	this->m_notebook = new wxNotebook(this, wxID_ANY);
+
+	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 	
-	SetupPSUDataView();
-	
+	SetupPSUDataView(GeneralPanel);
+
+	this->PMBusStatusPanel = new wxPanel(m_notebook, wxID_ANY);
+
+	this->PMBusMFR = new wxPanel(m_notebook, wxID_ANY);
+
+	this->VerificationPanel = new wxPanel(m_notebook, wxID_ANY);
+
+	this->STATUSPanel = new wxPanel(m_notebook, wxID_ANY);
+
+	// Add each panl into notebook component
+	m_notebook->AddPage(this->GeneralPanel, "General");
+	m_notebook->AddPage(this->PMBusStatusPanel, "PM Bus Status");
+	m_notebook->AddPage(this->PMBusMFR, "PMBus MFR");
+	m_notebook->AddPage(this->VerificationPanel, "Verification");
+	m_notebook->AddPage(this->STATUSPanel, "STATUS(DCH)");
+
 	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
 	//Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	//Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
@@ -92,7 +111,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	//this->m_topVeriticalSizer->Add(this->m_toolbar);
 	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
-	this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
+	//this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
+	this->m_topVeriticalSizer->Add(this->m_notebook, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
 	this->m_topVeriticalSizer->Add(this->m_txtctrl, wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);
@@ -314,10 +334,10 @@ void MainFrame::SetupStatusBar(void){
 
 }
 
-void MainFrame::SetupPSUDataView(void){
+void MainFrame::SetupPSUDataView(wxPanel* parent){
 	
 	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
-	this->m_dataViewCtrl = new wxDataViewCtrl(this, ID_ATTR_CTRL, wxDefaultPosition,
+	this->m_dataViewCtrl = new wxDataViewCtrl(parent, ID_ATTR_CTRL, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	m_list_model = new PSUDataViewListModel();
@@ -374,6 +394,7 @@ void MainFrame::SetupPSUDataView(void){
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_SORTABLE);
 
+#if 0
 	this->m_dataViewCtrl->AppendDateColumn("date",
 		PSUDataViewListModel::Col_Date);
 
@@ -391,4 +412,26 @@ void MainFrame::SetupPSUDataView(void){
 		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
 		PSUDataViewListModel::Col_Custom)
 		);
+#endif
+
+	// Setup Sub Notebook
+	this->m_subNotebook = new wxNotebook(parent, wxID_ANY);
+
+	this->STDPanel   = new wxPanel(this->m_subNotebook, wxID_ANY);
+	this->ReadPanel  = new wxPanel(this->m_subNotebook, wxID_ANY);
+	this->WritePanel = new wxPanel(this->m_subNotebook, wxID_ANY);
+
+	this->m_subNotebook->AddPage(this->STDPanel,  "STD");
+	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
+	this->m_subNotebook->AddPage(this->WritePanel,"Write");
+
+	// Setup Sizer
+	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
+	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
+	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
+	GeneralPanelSz->Add(m_subNotebook,3);
+	GeneralPanelSz->Add(this->m_dataViewCtrl, 7, wxGROW | wxALL, 5);
+
+	parent->SetSizerAndFit(GeneralPanelSz);
+
 }

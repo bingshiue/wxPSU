@@ -99,9 +99,9 @@
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PSUStatusBar.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="SerialPortReadThread.h" />
+    <ClInclude Include="SerialPortSendThread.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
