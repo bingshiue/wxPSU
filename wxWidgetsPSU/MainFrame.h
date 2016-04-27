@@ -27,6 +27,9 @@ enum
 	ID_HEX_TO_BIN = 1,
 	ID_Monitor,
 
+	ID_Enable_ALL,
+	ID_Disable_ALL,
+
 	ID_ATTR_CTRL = 51,
 
 	ID_TOOLBAR = 500,
@@ -139,6 +142,9 @@ private:
 	void OnMonitor(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+
+	void OnDisableAll(wxCommandEvent& event);
+	void OnEnableAll(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
 	void OnSelectionChanged(wxDataViewEvent &event);

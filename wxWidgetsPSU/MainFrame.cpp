@@ -4,7 +4,7 @@
 
 #include "MainFrame.h"
 #include "MyListStoreDerivedModel.h"
-#include "PMBUSCommandType.h"
+#include "PMBUSCommand.h"
 #include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
@@ -25,7 +25,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup Icon
 	SetIcon(sample_xpm);
 
-	// Setip PMNBusCommand Data
+	// Setup PMNBusCommand Data
 	SetupPMBusCommandData();
 
 	// Get old logger
@@ -156,28 +156,38 @@ EVT_MENU(ID_HEX_TO_BIN, MainFrame::OnHello)
 EVT_MENU(ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+EVT_MENU(ID_Enable_ALL, MainFrame::OnEnableAll)
+EVT_MENU(ID_Disable_ALL, MainFrame::OnDisableAll)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnSelectionChanged)
 EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 wxEND_EVENT_TABLE()
 
 MainFrame::~MainFrame()
-{	
-	this->m_serialPortReadCommandThread->m_running = false;
-	
-	this->m_serialPortReadCommandThread->Kill();
-	
+{		
 	wxLog::SetActiveTarget(m_oldLogger);
 }
 
 void MainFrame::SetupPMBusCommandData(void){
-	// 01H
-	this->m_PMBusData[0].m_toggle = true;
-	this->m_PMBusData[0].m_register = 0x00;
-	sprintf(this->m_PMBusData[0].m_name, "PAGE");
-	this->m_PMBusData[0].m_access = cmd_access_readwrite;
-	this->m_PMBusData[0].m_query = 0;
-	this->m_PMBusData[0].m_cook = 0;
+	
+	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+
+		this->m_PMBusData[idx].m_toggle = g_PMBUSCommand[idx].m_toggle;
+		this->m_PMBusData[idx].m_register = g_PMBUSCommand[idx].m_register;
+		sprintf(this->m_PMBusData[idx].m_name, g_PMBUSCommand[idx].m_name);
+		this->m_PMBusData[idx].m_access = g_PMBUSCommand[idx].m_access;
+		this->m_PMBusData[idx].m_query = g_PMBUSCommand[idx].m_query;
+		this->m_PMBusData[idx].m_cook = g_PMBUSCommand[idx].m_cook;
+	}
+
+#if 0
+	// 00H
+	this->m_PMBusData[0].m_toggle = g_PMBUSCommand[0].m_toggle;//true;
+	this->m_PMBusData[0].m_register = g_PMBUSCommand[0].m_register; //0x00;
+	sprintf(this->m_PMBusData[0].m_name, g_PMBUSCommand[0].m_name);
+	this->m_PMBusData[0].m_access = g_PMBUSCommand[0].m_access;//cmd_access_readwrite;
+	this->m_PMBusData[0].m_query = g_PMBUSCommand[0].m_query;
+	this->m_PMBusData[0].m_cook = g_PMBUSCommand[0].m_cook;
 	// 01H
 	this->m_PMBusData[1].m_toggle = true;
 	this->m_PMBusData[1].m_register = 0x01;
@@ -192,10 +202,15 @@ void MainFrame::SetupPMBusCommandData(void){
 	this->m_PMBusData[2].m_access = cmd_access_readwrite;
 	this->m_PMBusData[2].m_query = 0;
 	this->m_PMBusData[2].m_cook = 0;
+#endif
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
+	this->m_serialPortReadCommandThread->m_running = false;
+
+	this->m_serialPortReadCommandThread->Kill();
+	
 	// Close Serial Port
 	CloseSerialPort();
 
@@ -224,6 +239,8 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_monitor_running = true;
 		PSU_DEBUG_PRINT("Start Send Data Thread");
 		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model);
+
+		this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
 		if (this->m_serialPortSendCommandThread->Create() != wxTHREAD_NO_ERROR){
@@ -292,6 +309,7 @@ void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 }
 
 void MainFrame::SetupMenuBar(void){
+	// Create Menu Instance
 	wxMenu *menuFile = new wxMenu;
 	menuFile->Append(ID_HEX_TO_BIN, "&HEX_TO_BIN...\tCtrl-H",
 		"Help string shown in status bar for this menu item");
@@ -306,8 +324,16 @@ void MainFrame::SetupMenuBar(void){
 
 	wxMenu *menuOption = new wxMenu;
 
+	menuOption->Append(ID_Disable_ALL, "&Disable ALL",
+		"Disable All Commands");
+
+	menuOption->Append(ID_Enable_ALL, "&Enable ALL",
+		"Enable All Commands");
+
 	wxMenu *menuHelp = new wxMenu;
 	menuHelp->Append(wxID_ABOUT);
+
+	// Create MenuBar Instance
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menuFile,   "&File");
 	menuBar->Append(menuRun,    "&Run");
@@ -504,4 +530,36 @@ void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 #endif
 
 	wxLogMessage("wxEVT_DATAVIEW_SELECTION_CHANGED, First selected Item: %s", title);
+}
+
+void MainFrame::OnDisableAll(wxCommandEvent& event){
+	PSU_DEBUG_PRINT("Call %s", __FUNCTIONW__);
+	// Disable ALL Command
+	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+		this->m_PMBusData[idx].m_toggle = false;
+	}
+
+	wxVariant variant;
+	variant = false;
+
+	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+		this->m_list_model->SetValueByRow(variant, idx, PSUDataViewListModel::Col_Toggle);
+		this->m_list_model->RowValueChanged(idx, PSUDataViewListModel::Col_Toggle);
+	}
+}
+
+void MainFrame::OnEnableAll(wxCommandEvent& event){
+	PSU_DEBUG_PRINT("Call %s", __FUNCTIONW__);
+	// Enable ALL Command
+	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+		this->m_PMBusData[idx].m_toggle = true;
+	}
+
+	wxVariant variant;
+	variant = true;
+
+	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+		this->m_list_model->SetValueByRow(variant, idx, PSUDataViewListModel::Col_Toggle);
+		this->m_list_model->RowValueChanged(idx, PSUDataViewListModel::Col_Toggle);
+	}
 }

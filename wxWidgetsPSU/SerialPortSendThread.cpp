@@ -85,8 +85,8 @@ wxThread::ExitCode SerialSendThread::Entry()
 						wxVariant variant;
 						variant = outputMsg;
 
-						this->m_dataViewListCtrl->get()->SetValueByRow(variant,idx,6);
-						this->m_dataViewListCtrl->get()->RowValueChanged(idx,6);
+						this->m_dataViewListCtrl->get()->SetValueByRow(variant, idx, PSUDataViewListModel::Col_RawText);
+						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
 
 						PSU_DEBUG_PRINT(outputMsg.c_str());
 					}

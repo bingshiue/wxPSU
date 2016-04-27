@@ -58,6 +58,9 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 		else if (pmBusCommand[idx].m_access == cmd_access_read){
 			m_accessColValues.push_back(wxT("R"));
 		}
+		else if (pmBusCommand[idx].m_access == cmd_access_write){
+			m_accessColValues.push_back(wxT("W"));
+		}
 	}
 
 	// Setup Raw

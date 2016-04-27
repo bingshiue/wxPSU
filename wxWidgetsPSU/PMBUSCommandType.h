@@ -8,7 +8,11 @@
 
 enum {
 	cmd_access_read = 0,
+	cmd_access_br = cmd_access_read,
+	cmd_access_write,
+	cmd_access_bw = cmd_access_write,
 	cmd_access_readwrite,
+	cmd_access_brbw = cmd_access_readwrite
 };
 
 

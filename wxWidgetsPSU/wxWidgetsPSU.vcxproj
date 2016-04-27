@@ -97,6 +97,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MyListStoreDerivedModel.h" />
     <ClInclude Include="PMBusCMDGridTable.h" />
+    <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PSUStatusBar.h" />

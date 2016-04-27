@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PSU_DEBUG_MSG /**< Debug Messages */
+//#define PSU_DEBUG_MSG /**< Debug Messages */
 
 #ifdef PSU_DEBUG_MSG
 #define PSU_DEBUG_PRINT(fmt, ...)  \
