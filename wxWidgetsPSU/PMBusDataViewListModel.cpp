@@ -19,39 +19,63 @@ static int my_sort(int *v1, int *v2)
 	return *v1 - *v2;
 }
 
-#define INITIAL_NUMBER_OF_ITEMS  2
+#define INITIAL_NUMBER_OF_ITEMS  (PMBUSCOMMAND_SIZE)
 
-PSUDataViewListModel::PSUDataViewListModel() :
-wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
+PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
 {
-	// Init m_available[]
-	for (unsigned int idx = 0; idx < DATAVIEW_LIST_SIZE; idx++){
-		m_available[idx] = true;
+	// the first "DATAVIEW_LIST_SIZE" items are really stored in this model;
+	// all the others are synthesized on request
+	//static const unsigned NUMBER_REAL_ITEMS = DATAVIEW_LIST_SIZE;
+	
+	// Init m_available[] for toggle switch
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		m_available[idx] = pmBusCommand[idx].m_toggle;
+	}
+
+	// Setup Register
+	m_registerColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		wxString tmpStr = wxString::Format(wxT("%02x"), pmBusCommand[idx].m_register);
+		tmpStr.UpperCase();
+		tmpStr += wxT("h");
+		m_registerColValues.push_back(tmpStr);
+		//PSU_DEBUG_PRINT("%s:Count of m_registerColValues = %d", __FUNCTIONW__,m_registerColValues.GetCount());
 	}
 	
-	// the first 100 items are really stored in this model;
-	// all the others are synthesized on request
-	static const unsigned NUMBER_REAL_ITEMS = DATAVIEW_LIST_SIZE;
-
-	m_textColValues.reserve(NUMBER_REAL_ITEMS);
-	m_textColValues.push_back(wxT("PAGE"));
-	for (unsigned int i = 1; i < NUMBER_REAL_ITEMS; i++)
-	{
-		m_textColValues.push_back(wxT("OPERATION"));//wxString::Format("real row %d", i));
+	// Setup Name
+	m_nameColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		wxString tmpStr = wxString::Format(wxT("%s"), pmBusCommand[idx].m_name);
+		m_nameColValues.push_back(tmpStr);
 	}
 
-	m_accessColValues.assign(NUMBER_REAL_ITEMS, "R/W");
+	// Setup Access
+	m_accessColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		if (pmBusCommand[idx].m_access == cmd_access_readwrite){
+			m_accessColValues.push_back(wxT("R/W"));
+		}
+		else if (pmBusCommand[idx].m_access == cmd_access_read){
+			m_accessColValues.push_back(wxT("R"));
+		}
+	}
 
-	m_iconColValues.push_back("00H");
-	m_iconColValues.push_back("01H");
+	// Setup Raw
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		m_rawColValues[idx] = wxString(wxT("TEST"));
+	}
 
+	// Setup Icon
 	m_icon[0] = wxIcon(red_xpm);
 	m_icon[1] = wxIcon(green_xpm);
+
+	// Save PMBus Command Handle
+	m_pmBusCommand = pmBusCommand;
 }
 
 void PSUDataViewListModel::Prepend(const wxString &text)
 {
-	m_textColValues.Insert(text, 0);
+	m_nameColValues.Insert(text, 0);
 	RowPrepended();
 }
 
@@ -59,10 +83,10 @@ void PSUDataViewListModel::DeleteItem(const wxDataViewItem &item)
 {
 	unsigned int row = GetRow(item);
 
-	if (row >= m_textColValues.GetCount())
+	if (row >= m_nameColValues.GetCount())
 		return;
 
-	m_textColValues.RemoveAt(row);
+	m_nameColValues.RemoveAt(row);
 	RowDeleted(row);
 }
 
@@ -73,7 +97,7 @@ void PSUDataViewListModel::DeleteItems(const wxDataViewItemArray &items)
 	for (i = 0; i < items.GetCount(); i++)
 	{
 		unsigned int row = GetRow(items[i]);
-		if (row < m_textColValues.GetCount())
+		if (row < m_nameColValues.GetCount())
 			rows.Add(row);
 	}
 
@@ -81,7 +105,7 @@ void PSUDataViewListModel::DeleteItems(const wxDataViewItemArray &items)
 	{
 		// none of the selected items were in the range of the items
 		// which we store... for simplicity, don't allow removing them
-		wxLogError("Cannot remove rows with an index greater than %u", unsigned(m_textColValues.GetCount()));
+		wxLogError("Cannot remove rows with an index greater than %u", (unsigned)(m_nameColValues.GetCount()));
 		return;
 	}
 
@@ -90,7 +114,7 @@ void PSUDataViewListModel::DeleteItems(const wxDataViewItemArray &items)
 	// remaining indeces would all be wrong.
 	rows.Sort(my_sort_reverse);
 	for (i = 0; i < rows.GetCount(); i++)
-		m_textColValues.RemoveAt(rows[i]);
+		m_nameColValues.RemoveAt(rows[i]);
 
 	// This is just to test if wxDataViewCtrl can
 	// cope with removing rows not sorted in
@@ -107,9 +131,10 @@ void PSUDataViewListModel::AddMany()
  /**
   * @brief Get Value By Row.
   */
-void PSUDataViewListModel::GetValueByRow(wxVariant &variant,
-	unsigned int row, unsigned int col) const
+void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, unsigned int col) const
 {
+	wxString rawStr("");
+	
 	switch (col)
 	{
 	case Col_Toggle:
@@ -122,11 +147,12 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,
 		break;
 	case Col_IconText:
 	{
+		//PSU_DEBUG_PRINT("Count of m_registerColValues = %d", m_registerColValues.GetCount());
 		wxString text;
-		if (row >= m_iconColValues.GetCount())
+		if (row >= m_registerColValues.GetCount())
 			text = "virtual icon";
 		else
-			text = m_iconColValues[row];
+			text = m_registerColValues[row];
 
 		//variant << wxDataViewIconText(text, m_icon[row % 2]);
 		if (this->m_available[row] == false){
@@ -139,14 +165,14 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,
 	}
 	break;
 	case Col_NameText:
-		if (row >= m_textColValues.GetCount())
+		if (row >= m_nameColValues.GetCount())
 			variant = wxString::Format("virtual row %d", row);
 		else
-			variant = m_textColValues[row];
+			variant = m_nameColValues[row];
 		break;
 
 	case Col_AccessText:
-		if (row >= m_textColValues.GetCount())
+		if (row >= m_nameColValues.GetCount())
 			variant = wxString::Format("virtual access %d", row);
 		else
 			variant = m_accessColValues[row];
@@ -160,6 +186,8 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,
 		break;
 
 	case Col_RawText:
+
+		variant = m_rawColValues[row];
 
 		break;
 
@@ -256,33 +284,35 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,
 	unsigned int row, unsigned int col)
 {
+
 	switch (col)
 	{
 	case Col_Toggle:
 		PSU_DEBUG_PRINT("call %s : %d", __FUNCTIONW__, variant.GetBool());
 		this->m_available[row] = variant.GetBool();
+		this->m_pmBusCommand[row].m_toggle = this->m_available[row];
 		return true;
 
 	case Col_IconText:
 	case Col_NameText:
-		if (row >= m_textColValues.GetCount())
+		if (row >= m_nameColValues.GetCount())
 		{
 			// the item is not in the range of the items
 			// which we store... for simplicity, don't allow editing it
 			wxLogError("Cannot edit rows with an index greater than %d",
-				m_textColValues.GetCount());
+				m_nameColValues.GetCount());
 			return false;
 		}
 
 		if (col == Col_NameText)
 		{
-			m_textColValues[row] = variant.GetString();
+			m_nameColValues[row] = variant.GetString();
 		}
 		else // col == Col_IconText
 		{
 			wxDataViewIconText iconText;
 			iconText << variant;
-			m_iconColValues[row] = iconText.GetText();
+			m_registerColValues[row] = iconText.GetText();
 		}
 		return true;
 
@@ -298,6 +328,16 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,
 
 		break;
 	case Col_RawText:
+		PSU_DEBUG_PRINT("call %s ", __FUNCTIONW__);
+		PSU_DEBUG_PRINT("call %d ", this->m_pmBusCommand[row].m_recvBuff.m_length);
+		m_rawColValues[row].clear();
+		for (unsigned int idx = 0; idx < this->m_pmBusCommand[row].m_recvBuff.m_length; idx++){
+			m_rawColValues[row] += wxString::Format(" %02x ", this->m_pmBusCommand[row].m_recvBuff.m_recvBuff[idx]);
+		}
+
+		PSU_DEBUG_PRINT("call %s , %s", __FUNCTIONW__, m_rawColValues[row].c_str());
+
+		return true;
 
 		break;
 

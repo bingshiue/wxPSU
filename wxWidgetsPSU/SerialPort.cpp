@@ -151,7 +151,7 @@ int SerialReadData(unsigned char* buff){
 	wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations 
 	DWORD dwEventMask;                     // Event mask to trigger
-	unsigned char  TempChar[1024] = { 0 }; // Temperory Character
+	//unsigned char  TempChar[1024] = { 0 }; // Temperory Character
 	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
@@ -189,7 +189,7 @@ int SerialReadData(unsigned char* buff){
 	{
 		PSU_DEBUG_PRINT("Characters Received");
 
-		Status = ReadFile(hComm, &TempChar, NUMBER_OF_BYTES_TO_READ, &NoBytesRead, &g_ol);
+		Status = ReadFile(hComm, buff, NUMBER_OF_BYTES_TO_READ, &NoBytesRead, &g_ol);
 		if (GetLastError() == ERROR_IO_PENDING){
 			//
 			endtime = GetTickCount() + 50000;
@@ -211,7 +211,7 @@ int SerialReadData(unsigned char* buff){
 			outputMsg += wxString::Format("Read %d Bytes Data From SerialPort :", NoBytesRead);
 				
 			for (unsigned int idx = 0; idx < NoBytesRead; idx++){
-				outputMsg += wxString::Format(" %02x ", TempChar[idx]);
+				outputMsg += wxString::Format(" %02x ", buff[idx]);
 			}
 
 			PSU_DEBUG_PRINT(outputMsg.c_str());

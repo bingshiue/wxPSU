@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "CommonDef.h"
+#include "PMBusCommandType.h"
 #include "wx/hashmap.h"
 
 class MyCustomRenderer : public wxDataViewCustomRenderer
@@ -99,7 +100,7 @@ private:
 WX_DECLARE_HASH_MAP(unsigned, wxString, wxIntegerHash, wxIntegerEqual,
 	IntToStringMap);
 
-#define DATAVIEW_LIST_SIZE 20/**< Size of DataView List */
+#define DATAVIEW_LIST_SIZE (PMBUSCOMMAND_SIZE)/**< Size of DataView List */
 
 class PSUDataViewListModel : public wxDataViewVirtualListModel
 {
@@ -119,7 +120,7 @@ public:
 		Col_Max
 	};
 
-	PSUDataViewListModel();
+	PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand);
 
 	// helper methods to change the model
 
@@ -157,11 +158,15 @@ public:
 
 private:
 	bool             m_available[DATAVIEW_LIST_SIZE];
-	wxArrayString    m_textColValues;
-	wxArrayString    m_iconColValues;
+	wxArrayString    m_registerColValues;
+	wxArrayString    m_nameColValues;
 	wxArrayString    m_accessColValues;
+	wxArrayString    m_queryColValues;
+	wxArrayString    m_cookColValues;
+	wxString         m_rawColValues[DATAVIEW_LIST_SIZE];
 	IntToStringMap   m_customColValues;
 	wxIcon           m_icon[2];
+	PMBUSCOMMAND_t  *m_pmBusCommand;
 };
 
 #endif

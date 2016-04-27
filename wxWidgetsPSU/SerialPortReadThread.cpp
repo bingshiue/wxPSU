@@ -5,19 +5,22 @@
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
 
-SerialReadThread::SerialReadThread(wxSemaphore* semaphore){ 
+SerialReadThread::SerialReadThread(wxSemaphore* semaphore, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, unsigned int recvBuffSize){
 	this->m_rxTxSemaphore = semaphore;
+	this->m_pmBusCommand = pmBusCommand;
+	this->m_recvBuff = recvBuff;
+	this->m_recvBuffSize = recvBuffSize;
 }
 
 SerialReadThread::~SerialReadThread() { }
 
 wxThread::ExitCode SerialReadThread::Entry()
 {
-	unsigned char buffer[256];
-
 	wxLogMessage("Thread started (priority = %u).", GetPriority());
 
-	while (true){
+	this->m_running = true;
+
+	while (this->m_running == true){
 
 		wxLogMessage("Prepare To Read Data From Serisl Port :");
 
@@ -25,7 +28,7 @@ wxThread::ExitCode SerialReadThread::Entry()
 		//wxThread::Sleep(1000);
 
 		// Read Data From Serial Port
-		SerialReadData(buffer);
+		this->m_recvBuff->m_length = SerialReadData(this->m_recvBuff->m_recvBuff);
 
 		wxLogMessage("Semaphore Post");
 		// Semaphore Post

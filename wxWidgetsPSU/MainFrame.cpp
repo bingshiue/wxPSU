@@ -3,11 +3,8 @@
  */
 
 #include "MainFrame.h"
-#include "CommonDef.h"
-#include "SerialPortReadThread.h"
-#include "SerialPort.h"
 #include "MyListStoreDerivedModel.h"
-#include "PMBUSCommand.h"
+#include "PMBUSCommandType.h"
 #include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
@@ -16,6 +13,8 @@ static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
+	int ret;
+	
 	// Initializa Semaphore
 	this->m_rxTxSemaphore = new wxSemaphore(0,0);
 	
@@ -25,6 +24,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	// Setup Icon
 	SetIcon(sample_xpm);
+
+	// Setip PMNBusCommand Data
+	SetupPMBusCommandData();
 
 	// Get old logger
 	m_oldLogger = wxLog::GetActiveTarget();
@@ -112,9 +114,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->m_topVeriticalSizer->Add(this->m_toolbar);
 	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	//this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
-	this->m_topVeriticalSizer->Add(this->m_notebook, wxSizerFlags(1).Expand());
+	this->m_topVeriticalSizer->Add(this->m_notebook, 7, wxEXPAND | wxALL, 1);
 	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
-	this->m_topVeriticalSizer->Add(this->m_txtctrl, wxSizerFlags(1).Expand());
+	this->m_topVeriticalSizer->Add(this->m_txtctrl, 2, wxEXPAND | wxALL, 1);//wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);
 
 	SetSizer(this->m_topVeriticalSizer);
@@ -125,6 +127,24 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
+	// Initial Serial Port
+	ret = OpenSerialPort(3);
+
+	// If Open Serial Port Success
+	if (ret == EXIT_SUCCESS){
+
+		// Create SerialReadThread
+		this->m_serialPortReadCommandThread = new SerialReadThread(this->m_rxTxSemaphore, this->m_PMBusData, &this->m_serialPortRecvBuff, SERIALPORT_RECV_BUFF_SIZE);
+
+		// If Create Thread Success
+		if (this->m_serialPortReadCommandThread->Create() != wxTHREAD_NO_ERROR){
+			wxLogError(wxT("Can't create thread!"));
+		}
+		else{
+			this->m_serialPortReadCommandThread->Run();
+		}
+	}
+
 #if 0
 	// Log : Set Active Target 
 	/wxLog::SetActiveTarget(new wxLogStderr());
@@ -132,16 +152,46 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_MENU(ID_Hello, MainFrame::OnHello)
+EVT_MENU(ID_HEX_TO_BIN, MainFrame::OnHello)
 EVT_MENU(ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnSelectionChanged)
 EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
+EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 wxEND_EVENT_TABLE()
 
 MainFrame::~MainFrame()
-{
+{	
+	this->m_serialPortReadCommandThread->m_running = false;
+	
+	this->m_serialPortReadCommandThread->Kill();
+	
 	wxLog::SetActiveTarget(m_oldLogger);
+}
+
+void MainFrame::SetupPMBusCommandData(void){
+	// 01H
+	this->m_PMBusData[0].m_toggle = true;
+	this->m_PMBusData[0].m_register = 0x00;
+	sprintf(this->m_PMBusData[0].m_name, "PAGE");
+	this->m_PMBusData[0].m_access = cmd_access_readwrite;
+	this->m_PMBusData[0].m_query = 0;
+	this->m_PMBusData[0].m_cook = 0;
+	// 01H
+	this->m_PMBusData[1].m_toggle = true;
+	this->m_PMBusData[1].m_register = 0x01;
+	sprintf(this->m_PMBusData[1].m_name,"OPERATION");
+	this->m_PMBusData[1].m_access = cmd_access_readwrite;
+	this->m_PMBusData[1].m_query = 0;
+	this->m_PMBusData[1].m_cook = 0;
+	// 3AH
+	this->m_PMBusData[2].m_toggle = true;
+	this->m_PMBusData[2].m_register = 0x3a;
+	sprintf(this->m_PMBusData[2].m_name, "FAN_CONFIG_1_2");
+	this->m_PMBusData[2].m_access = cmd_access_readwrite;
+	this->m_PMBusData[2].m_query = 0;
+	this->m_PMBusData[2].m_cook = 0;
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -164,38 +214,34 @@ void MainFrame::OnHello(wxCommandEvent& event)
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT("On Monitor : Polling Time = %d", this->m_polling_time);
+	PSU_DEBUG_PRINT("On Monitor : m_monitor_running = %d", this->m_monitor_running);
 
 	int loop = 0;
-	int ret;
 
 	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
 
-	while (loop < 2) {
-		Sleep(this->m_polling_time - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
-		wxLogMessage("loop=%d", loop);
-		// Send 2 Commands in turn For Loop Test
-		switch (loop % 2){
-		case 0:
- 			SerialSendData(pmbusCommand[0].mData, CMD_DATA_SIZE);
-			break;
+	if (this->m_monitor_running == false){ // Start Send Data Thread
+		this->m_monitor_running = true;
+		PSU_DEBUG_PRINT("Start Send Data Thread");
+		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model);
 
-		case 1:
-			SerialSendData(pmbusCommand[1].mData, CMD_DATA_SIZE);
-			break;
-
-		};
-
-		loop++;
-		// Semaphore Wait for Read Thread Complete.
-		PSU_DEBUG_PRINT("Semaphore WaitTimeout : %d", m_rxTxSemaphore->IsOk());
-		ret = m_rxTxSemaphore->WaitTimeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
-		if (ret != wxSEMA_NO_ERROR){
-			PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs : error = %d", __FUNCTIONW__,ret);
+		// If Create Thread Success
+		if (this->m_serialPortSendCommandThread->Create() != wxTHREAD_NO_ERROR){
+			PSU_DEBUG_PRINT("Can't Create Send Command Thread");
 		}
-	};
+		else{
+			this->m_serialPortSendCommandThread->Run();
+		}
+
+	}
+	else{ // One Send Command Thread is Running
+		this->m_monitor_running = false;
+		PSU_DEBUG_PRINT("Stop Send Data Thread");
+		this->m_serialPortSendCommandThread->m_running = false;
+	}
 
 	// Work Around for txtctrl can't be focus
-	this->m_txtctrl->SetFocus();
+	//this->m_txtctrl->SetFocus();
 
 }
 
@@ -239,9 +285,15 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 		//title, event.GetColumn());
 }
 
+void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
+	PSU_DEBUG_PRINT("%s:",__FUNCTIONW__);
+	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
+	PSU_DEBUG_PRINT("%s: Select Polling Time is %d", __FUNCTIONW__, this->m_polling_time);
+}
+
 void MainFrame::SetupMenuBar(void){
 	wxMenu *menuFile = new wxMenu;
-	menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
+	menuFile->Append(ID_HEX_TO_BIN, "&HEX_TO_BIN...\tCtrl-H",
 		"Help string shown in status bar for this menu item");
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
@@ -291,7 +343,7 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Polling Time(ms)"));
 	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
 
-	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
 	m_polling_time_combobox->Append(wxT("  20"));
 	m_polling_time_combobox->Append(wxT("  50"));
 	m_polling_time_combobox->Append(wxT(" 100"));
@@ -301,7 +353,7 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_combobox->Append(wxT("1000"));
 	m_polling_time_combobox->Append(wxT("1500"));
 
-	m_polling_time_combobox->SetSelection(0);
+	m_polling_time_combobox->SetSelection(2);
 	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
 
 	// Append Address 
@@ -340,7 +392,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	this->m_dataViewCtrl = new wxDataViewCtrl(parent, ID_ATTR_CTRL, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
-	m_list_model = new PSUDataViewListModel();
+	m_list_model = new PSUDataViewListModel(this->m_PMBusData);
 	this->m_dataViewCtrl->AssociateModel(m_list_model.get());
 
 	// the various columns
@@ -429,9 +481,27 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
-	GeneralPanelSz->Add(m_subNotebook,3);
-	GeneralPanelSz->Add(this->m_dataViewCtrl, 7, wxGROW | wxALL, 5);
+	GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 3);
+	GeneralPanelSz->Add(this->m_dataViewCtrl, 7, wxGROW | wxALL, 3);
 
 	parent->SetSizerAndFit(GeneralPanelSz);
 
+}
+
+void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
+{
+	wxString title;// = m_list_model->GetTitle(event.GetItem());
+	if (title.empty())
+		title = "None";
+#if 0
+	PSU_DEBUG_PRINT("m_subNotebook Get PageCount: %d", this->m_subNotebook->GetPageCount());
+	if (this->m_subNotebook->GetPageCount() == 3){
+		this->m_subNotebook->RemovePage(2);
+	}
+	else{
+		this->m_subNotebook->AddPage(this->WritePanel, "Write");
+	}
+#endif
+
+	wxLogMessage("wxEVT_DATAVIEW_SELECTION_CHANGED, First selected Item: %s", title);
 }

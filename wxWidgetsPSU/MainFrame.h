@@ -4,12 +4,19 @@
 #ifndef _MAINFRAME_H_
 #define _MAINFRAME_H_
 
+#include "CommonDef.h"
 #include "main.h"
+#include "SerialPortReadThread.h"
+#include "SerialPortSendThread.h"
+#include "SerialPort.h"
 #include "PMBusDataViewListModel.h"
 #include "PSUStatusBar.h"
+#include "PMBUSCommandType.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
+
+#define SERIALPORT_RECV_BUFF_SIZE  256
 
 enum {
 	CID_SEND_BUTTON = 101,
@@ -17,7 +24,7 @@ enum {
 
 enum
 {
-	ID_Hello = 1,
+	ID_HEX_TO_BIN = 1,
 	ID_Monitor,
 
 	ID_ATTR_CTRL = 51,
@@ -27,13 +34,7 @@ enum
 	CID_CHECKBOX_A1,
 	CID_CHECKBOX_A0,
 
-	ID_COMBO = 1000
-};
-
-enum RUNMODE {
-	RunMode_Iteration = 0,
-	RunMode_Continally,
-	RunMode_StopAnError
+	ID_POLLING_TIME_COMBO = 1000
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -41,6 +42,18 @@ class MainFrame : public wxFrame, private wxLog
 public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	virtual ~MainFrame();
+
+	PMBUSCOMMAND_t m_PMBusData[PMBUSCOMMAND_SIZE];/**< PM Bus Data */
+
+	bool m_monitor_running;/**< Indicator for mobitor is running */
+
+	unsigned int m_runMode = RunMode_Continally;
+
+	SerialReadThread *m_serialPortReadCommandThread;/**< Handle for Read Command Thread */
+	SerialSendThread *m_serialPortSendCommandThread;/**< Handle for Send Command Thread */
+
+	RECVBUFF_t m_serialPortRecvBuff;/**< Receive Data Buffer */
+
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
 	wxSizer* m_hbox;/**< Horizontal Sizer */
@@ -78,7 +91,7 @@ public:
 
 
 	// Tool Bar
-	wxToolBar  *m_toolbar;
+	wxToolBar    *m_toolbar;
 
 	wxStaticText *m_iteration_text;
 	wxTextCtrl   *m_iteration_input;
@@ -115,6 +128,8 @@ private:
 
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
 
+	void SetupPMBusCommandData(void);
+
 	void SetupMenuBar(void);
 	void SetupToolBar(void);
 	void SetupStatusBar(void);
@@ -126,6 +141,9 @@ private:
 	void OnAbout(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
+	void OnSelectionChanged(wxDataViewEvent &event);
+
+	void OnPollingTimeCombo(wxCommandEvent& event);
 
 	// logging helper
 	void DoLogLine(wxTextCtrl *text,

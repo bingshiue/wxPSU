@@ -85,6 +85,7 @@ void PSUStatusBar::UpdateClock()
 	//SetStatusText(strLong, Field_Monitoring_Time);
 
 	SetStatusText(wdt.FormatISOTime(), Field_Monitoring_Time);
+
 }
 
 void PSUStatusBar::OnSize(wxSizeEvent& event){

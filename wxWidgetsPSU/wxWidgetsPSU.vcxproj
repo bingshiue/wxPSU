@@ -89,6 +89,7 @@
     <ClCompile Include="PSUStatusBar.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SerialPortReadThread.cpp" />
+    <ClCompile Include="SerialPortSendThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />
@@ -96,7 +97,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MyListStoreDerivedModel.h" />
     <ClInclude Include="PMBusCMDGridTable.h" />
-    <ClInclude Include="PMBUSCommand.h" />
+    <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PSUStatusBar.h" />
     <ClInclude Include="SerialPort.h" />

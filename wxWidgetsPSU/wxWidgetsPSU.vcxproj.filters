@@ -39,6 +39,9 @@
     <ClCompile Include="PSUStatusBar.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SerialPortSendThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -56,9 +59,6 @@
     <ClInclude Include="MainFrame.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="PMBUSCommand.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
     <ClInclude Include="PMBusCMDGridTable.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
@@ -72,6 +72,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="SerialPortSendThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCommandType.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
