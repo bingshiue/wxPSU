@@ -103,7 +103,9 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	ZeroMemory(&g_ol, sizeof(g_ol));
 	g_ol.Offset = 0;
 	g_ol.OffsetHigh = 0;
-	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);;
+	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	//PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
 
 	Status =
 		WriteFile(hComm,     // Handle to the Serialport
@@ -146,21 +148,23 @@ int SerialSendData(unsigned char* buff, unsigned int size){
     return dNoOfBytesWritten;
 }
 
-#define NUMBER_OF_BYTES_TO_READ  8/**< Number of Bytes To Read */
+#define NUMBER_OF_BYTES_TO_READ  1/**< Number of Bytes To Read */
 int SerialReadData(unsigned char* buff){
 	wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations 
 	DWORD dwEventMask;                     // Event mask to trigger
-	//unsigned char  TempChar[1024] = { 0 }; // Temperory Character
+	unsigned char TempChar;                // Temperory Character
 	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
 	OVERLAPPED g_ol;                       // Overlapped Sructure */
-	int i = 0;
+	DWORD lastError;                       // Last Error
+	unsigned int i = 0;
 
 	//
 	memset(&g_ol, 0, sizeof(OVERLAPPED));
 	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ResetEvent(g_ol.hEvent);
 
 	/*------------------------------------ Setting Receive Mask ----------------------------------------------*/
 
@@ -177,7 +181,9 @@ int SerialReadData(unsigned char* buff){
 
 	PSU_DEBUG_PRINT("Waiting for Data Reception");
 
-	Status = WaitCommEvent(hComm, &dwEventMask, NULL); //Wait for the character to be received
+	Status = WaitCommEvent(hComm, &dwEventMask,NULL); //Wait for the character to be received
+
+	wxLogMessage("Statux = %d, dwEventMask = %d", Status, dwEventMask);
 
 	/*-------------------------- Program will Wait here till a Character is received ------------------------*/
 
@@ -188,40 +194,58 @@ int SerialReadData(unsigned char* buff){
 	else //If WaitCommEvent()==True Read the RXed data using ReadFile();
 	{
 		PSU_DEBUG_PRINT("Characters Received");
+		i = 0;
 
-		Status = ReadFile(hComm, buff, NUMBER_OF_BYTES_TO_READ, &NoBytesRead, &g_ol);
-		if (GetLastError() == ERROR_IO_PENDING){
-			//
-			endtime = GetTickCount() + 50000;
-			//
-			while (GetOverlappedResult(hComm, &g_ol, &NoBytesRead, FALSE) == 0){
-				if (GetTickCount() > endtime)
-				{
-					PSU_DEBUG_PRINT("Receive Data Timeout");
-					break;
+		do {
+			Status = ReadFile(hComm, &TempChar, NUMBER_OF_BYTES_TO_READ, &NoBytesRead, &g_ol);
+			lastError = GetLastError();
+			if (lastError == ERROR_IO_PENDING){
+				//
+				endtime = GetTickCount() + 50000;
+				//
+				while (GetOverlappedResult(hComm, &g_ol, &NoBytesRead, TRUE) == 0){
+					if (GetTickCount() > endtime)
+					{
+						PSU_DEBUG_PRINT("Receive Data Timeout");
+						break;
+					}
 				}
 			}
-		}
-		else{
-			PSU_DEBUG_PRINT("ReadFile Occurs Unkonwn Error : %d", GetLastError());
+			else if (lastError != 0){
+				//PSU_DEBUG_PRINT("ReadFile Occurs Unkonwn Error : %d", GetLastError());
+				wxLogMessage("ReadFile Get Last Error : %d", lastError);
+			}
+
+			wxLogMessage("NoBytesRead = %d", NoBytesRead);
+			if (NoBytesRead > 0){
+				buff[i] = TempChar;
+				i++;
+			}
+
+		} while (NoBytesRead > 0);
+
+
+		if (i==0){
+			wxLogMessage("i = %d",i);
 		}
 
-		if (NoBytesRead > 0){
+		if (i >= 0){//NoBytesRead > 0){
 			/*------------Printing the RXed Data to Console----------------------*/
-			outputMsg += wxString::Format("Read %d Bytes Data From SerialPort :", NoBytesRead);
+			outputMsg += wxString::Format("Read %d Bytes Data From SerialPort :", i);// NoBytesRead);
 				
-			for (unsigned int idx = 0; idx < NoBytesRead; idx++){
+			for (unsigned int idx = 0; idx < i; idx++){
 				outputMsg += wxString::Format(" %02x ", buff[idx]);
 			}
 
 			PSU_DEBUG_PRINT(outputMsg.c_str());
+			wxLogMessage(outputMsg.c_str());
 		}
 
 		ResetEvent(g_ol.hEvent);
 		CloseHandle(g_ol.hEvent);
 	}
 
-	return NoBytesRead;// Return how many bytes data readed
+	return i;// NoBytesRead;// Return how many bytes data readed
 }
 
 

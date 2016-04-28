@@ -163,7 +163,7 @@ private:
 	wxArrayString    m_accessColValues;
 	wxArrayString    m_queryColValues;
 	wxArrayString    m_cookColValues;
-	wxString         m_rawColValues[DATAVIEW_LIST_SIZE];
+	wxArrayString    m_rawColValues;
 	IntToStringMap   m_customColValues;
 	wxIcon           m_icon[2];
 	PMBUSCOMMAND_t  *m_pmBusCommand;

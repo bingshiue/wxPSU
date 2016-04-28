@@ -159,7 +159,7 @@ EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_MENU(ID_Enable_ALL, MainFrame::OnEnableAll)
 EVT_MENU(ID_Disable_ALL, MainFrame::OnDisableAll)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnSelectionChanged)
-EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
+//EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 wxEND_EVENT_TABLE()
 
@@ -240,7 +240,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		PSU_DEBUG_PRINT("Start Send Data Thread");
 		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model);
 
-		this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
+		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
 		if (this->m_serialPortSendCommandThread->Create() != wxTHREAD_NO_ERROR){

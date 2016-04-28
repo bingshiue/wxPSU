@@ -64,8 +64,9 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 	}
 
 	// Setup Raw
+	m_rawColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
-		m_rawColValues[idx] = wxString(wxT("TEST"));
+		m_rawColValues.push_back(wxT("Raw Data"));
 	}
 
 	// Setup Icon
@@ -284,8 +285,7 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	return true;
 }
 
-bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,
-	unsigned int row, unsigned int col)
+bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int row, unsigned int col)
 {
 
 	switch (col)
@@ -332,13 +332,13 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,
 		break;
 	case Col_RawText:
 		PSU_DEBUG_PRINT("call %s ", __FUNCTIONW__);
-		PSU_DEBUG_PRINT("call %d ", this->m_pmBusCommand[row].m_recvBuff.m_length);
+		wxLogMessage("call row = %d, length = %d ", row,this->m_pmBusCommand[row].m_recvBuff.m_length);
 		m_rawColValues[row].clear();
 		for (unsigned int idx = 0; idx < this->m_pmBusCommand[row].m_recvBuff.m_length; idx++){
 			m_rawColValues[row] += wxString::Format(" %02x ", this->m_pmBusCommand[row].m_recvBuff.m_recvBuff[idx]);
 		}
 
-		PSU_DEBUG_PRINT("call %s , %s", __FUNCTIONW__, m_rawColValues[row].c_str());
+		wxLogMessage("call %s , %s", __FUNCTIONW__, m_rawColValues[row].c_str());
 
 		return true;
 

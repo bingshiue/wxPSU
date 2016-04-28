@@ -29,7 +29,7 @@ void SerialSendThread::productSendBuff(unsigned int command){
 	this->m_sendBuff[4] = 0x0d;
 	this->m_sendBuff[5] = 0x0a;
 	this->m_sendBuff[6] = 0xb7;
-	this->m_sendBuff[7] = 0x02;
+	this->m_sendBuff[7] = 0x08;
 	this->m_sendBuff[8] = 0x0d;
 	this->m_sendBuff[9] = 0x0a;
 }
@@ -56,18 +56,19 @@ wxThread::ExitCode SerialSendThread::Entry()
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
-					Sleep(50);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
+					Sleep(this->m_pollingTime);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
 					this->productSendBuff(this->m_pmBusCommand[idx].m_register);
 					SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
 
 					// Semaphore Wait for Read Thread Complete
 					PSU_DEBUG_PRINT("Semaphore WaitTimeout : Is Semaphore OK %d", m_rxTxSemaphore->IsOk());
-					ret = m_rxTxSemaphore->WaitTimeout(this->m_pollingTime);////SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+					ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 					if (ret != wxSEMA_NO_ERROR){
 						PSU_DEBUG_PRINT("%s: Semaphore wait timout occurs : error = %d", __FUNCTIONW__, ret);
 					}
 					else{
 						PSU_DEBUG_PRINT("%s: Receive Data of CMD %2x, Length = %d", __FUNCTIONW__, this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
+						wxLogMessage("%s: Receive Data of CMD %2x, Length = %d", __FUNCTIONW__, this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
 						// copy data to PMBus Command Structure
 						this->m_pmBusCommand[idx].m_recvBuff.m_length = this->m_recvBuff->m_length;
 						for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
@@ -85,6 +86,7 @@ wxThread::ExitCode SerialSendThread::Entry()
 						wxVariant variant;
 						variant = outputMsg;
 
+						wxLogMessage("%s: idx = %d", __FUNCTIONW__, idx);
 						this->m_dataViewListCtrl->get()->SetValueByRow(variant, idx, PSUDataViewListModel::Col_RawText);
 						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
 
