@@ -21,7 +21,7 @@ SerialSendThread::SerialSendThread(wxSemaphore* semaphore, unsigned int runMode,
 SerialSendThread::~SerialSendThread() { }
 
 
-void SerialSendThread::productSendBuff(unsigned int command){
+void SerialSendThread::productSendBuff(unsigned int command, unsigned int responseDataLength){
 	this->m_sendBuff[0] = 0x41;
 	this->m_sendBuff[1] = 0x44;
 	this->m_sendBuff[2] = 0xb6;
@@ -29,7 +29,7 @@ void SerialSendThread::productSendBuff(unsigned int command){
 	this->m_sendBuff[4] = 0x0d;
 	this->m_sendBuff[5] = 0x0a;
 	this->m_sendBuff[6] = 0xb7;
-	this->m_sendBuff[7] = 0x08;
+	this->m_sendBuff[7] = responseDataLength;
 	this->m_sendBuff[8] = 0x0d;
 	this->m_sendBuff[9] = 0x0a;
 }
@@ -56,8 +56,8 @@ wxThread::ExitCode SerialSendThread::Entry()
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
-					Sleep(this->m_pollingTime);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
-					this->productSendBuff(this->m_pmBusCommand[idx].m_register);
+					
+					this->productSendBuff(this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
 					SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
 
 					// Semaphore Wait for Read Thread Complete
@@ -92,6 +92,8 @@ wxThread::ExitCode SerialSendThread::Entry()
 
 						PSU_DEBUG_PRINT(outputMsg.c_str());
 					}
+
+					Sleep(this->m_pollingTime);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);// Sleep
 				}
 				else{
 					continue;

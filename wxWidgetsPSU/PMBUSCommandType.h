@@ -54,6 +54,8 @@ typedef struct pmbuscmd_t {
 	unsigned int    m_cook;/**< Cook */
 	unsigned char   m_raw[RAW_SIZE];/**< Raw */
 
+	unsigned int    m_responseDataLength;/**< Response Data Length */
+
 
 	RECVBUFF_t      m_recvBuff;/**< Receive Data Buffer */
 

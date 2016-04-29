@@ -178,6 +178,7 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_access = g_PMBUSCommand[idx].m_access;
 		this->m_PMBusData[idx].m_query = g_PMBUSCommand[idx].m_query;
 		this->m_PMBusData[idx].m_cook = g_PMBUSCommand[idx].m_cook;
+		this->m_PMBusData[idx].m_responseDataLength = g_PMBUSCommand[idx].m_responseDataLength;
 	}
 
 #if 0

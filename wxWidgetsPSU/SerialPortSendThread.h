@@ -37,7 +37,7 @@ public:
 
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
 
-	void productSendBuff(unsigned int command);
+	void productSendBuff(unsigned int command,unsigned int responseDataLength);
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;
