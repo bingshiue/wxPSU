@@ -49,9 +49,7 @@ private:
 	wxStaticBitmap *m_statbmp;
 
 	wxStopWatch m_sw;
-	time_t t1;
-	time_t t2;
-	long m_startTime;
+	wxDateTime m_beginTime;
 
 	// any class wishing to process wxWidgets events must use this macro
 	wxDECLARE_EVENT_TABLE();

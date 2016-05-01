@@ -46,9 +46,8 @@ PSUStatusBar::PSUStatusBar(wxWindow *parent, long style)
 #endif
 
 	m_sw.Start();
-	m_startTime = m_sw.Time()/1000;
 
-	t1 = time(NULL);
+	m_beginTime = wxDateTime::Now();
 
 	//SetMinHeight(wxMax(m_statbmp->GetBestSize().GetHeight(),
 		//m_checkbox->GetBestSize().GetHeight()));
@@ -70,21 +69,10 @@ PSUStatusBar::~PSUStatusBar()
 
 void PSUStatusBar::UpdateClock()
 {
-	//SetStatusText(wxDateTime::Now().FormatTime(), Field_Clock);
-	long currentTime = m_sw.Time()/1000;
 
-	t2 = time(NULL);
+	wxTimeSpan Elapsed = wxDateTime::Now() - m_beginTime;
 
-	wxDateTime wdt(t2-t1);
- 
-		
-	//wxDateTime::ToTimezone(wxDateTime::GMT0);
-
-	//wxString strLong = wxString::Format(wxT("%ld"), currentTime - m_startTime);
-
-	//SetStatusText(strLong, Field_Monitoring_Time);
-
-	SetStatusText(wdt.FormatISOTime(), Field_Monitoring_Time);
+	SetStatusText(Elapsed.Format(), Field_Monitoring_Time);
 
 }
 
