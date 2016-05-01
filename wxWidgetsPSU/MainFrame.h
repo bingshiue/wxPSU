@@ -52,6 +52,8 @@ public:
 
 	unsigned int m_runMode = RunMode_Continally;
 
+	BOOL m_enumSerialPort[SERIAL_PORT_MAX_COUNT];
+
 	SerialReadThread *m_serialPortReadCommandThread;/**< Handle for Read Command Thread */
 	SerialSendThread *m_serialPortSendCommandThread;/**< Handle for Send Command Thread */
 

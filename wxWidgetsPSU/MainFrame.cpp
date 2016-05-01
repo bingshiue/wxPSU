@@ -127,8 +127,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
+
+	// Enumerate Serial Port
+	EnumerateAvailableSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
+
 	// Initial Serial Port
-	ret = OpenSerialPort(3);
+	ret = OpenSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
 
 	// If Open Serial Port Success
 	if (ret == EXIT_SUCCESS){

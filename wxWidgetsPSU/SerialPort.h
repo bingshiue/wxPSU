@@ -16,15 +16,19 @@
 #endif
 
 /**
+ * @brief Enumerate Available SerialPort.
+ */
+int EnumerateAvailableSerialPort(BOOL *array,unsigned int sizeofArray);
+
+/**
  * @brief Open Serial Port 
  */
-int OpenSerialPort(int PortNum);
+int OpenSerialPort(BOOL *array, unsigned int sizeofArray);//int PortNum)
 
 /**
  * @brief Serial Port Send Data
  */
 int SerialSendData(unsigned char* buff,unsigned int size);
-
 
 /**
  * @brief Serial Port Read Data

@@ -7,17 +7,95 @@ using namespace std;
 #include <stdlib.h>
 #include "SerialPort.h"
 
+
+BOOL GetSerialPortName(wchar_t *buff, unsigned int sizeOfBuff, unsigned int num){
+	BOOL ret = TRUE;
+
+	if (sizeOfBuff < 16 || num < 0){
+		PSU_DEBUG_PRINT("%s: Error Occurs, sizeOfBuff=%d, num=%d", __FUNCTIONW__, sizeOfBuff, num);
+		ret = FALSE;
+		return ret;
+	}
+
+	if (num <= 9){
+		wsprintf(buff,L"Com%d",num+1);
+	}
+	else{
+		wsprintf(buff,L"\\\\.\\COM%d", num + 1);// "\\.\COMx"
+	}
+
+	return ret;
+}
+
+
+int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray){
+    
+	HANDLE enumHandle;
+	wchar_t SerialPortName[64];
+	unsigned int success = 0;
+
+
+	for (unsigned int idx=0; idx < sizeofArray; idx++){
+
+		GetSerialPortName(SerialPortName, sizeof(SerialPortName) / sizeof(wchar_t), idx);
+
+		enumHandle =
+			CreateFile(SerialPortName,        // Name of the Port to be Opened
+			GENERIC_READ | GENERIC_WRITE,     // Read/Write Access
+			0,                                // No Sharing, ports cant be shared
+			NULL,                             // No Security
+			OPEN_EXISTING,                    // Open existing port only
+			FILE_FLAG_OVERLAPPED,             // (Non Overlapped I/O)
+			NULL);
+
+		if (enumHandle == INVALID_HANDLE_VALUE){
+			PSU_DEBUG_PRINT("%s: Open %s Failed" , __FUNCTIONW__, SerialPortName);
+		}
+		else{
+			PSU_DEBUG_PRINT("%s: Open %s Success", __FUNCTIONW__, SerialPortName);
+			array[idx] = TRUE;
+			success++;
+			// Close Handle
+			CloseHandle(enumHandle);
+		}
+
+	}
+
+	return success;
+}
+
+unsigned int GetFirstAvailableSerialPortIndex(BOOL *array, unsigned int sizeofArray){
+
+	unsigned int index = 0;
+
+	for (unsigned int idx = 0; idx < sizeofArray; idx++){
+		if (array[idx]==TRUE){
+			return index;
+		}
+	}
+
+	return index;
+
+}
+
+
 HANDLE hComm;/**< Handle for Serial Port */
 wchar_t ComPortName[] = L"COM3"; // Name of the Serial port(May Change) to be opened,
 DCB dcbSerialParams = { 0 };/**< Initializing DCB structure */
 //OVERLAPPED g_ol;/**< Overlapped Sructure */
 
-int OpenSerialPort(int PortNum)
+int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 {
 	int ret = EXIT_SUCCESS;
 	BOOL Status;
+	wchar_t SerialPortName[64];
+
+	unsigned int availableIndex = GetFirstAvailableSerialPortIndex(array, sizeofArray);
+	GetSerialPortName(SerialPortName, sizeof(SerialPortName) / sizeof(wchar_t), availableIndex);
+
+
 	hComm = 
-	CreateFile(ComPortName,                // Name of the Port to be Opened
+		CreateFile(SerialPortName,//ComPortName,                // Name of the Port to be Opened
 		GENERIC_READ | GENERIC_WRITE,      // Read/Write Access
 		0,                                 // No Sharing, ports cant be shared
 		NULL,                              // No Security
@@ -26,11 +104,11 @@ int OpenSerialPort(int PortNum)
 		NULL);                             // Null for Comm Devices
 
 	if (hComm == INVALID_HANDLE_VALUE){
-		PSU_DEBUG_PRINT("Error! Port %s can't be opened", ComPortName);
+		PSU_DEBUG_PRINT("Error! Port %s can't be opened", SerialPortName);
 		return EXIT_FAILURE;
 	}
 	else{
-		PSU_DEBUG_PRINT("Port %s Opened", ComPortName);
+		PSU_DEBUG_PRINT("Port %s Opened", SerialPortName);
 	}
 
 	/*------------------------------- Setting the Parameters for the SerialPort ------------------------------*/
