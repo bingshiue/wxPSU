@@ -13,6 +13,7 @@
 #include "SerialPort.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSDataViewListModel.h"
+#include "SerialPortReadThread.h"
 
 #define CMD_DATA_SIZE 10/**< Command Data Size */
 
@@ -34,6 +35,8 @@ public:
 	unsigned int m_runMode;
 	PMBUSCOMMAND_t *m_pmBusCommand;
 	RECVBUFF_t *m_recvBuff;
+
+	SerialReadThread *m_serialPortReadCommandThread;
 
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
 

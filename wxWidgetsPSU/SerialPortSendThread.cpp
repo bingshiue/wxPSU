@@ -58,7 +58,19 @@ wxThread::ExitCode SerialSendThread::Entry()
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 					
 					this->productSendBuff(this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
+
 					SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
+
+					// Create SerialReadThread
+					this->m_serialPortReadCommandThread = new SerialReadThread(this->m_rxTxSemaphore, this->m_pmBusCommand, this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE);
+
+					// If Create Thread Success
+					if (this->m_serialPortReadCommandThread->Create() != wxTHREAD_NO_ERROR){
+						wxLogError(wxT("Can't create thread!"));
+					}
+					else{
+						this->m_serialPortReadCommandThread->Run();
+					}
 
 					// Semaphore Wait for Read Thread Complete
 					PSU_DEBUG_PRINT("Semaphore WaitTimeout : Is Semaphore OK %d", m_rxTxSemaphore->IsOk());
@@ -99,7 +111,7 @@ wxThread::ExitCode SerialSendThread::Entry()
 					continue;
 				}
 			}
-		}
+		} //while(m_running)
 
 		break;
 

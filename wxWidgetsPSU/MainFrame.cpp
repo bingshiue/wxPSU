@@ -136,7 +136,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	// If Open Serial Port Success
 	if (ret == EXIT_SUCCESS){
-
+#if 0
 		// Create SerialReadThread
 		this->m_serialPortReadCommandThread = new SerialReadThread(this->m_rxTxSemaphore, this->m_PMBusData, &this->m_serialPortRecvBuff, SERIALPORT_RECV_BUFF_SIZE);
 
@@ -147,6 +147,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		else{
 			this->m_serialPortReadCommandThread->Run();
 		}
+#endif
 	}
 
 #if 0
@@ -259,7 +260,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	else{ // One Send Command Thread is Running
 		this->m_monitor_running = false;
 		PSU_DEBUG_PRINT("Stop Send Data Thread");
-		this->m_serialPortSendCommandThread->m_running = false;
+		//this->m_serialPortSendCommandThread->m_running = false;
 	}
 
 	// Work Around for txtctrl can't be focus

@@ -70,6 +70,7 @@ unsigned int GetFirstAvailableSerialPortIndex(BOOL *array, unsigned int sizeofAr
 
 	for (unsigned int idx = 0; idx < sizeofArray; idx++){
 		if (array[idx]==TRUE){
+			index = idx;
 			return index;
 		}
 	}
@@ -91,6 +92,9 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 	wchar_t SerialPortName[64];
 
 	unsigned int availableIndex = GetFirstAvailableSerialPortIndex(array, sizeofArray);
+
+	PSU_DEBUG_PRINT("availableIndex=%d", availableIndex);
+
 	GetSerialPortName(SerialPortName, sizeof(SerialPortName) / sizeof(wchar_t), availableIndex);
 
 
@@ -184,7 +188,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	g_ol.OffsetHigh = 0;
 	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	//PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
+	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
 
 	Status =
 		WriteFile(hComm,     // Handle to the Serialport
@@ -233,6 +237,8 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 int SerialReadData(unsigned char* buff){
 	wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations
+	BOOL  SetCommMaskFlag;                 //
+	BOOL  WaitForSingleObjectFailed;       //
 	int ReadFileStatus;                    //
 	DWORD dwEventMask;                     // Event mask to trigger
 	unsigned char TempChar;                // Temperory Character
@@ -251,8 +257,13 @@ int SerialReadData(unsigned char* buff){
 
 	dwEventMask = 0x00000000;
 
+	NoBytesRead = 0;
+
 	bWaitForSingle = false;
 	bWaitRxCharEvent = false;
+
+	SetCommMaskFlag = FALSE;
+	WaitForSingleObjectFailed = FALSE;
 
 	//
 	memset(&g_ol, 0, sizeof(OVERLAPPED));
@@ -280,22 +291,27 @@ int SerialReadData(unsigned char* buff){
 
 	do {
 
-	Sleep(25);
+		//Sleep(30);
 
-	Status = SetCommMask(hComm, EV_RXCHAR);
+		if (SetCommMaskFlag == FALSE){
 
-	if (Status == FALSE){
-		PSU_DEBUG_PRINT("Error! in Setting CommMask");
-	}
-	else{
-		PSU_DEBUG_PRINT("Setting CommMask successfull");
-	}
+			Status = SetCommMask(hComm, EV_RXCHAR);
 
-	Status = WaitCommEvent(hComm, &dwEventMask, &g_ol); //Wait for the character to be received
+			if (Status == FALSE){
+				PSU_DEBUG_PRINT("Error! in Setting CommMask");
+			}
+			else{
+				PSU_DEBUG_PRINT("Setting CommMask successfull");
+			}
 
-	//wxLogMessage("Status = %d, dwEventMask = %lu", Status, dwEventMask);
+			SetCommMaskFlag = TRUE;
+		}
 
-	/*-------------------------- Program will Wait here till a Character is received ------------------------*/
+		Status = WaitCommEvent(hComm, &dwEventMask, &g_ol); //Wait for the character to be received
+
+	    //wxLogMessage("Status = %d, dwEventMask = %lu", Status, dwEventMask);
+
+	    /*-------------------------- Program will Wait here till a Character is received ------------------------*/
 
 	if (dwEventMask !=0 )
 	{
@@ -310,9 +326,32 @@ int SerialReadData(unsigned char* buff){
 			if (GetLastError() == ERROR_IO_PENDING){
 				wxLogMessage("WaitCommEvent : %s", "ERROR_IO_PENDING");
 				wxLogMessage("WaitForSingleObject");
-				dwRes = WaitForSingleObject(g_ol.hEvent, 50);
+
+#if 0
+				WaitForSingleObject(g_ol.hEvent, INFINITE);
+#else
+				endtime = 0;
+				while ((dwRes = WaitForSingleObject(g_ol.hEvent, 50) == WAIT_TIMEOUT)){
+					endtime++;
+					if (endtime > 9){
+						wxLogMessage("WaitForSingleObject Timeout Occurs");
+						WaitForSingleObjectFailed = TRUE;
+						break;
+					}
+				};
+#endif
+
 			}
 		}
+
+		if (WaitForSingleObjectFailed==TRUE){
+			WaitForSingleObjectFailed = FALSE;
+			SetCommMaskFlag = FALSE;
+
+			continue;
+
+		}
+
 
 		DWORD   dwErrors;
 		COMSTAT ComStat;
@@ -335,7 +374,21 @@ int SerialReadData(unsigned char* buff){
 
 					if (lastError == ERROR_IO_PENDING){
 						wxLogMessage("ReadFile IO PENDING Wait GetOverlappedResult");
-						GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, INFINITE);
+#if 0
+						GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, TRUE);
+						//while(!GetOverlappedResult(hComm, &g_ol2, &NoBytesRead,FALSE));
+						wxLogMessage("GetOverlappedResult Return ! NoBytesRead=%d",NoBytesRead);
+#else
+						endtime = GetTickCount() + 20;
+						while (GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, FALSE) == 0){
+							//wxLogMessage("%s:%d",__FUNCTIONW__,__LINE__);
+							if (GetTickCount() > endtime){
+								wxLogMessage("%s: ReadFile GetOverlappedResult Timeout Occurs", __FUNCTIONW__);
+								NoBytesRead = 0;
+								break;
+							}
+						}
+#endif
 					}
 					else{
 						wxLogMessage("lastError=%d", lastError);
@@ -345,6 +398,7 @@ int SerialReadData(unsigned char* buff){
 				else{
 					wxLogMessage("Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 					if (NoBytesRead == 0){
+						wxLogMessage("Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						//break;
 					}
 				}
@@ -355,7 +409,7 @@ int SerialReadData(unsigned char* buff){
 					i++;
 				}
 
-			} while (NoBytesRead > 0);
+		} while ( NoBytesRead > 0 );
 
 				ResetEvent(g_ol.hEvent);
 				ResetEvent(g_ol2.hEvent);

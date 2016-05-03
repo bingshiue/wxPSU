@@ -20,7 +20,7 @@ wxThread::ExitCode SerialReadThread::Entry()
 
 	this->m_running = true;
 
-	while (this->m_running == true){
+	//while (this->m_running == true){
 
 		wxLogMessage("Prepare To Read Data From Serisl Port :");
 
@@ -32,9 +32,9 @@ wxThread::ExitCode SerialReadThread::Entry()
 		this->m_rxTxSemaphore->Post();
 
 		// wxSleep() can't be called from non-GUI thread!
-		wxThread::Sleep(10);
+		//wxThread::Sleep(1000);
 
-	};
+	//};
 
 	wxLogMessage("Thread finished.");
 
