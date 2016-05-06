@@ -291,7 +291,7 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 	switch (col)
 	{
 	case Col_Toggle:
-		PSU_DEBUG_PRINT("call %s : %d", __FUNCTIONW__, variant.GetBool());
+		PSU_DEBUG_PRINT(MSG_DETAIL, "%d", variant.GetBool());
 		this->m_available[row] = variant.GetBool();
 		this->m_pmBusCommand[row].m_toggle = this->m_available[row];
 		return true;
@@ -331,14 +331,14 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 
 		break;
 	case Col_RawText:
-		PSU_DEBUG_PRINT("call %s ", __FUNCTIONW__);
-		wxLogMessage("call row = %d, length = %d ", row,this->m_pmBusCommand[row].m_recvBuff.m_length);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "");
+		PSU_DEBUG_PRINT(MSG_DETAIL, "row = %d, length = %d ", row, this->m_pmBusCommand[row].m_recvBuff.m_length);
 		m_rawColValues[row].clear();
 		for (unsigned int idx = 0; idx < this->m_pmBusCommand[row].m_recvBuff.m_length; idx++){
 			m_rawColValues[row] += wxString::Format(" %02x ", this->m_pmBusCommand[row].m_recvBuff.m_recvBuff[idx]);
 		}
 
-		wxLogMessage("call %s , %s", __FUNCTIONW__, m_rawColValues[row].c_str());
+		PSU_DEBUG_PRINT(MSG_DETAIL, "call %s , %s", m_rawColValues[row].c_str());
 
 		return true;
 

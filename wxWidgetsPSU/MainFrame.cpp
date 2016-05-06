@@ -229,13 +229,13 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 }
 void MainFrame::OnHello(wxCommandEvent& event)
 {
-	wxLogMessage("Hello world from wxWidgets!");
+	PSU_DEBUG_PRINT(MSG_DETAIL,"Hello world from wxWidgets!");
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
-	PSU_DEBUG_PRINT("On Monitor : Polling Time = %d", this->m_polling_time);
-	PSU_DEBUG_PRINT("On Monitor : m_monitor_running = %d", this->m_monitor_running);
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "m_monitor_running = %d", this->m_monitor_running);
 
 	int loop = 0;
 
@@ -243,14 +243,17 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 	if (this->m_monitor_running == false){ // Start Send Data Thread
 		this->m_monitor_running = true;
-		PSU_DEBUG_PRINT("Start Send Data Thread");
-		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model);
+		(this->m_status_bar->getTimer())->Start();
+		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
+
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
+		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model, this->m_status_bar);
 
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
 		if (this->m_serialPortSendCommandThread->Create() != wxTHREAD_NO_ERROR){
-			PSU_DEBUG_PRINT("Can't Create Send Command Thread");
+			PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Send Command Thread");
 		}
 		else{
 			this->m_serialPortSendCommandThread->Run();
@@ -259,8 +262,9 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	}
 	else{ // One Send Command Thread is Running
 		this->m_monitor_running = false;
-		PSU_DEBUG_PRINT("Stop Send Data Thread");
-		//this->m_serialPortSendCommandThread->m_running = false;
+		(this->m_status_bar->getTimer())->Stop();
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
+		this->m_serialPortSendCommandThread->m_running = false;
 	}
 
 	// Work Around for txtctrl can't be focus
@@ -303,15 +307,16 @@ const wxLogRecordInfo& info)
 
 void MainFrame::OnValueChanged(wxDataViewEvent &event)
 {
-	/*wxString title*/ unsigned int row = m_list_model->GetRow(event.GetItem());//GetTitle(event.GetItem());
-	wxLogMessage("wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
-		//title, event.GetColumn());
+	/*wxString title*/ 
+	unsigned int row = m_list_model->GetRow(event.GetItem());//GetTitle(event.GetItem());
+	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
+	//title, event.GetColumn());
 }
 
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
-	PSU_DEBUG_PRINT("%s:",__FUNCTIONW__);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "%s:", __FUNCTIONW__);
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
-	PSU_DEBUG_PRINT("%s: Select Polling Time is %d", __FUNCTIONW__, this->m_polling_time);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "%s: Select Polling Time is %d", __FUNCTIONW__, this->m_polling_time);
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -513,8 +518,8 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
-	GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 3);
-	GeneralPanelSz->Add(this->m_dataViewCtrl, 7, wxGROW | wxALL, 3);
+	//GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(this->m_dataViewCtrl,7, wxGROW | wxALL, 0);
 
 	parent->SetSizerAndFit(GeneralPanelSz);
 
@@ -526,7 +531,7 @@ void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 	if (title.empty())
 		title = "None";
 #if 0
-	PSU_DEBUG_PRINT("m_subNotebook Get PageCount: %d", this->m_subNotebook->GetPageCount());
+	PSU_DEBUG_PRINT(MSG_DETAIL, "m_subNotebook Get PageCount: %d", this->m_subNotebook->GetPageCount());
 	if (this->m_subNotebook->GetPageCount() == 3){
 		this->m_subNotebook->RemovePage(2);
 	}
@@ -535,11 +540,11 @@ void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 	}
 #endif
 
-	wxLogMessage("wxEVT_DATAVIEW_SELECTION_CHANGED, First selected Item: %s", title);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_SELECTION_CHANGED, First selected Item: %s", title);
 }
 
 void MainFrame::OnDisableAll(wxCommandEvent& event){
-	PSU_DEBUG_PRINT("Call %s", __FUNCTIONW__);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "");
 	// Disable ALL Command
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
 		this->m_PMBusData[idx].m_toggle = false;
@@ -555,7 +560,7 @@ void MainFrame::OnDisableAll(wxCommandEvent& event){
 }
 
 void MainFrame::OnEnableAll(wxCommandEvent& event){
-	PSU_DEBUG_PRINT("Call %s", __FUNCTIONW__);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "");
 	// Enable ALL Command
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
 		this->m_PMBusData[idx].m_toggle = true;

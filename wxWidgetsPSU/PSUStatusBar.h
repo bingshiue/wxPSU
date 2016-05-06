@@ -23,6 +23,12 @@ public:
 	void OnToggleClock(wxCommandEvent& event);
 	void OnIdle(wxIdleEvent& event);
 
+	wxTimer* getTimer(void) { return &this->m_timer; }
+	wxDateTime& getBeginDateTime(void) { return this->m_beginTime; }
+
+	void setMonitoringCMDName(wxString& cmdName);
+	void setMonitoringSummary(wxString& summary);
+
 private:
 	// toggle the state of the status bar controls
 	void DoToggle();
@@ -48,7 +54,7 @@ private:
 #endif
 	wxStaticBitmap *m_statbmp;
 
-	wxStopWatch m_sw;
+	//wxStopWatch m_sw;
 	wxDateTime m_beginTime;
 
 	// any class wishing to process wxWidgets events must use this macro

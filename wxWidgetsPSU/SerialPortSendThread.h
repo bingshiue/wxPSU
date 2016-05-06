@@ -13,6 +13,7 @@
 #include "SerialPort.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSDataViewListModel.h"
+#include "PSUStatusBar.h"
 #include "SerialPortReadThread.h"
 
 #define CMD_DATA_SIZE 10/**< Command Data Size */
@@ -28,7 +29,7 @@ public:
 	unsigned int  m_pollingTime;/**< polling time */
 
 	SerialSendThread(wxSemaphore* semaphore);
-	SerialSendThread(wxSemaphore* semaphore, unsigned int runMode, unsigned int pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel);
+	SerialSendThread(wxSemaphore* semaphore, unsigned int runMode, unsigned int pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel, PSUStatusBar *status_bar);
 	virtual ~SerialSendThread();
 
 	wxSemaphore *m_rxTxSemaphore;
@@ -39,6 +40,7 @@ public:
 	SerialReadThread *m_serialPortReadCommandThread;
 
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
+	PSUStatusBar  *m_status_bar;
 
 	void productSendBuff(unsigned int command,unsigned int responseDataLength);
 

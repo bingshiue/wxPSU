@@ -17,7 +17,7 @@
 */
 class SerialReadThread : public wxThread{
 public:
-	SerialReadThread(wxSemaphore* semaphore, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, unsigned int recvBuffSize);
+	SerialReadThread(wxSemaphore* semaphore, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, unsigned int recvBuffSize, unsigned int bytesToRead);
 	virtual ~SerialReadThread();
 
 	bool m_running;
@@ -29,6 +29,8 @@ public:
 	RECVBUFF_t* m_recvBuff;
 
 	unsigned int m_recvBuffSize;
+
+	unsigned int m_bytesToRead;
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;

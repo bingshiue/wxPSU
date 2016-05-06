@@ -42,10 +42,10 @@ PSUStatusBar::PSUStatusBar(wxWindow *parent, long style)
 
 
 #if wxUSE_TIMER
-	m_timer.Start(1000);
+	//m_timer.Start(1000);
 #endif
 
-	m_sw.Start();
+	//m_sw.Start();
 
 	m_beginTime = wxDateTime::Now();
 
@@ -86,6 +86,14 @@ void PSUStatusBar::OnToggleClock(wxCommandEvent& event){
 
 void PSUStatusBar::OnIdle(wxIdleEvent& event){
 
+}
+
+void PSUStatusBar::setMonitoringCMDName(wxString& cmdName){
+	SetStatusText(cmdName, Field_Monitoring_Command);
+}
+
+void PSUStatusBar::setMonitoringSummary(wxString& summary){
+	SetStatusText(summary, Field_Monitoring_Summary);
 }
 
 wxBEGIN_EVENT_TABLE(PSUStatusBar, wxStatusBar)

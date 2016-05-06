@@ -16,28 +16,28 @@
 #endif
 
 /**
- * @brief Enumerate Available SerialPort.
- */
-int EnumerateAvailableSerialPort(BOOL *array,unsigned int sizeofArray);
+* @brief Enumerate Available SerialPort.
+*/
+int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray);
 
 /**
- * @brief Open Serial Port 
- */
+* @brief Open Serial Port
+*/
 int OpenSerialPort(BOOL *array, unsigned int sizeofArray);//int PortNum)
 
 /**
- * @brief Serial Port Send Data
- */
-int SerialSendData(unsigned char* buff,unsigned int size);
+* @brief Serial Port Send Data
+*/
+int SerialSendData(unsigned char* buff, unsigned int size);
 
 /**
- * @brief Serial Port Read Data
- */
-int SerialReadData(unsigned char* buff);
+* @brief Serial Port Read Data
+*/
+int SerialReadData(unsigned char* buff, unsigned int bytesToRead);
 
 /**
- * @brief Close Serial Port
- */
+* @brief Close Serial Port
+*/
 int CloseSerialPort(void);
 
 #endif

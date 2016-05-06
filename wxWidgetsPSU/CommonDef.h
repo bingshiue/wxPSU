@@ -8,12 +8,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PSU_DEBUG_MSG /**< Debug Messages */
+#define PSU_PRINT(fmt, ...)  \
+		wxLogMessage(fmt,__VA_ARGS__);
+
+
+enum DEBUG_MSG_LEVEL {
+	MSG_FATAL = 0,
+	MSG_EMERGECY,
+	MSG_ALERT,
+	MSG_DEBUG,
+	MSG_DETAIL,
+};
+
+#define PSU_DEBUG_MSG /**< Print More Debug Messages */
+#define DEFAULT_DEBUG_MSG_LEVEL  MSG_ALERT /**< Default Debug Message Level */
 
 #ifdef PSU_DEBUG_MSG
-#define PSU_DEBUG_PRINT(fmt, ...)  \
-		wxLogMessage(fmt,__VA_ARGS__);
-		//printf("%s():"fmt,__func__,## __VA_ARGS__);
+#define PSU_DEBUG_PRINT(level,fmt, ...)  \
+		if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
+			wxLogMessage("%s():"fmt,__FUNCTIONW__,## __VA_ARGS__);
 #else
 #define PSU_DEBUG_PRINT(fmt, ...)  \
 		while(0) ;

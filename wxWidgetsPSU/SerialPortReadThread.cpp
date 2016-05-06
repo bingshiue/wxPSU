@@ -5,38 +5,38 @@
 #include "SerialPortReadThread.h"
 #include "SerialPort.h"
 
-SerialReadThread::SerialReadThread(wxSemaphore* semaphore, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, unsigned int recvBuffSize){
+SerialReadThread::SerialReadThread(wxSemaphore* semaphore, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, unsigned int recvBuffSize, unsigned int bytesToRead){
 	this->m_rxTxSemaphore = semaphore;
 	this->m_pmBusCommand = pmBusCommand;
 	this->m_recvBuff = recvBuff;
 	this->m_recvBuffSize = recvBuffSize;
+	this->m_bytesToRead = bytesToRead;
 }
 
 SerialReadThread::~SerialReadThread() { }
 
 wxThread::ExitCode SerialReadThread::Entry()
 {
-	wxLogMessage("Thread started (priority = %u).", GetPriority());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread started (priority = %u).", GetPriority());
 
 	this->m_running = true;
 
 	//while (this->m_running == true){
 
-		wxLogMessage("Prepare To Read Data From Serisl Port :");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Read Data From Serisl Port :");
 
 		// Read Data From Serial Port
-		this->m_recvBuff->m_length = SerialReadData(this->m_recvBuff->m_recvBuff);
+		this->m_recvBuff->m_length = SerialReadData(this->m_recvBuff->m_recvBuff,this->m_bytesToRead);
 
-		wxLogMessage("Semaphore Post");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore Post");
 		// Semaphore Post
 		this->m_rxTxSemaphore->Post();
 
-		// wxSleep() can't be called from non-GUI thread!
 		//wxThread::Sleep(1000);
 
 	//};
 
-	wxLogMessage("Thread finished.");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
 
 	return NULL;
 }
