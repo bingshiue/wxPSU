@@ -8,6 +8,8 @@
 #include "wx_small.xpm"
 #include "green.xpm"
 #include "red.xpm"
+#include "yellow.xpm"
+#include "gray.xpm"
 
 static int my_sort_reverse(int *v1, int *v2)
 {
@@ -70,8 +72,10 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 	}
 
 	// Setup Icon
-	m_icon[0] = wxIcon(red_xpm);
-	m_icon[1] = wxIcon(green_xpm);
+	m_icon[XPM_red]    = wxIcon(red_xpm);
+	m_icon[XPM_green]  = wxIcon(green_xpm);
+	m_icon[XPM_yellow] = wxIcon(yellow_xpm);
+	m_icon[XPM_gray]   = wxIcon(gray_xpm);
 
 	// Save PMBus Command Handle
 	m_pmBusCommand = pmBusCommand;
@@ -149,21 +153,46 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 			variant = true;
 		}
 		break;
-	case Col_IconText:
+	case Col_RegisterIconText:
 	{
 		//PSU_DEBUG_PRINT("Count of m_registerColValues = %d", m_registerColValues.GetCount());
 		wxString text;
-		if (row >= m_registerColValues.GetCount())
+		if (row >= m_registerColValues.GetCount()){
 			text = "virtual icon";
-		else
-			text = m_registerColValues[row];
-
-		//variant << wxDataViewIconText(text, m_icon[row % 2]);
-		if (this->m_available[row] == false){
-			variant << wxDataViewIconText(text, m_icon[0]);
 		}
 		else{
-			variant << wxDataViewIconText(text, m_icon[1]);
+			text = m_registerColValues[row];
+		}
+
+		//variant << wxDataViewIconText(text, m_icon[row % 2]);
+		if(this->m_available[row] == true){
+
+			switch (this->m_pmBusCommand[row].m_cmdStatus.m_status){
+
+			case cmd_status_not_run:
+				variant << wxDataViewIconText(text, m_icon[XPM_red]);
+				break;
+
+			case cmd_status_running:
+				variant << wxDataViewIconText(text, m_icon[XPM_yellow]);
+				break;
+
+			case cmd_status_success:
+				variant << wxDataViewIconText(text, m_icon[XPM_green]);
+				break;
+
+			case cmd_status_failure:
+				variant << wxDataViewIconText(text, m_icon[XPM_red]);
+				break;
+
+
+			default:
+				PSU_DEBUG_PRINT(MSG_FATAL, "CMD Status Abnormal, Status=%d", this->m_pmBusCommand[row].m_cmdStatus.m_status);
+				break;
+			}
+		}
+		else{
+			variant << wxDataViewIconText(text, m_icon[XPM_gray]);
 		}
 
 	}
@@ -233,7 +262,7 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	case Col_Toggle:
 		return false;
 		break;
-	case Col_IconText:
+	case Col_RegisterIconText:
 		//if (!(row % 2))
 			//return false;
 		attr.SetColour(*wxBLUE);
@@ -288,6 +317,8 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int row, unsigned int col)
 {
 
+	wxDataViewIconText iconText;
+
 	switch (col)
 	{
 	case Col_Toggle:
@@ -296,7 +327,23 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 		this->m_pmBusCommand[row].m_toggle = this->m_available[row];
 		return true;
 
-	case Col_IconText:
+	case Col_RegisterIconText:
+		if (row >= m_registerColValues.GetCount())
+		{
+			// the item is not in the range of the items
+			// which we store... for simplicity, don't allow editing it
+			wxLogError("Cannot edit rows with an index greater than %d",
+				m_registerColValues.GetCount());
+			return false;
+		}
+
+		iconText << variant;
+		m_registerColValues[row] = iconText.GetText();
+
+		return true;
+
+		break;
+
 	case Col_NameText:
 		if (row >= m_nameColValues.GetCount())
 		{
@@ -307,16 +354,8 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 			return false;
 		}
 
-		if (col == Col_NameText)
-		{
-			m_nameColValues[row] = variant.GetString();
-		}
-		else // col == Col_IconText
-		{
-			wxDataViewIconText iconText;
-			iconText << variant;
-			m_registerColValues[row] = iconText.GetText();
-		}
+		m_nameColValues[row] = variant.GetString();
+		
 		return true;
 
 		break;

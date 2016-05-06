@@ -32,8 +32,6 @@ wxThread::ExitCode SerialReadThread::Entry()
 		// Semaphore Post
 		this->m_rxTxSemaphore->Post();
 
-		//wxThread::Sleep(1000);
-
 	//};
 
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");

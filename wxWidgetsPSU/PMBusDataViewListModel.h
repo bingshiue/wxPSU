@@ -101,6 +101,7 @@ WX_DECLARE_HASH_MAP(unsigned, wxString, wxIntegerHash, wxIntegerEqual,
 	IntToStringMap);
 
 #define DATAVIEW_LIST_SIZE (PMBUSCOMMAND_SIZE)/**< Size of DataView List */
+#define XPM_SIZE  4/**< Size of XPM Array */
 
 class PSUDataViewListModel : public wxDataViewVirtualListModel
 {
@@ -108,7 +109,7 @@ public:
 	enum
 	{
 		Col_Toggle,
-		Col_IconText,
+		Col_RegisterIconText,
 		Col_NameText,
 		Col_AccessText,
 		Col_QueryText,
@@ -118,6 +119,14 @@ public:
 		Col_TextWithAttr,
 		Col_Custom,
 		Col_Max
+	};
+
+	enum
+	{
+		XPM_red = 0,
+		XPM_green,
+		XPM_yellow,
+		XPM_gray
 	};
 
 	PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand);
@@ -142,7 +151,7 @@ public:
 		if (col == Col_Toggle) 
 		return wxT("bool");
 		
-		if (col == Col_IconText)
+		if (col == Col_RegisterIconText)
 		return wxT("wxDataViewIconText");
 
 		return wxT("string");
@@ -165,7 +174,7 @@ private:
 	wxArrayString    m_cookColValues;
 	wxArrayString    m_rawColValues;
 	IntToStringMap   m_customColValues;
-	wxIcon           m_icon[2];
+	wxIcon           m_icon[XPM_SIZE];
 	PMBUSCOMMAND_t  *m_pmBusCommand;
 };
 

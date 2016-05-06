@@ -140,7 +140,7 @@ private:
 	void SetupStatusBar(void);
 	void SetupPSUDataView(wxPanel* parent);
 
-	void OnHello(wxCommandEvent& event);
+	void OnHexToBin(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);

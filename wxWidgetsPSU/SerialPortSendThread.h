@@ -23,17 +23,17 @@
 */
 class SerialSendThread : public wxThread{
 public:
-	unsigned int  m_running;/**< Indicate thread is running */
+	bool          m_running;/**< Indicate thread is running */
 	unsigned int  m_register;/**< Register */
 	unsigned char m_sendBuff[CMD_DATA_SIZE];/**< Send Buffer */
-	unsigned int  m_pollingTime;/**< polling time */
+	unsigned int  *m_pollingTime;/**< polling time */
 
 	SerialSendThread(wxSemaphore* semaphore);
-	SerialSendThread(wxSemaphore* semaphore, unsigned int runMode, unsigned int pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel, PSUStatusBar *status_bar);
+	SerialSendThread(wxSemaphore* semaphore, unsigned int* runMode, unsigned int* pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel, PSUStatusBar *status_bar);
 	virtual ~SerialSendThread();
 
 	wxSemaphore *m_rxTxSemaphore;
-	unsigned int m_runMode;
+	unsigned int *m_runMode;
 	PMBUSCOMMAND_t *m_pmBusCommand;
 	RECVBUFF_t *m_recvBuff;
 

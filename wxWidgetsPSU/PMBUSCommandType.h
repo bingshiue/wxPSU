@@ -15,18 +15,12 @@ enum {
 	cmd_access_brbw = cmd_access_readwrite
 };
 
-
-#define CMD_DATA_SIZE 10/**< Command Data Size */
-
-/**
- * @brief Structure for PMBus Command.
- */
-typedef struct pmbuscmd_tag {
-	unsigned int  mCommand;/**< Command */
-	unsigned char mData[CMD_DATA_SIZE];/**< Data */
-
-}PMBUSCommand;
-
+enum {
+	cmd_status_not_run = 0,
+	cmd_status_running,
+	cmd_status_success,
+	cmd_status_failure,
+};
 
 #define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
@@ -38,7 +32,37 @@ typedef struct recvbuff_t {
 	unsigned char m_recvBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Receive Data Buff */
 }RECVBUFF_t;
 
+/**
+ * @brief Struct for CMD Status
+ */
+typedef struct cmdstatus_t {
+	unsigned char m_status;/**< Status of CMD */
+}CMDSTATUS_t;
 
+/**
+ * @brief Command Query Call Back Function.
+ */
+typedef int(*CMDQueryCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+
+/**
+ * @brief Command Cook Call Back Function.
+ */
+typedef int(*CMDCookCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+
+/**
+ * @brief Command Raw Call Back Function.
+ */
+typedef int(*CMDRawCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+
+/**
+ * @brief Struct for CB Functions
+ */
+typedef struct cmdcbfunc_t {
+	CMDQueryCBFunc m_quertCBFunc;/**< Query CB Function */
+	CMDCookCBFunc  m_cookCBFunc;/**< Query CB Function */
+	CMDRawCBFunc   m_rawCBFunc;/**< Query CB Function */
+
+}CMDCBFUNC_t;
 
 #define NAME_SIZE  64
 #define RAW_SIZE    8
@@ -58,16 +82,10 @@ typedef struct pmbuscmd_t {
 
 
 	RECVBUFF_t      m_recvBuff;/**< Receive Data Buffer */
+	CMDSTATUS_t     m_cmdStatus;/**< CMD Status */
+
+	CMDCBFUNC_t     m_cmdCBFunc;/**< CallBack Function */
 
 }PMBUSCOMMAND_t;
-
-#define TOTAL_CMD_CNT 2 /**< Total Command Count */
-
-#if 0
-PMBUSCommand pmbusCommand[TOTAL_CMD_CNT] = {
-	{ 0x01, { 0x41, 0x44, 0xb6, 0x01, 0x0d, 0x0a, 0xb7, 0x02, 0x0d, 0x0a } },
-	{ 0x3a, { 0x41, 0x44, 0xb6, 0x3a, 0x0d, 0x0a, 0xb7, 0x02, 0x0d, 0x0a } },
-};
-#endif
 
 #endif

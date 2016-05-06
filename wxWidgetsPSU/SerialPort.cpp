@@ -51,7 +51,7 @@ int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray){
 			//PSU_DEBUG_PRINT("%s: Open %s Failed \n", __FUNCTIONW__, SerialPortName);
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_DEBUG, "%s can be use", SerialPortName);
+			PSU_DEBUG_PRINT(MSG_ALERT, "Find Serial Port : %s", SerialPortName);
 			array[idx] = TRUE;
 			success++;
 			// Close Handle
@@ -108,7 +108,7 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 		return EXIT_FAILURE;
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Port %s Opened", SerialPortName);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Port %s Opened", SerialPortName);
 	}
 
 	/*------------------------------- Setting the Parameters for the SerialPort ------------------------------*/
@@ -125,6 +125,8 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 	dcbSerialParams.ByteSize = 8;             // Setting ByteSize = 8
 	dcbSerialParams.StopBits = ONESTOPBIT;    // Setting StopBits = 1
 	dcbSerialParams.Parity   = NOPARITY;      // Setting Parity   = None
+
+	//dcbSerialParams.EofChar = '\n';
 
 	Status = SetCommState(hComm, &dcbSerialParams);  //Configuring the port according to settings in DCB 
 
@@ -165,6 +167,20 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 	return ret;
 }
 
+int DumpComStat(void){
+	DWORD dwErrors;
+	COMSTAT ComStat;
+
+	ClearCommError(hComm, &dwErrors, &ComStat);
+
+	PSU_DEBUG_PRINT(MSG_FATAL, "dwErrors=%ld", dwErrors);
+	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
+	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbInQue=%ld", ComStat.cbInQue);
+
+	return EXIT_SUCCESS;
+}
+
+
 int SerialSendData(unsigned char* buff, unsigned int size){
 
 	//wxString outputMsg("");
@@ -173,8 +189,6 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	OVERLAPPED g_ol;/**< Overlapped Sructure */
 	int send_err;
 	DWORD send_size;
-	DWORD lpErrorsCH1; /* Error Information */
-	COMSTAT lpStatCH1; /* Port Status */
 
 	send_size = size;
 
@@ -183,7 +197,8 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	g_ol.OffsetHigh = 0;
 	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	//PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
+	// Purge CommPort
+	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
 
 	Status =
 		WriteFile(hComm,     // Handle to the Serialport
@@ -204,6 +219,10 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 
 			if (dNoOfBytesWritten != send_size){
 				PSU_DEBUG_PRINT(MSG_FATAL, "Send Size Unexpected ! dNoOfBytesWritten=%d", dNoOfBytesWritten);
+				DumpComStat();
+
+				ResetEvent(g_ol.hEvent);
+				CloseHandle(g_ol.hEvent);
 				return -2;
 			}
 			else{
@@ -215,11 +234,12 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 		}
 		else
 		{
-			PSU_DEBUG_PRINT(MSG_FATAL, "ERROR in Send");
+			PSU_DEBUG_PRINT(MSG_FATAL, "ERROR in Send, Error = %d", send_err);
 			// Get Error Information
-			ClearCommError(hComm, &lpErrorsCH1, &lpStatCH1);
-			//lpErrorsCH1_lach |= lpErrorsCH1;
+			DumpComStat();
 			
+			ResetEvent(g_ol.hEvent);
+			CloseHandle(g_ol.hEvent);
 			return -1;
 		}
 
@@ -245,6 +265,8 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
 	OVERLAPPED g_ol;                       // Overlapped Sructure */
 	OVERLAPPED g_ol2;                      // Overlapped Sructure */
+	DWORD dwErrors;
+	COMSTAT ComStat;
 	BOOL bWaitForSingle;                   //
 	BOOL bWaitRxCharEvent;                 //
 	DWORD lastError;                       // Last Error
@@ -268,7 +290,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	g_ol2.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	/*------------------------------------ Setting Receive Mask ----------------------------------------------*/
-#if 1
+#if 0
 	Status = SetCommMask(hComm, EV_RXCHAR); //Configure Windows to Monitor the serial device for Character Reception
 
 	if (Status == FALSE){
@@ -286,7 +308,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	do {
 
 		//Sleep(25);
-#if 0
+#if 1
 		Status = SetCommMask(hComm, EV_RXCHAR);
 
 		if (Status == FALSE){
@@ -297,13 +319,11 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 		}
 #endif
 
-		DWORD   dwErrors;
-		COMSTAT ComStat;
-		ClearCommError(hComm, &dwErrors, &ComStat);
+		//ClearCommError(hComm, &dwErrors, &ComStat);
 
-		DWORD RcvLen = ComStat.cbInQue;
+		//DWORD RcvLen = ComStat.cbInQue;
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "RcvLen=%d Begin", RcvLen);
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "RcvLen=%d Begin", RcvLen);
 
 
 		dwEventMask = 0x00000000;
@@ -333,6 +353,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			case WAIT_TIMEOUT:
 				PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT");
 				WaitCommEventTimeOutFlag = TRUE;
+				DumpComStat();
 				break;
 
 			case WAIT_OBJECT_0:
@@ -341,6 +362,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 			default:
 				PSU_DEBUG_PRINT(MSG_ALERT, "dwRes != WAIT_OBJECT_0");
+				DumpComStat();
 				break;
 			}
 #endif
@@ -364,15 +386,18 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 				PSU_DEBUG_PRINT(MSG_DETAIL, "dwEventMask=%d", dwEventMask);
 			}
 
-			//DWORD   dwErrors;
-			//COMSTAT ComStat;
-			ClearCommError(hComm, &dwErrors, &ComStat);
 
-			DWORD RcvLen = ComStat.cbInQue;
+			//ClearCommError(hComm, &dwErrors, &ComStat);
 
-			PSU_DEBUG_PRINT(MSG_DETAIL, "RcvLen=%d Begin", RcvLen);
+			//if (ComStat.fEof == TRUE){
+				//PSU_DEBUG_PRINT(MSG_ALERT,"ComStat.fEof == TRUE");
+			//}
 
-			if (RcvLen > 0){// Char in Queue
+			//DWORD RcvLen = ComStat.cbInQue;
+
+			//PSU_DEBUG_PRINT(MSG_DETAIL, "RcvLen=%d Begin", RcvLen);
+
+			//if (RcvLen > 0){// Char in Queue
 
 				//do { // Read Until No Data Can be Read
 
@@ -397,6 +422,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 									PSU_DEBUG_PRINT(MSG_ALERT, "GetOverlappedResult Timeout");
 									PSU_DEBUG_PRINT(MSG_ALERT, "NoBytesRead=%d", NoBytesRead);
 									ReadFileOverlappedTimeOutFlag = TRUE;
+									DumpComStat();
 
 									break;
 								}
@@ -452,10 +478,6 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 				//PSU_DEBUG_PRINT("RcvLen=%d, End \n", RcvLen);
 				//}
 
-				//if (ComStat.fEof == TRUE){
-				//PSU_DEBUG_PRINT("ComStat.fEof == TRUE \n");
-				//}
-
 				//} while (i < 14);//NoBytesRead);//(RcvLen > 0);
 
 #if 0
@@ -474,7 +496,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 				bWaitRxCharEvent = true;
 #endif
-			}// if (RcvLen > 0)
+			//}// if (RcvLen > 0)
 #if 0
 			//bWaitingOnStatusHandle = TRUE;
 

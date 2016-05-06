@@ -9,7 +9,7 @@ SerialSendThread::SerialSendThread(wxSemaphore* semaphore){
 	this->m_rxTxSemaphore = semaphore;
 }
 
-SerialSendThread::SerialSendThread(wxSemaphore* semaphore, unsigned int runMode, unsigned int pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel> *dataViewListModel, PSUStatusBar *status_bar){
+SerialSendThread::SerialSendThread(wxSemaphore* semaphore, unsigned int* runMode, unsigned int* pollingTime, PMBUSCOMMAND_t *pmBusCommand, RECVBUFF_t *recvBuff, wxObjectDataPtr<PSUDataViewListModel> *dataViewListModel, PSUStatusBar *status_bar){
 	this->m_rxTxSemaphore = semaphore;
 	this->m_runMode = runMode;
 	this->m_pollingTime = pollingTime;
@@ -48,7 +48,7 @@ wxThread::ExitCode SerialSendThread::Entry()
 	PSU_DEBUG_PRINT(MSG_DETAIL, "m_pollingTime=%d", this->m_pollingTime);
 	m_running = true;
 
-	switch (this->m_runMode){
+	switch (*this->m_runMode){
 
 	case RunMode_Iteration:
 
@@ -59,20 +59,14 @@ wxThread::ExitCode SerialSendThread::Entry()
 		PSU_DEBUG_PRINT(MSG_DEBUG, "RunMode is Continally ");
 		while (m_running){
 
-			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running==true; idx++){
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
-					// Set Monitoring Name / Monitoring Summary of Status Bar
-					wxString monitor("Monitoring...[");
-					wxString cmd(wxString::Format("%2x", this->m_pmBusCommand[idx].m_register).Upper());
-					wxString hex("h]");
-					this->m_status_bar->setMonitoringCMDName(monitor+cmd+hex);
-
-					iteration++;
-					wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld",iteration,success,timeout));
-					this->m_status_bar->setMonitoringSummary(summary);
+					// Update DataView Register Field Icon
+					this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
+					this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RegisterIconText);
 	                
-					//
+					// Prepare Send Buffer
 					this->productSendBuff(this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
 
 					// Create SerialReadThread
@@ -86,7 +80,10 @@ wxThread::ExitCode SerialSendThread::Entry()
 						this->m_serialPortReadCommandThread->Run();
 					}
 
-					//
+					// Sleep Polling Time
+					Sleep(*this->m_pollingTime);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+
+					// Send Data
 					SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
 
 					// Semaphore Wait for Read Thread Complete
@@ -99,10 +96,11 @@ wxThread::ExitCode SerialSendThread::Entry()
 						
 						if (this->m_recvBuff->m_length == 0){
 							PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %d", this->m_recvBuff->m_length, this->m_pmBusCommand[idx].m_register);
+							this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
 							timeout++;
 						}
 						else{
-
+							//
 							if (this->m_recvBuff->m_length == (this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH)){
 
 								PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
@@ -121,28 +119,42 @@ wxThread::ExitCode SerialSendThread::Entry()
 									outputMsg += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
 								}
 
-								// Update Data View Model
+								// Update Data View Model Raw Field
 								wxVariant variant;
 								variant = outputMsg;
 
+								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
 								PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
 								this->m_dataViewListCtrl->get()->SetValueByRow(variant, idx, PSUDataViewListModel::Col_RawText);
 								this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
 
 								PSU_DEBUG_PRINT(MSG_DETAIL, "%s", outputMsg.c_str());
 							}
+							//
 							else{
-								PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Not As Expected %d", this->m_recvBuff->m_length);
+								PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Not As Expected CMD=%d, Length=%d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
+								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
 							}
 						}
 					}
 
-					Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+					//Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 				}
 				else{
 					continue;
 				}
-			}
+
+				// Set Monitoring Name / Monitoring Summary of Status Bar
+				wxString monitor("Monitoring...[");
+				wxString cmd(wxString::Format("%2x", this->m_pmBusCommand[idx].m_register).Upper());
+				wxString hex("h]");
+				this->m_status_bar->setMonitoringCMDName(monitor + cmd + hex);
+
+				iteration++;
+				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
+				this->m_status_bar->setMonitoringSummary(summary);
+
+			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
 		} //while(m_running)
 
 		break;

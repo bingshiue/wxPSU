@@ -134,20 +134,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Initial Serial Port
 	ret = OpenSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
 
-	// If Open Serial Port Success
-	if (ret == EXIT_SUCCESS){
-#if 0
-		// Create SerialReadThread
-		this->m_serialPortReadCommandThread = new SerialReadThread(this->m_rxTxSemaphore, this->m_PMBusData, &this->m_serialPortRecvBuff, SERIALPORT_RECV_BUFF_SIZE);
-
-		// If Create Thread Success
-		if (this->m_serialPortReadCommandThread->Create() != wxTHREAD_NO_ERROR){
-			wxLogError(wxT("Can't create thread!"));
-		}
-		else{
-			this->m_serialPortReadCommandThread->Run();
-		}
-#endif
+	// If Open Serial Port Failed
+	if (ret != EXIT_SUCCESS){
+		PSU_DEBUG_PRINT(MSG_FATAL, "Open Serial Port Failed ! Need add error handle mechanism here");
 	}
 
 #if 0
@@ -157,7 +146,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_MENU(ID_HEX_TO_BIN, MainFrame::OnHello)
+EVT_MENU(ID_HEX_TO_BIN, MainFrame::OnHexToBin)
 EVT_MENU(ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
@@ -186,29 +175,6 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_responseDataLength = g_PMBUSCommand[idx].m_responseDataLength;
 	}
 
-#if 0
-	// 00H
-	this->m_PMBusData[0].m_toggle = g_PMBUSCommand[0].m_toggle;//true;
-	this->m_PMBusData[0].m_register = g_PMBUSCommand[0].m_register; //0x00;
-	sprintf(this->m_PMBusData[0].m_name, g_PMBUSCommand[0].m_name);
-	this->m_PMBusData[0].m_access = g_PMBUSCommand[0].m_access;//cmd_access_readwrite;
-	this->m_PMBusData[0].m_query = g_PMBUSCommand[0].m_query;
-	this->m_PMBusData[0].m_cook = g_PMBUSCommand[0].m_cook;
-	// 01H
-	this->m_PMBusData[1].m_toggle = true;
-	this->m_PMBusData[1].m_register = 0x01;
-	sprintf(this->m_PMBusData[1].m_name,"OPERATION");
-	this->m_PMBusData[1].m_access = cmd_access_readwrite;
-	this->m_PMBusData[1].m_query = 0;
-	this->m_PMBusData[1].m_cook = 0;
-	// 3AH
-	this->m_PMBusData[2].m_toggle = true;
-	this->m_PMBusData[2].m_register = 0x3a;
-	sprintf(this->m_PMBusData[2].m_name, "FAN_CONFIG_1_2");
-	this->m_PMBusData[2].m_access = cmd_access_readwrite;
-	this->m_PMBusData[2].m_query = 0;
-	this->m_PMBusData[2].m_cook = 0;
-#endif
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -227,9 +193,9 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 	wxMessageBox("This is a wxWidgets' Hello world sample",
 		"About Hello World", wxOK | wxICON_INFORMATION);
 }
-void MainFrame::OnHello(wxCommandEvent& event)
+void MainFrame::OnHexToBin(wxCommandEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_DETAIL,"Hello world from wxWidgets!");
+	PSU_DEBUG_PRINT(MSG_ALERT,"Not Implement");
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
@@ -247,7 +213,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, this->m_runMode, this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model, this->m_status_bar);
+		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model, this->m_status_bar);
 
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
@@ -314,9 +280,8 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 }
 
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DETAIL, "%s:", __FUNCTIONW__);
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
-	PSU_DEBUG_PRINT(MSG_DETAIL, "%s: Select Polling Time is %d", __FUNCTIONW__, this->m_polling_time);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Select Polling Time is %d", this->m_polling_time);
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -390,7 +355,7 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_combobox->Append(wxT("1000"));
 	m_polling_time_combobox->Append(wxT("1500"));
 
-	m_polling_time_combobox->SetSelection(2);
+	m_polling_time_combobox->SetSelection(0);
 	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
 
 	// Append Address 
@@ -438,50 +403,50 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxDVC_TOGGLE_DEFAULT_WIDTH,
 		wxALIGN_NOT,
-		wxDATAVIEW_COL_RESIZABLE
+		wxDATAVIEW_COL_REORDERABLE
 		);
 
 	this->m_dataViewCtrl->AppendIconTextColumn("Register",
-		PSUDataViewListModel::Col_IconText,
-		wxDATAVIEW_CELL_EDITABLE,
+		PSUDataViewListModel::Col_RegisterIconText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Name",
 		PSUDataViewListModel::Col_NameText,
-		wxDATAVIEW_CELL_EDITABLE,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Access",
 		PSUDataViewListModel::Col_AccessText,
-		wxDATAVIEW_CELL_EDITABLE,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Query",
 		PSUDataViewListModel::Col_QueryText,
-		wxDATAVIEW_CELL_EDITABLE,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Cook",
 		PSUDataViewListModel::Col_CookText,
-		wxDATAVIEW_CELL_EDITABLE,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
-		wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Raw",
 		PSUDataViewListModel::Col_RawText,
-		wxDATAVIEW_CELL_EDITABLE,
+		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
-		wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);
 
 #if 0
 	this->m_dataViewCtrl->AppendDateColumn("date",
@@ -544,7 +509,7 @@ void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 }
 
 void MainFrame::OnDisableAll(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DETAIL, "");
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Disable ALL Commands");
 	// Disable ALL Command
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
 		this->m_PMBusData[idx].m_toggle = false;
@@ -560,7 +525,7 @@ void MainFrame::OnDisableAll(wxCommandEvent& event){
 }
 
 void MainFrame::OnEnableAll(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DETAIL, "");
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Enable ALL Commands");
 	// Enable ALL Command
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
 		this->m_PMBusData[idx].m_toggle = true;

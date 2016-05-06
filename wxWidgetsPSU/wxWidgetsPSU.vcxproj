@@ -99,6 +99,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MyListStoreDerivedModel.h" />
+    <ClInclude Include="PMBUSCMDCB.h" />
     <ClInclude Include="PMBusCMDGridTable.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
