@@ -180,12 +180,13 @@ int DumpComStat(void){
 	return EXIT_SUCCESS;
 }
 
+//#define WRITE_WAIT_INFINITE // Wait Infinite for Write Overlapped Operation
 
 int SerialSendData(unsigned char* buff, unsigned int size){
 
-	//wxString outputMsg("");
 	BOOL Status;
 	DWORD  dNoOfBytesWritten = 0;
+	DWORD endtime; // For Compute Timeout
 	OVERLAPPED g_ol;/**< Overlapped Sructure */
 	int send_err;
 	DWORD send_size;
@@ -214,8 +215,28 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 		{
 			PSU_DEBUG_PRINT(MSG_DEBUG, "IO_PENDING");
 
+#ifdef WRITE_WAIT_INFINITE
 			//while (!GetOverlappedResult(hComm, &g_ol, &dNoOfBytesWritten, FALSE));
 			GetOverlappedResult(hComm, &g_ol, &dNoOfBytesWritten, TRUE);
+
+#else
+			endtime = GetTickCount() + 500;
+			while (!GetOverlappedResult(hComm, &g_ol, &dNoOfBytesWritten, FALSE)){
+				if (GetTickCount() > endtime)
+				{
+					PSU_DEBUG_PRINT(MSG_ALERT, "GetOverlappedResult Timeout");
+					PSU_DEBUG_PRINT(MSG_ALERT, "dNoOfBytesWritten=%d", dNoOfBytesWritten);
+					DumpComStat();
+
+					ResetEvent(g_ol.hEvent);
+					CloseHandle(g_ol.hEvent);
+					return -3;
+
+					break;
+				}
+			};
+
+#endif
 
 			if (dNoOfBytesWritten != send_size){
 				PSU_DEBUG_PRINT(MSG_FATAL, "Send Size Unexpected ! dNoOfBytesWritten=%d", dNoOfBytesWritten);
@@ -361,7 +382,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 				break;
 
 			default:
-				PSU_DEBUG_PRINT(MSG_ALERT, "dwRes != WAIT_OBJECT_0");
+				PSU_DEBUG_PRINT(MSG_ALERT, "dwRes != WAIT_OBJECT_0,dwRes=%ld", dwRes);
 				DumpComStat();
 				break;
 			}

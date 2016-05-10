@@ -39,6 +39,7 @@ void SerialSendThread::productSendBuff(unsigned int command, unsigned int respon
 wxThread::ExitCode SerialSendThread::Entry()
 {
 	int ret;
+	int sendResult = 0;
 	DWORD iteration=0;
 	DWORD success=0;
 	DWORD timeout = 0;
@@ -84,7 +85,10 @@ wxThread::ExitCode SerialSendThread::Entry()
 					Sleep(*this->m_pollingTime);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
 					// Send Data
-					SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
+					sendResult = SerialSendData(this->m_sendBuff, CMD_DATA_SIZE);
+					if (sendResult < 0){
+						PSU_DEBUG_PRINT(MSG_ALERT, "Serial Send Failed, sendResult=%d", sendResult);
+					}
 
 					// Semaphore Wait for Read Thread Complete
 					PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout");
