@@ -139,6 +139,42 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		PSU_DEBUG_PRINT(MSG_FATAL, "Open Serial Port Failed ! Need add error handle mechanism here");
 	}
 
+	EnumerateAvailableHIDDevice(NULL,0);
+	OpenHIDDevice(NULL,0);
+
+	unsigned char send_buff[64];
+	unsigned char recv_buff[64];
+	productSendBuffer(send_buff, sizeof(send_buff), 0x00, 0x02);
+
+	int res;
+
+	res = HIDSendData(send_buff, 64);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Data Write: Res = %d", res);
+
+	res = 0;
+
+	while (res == 0) {
+		res = HIDReadData(recv_buff, sizeof(recv_buff) / sizeof(unsigned char));
+		if (res == 0)
+			PSU_DEBUG_PRINT(MSG_ALERT, "waiting...\n");
+		if (res < 0)
+			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read()\n");
+#ifdef WIN32
+		Sleep(20);
+#else
+		usleep(500 * 1000);
+#endif
+	};
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "Data Read: Res = %d", res);
+	// Print out the returned buffer.
+	for (unsigned int i = 0; i < res; i++){
+		if (i % 0x10 == 0) printf("\n");
+		PSU_DEBUG_PRINT(MSG_ALERT, "%02hhx ", recv_buff[i]);
+	}
+
+	CloseHIDDevice();
+
 #if 0
 	// Log : Set Active Target 
 	/wxLog::SetActiveTarget(new wxLogStderr());

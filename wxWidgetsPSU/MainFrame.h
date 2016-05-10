@@ -9,6 +9,7 @@
 #include "SerialPortReadThread.h"
 #include "SerialPortSendThread.h"
 #include "SerialPort.h"
+#include "HID.h"
 #include "PMBusDataViewListModel.h"
 #include "PSUStatusBar.h"
 #include "PMBUSCommandType.h"
