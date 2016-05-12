@@ -21,9 +21,6 @@
     <ClCompile Include="SerialPort.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="SerialPortReadThread.cpp">
-      <Filter>原始程式檔</Filter>
-    </ClCompile>
     <ClCompile Include="MainFrame.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
@@ -39,10 +36,25 @@
     <ClCompile Include="PSUStatusBar.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="SerialPortSendThread.cpp">
+    <ClCompile Include="HID.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="HID.cpp">
+    <ClCompile Include="IOPortSendCMDThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="IOPortReadCMDThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PEC.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSCBQuery.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSCBCook.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSCBRaw.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
@@ -51,9 +63,6 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="CommonDef.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="SerialPortReadThread.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
@@ -74,9 +83,6 @@
     <ClInclude Include="PSUStatusBar.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="SerialPortSendThread.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
     <ClInclude Include="PMBUSCommandType.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
@@ -87,6 +93,27 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="HID.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="IOAccess.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="IOPortSendCMDThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="IOPortReadCMDThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PEC.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCBQuery.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCBCook.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCBRaw.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

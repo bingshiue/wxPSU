@@ -24,12 +24,15 @@ enum {
 
 #define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
+typedef struct pmbuscmd_t;
+
 /**
  * @brief Struct for Receive Buff 
  */
 typedef struct recvbuff_t {
 	unsigned int m_length;/**< Receive Data length */
 	unsigned char m_recvBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Receive Data Buff */
+	unsigned char m_dataBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Data Buff (Only contain the data bytes) */
 }RECVBUFF_t;
 
 /**
@@ -52,13 +55,13 @@ typedef int(*CMDCookCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned in
 /**
  * @brief Command Raw Call Back Function.
  */
-typedef int(*CMDRawCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+typedef int(*CMDRawCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 
 /**
  * @brief Struct for CB Functions
  */
 typedef struct cmdcbfunc_t {
-	CMDQueryCBFunc m_quertCBFunc;/**< Query CB Function */
+	CMDQueryCBFunc m_queryCBFunc;/**< Query CB Function */
 	CMDCookCBFunc  m_cookCBFunc;/**< Query CB Function */
 	CMDRawCBFunc   m_rawCBFunc;/**< Query CB Function */
 

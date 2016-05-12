@@ -32,7 +32,7 @@ enum DEBUG_MSG_LEVEL {
 		while(0) ;
 #endif
 
-#define SERIAL_PORT_MAX_COUNT  255/**< Max Count of Serial Port */     
+#define IO_PORT_MAX_COUNT  255/**< Max Count of IO Device */     
 
 #define SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT  1000/**< Timeout of Serial Port Send Semaphore */
 #define SERIAL_PORT_SEND_POLLING_INTERVAL  20/**< Interval of Serial Port Send Polling (Miliseconds) */

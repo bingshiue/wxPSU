@@ -88,19 +88,28 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MyListStoreDerivedModel.cpp" />
+    <ClCompile Include="PEC.cpp" />
+    <ClCompile Include="PMBUSCBCook.cpp" />
+    <ClCompile Include="PMBUSCBQuery.cpp" />
+    <ClCompile Include="PMBUSCBRaw.cpp" />
     <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="PMBusDataViewListModel.cpp" />
     <ClCompile Include="PSUStatusBar.cpp" />
     <ClCompile Include="SerialPort.cpp" />
-    <ClCompile Include="SerialPortReadThread.cpp" />
-    <ClCompile Include="SerialPortSendThread.cpp" />
+    <ClCompile Include="IOPortReadCMDThread.cpp" />
+    <ClCompile Include="IOPortSendCMDThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="HID.h" />
+    <ClInclude Include="IOAccess.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MyListStoreDerivedModel.h" />
+    <ClInclude Include="PEC.h" />
+    <ClInclude Include="PMBUSCBCook.h" />
+    <ClInclude Include="PMBUSCBQuery.h" />
+    <ClInclude Include="PMBUSCBRaw.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
     <ClInclude Include="PMBusCMDGridTable.h" />
     <ClInclude Include="PMBUSCommand.h" />
@@ -108,8 +117,8 @@
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PSUStatusBar.h" />
     <ClInclude Include="SerialPort.h" />
-    <ClInclude Include="SerialPortReadThread.h" />
-    <ClInclude Include="SerialPortSendThread.h" />
+    <ClInclude Include="IOPortReadCMDThread.h" />
+    <ClInclude Include="IOPortSendCMDThread.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

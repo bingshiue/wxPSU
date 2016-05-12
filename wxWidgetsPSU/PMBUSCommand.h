@@ -7,7 +7,7 @@
 #include "PMBUSCommandType.h"
 
 PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
-// toggle  Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t
+// toggle  Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t
 // OOH
 	{ true, 0x00, "PAGE", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // 01H
@@ -17,7 +17,7 @@ PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
 // 03H
 	{ true, 0x03, "CLEAR_FAULTS", cmd_access_write, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
 // 1BH
-	{ true, 0x1b, "SMRALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
+	{ true, 0x1b, "SMRALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
 // 20H
 	{ true, 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // 3AH

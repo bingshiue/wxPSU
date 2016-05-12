@@ -5,6 +5,7 @@
 #include "MainFrame.h"
 #include "MyListStoreDerivedModel.h"
 #include "PMBUSCommand.h"
+#include "PMBUSCMDCB.h"
 #include "PMBusCMDGridTable.h"
 #include "sample.xpm"
 
@@ -15,6 +16,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {	
 	int ret;
 	
+	// Setup IO Structure
+	this->DoSetupIOAccess();
+
+	// Current Use IO
+	//this->m_CurrentUseIOInterface = IOACCESS_HID;
+	this->m_CurrentUseIOInterface = IOACCESS_SERIALPORT;
+
 	// Initializa Semaphore
 	this->m_rxTxSemaphore = new wxSemaphore(0,0);
 	
@@ -128,6 +136,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
 
+	// Open Device
+	this->m_IOAccess[this->m_CurrentUseIOInterface].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+	ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+
+	if(ret != EXIT_SUCCESS){
+		PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+	}
+
+#if 0 // Open Serial Port
 	// Enumerate Serial Port
 	EnumerateAvailableSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
 
@@ -138,42 +155,48 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	if (ret != EXIT_SUCCESS){
 		PSU_DEBUG_PRINT(MSG_FATAL, "Open Serial Port Failed ! Need add error handle mechanism here");
 	}
-
-	EnumerateAvailableHIDDevice(NULL,0);
-	OpenHIDDevice(NULL,0);
-
-	unsigned char send_buff[64];
-	unsigned char recv_buff[64];
-	productSendBuffer(send_buff, sizeof(send_buff), 0x00, 0x02);
-
-	int res;
-
-	res = HIDSendData(send_buff, 64);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data Write: Res = %d", res);
-
-	res = 0;
-
-	while (res == 0) {
-		res = HIDReadData(recv_buff, sizeof(recv_buff) / sizeof(unsigned char));
-		if (res == 0)
-			PSU_DEBUG_PRINT(MSG_ALERT, "waiting...\n");
-		if (res < 0)
-			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read()\n");
-#ifdef WIN32
-		Sleep(20);
-#else
-		usleep(500 * 1000);
 #endif
-	};
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data Read: Res = %d", res);
-	// Print out the returned buffer.
-	for (unsigned int i = 0; i < res; i++){
-		if (i % 0x10 == 0) printf("\n");
-		PSU_DEBUG_PRINT(MSG_ALERT, "%02hhx ", recv_buff[i]);
+#if 0 // Test HID 
+	EnumerateAvailableHIDDevice(NULL,0);
+	int open = 0;
+	open = OpenHIDDevice(NULL,0);
+
+	if (open == EXIT_SUCCESS){
+
+		unsigned char send_buff[64];
+		unsigned char recv_buff[64];
+		productSendBuffer(send_buff, sizeof(send_buff), 0x00, 0x02);
+
+		int res;
+
+		res = HIDSendData(send_buff, 64);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Data Write: Res = %d", res);
+
+		res = 0;
+
+		while (res == 0) {
+			res = HIDReadData(recv_buff, sizeof(recv_buff) / sizeof(unsigned char));
+			if (res == 0)
+				PSU_DEBUG_PRINT(MSG_ALERT, "waiting...");
+			if (res < 0)
+				PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read()");
+#ifdef WIN32
+			Sleep(20);
+#else
+			usleep(500 * 1000);
+#endif
+		};
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "Data Read: Res = %d", res);
+		// Print out the returned buffer.
+		for (int i = 0; i < res; i++){
+			PSU_DEBUG_PRINT(MSG_ALERT, "%02hhx ", recv_buff[i]);
+		}
+
+		CloseHIDDevice();
 	}
-
-	CloseHIDDevice();
+#endif
 
 #if 0
 	// Log : Set Active Target 
@@ -209,18 +232,26 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_query = g_PMBUSCommand[idx].m_query;
 		this->m_PMBusData[idx].m_cook = g_PMBUSCommand[idx].m_cook;
 		this->m_PMBusData[idx].m_responseDataLength = g_PMBUSCommand[idx].m_responseDataLength;
+		this->m_PMBusData[idx].m_cmdCBFunc.m_queryCBFunc = CMDQueryCBFuncArray[idx];
+		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = CMDCookCBFuncArray[idx];
+		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = CMDRawCBFuncArray[idx];
 	}
 
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
-	this->m_serialPortReadCommandThread->m_running = false;
+	//this->m_IOPortReadCMDThread->m_running = false;
 
-	this->m_serialPortReadCommandThread->Kill();
+	//this->m_IOPortReadCMDThread->Kill();
 	
+	// Close IO Device
+	this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
+
+#if 0
 	// Close Serial Port
 	CloseSerialPort();
+#endif
 
 	Close(true);
 }
@@ -243,22 +274,22 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
 
-	if (this->m_monitor_running == false){ // Start Send Data Thread
+	// Start Send Data Thread
+	if (this->m_monitor_running == false){
 		this->m_monitor_running = true;
 		(this->m_status_bar->getTimer())->Start();
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_serialPortSendCommandThread = new SerialSendThread(this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_serialPortRecvBuff, &m_list_model, this->m_status_bar);
-
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
-		if (this->m_serialPortSendCommandThread->Create() != wxTHREAD_NO_ERROR){
+		if (this->m_IOPortSendCMDThread->Create() != wxTHREAD_NO_ERROR){
 			PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Send Command Thread");
 		}
 		else{
-			this->m_serialPortSendCommandThread->Run();
+			this->m_IOPortSendCMDThread->Run();
 		}
 
 	}
@@ -266,11 +297,8 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_monitor_running = false;
 		(this->m_status_bar->getTimer())->Stop();
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
-		this->m_serialPortSendCommandThread->m_running = false;
+		this->m_IOPortSendCMDThread->m_running = false;
 	}
-
-	// Work Around for txtctrl can't be focus
-	//this->m_txtctrl->SetFocus();
 
 }
 
@@ -318,6 +346,7 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 	PSU_DEBUG_PRINT(MSG_ALERT, "Select Polling Time is %d", this->m_polling_time);
+	this->m_dataViewCtrl->SetFocus();
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -382,6 +411,8 @@ void MainFrame::SetupToolBar(void){
 	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
 
 	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_polling_time_combobox->Append(wxT("   0"));
+	m_polling_time_combobox->Append(wxT("  10"));
 	m_polling_time_combobox->Append(wxT("  20"));
 	m_polling_time_combobox->Append(wxT("  50"));
 	m_polling_time_combobox->Append(wxT(" 100"));
@@ -391,7 +422,7 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_combobox->Append(wxT("1000"));
 	m_polling_time_combobox->Append(wxT("1500"));
 
-	m_polling_time_combobox->SetSelection(0);
+	m_polling_time_combobox->SetSelection(2);
 	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
 
 	// Append Address 
@@ -526,6 +557,10 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 
 }
 
+unsigned int MainFrame::getCurrentUseIOInterface(void){
+	return this->m_CurrentUseIOInterface;
+}
+
 void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 {
 	wxString title;// = m_list_model->GetTitle(event.GetItem());
@@ -574,4 +609,21 @@ void MainFrame::OnEnableAll(wxCommandEvent& event){
 		this->m_list_model->SetValueByRow(variant, idx, PSUDataViewListModel::Col_Toggle);
 		this->m_list_model->RowValueChanged(idx, PSUDataViewListModel::Col_Toggle);
 	}
+}
+
+void MainFrame::DoSetupIOAccess(void){
+	// Setup IOAccess Sturct Member
+	// Serial Port
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_EnumerateAvailableDevice = EnumerateAvailableSerialPort;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_OpenDevice = OpenSerialPort;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_CloseDevice = CloseSerialPort;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceSendData = SerialSendData;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceReadData = SerialReadData;
+
+	// HID
+	this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice = EnumerateAvailableHIDDevice;
+	this->m_IOAccess[IOACCESS_HID].m_OpenDevice = OpenHIDDevice;
+	this->m_IOAccess[IOACCESS_HID].m_CloseDevice = CloseHIDDevice;
+	this->m_IOAccess[IOACCESS_HID].m_DeviceSendData = HIDSendData;
+	this->m_IOAccess[IOACCESS_HID].m_DeviceReadData = HIDReadData;
 }

@@ -6,10 +6,11 @@
 
 #include "CommonDef.h"
 #include "main.h"
-#include "SerialPortReadThread.h"
-#include "SerialPortSendThread.h"
+#include "IOPortReadCMDThread.h"
+#include "IOPortSendCMDThread.h"
 #include "SerialPort.h"
 #include "HID.h"
+#include "IOAccess.h"
 #include "PMBusDataViewListModel.h"
 #include "PSUStatusBar.h"
 #include "PMBUSCommandType.h"
@@ -47,18 +48,19 @@ public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	virtual ~MainFrame();
 
+	IOACCESS m_IOAccess[IO_SIZE];
 	PMBUSCOMMAND_t m_PMBusData[PMBUSCOMMAND_SIZE];/**< PM Bus Data */
 
 	bool m_monitor_running;/**< Indicator for mobitor is running */
 
 	unsigned int m_runMode = RunMode_Continally;
 
-	BOOL m_enumSerialPort[SERIAL_PORT_MAX_COUNT];
+	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 
-	SerialReadThread *m_serialPortReadCommandThread;/**< Handle for Read Command Thread */
-	SerialSendThread *m_serialPortSendCommandThread;/**< Handle for Send Command Thread */
+	IOPortReadCMDThread *m_IOPortReadCMDThread;/**< Handle for IO Port Read Command Thread */
+	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle for IO Port Send Command Thread */
 
-	RECVBUFF_t m_serialPortRecvBuff;/**< Receive Data Buffer */
+	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
@@ -125,6 +127,8 @@ public:
 	*/
 	wxSemaphore *m_rxTxSemaphore;
 
+	unsigned int getCurrentUseIOInterface(void);
+
 protected:
 	virtual void DoLogRecord(wxLogLevel level,
 		const wxString& msg,
@@ -132,6 +136,7 @@ protected:
 
 private:
 
+	unsigned int m_CurrentUseIOInterface;/**< Current Use IO Interface */
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
 
 	void SetupPMBusCommandData(void);
@@ -159,6 +164,8 @@ private:
 		const wxString& timestr,
 		const wxString& threadstr,
 		const wxString& msg);
+
+	void DoSetupIOAccess(void);
 
 	wxDECLARE_EVENT_TABLE();
 

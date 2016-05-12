@@ -1,0 +1,325 @@
+/**
+* @file SerialPortSendThread.cpp
+*/
+
+#include "IOPortSendCMDThread.h"
+
+IOPortSendCMDThread::IOPortSendCMDThread(wxSemaphore* semaphore){
+	this->m_rxTxSemaphore = semaphore;
+}
+
+IOPortSendCMDThread::IOPortSendCMDThread(
+	IOACCESS*    ioaccess,
+	unsigned int* currentIO,
+	wxSemaphore* semaphore,
+	unsigned int* runMode,
+	unsigned int* pollingTime,
+	PMBUSCOMMAND_t *pmBusCommand,
+	RECVBUFF_t *recvBuff,
+	wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
+	PSUStatusBar *status_bar
+	)
+{
+	this->m_IOAccess = ioaccess;
+	this->m_CurrentIO = currentIO;
+	this->m_rxTxSemaphore = semaphore;
+	this->m_runMode = runMode;
+	this->m_pollingTime = pollingTime;
+	this->m_pmBusCommand = pmBusCommand;
+	this->m_recvBuff = recvBuff;
+	this->m_dataViewListCtrl = dataViewListModel;
+	this->m_status_bar = status_bar;
+}
+
+IOPortSendCMDThread::~IOPortSendCMDThread() { }
+
+
+void IOPortSendCMDThread::productSendBuff(unsigned int command, unsigned int responseDataLength){
+	
+	switch (*this->m_CurrentIO){
+
+	case IOACCESS_SERIALPORT:
+		this->m_sendBuff[0] = 0x41;
+		this->m_sendBuff[1] = 0x44;
+		this->m_sendBuff[2] = 0xb6;
+		this->m_sendBuff[3] = command;
+		this->m_sendBuff[4] = 0x0d;
+		this->m_sendBuff[5] = 0x0a;
+		this->m_sendBuff[6] = 0xb7;
+		this->m_sendBuff[7] = responseDataLength;
+		this->m_sendBuff[8] = 0x0d;
+		this->m_sendBuff[9] = 0x0a;
+		break;
+
+	case IOACCESS_HID:
+		this->m_sendBuff[0] = 0x05;           // Report ID is 0x05
+		this->m_sendBuff[1] = 0x0a;
+		this->m_sendBuff[2] = 0x41;
+		this->m_sendBuff[3] = 0x44;
+		this->m_sendBuff[4] = 0xb6;
+		this->m_sendBuff[5] = command;        // Command is 0x3a
+		this->m_sendBuff[6] = 0x0d;
+		this->m_sendBuff[7] = 0x0a;
+		this->m_sendBuff[8] = 0xb7;
+		this->m_sendBuff[9] = responseDataLength; // Response Data Length
+		this->m_sendBuff[10] = 0x0d;
+		this->m_sendBuff[11] = 0x0a;
+		this->m_sendBuff[12] = 0x01;
+		this->m_sendBuff[13] = 0x00;
+		this->m_sendBuff[14] = 0x00;
+		this->m_sendBuff[15] = 0x00;
+
+		this->m_sendBuff[16] = 0x00;
+		this->m_sendBuff[17] = 0x00;
+		this->m_sendBuff[18] = 0x00;
+		this->m_sendBuff[19] = 0x00;
+		this->m_sendBuff[20] = 0x00;
+		this->m_sendBuff[21] = 0x00;
+		this->m_sendBuff[22] = 0x00;
+		this->m_sendBuff[23] = 0x00;
+		this->m_sendBuff[24] = 0x00;
+		this->m_sendBuff[25] = 0x01;
+		this->m_sendBuff[26] = responseDataLength; // Response Data Length
+		this->m_sendBuff[27] = 0x00;
+		this->m_sendBuff[28] = 0x00;
+		this->m_sendBuff[29] = 0x02;
+		this->m_sendBuff[30] = 0xb7;
+		this->m_sendBuff[31] = responseDataLength; // Response Data Length
+
+		this->m_sendBuff[32] = 0x00;
+		this->m_sendBuff[33] = 0x01; //
+		this->m_sendBuff[34] = 0xb7; //
+		this->m_sendBuff[35] = 0x00;
+		this->m_sendBuff[36] = 0x00;
+		this->m_sendBuff[37] = 0x00;
+		this->m_sendBuff[38] = 0x00;
+		this->m_sendBuff[39] = 0x00;
+		this->m_sendBuff[40] = 0x00;
+		this->m_sendBuff[41] = 0x00;
+		this->m_sendBuff[42] = 0x00;
+		this->m_sendBuff[43] = 0x00;
+		this->m_sendBuff[44] = 0x00;
+		this->m_sendBuff[45] = 0x00;
+		this->m_sendBuff[46] = 0x00;
+		this->m_sendBuff[47] = 0x00;
+
+		this->m_sendBuff[48] = 0x00;
+		this->m_sendBuff[49] = 0x00;
+		this->m_sendBuff[50] = 0x00;
+		this->m_sendBuff[51] = 0x00;
+		this->m_sendBuff[52] = 0x00;
+		this->m_sendBuff[53] = 0x00;
+		this->m_sendBuff[54] = 0x00;
+		this->m_sendBuff[55] = 0x00;
+		this->m_sendBuff[56] = 0x00;
+		this->m_sendBuff[57] = 0x00;
+		this->m_sendBuff[58] = 0x00;
+		this->m_sendBuff[59] = 0x00;
+		this->m_sendBuff[60] = 0x00;
+		this->m_sendBuff[61] = 0x00;
+		this->m_sendBuff[62] = 0x00;
+		this->m_sendBuff[63] = 0x00;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+}
+
+#define BASE_RESPONSE_DATA_LENGTH  6
+#define STR_LENGTH  256
+wxThread::ExitCode IOPortSendCMDThread::Entry()
+{
+	int ret;
+	int sendResult = 0;
+	int ExpectReceiveDataLength = 0;
+	DWORD iteration=0;
+	DWORD success=0;
+	DWORD timeout = 0;
+	wchar_t QueryStr[STR_LENGTH];
+	wchar_t CookStr[STR_LENGTH];
+	wchar_t RawStr[STR_LENGTH];
+	
+	PSU_DEBUG_PRINT(MSG_DEBUG, "In Send Data Thread ");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread started (priority = %u).", GetPriority());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "RunMode is Continally ");
+	PSU_DEBUG_PRINT(MSG_DETAIL,"m_pollingTime=%d", this->m_pollingTime);
+
+	m_running = true;
+
+	switch (*this->m_runMode){
+
+	case RunMode_Iteration:
+
+		break;
+
+	case RunMode_Continally:
+		// RunMode is Continally 
+		while (m_running){
+
+			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running==true; idx++){
+				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
+
+					// Update DataView Register Field Icon
+					this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
+					this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RegisterIconText);
+	                
+					// Prepare Send Buffer
+					this->productSendBuff(this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
+
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Send");
+					// Sleep Polling Time
+					Sleep(*this->m_pollingTime);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+
+					// Send Data
+					sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? SERIAL_SEND_DATA_SIZE : HID_SEND_DATA_SIZE);
+					if (sendResult <= 0){
+						PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
+					}
+					else{
+						PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+					}
+
+					// Create IOPortReadCMDThread
+					this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess,this->m_CurrentIO,this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH);
+
+					// If Create Thread Success
+					if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+						PSU_DEBUG_PRINT(MSG_FATAL, "Can't create thread!");
+					}
+					else{
+						this->m_IOPortReadCMDThread->Run();
+					}
+
+					//
+
+					// Semaphore Wait for Read Thread Complete
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
+					ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+					if (ret != wxSEMA_NO_ERROR){
+						PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+					}
+					else{
+						
+						if (this->m_recvBuff->m_length == 0){
+							PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %d", this->m_recvBuff->m_length, this->m_pmBusCommand[idx].m_register);
+							this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
+							timeout++;
+						}
+						else{
+							// Get Expect Data Length
+							ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+							PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
+							
+							//
+							//if (this->m_recvBuff->m_length == (this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH))
+							if (this->m_recvBuff->m_length == ExpectReceiveDataLength)
+							{
+
+								PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
+								success++;
+
+								// copy data to PMBus Command Structure
+								this->m_pmBusCommand[idx].m_recvBuff.m_length = this->m_recvBuff->m_length;
+								for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
+									this->m_pmBusCommand[idx].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
+									PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[idx].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
+								}
+
+								// Prepare Data Buffer
+								this->productDataBuff(idx, this->m_pmBusCommand[idx].m_responseDataLength);
+
+								// Call Raw Data CB Function
+								this->m_pmBusCommand[idx].m_cmdCBFunc.m_rawCBFunc(&(this->m_pmBusCommand[idx]), RawStr, this->m_pmBusCommand[idx].m_responseDataLength);
+
+								//#define PRINT_RAW_IN_FEILD
+								#ifdef PRINT_RAW_IN_FEILD
+								wxString outputMsg("");
+								for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+									outputMsg += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+								}
+								#else
+								wxString outputMsg(RawStr);
+								#endif
+
+								// Update Data View Model Raw Field
+								wxVariant variant;
+								variant = outputMsg;
+
+								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
+								PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
+								this->m_dataViewListCtrl->get()->SetValueByRow(variant, idx, PSUDataViewListModel::Col_RawText);
+								this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
+
+								PSU_DEBUG_PRINT(MSG_DEBUG, "%s", outputMsg.c_str());
+							}
+							//
+							else{
+								PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
+								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
+							}
+						}
+					}
+
+					//Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+				}
+				else{
+					continue;
+				}
+
+				// Set Monitoring Name / Monitoring Summary of Status Bar
+				wxString monitor("Monitoring...[");
+				wxString cmd(wxString::Format("%02x", this->m_pmBusCommand[idx].m_register).Upper());
+				wxString hex("h]");
+				this->m_status_bar->setMonitoringCMDName(monitor + cmd + hex);
+
+				iteration++;
+				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
+				this->m_status_bar->setMonitoringSummary(summary);
+
+			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
+		} //while(m_running)
+
+		break;
+
+	case RunMode_StopAnError:
+
+		break;
+
+	default:
+
+		break;
+	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
+
+	return NULL;
+}
+
+void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength){
+
+	switch (*this->m_CurrentIO){
+
+	case IOACCESS_SERIALPORT:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
+		}
+
+		break;
+
+	case IOACCESS_HID:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx+6];
+		}
+
+		break;
+
+	default :
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Wrong !");
+		break;
+	}
+}

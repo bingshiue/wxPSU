@@ -4,72 +4,9 @@
 #ifndef _PMBUSCMDCB_H_
 #define _PMBUSCMDCB_H_
 
-#include "PMBUSCommandType.h"
-
-int Query_00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_02H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_03H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_1bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_20H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_3aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_3bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_51H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_5dH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_6aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_6bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_78H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_79H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7cH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7dH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7eH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_7fH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_81H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_86H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_87H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_88H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_89H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8c00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8b00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8c01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8d01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8eH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_8fH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_90H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_96H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_97H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_98H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_99H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_9aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_9bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_9cH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_9dH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_9eH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a0H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a1H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a2H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a3H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a4H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a5H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a6H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a7H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a8H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_a9H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_aaH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_abH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_d0H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_dbH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_dcH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_ddH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_f1H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_faH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_fcH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-
-
+#include "PMBUSCBQuery.h"
+#include "PMBUSCBCook.h"
+#include "PMBUSCBRaw.h"
 
 CMDQueryCBFunc CMDQueryCBFuncArray[PMBUSCOMMAND_SIZE] = {
 	Query_00H,
@@ -136,8 +73,134 @@ CMDQueryCBFunc CMDQueryCBFuncArray[PMBUSCOMMAND_SIZE] = {
 	Query_fcH
 };
 
-CMDCookCBFunc CMDCookCBFuncArray[PMBUSCOMMAND_SIZE];
+CMDCookCBFunc CMDCookCBFuncArray[PMBUSCOMMAND_SIZE] = {
+	Cook_00H,
+	Cook_01H,
+	Cook_02H,
+	Cook_03H,
+	Cook_1bH,
+	Cook_20H,
+	Cook_3aH,
+	Cook_3bH,
+	Cook_51H,
+	Cook_5dH,
+	Cook_6aH,
+	Cook_6bH,
+	Cook_78H,
+	Cook_79H,
+	Cook_7aH,
+	Cook_7bH,
+	Cook_7cH,
+	Cook_7dH,
+	Cook_7eH,
+	Cook_7fH,
+	Cook_81H,
+	Cook_86H,
+	Cook_87H,
+	Cook_88H,
+	Cook_89H,
+	Cook_8aH,
+	Cook_8bH,
+	Cook_8c00H,
+	Cook_8b00H,
+	Cook_8c01H,
+	Cook_8d01H,
+	Cook_8eH,
+	Cook_8fH,
+	Cook_90H,
+	Cook_96H,
+	Cook_97H,
+	Cook_98H,
+	Cook_99H,
+	Cook_9aH,
+	Cook_9bH,
+	Cook_9cH,
+	Cook_9dH,
+	Cook_9eH,
+	Cook_a0H,
+	Cook_a1H,
+	Cook_a2H,
+	Cook_a3H,
+	Cook_a4H,
+	Cook_a5H,
+	Cook_a6H,
+	Cook_a7H,
+	Cook_a8H,
+	Cook_a9H,
+	Cook_aaH,
+	Cook_abH,
+	Cook_d0H,
+	Cook_dbH,
+	Cook_dcH,
+	Cook_ddH,
+	Cook_f1H,
+	Cook_faH,
+	Cook_fcH
+};
 
-CMDRawCBFunc CMDRawCBFuncArray[PMBUSCOMMAND_SIZE];
+CMDRawCBFunc CMDRawCBFuncArray[PMBUSCOMMAND_SIZE] = {
+	Raw_00H,
+	Raw_01H,
+	Raw_02H,
+	Raw_03H,
+	Raw_1bH,
+	Raw_20H,
+	Raw_3aH,
+	Raw_3bH,
+	Raw_51H,
+	Raw_5dH,
+	Raw_6aH,
+	Raw_6bH,
+	Raw_78H,
+	Raw_79H,
+	Raw_7aH,
+	Raw_7bH,
+	Raw_7cH,
+	Raw_7dH,
+	Raw_7eH,
+	Raw_7fH,
+	Raw_81H,
+	Raw_86H,
+	Raw_87H,
+	Raw_88H,
+	Raw_89H,
+	Raw_8aH,
+	Raw_8bH,
+	Raw_8c00H,
+	Raw_8b00H,
+	Raw_8c01H,
+	Raw_8d01H,
+	Raw_8eH,
+	Raw_8fH,
+	Raw_90H,
+	Raw_96H,
+	Raw_97H,
+	Raw_98H,
+	Raw_99H,
+	Raw_9aH,
+	Raw_9bH,
+	Raw_9cH,
+	Raw_9dH,
+	Raw_9eH,
+	Raw_a0H,
+	Raw_a1H,
+	Raw_a2H,
+	Raw_a3H,
+	Raw_a4H,
+	Raw_a5H,
+	Raw_a6H,
+	Raw_a7H,
+	Raw_a8H,
+	Raw_a9H,
+	Raw_aaH,
+	Raw_abH,
+	Raw_d0H,
+	Raw_dbH,
+	Raw_dcH,
+	Raw_ddH,
+	Raw_f1H,
+	Raw_faH,
+	Raw_fcH
+};
 
 #endif

@@ -314,6 +314,7 @@ bool PSUDataViewListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	return true;
 }
 
+//#define PRINT_RAW_IN_FEILD
 bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int row, unsigned int col)
 {
 
@@ -370,14 +371,17 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 
 		break;
 	case Col_RawText:
+#ifdef PRINT_RAW_IN_FEILD
 		PSU_DEBUG_PRINT(MSG_DETAIL, "");
 		PSU_DEBUG_PRINT(MSG_DETAIL, "row = %d, length = %d ", row, this->m_pmBusCommand[row].m_recvBuff.m_length);
 		m_rawColValues[row].clear();
 		for (unsigned int idx = 0; idx < this->m_pmBusCommand[row].m_recvBuff.m_length; idx++){
 			m_rawColValues[row] += wxString::Format(" %02x ", this->m_pmBusCommand[row].m_recvBuff.m_recvBuff[idx]);
 		}
-
 		PSU_DEBUG_PRINT(MSG_DETAIL, "call %s , %s", m_rawColValues[row].c_str());
+#else
+		m_rawColValues[row] = variant.GetString();
+#endif
 
 		return true;
 

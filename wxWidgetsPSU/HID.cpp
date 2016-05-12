@@ -7,6 +7,8 @@ using namespace std;
 
 #include "HID.h"
 
+#define READ_OPERATION_BLOCKING
+
 #define DEFAULT_VID 0x4d8/**< Default VID */
 #define DEFAULT_PID 0x3f/**< Default PID */
 #define MAX_STR 255
@@ -88,8 +90,13 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray){
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read indexed string 1");
 		PSU_DEBUG_PRINT(MSG_ALERT, "Indexed String 1: %ls", wstr);
 
+#ifdef READ_OPERATION_BLOCKING
+		// Set the hid_read() function to be blocking.
+		hid_set_nonblocking(handle, 0);
+#else
 		// Set the hid_read() function to be non-blocking.
 		hid_set_nonblocking(handle, 1);
+#endif
 	}
 
 	return EXIT_SUCCESS;
@@ -100,9 +107,29 @@ int HIDSendData(unsigned char* buff, unsigned int size){
 	return hid_write(handle, buff, size);
 }
 
+#define RETRY_TIMES  3
+#define HID_EXPECT_DATA_LENGTH  64/**< HID Expect Data Length */
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
+	unsigned int retry = 0;
+	unsigned int readSize = 0;
 
-	return hid_read(handle, buff, sizeOfBuff);
+	while (retry < RETRY_TIMES && readSize <= 0){
+
+		readSize = hid_read(handle, buff, sizeOfBuff+2);// Read To [0x0d] [0x0a]
+		if (readSize != HID_EXPECT_DATA_LENGTH){
+			PSU_DEBUG_PRINT(MSG_ALERT, "readSize = %d", readSize);
+		}
+
+		retry++;
+		Sleep(20);
+	}
+
+	if (retry >= RETRY_TIMES){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Read Data Timeout Occurs, Retry = %d", retry);
+		readSize = 0;
+	}
+
+	return sizeOfBuff + 2;//readSize;
 }
 
 int CloseHIDDevice(void){
@@ -116,8 +143,8 @@ int CloseHIDDevice(void){
 	ret = hid_exit();
 
 	if (ret < 0){
-		return EXIT_FAILURE;
 		PSU_DEBUG_PRINT(MSG_ALERT, "Close HID Device Handle Failed");
+		return EXIT_FAILURE;
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Close HID Device Handle Success");
