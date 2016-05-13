@@ -98,6 +98,7 @@
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />
     <ClCompile Include="IOPortSendCMDThread.cpp" />
+    <ClCompile Include="STDPage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />
     <ClInclude Include="IOPortSendCMDThread.h" />
+    <ClInclude Include="STDPage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

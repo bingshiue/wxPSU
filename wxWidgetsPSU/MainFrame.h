@@ -14,6 +14,7 @@
 #include "PMBusDataViewListModel.h"
 #include "PSUStatusBar.h"
 #include "PMBUSCommandType.h"
+#include "STDPage.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -93,7 +94,9 @@ public:
 	wxPanel    *VerificationPanel;
 	wxPanel    *STATUSPanel;
 
-	wxPanel    *STDPanel;
+	//wxPanel    *STDPanel;
+	STDPage    *m_stdPage;
+
 	wxPanel    *ReadPanel;
 	wxPanel    *WritePanel;
 

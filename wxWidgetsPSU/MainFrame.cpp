@@ -11,8 +11,7 @@
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-	: wxFrame(NULL, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
 	int ret;
 	
@@ -540,11 +539,12 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	// Setup Sub Notebook
 	this->m_subNotebook = new wxNotebook(parent, wxID_ANY);
 
-	this->STDPanel   = new wxPanel(this->m_subNotebook, wxID_ANY);
+	//this->STDPanel   = new wxPanel(this->m_subNotebook, wxID_ANY);
+	this->m_stdPage = new STDPage(this->m_subNotebook);
 	this->ReadPanel  = new wxPanel(this->m_subNotebook, wxID_ANY);
 	this->WritePanel = new wxPanel(this->m_subNotebook, wxID_ANY);
 
-	this->m_subNotebook->AddPage(this->STDPanel,  "STD");
+	this->m_subNotebook->AddPage(this->m_stdPage, "STD");
 	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
 	this->m_subNotebook->AddPage(this->WritePanel,"Write");
 
@@ -552,8 +552,8 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
-	GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 0);
-	GeneralPanelSz->Add(this->m_dataViewCtrl,7, wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(m_subNotebook, 2, wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(this->m_dataViewCtrl,8, wxGROW | wxALL, 0);
 
 	parent->SetSizerAndFit(GeneralPanelSz);
 
