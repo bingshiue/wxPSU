@@ -255,11 +255,13 @@ void MainFrame::OnExit(wxCommandEvent& event)
 
 	Close(true);
 }
+
 void MainFrame::OnAbout(wxCommandEvent& event)
 {
-	wxMessageBox("This is a wxWidgets' Hello world sample",
-		"About Hello World", wxOK | wxICON_INFORMATION);
+	wxMessageBox("Acbel PSU Tool",
+		"Acbel", wxOK | wxICON_INFORMATION);
 }
+
 void MainFrame::OnHexToBin(wxCommandEvent& event)
 {
 	PSU_DEBUG_PRINT(MSG_ALERT,"Not Implement");
@@ -469,7 +471,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 		PSUDataViewListModel::Col_Toggle,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxDVC_TOGGLE_DEFAULT_WIDTH,
-		wxALIGN_NOT,
+		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_REORDERABLE
 		);
 
@@ -491,28 +493,28 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 		PSUDataViewListModel::Col_AccessText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
+		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Query",
 		PSUDataViewListModel::Col_QueryText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
+		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Cook",
 		PSUDataViewListModel::Col_CookText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
+		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);
 
 	this->m_dataViewCtrl->AppendTextColumn("Raw",
 		PSUDataViewListModel::Col_RawText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
+		wxALIGN_LEFT,
 		wxCOL_RESIZABLE);
 
 #if 0
@@ -550,7 +552,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
-	//GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(m_subNotebook, 3, wxGROW | wxALL, 0);
 	GeneralPanelSz->Add(this->m_dataViewCtrl,7, wxGROW | wxALL, 0);
 
 	parent->SetSizerAndFit(GeneralPanelSz);

@@ -5,6 +5,7 @@
 #ifndef _PSUSTATUSBAR_H_
 #define _PSUSTATUSBAR_H_
 
+#include "CommonDef.h"
 #include "main.h"
 
 class PSUStatusBar : public wxStatusBar
@@ -24,6 +25,7 @@ public:
 	void OnIdle(wxIdleEvent& event);
 
 	wxTimer* getTimer(void) { return &this->m_timer; }
+	wxGauge* getGauge(void) { return this->m_gauge; }
 	wxDateTime& getBeginDateTime(void) { return this->m_beginTime; }
 
 	void setMonitoringCMDName(wxString& cmdName);
@@ -35,11 +37,11 @@ private:
 
 	enum
 	{
-		Field_SerialPort_Setting = 0,
+		Field_IO_Setting = 0,
 		Field_I2C_Clock,
 		Field_Run_Mode,
 		Field_Monitoring_Command,
-		Field_Reserved,
+		Field_Gauge,
 		Field_Monitoring_Time,
 		Field_Monitoring_Summary,
 		Field_Max
@@ -53,6 +55,8 @@ private:
 	//wxCheckBox *m_checkbox;
 #endif
 	wxStaticBitmap *m_statbmp;
+
+	wxGauge *m_gauge;
 
 	//wxStopWatch m_sw;
 	wxDateTime m_beginTime;

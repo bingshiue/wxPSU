@@ -4,6 +4,10 @@
 #ifndef _PMBUSCOMMANDTYPE_H_
 #define _PMBUSCOMMANDTYPE_H_
 
+#ifdef _MSC_VER
+#pragma warning(disable:4091)
+#endif
+
 #include "CommonDef.h"
 
 enum {
@@ -50,7 +54,7 @@ typedef int(*CMDQueryCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned i
 /**
  * @brief Command Cook Call Back Function.
  */
-typedef int(*CMDCookCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+typedef int(*CMDCookCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 /**
  * @brief Command Raw Call Back Function.
@@ -89,6 +93,6 @@ typedef struct pmbuscmd_t {
 
 	CMDCBFUNC_t     m_cmdCBFunc;/**< CallBack Function */
 
-}PMBUSCOMMAND_t;
+} PMBUSCOMMAND_t;
 
 #endif

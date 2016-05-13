@@ -135,6 +135,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int ret;
 	int sendResult = 0;
 	int ExpectReceiveDataLength = 0;
+	int retry = 0;
+	bool sendRetryStillFailed = false;
 	DWORD iteration=0;
 	DWORD success=0;
 	DWORD timeout = 0;
@@ -148,6 +150,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	PSU_DEBUG_PRINT(MSG_DETAIL,"m_pollingTime=%d", this->m_pollingTime);
 
 	m_running = true;
+
+	this->m_status_bar->getGauge()->Pulse();
 
 	switch (*this->m_runMode){
 
@@ -173,13 +177,36 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					// Sleep Polling Time
 					Sleep(*this->m_pollingTime);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
-					// Send Data
-					sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? SERIAL_SEND_DATA_SIZE : HID_SEND_DATA_SIZE);
-					if (sendResult <= 0){
-						PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
-					}
-					else{
-						PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+
+					retry = 0;
+					do {
+
+						// Send Data
+						sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? SERIAL_SEND_DATA_SIZE : HID_SEND_DATA_SIZE);
+						if (sendResult <= 0){
+							PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
+							// Retry 
+							retry++;
+							if (retry >= 3){
+								PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Failed, Retry Times = %d", retry);
+								sendRetryStillFailed = true;
+								break;
+							}
+							else{
+								PSU_DEBUG_PRINT(MSG_ALERT, "Retry Times = %d", retry);
+							}
+
+						}
+						else{
+							PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+						}
+
+					} while (sendResult <=0);
+					
+					if (sendRetryStillFailed == true){
+						PSU_DEBUG_PRINT(MSG_ALERT, "Retry Send Still Failed, Exit Send Thread");
+						m_running = false;
+						break;
 					}
 
 					// Create IOPortReadCMDThread
@@ -236,24 +263,38 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 								//#define PRINT_RAW_IN_FEILD
 								#ifdef PRINT_RAW_IN_FEILD
-								wxString outputMsg("");
+								wxString RawMsg("");
 								for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
-									outputMsg += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+									RawMsg += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
 								}
 								#else
-								wxString outputMsg(RawStr);
+								wxString RawMsg(RawStr);
 								#endif
 
 								// Update Data View Model Raw Field
-								wxVariant variant;
-								variant = outputMsg;
+								wxVariant variantRaw;
+								variantRaw = RawMsg;
 
 								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
 								PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
-								this->m_dataViewListCtrl->get()->SetValueByRow(variant, idx, PSUDataViewListModel::Col_RawText);
+								this->m_dataViewListCtrl->get()->SetValueByRow(variantRaw, idx, PSUDataViewListModel::Col_RawText);
 								this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
 
-								PSU_DEBUG_PRINT(MSG_DEBUG, "%s", outputMsg.c_str());
+								PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
+
+								// Call Cook Data CB Function
+								memset(CookStr, 0, STR_LENGTH);
+								this->m_pmBusCommand[idx].m_cmdCBFunc.m_cookCBFunc(&(this->m_pmBusCommand[idx]), CookStr, this->m_pmBusCommand[idx].m_responseDataLength);
+
+								// Update Data View Model Cook Field
+								wxString CookMsg(CookStr);
+								wxVariant variantCook;
+								variantCook = CookMsg;
+
+								this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PSUDataViewListModel::Col_CookText);
+								this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_CookText);
+
+								PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
 							}
 							//
 							else{
@@ -281,6 +322,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
 		} //while(m_running)
+
+		this->m_status_bar->getGauge()->SetValue(0);
 
 		break;
 

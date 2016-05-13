@@ -10,8 +10,7 @@
 #pragma warning(disable: 4355)
 #endif
 
-PSUStatusBar::PSUStatusBar(wxWindow *parent, long style) 
-	: wxStatusBar(parent, wxID_ANY, style, "PSUStatusBar")
+PSUStatusBar::PSUStatusBar(wxWindow *parent, long style) : wxStatusBar(parent, wxID_ANY, style, "PSUStatusBar")
 #if wxUSE_TIMER
 	, m_timer(this)
 #endif
@@ -20,23 +19,27 @@ PSUStatusBar::PSUStatusBar(wxWindow *parent, long style)
 #endif
 {
 	int widths[Field_Max];
-	widths[Field_SerialPort_Setting] = 120;
+	widths[Field_IO_Setting] = 120;
 	widths[Field_I2C_Clock] = 50;
-	widths[Field_Run_Mode] = 80;
+	widths[Field_Run_Mode] = 100;
 	widths[Field_Monitoring_Command] = 150;
-	widths[Field_Reserved] = 100;
-	widths[Field_Monitoring_Time] = -1; // growable
+	widths[Field_Gauge] = 100;
+	widths[Field_Monitoring_Time] = 50; // growable
 	widths[Field_Monitoring_Summary] = -1;
+
+	SetFieldsCount(Field_Max);
+	SetStatusWidths(Field_Max, widths);
 
 #if wxUSE_CHECKBOX
 	//m_checkbox = new wxCheckBox(this, StatusBar_Checkbox, wxT("&Toggle clock"));
 	//m_checkbox->SetValue(true);
 #endif
 
-	SetFieldsCount(Field_Max);
-	SetStatusWidths(Field_Max, widths);
+	m_gauge = new wxGauge(this, wxID_ANY, 100);
 
-	this->SetStatusText(wxT("Com3-9600-N81"), Field_SerialPort_Setting);
+	m_gauge->SetValue(0);
+
+	this->SetStatusText(wxT("Com3-9600-N81"), Field_IO_Setting);
 	this->SetStatusText(wxT("100kHz"), Field_I2C_Clock);
 	this->SetStatusText(wxT("Continually"), Field_Run_Mode);
 
@@ -77,7 +80,21 @@ void PSUStatusBar::UpdateClock()
 }
 
 void PSUStatusBar::OnSize(wxSizeEvent& event){
+	// ReSize Gauge
+	if (!this->m_gauge){
+		return;
+	}
 
+	wxRect rect;
+	if (!GetFieldRect(Field_Gauge, rect))
+	{
+		event.Skip();
+		return;
+	}
+
+	wxRect rectCheck = rect;
+	rectCheck.Deflate(1);
+	m_gauge->SetSize(rectCheck);
 }
 
 void PSUStatusBar::OnToggleClock(wxCommandEvent& event){

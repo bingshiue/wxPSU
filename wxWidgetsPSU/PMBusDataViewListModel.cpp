@@ -65,6 +65,13 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 		}
 	}
 
+	// Setup Cook
+	m_cookColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		m_cookColValues.push_back(wxT("Cook"));
+	}
+
+
 	// Setup Raw
 	m_rawColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
@@ -215,6 +222,8 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 
 		break;
 	case Col_CookText:
+
+		variant = m_cookColValues[row];
 
 		break;
 
@@ -368,6 +377,8 @@ bool PSUDataViewListModel::SetValueByRow(const wxVariant &variant,unsigned int r
 
 		break;
 	case Col_CookText:
+
+		m_cookColValues[row] = variant.GetString();
 
 		break;
 	case Col_RawText:

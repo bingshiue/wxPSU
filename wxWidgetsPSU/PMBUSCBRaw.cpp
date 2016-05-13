@@ -9,7 +9,18 @@ int Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLeng
 int Raw_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_02H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
-int Raw_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
+
+int Raw_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ 
+	// Because of this command's access attribute is write, don't show any response data in raw field
+	const wchar_t* tmp_wchar;
+	wxString wxstr("");
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+	
+	return EXIT_SUCCESS; 
+}
+
 int Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
