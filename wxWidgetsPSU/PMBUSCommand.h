@@ -17,7 +17,7 @@ PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
 // 03H
 	{ true, 0x03, "CLEAR_FAULTS", cmd_access_write, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
 // 1BH
-	{ true, 0x1b, "SMRALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
+	{ true, 0x1b, "SMRALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, {0x01,0x78} }, { 0 } },
 // 20H
 	{ true, 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // 3AH
@@ -119,13 +119,13 @@ PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
 // ABh         
 	{ true, 0xab, "MFR_EFFICIENCY_HL", cmd_access_br, 0, 0, { 0 }, 0x14, { 0 }, { 0 }, { 0 } },
 // D0h         
-	{ true, 0xd0, "Cold_Redundancy_Config", cmd_access_readwrite, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
+	{ true, 0xd0, "Cold_Redundancy_Config", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // DBh         
-	{ true, 0xdb, "Read_RealTime", cmd_access_read, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 } },
+	{ true, 0xdb, "Read_RealTime", cmd_access_read, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
 // DCh         
 	{ true, 0xdc, "Read_BoxSTATUS", cmd_access_readwrite, 0, 0, { 0 }, 0x0C, { 0 }, { 0 }, { 0 } },
 // DDh         
-	{ true, 0xdd, "Black_BOX_Index", cmd_access_readwrite, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 } },
+	{ true, 0xdd, "Black_BOX_Index", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // F1h         
 	{ true, 0xf1, "Firmware_Version_Command", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 } },
 // FAh         

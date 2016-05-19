@@ -13,8 +13,10 @@
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSDataViewListModel.h"
+#include "PMBUSHelper.h"
 #include "PSUStatusBar.h"
 #include "IOPortReadCMDThread.h"
+#include "STDPage.h"
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Max Size */
 
@@ -35,15 +37,16 @@ public:
 
 	IOPortSendCMDThread(wxSemaphore* semaphore);
 	IOPortSendCMDThread(
-						IOACCESS*    ioaccess,
-						unsigned int* currentIO,
-						wxSemaphore* semaphore, 
-						unsigned int* runMode, 
-						unsigned int* pollingTime, 
-						PMBUSCOMMAND_t *pmBusCommand, 
-						RECVBUFF_t *recvBuff, 
-						wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel, 
-						PSUStatusBar *status_bar
+		IOACCESS*    ioaccess,
+		unsigned int* currentIO,
+		wxSemaphore* semaphore,
+		unsigned int* runMode,
+		unsigned int* pollingTime,
+		PMBUSCOMMAND_t *pmBusCommand,
+		RECVBUFF_t *recvBuff,
+		wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
+		PSUStatusBar *status_bar,
+		STDPage* stdPage
 						);
 	virtual ~IOPortSendCMDThread();
 
@@ -56,9 +59,12 @@ public:
 
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
 	PSUStatusBar  *m_status_bar;
+	STDPage *m_stdPage;
 
-	void productSendBuff(unsigned int command,unsigned int responseDataLength);
-	void productDataBuff(unsigned int cmdIndex,unsigned int responseDataLength);
+	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
+	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);
+
+	void UpdateSTDPage(void);
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;

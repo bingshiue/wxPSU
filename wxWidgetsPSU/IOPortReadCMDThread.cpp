@@ -28,7 +28,7 @@ wxThread::ExitCode IOPortReadCMDThread::Entry()
 {
 	int ret;
 	
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread started (priority = %u), CMD=%02xH", GetPriority(), this->m_pmBusCommand->m_register);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Thread started (priority = %u), CMD=%02xH", GetPriority(), this->m_pmBusCommand->m_register);
 
 	this->m_running = true;
 
@@ -39,7 +39,7 @@ wxThread::ExitCode IOPortReadCMDThread::Entry()
 		// Read Data From IO
 		this->m_recvBuff->m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff->m_recvBuff,this->m_bytesToRead);
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore Post");
+		PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore Post");
 		// Semaphore Post
 		ret = this->m_rxTxSemaphore->Post();
 

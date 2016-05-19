@@ -68,14 +68,14 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 	// Setup Cook
 	m_cookColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
-		m_cookColValues.push_back(wxT("Cook"));
+		m_cookColValues.push_back(wxT(""));
 	}
 
 
 	// Setup Raw
 	m_rawColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
-		m_rawColValues.push_back(wxT("Raw Data"));
+		m_rawColValues.push_back(wxT(""));
 	}
 
 	// Setup Icon
@@ -177,7 +177,12 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 			switch (this->m_pmBusCommand[row].m_cmdStatus.m_status){
 
 			case cmd_status_not_run:
-				variant << wxDataViewIconText(text, m_icon[XPM_red]);
+				if (this->m_pmBusCommand[row].m_access != cmd_access_write){
+					variant << wxDataViewIconText(text, m_icon[XPM_red]);
+				}
+				else{
+					variant << wxDataViewIconText(text, m_icon[XPM_gray]);
+				}
 				break;
 
 			case cmd_status_running:
@@ -189,6 +194,7 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 				break;
 
 			case cmd_status_failure:
+			case cmd_status_checksum_error:
 				variant << wxDataViewIconText(text, m_icon[XPM_red]);
 				break;
 

@@ -15,6 +15,9 @@
 #include "PSUStatusBar.h"
 #include "PMBUSCommandType.h"
 #include "STDPage.h"
+#include "BaseWritePage.h"
+#include "PMBUSCMDWritePages.h"
+#include "PMBUSHelper.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -98,7 +101,7 @@ public:
 	STDPage    *m_stdPage;
 
 	wxPanel    *ReadPanel;
-	wxPanel    *WritePanel;
+	BaseWritePage  *m_writePage;
 
 
 	// Tool Bar
@@ -133,9 +136,7 @@ public:
 	unsigned int getCurrentUseIOInterface(void);
 
 protected:
-	virtual void DoLogRecord(wxLogLevel level,
-		const wxString& msg,
-		const wxLogRecordInfo& info) wxOVERRIDE;
+	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
 private:
 
@@ -158,7 +159,7 @@ private:
 	void OnEnableAll(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
-	void OnSelectionChanged(wxDataViewEvent &event);
+	void OnDVSelectionChanged(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
 

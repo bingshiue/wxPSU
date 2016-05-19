@@ -94,11 +94,14 @@
     <ClCompile Include="PMBUSCBRaw.cpp" />
     <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="PMBusDataViewListModel.cpp" />
+    <ClCompile Include="PMBUSHelper.cpp" />
     <ClCompile Include="PSUStatusBar.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />
     <ClCompile Include="IOPortSendCMDThread.cpp" />
     <ClCompile Include="STDPage.cpp" />
+    <ClCompile Include="BaseWritePage.cpp" />
+    <ClCompile Include="WritePage00H.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />
@@ -113,14 +116,18 @@
     <ClInclude Include="PMBUSCBRaw.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
     <ClInclude Include="PMBusCMDGridTable.h" />
+    <ClInclude Include="PMBUSCMDWritePages.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
+    <ClInclude Include="PMBUSHelper.h" />
+    <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PSUStatusBar.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />
     <ClInclude Include="IOPortSendCMDThread.h" />
     <ClInclude Include="STDPage.h" />
+    <ClInclude Include="BaseWritePage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

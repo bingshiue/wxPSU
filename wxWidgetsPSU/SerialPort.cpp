@@ -154,7 +154,7 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 	timeouts.WriteTotalTimeoutConstant = 50;
 	timeouts.WriteTotalTimeoutMultiplier = 10;
 
-#if 0
+#if 1
 	if (SetCommTimeouts(hComm, &timeouts) == FALSE){
 		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting Time Outs");
 		return EXIT_FAILURE;
@@ -199,7 +199,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	// Purge CommPort
-	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR);
+	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_RXABORT);
 
 	Status =
 		WriteFile(hComm,     // Handle to the Serialport
@@ -354,7 +354,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 		lastError = GetLastError();
 
-		if (GetLastError() == ERROR_IO_PENDING){
+		if (lastError == ERROR_IO_PENDING){
 			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEvent : ERROR_IO_PENDING");
 			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject");
 
@@ -383,16 +383,23 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 			default:
 				PSU_DEBUG_PRINT(MSG_ALERT, "dwRes != WAIT_OBJECT_0,dwRes=%ld", dwRes);
+				WaitCommEventTimeOutFlag = TRUE;
 				DumpComStat();
 				break;
 			}
 #endif
 
 		}
+		else{
+			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEvent : LastError = %d", lastError);
+		}
 
 		if (WaitCommEventTimeOutFlag==TRUE){
 
 			break;// while (bWaitRxCharEvent == false)
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_ALERT, "WaitCommEventTimeOutFlag = False");
 		}
 
 		/*-------------------------- Program will Wait here till a Character is received ------------------------*/
@@ -427,15 +434,42 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 					// ReadFile return 0 if Operation failure
 					ReadFileStatus = ReadFile(hComm, buff + i, 1, &NoBytesRead, &g_ol2);
+					//ReadFileStatus = ReadFile(hComm, buff, bytesToRead, &NoBytesRead, &g_ol2);
 					if (ReadFileStatus == 0){
 
 						lastError = GetLastError();
 
 						if (lastError == ERROR_IO_PENDING){
-							PSU_DEBUG_PRINT(MSG_DEBUG, "ReadFile IO PENDING Wait GetOverlappedResult");
+							PSU_DEBUG_PRINT(MSG_DETAIL, "ReadFile IO PENDING Wait GetOverlappedResult");
 #ifdef WAIT_INFINITE
 							GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, TRUE);
 #else
+							
+							#ifdef USE_WaitForSingleObject_READ_FILE
+							dwRes = WaitForSingleObject(g_ol2.hEvent, WAITCOMMEVENT_TIMEOUT);
+
+							switch (dwRes){
+
+							case WAIT_TIMEOUT:
+								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : WaitForSingleObject WAIT_TIMEOUT");
+								//WaitCommEventTimeOutFlag = TRUE;
+								ReadFileOverlappedTimeOutFlag = TRUE;
+								DumpComStat();
+								break;
+
+							case WAIT_OBJECT_0:
+								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : dwRes  = WAIT_OBJECT_0");
+								break;
+
+							default:
+								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : dwRes != WAIT_OBJECT_0,dwRes=%ld", dwRes);
+								DumpComStat();
+								break;
+						    }
+							#endif
+							
+							#define USE_GETOVERLAPPEDRESULT_READ_FILE
+                            #ifdef USE_GETOVERLAPPEDRESULT_READ_FILE
 							endtime = GetTickCount() + 500;
 							while (!GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, FALSE)){
 								if (GetTickCount() > endtime)
@@ -448,27 +482,31 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 									break;
 								}
 							};
+							#endif
 #endif
 						}
-						else{
+						else{// if (lastError == ERROR_IO_PENDING)
 							PSU_DEBUG_PRINT(MSG_FATAL, "ReadFile lastError=%d", lastError);
+							NoBytesRead = 0;
+							DumpComStat();
 							//break;
 						}
 
 						// If Overlapped Timeout Occurs
 						if (ReadFileOverlappedTimeOutFlag == TRUE){
+							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Overlapped Timeout Occurs ! break while loop");
 							break; // break while (i < bytesToRead);
 						}
 
 					}
-					else{
+					else{// if (ReadFileStatus == 0)
 						PSU_DEBUG_PRINT(MSG_DETAIL, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						if (NoBytesRead == 0){
-							;
+							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
 						}
 					}
 
-					PSU_DEBUG_PRINT(MSG_DETAIL, "NoBytesRead = %d", NoBytesRead);
+					PSU_DEBUG_PRINT(MSG_DEBUG, "NoBytesRead = %d", NoBytesRead);
 
 					if (NoBytesRead < bytesToRead){
 						;

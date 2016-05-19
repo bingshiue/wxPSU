@@ -34,11 +34,11 @@ int Query_87H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ 
 int Query_88H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_89H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_8aH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
-int Query_8bH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
-int Query_8c00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_8b00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
+int Query_8c00H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
+int Query_8b01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_8c01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
-int Query_8d01H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
+int Query_8dH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_8eH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_8fH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }
 int Query_90H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr){ return EXIT_SUCCESS; }

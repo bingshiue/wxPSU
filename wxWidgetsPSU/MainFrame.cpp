@@ -210,7 +210,7 @@ EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_MENU(ID_Enable_ALL, MainFrame::OnEnableAll)
 EVT_MENU(ID_Disable_ALL, MainFrame::OnDisableAll)
-EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnSelectionChanged)
+EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 wxEND_EVENT_TABLE()
@@ -231,6 +231,7 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_query = g_PMBUSCommand[idx].m_query;
 		this->m_PMBusData[idx].m_cook = g_PMBUSCommand[idx].m_cook;
 		this->m_PMBusData[idx].m_responseDataLength = g_PMBUSCommand[idx].m_responseDataLength;
+		this->m_PMBusData[idx].m_cmdStatus = g_PMBUSCommand[idx].m_cmdStatus;
 		this->m_PMBusData[idx].m_cmdCBFunc.m_queryCBFunc = CMDQueryCBFuncArray[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = CMDCookCBFuncArray[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = CMDRawCBFuncArray[idx];
@@ -240,6 +241,14 @@ void MainFrame::SetupPMBusCommandData(void){
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
+	if (this->m_monitor_running == true){
+
+		wxMessageDialog *closeWarning = new wxMessageDialog(NULL, L"Monitor Still Running, Please Stop It !", L"Warning", wxOK | wxICON_WARNING);
+		closeWarning->ShowModal();
+
+		return;
+	}
+	
 	//this->m_IOPortReadCMDThread->m_running = false;
 
 	//this->m_IOPortReadCMDThread->Kill();
@@ -282,7 +291,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
@@ -392,6 +401,9 @@ void MainFrame::SetupToolBar(void){
 
 	// Create Tool Bar Instance
 	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
+
+	// Append Monitor Button
+	m_toolbar->AddTool(ID_Monitor, wxEmptyString, wxBITMAP(MONITOR), wxT("Monitor"), wxITEM_NORMAL);
 
 	// Append Exit Button
 	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP(EXIT), wxT("Exit Program"), wxITEM_NORMAL);
@@ -505,7 +517,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	this->m_dataViewCtrl->AppendTextColumn("Cook",
 		PSUDataViewListModel::Col_CookText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
+		350,
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);
 
@@ -542,11 +554,12 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	//this->STDPanel   = new wxPanel(this->m_subNotebook, wxID_ANY);
 	this->m_stdPage = new STDPage(this->m_subNotebook);
 	this->ReadPanel  = new wxPanel(this->m_subNotebook, wxID_ANY);
-	this->WritePanel = new wxPanel(this->m_subNotebook, wxID_ANY);
+	this->m_writePage = new WritePage00H(this->m_subNotebook,wxString(L"00h-PAGE"));
 
 	this->m_subNotebook->AddPage(this->m_stdPage, "STD");
 	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
-	this->m_subNotebook->AddPage(this->WritePanel,"Write");
+	this->m_subNotebook->AddPage(this->m_writePage, "Write"); // Don't show write page after APP initialized
+	this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
 
 	// Setup Sizer
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
@@ -563,12 +576,14 @@ unsigned int MainFrame::getCurrentUseIOInterface(void){
 	return this->m_CurrentUseIOInterface;
 }
 
-void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
+void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 {
-	wxString title;// = m_list_model->GetTitle(event.GetItem());
-	if (title.empty())
-		title = "None";
+
 #if 0
+	//wxString title;// = m_list_model->GetTitle(event.GetItem());
+	//if (title.empty())
+		//title = "None";
+
 	PSU_DEBUG_PRINT(MSG_DETAIL, "m_subNotebook Get PageCount: %d", this->m_subNotebook->GetPageCount());
 	if (this->m_subNotebook->GetPageCount() == 3){
 		this->m_subNotebook->RemovePage(2);
@@ -578,7 +593,36 @@ void MainFrame::OnSelectionChanged(wxDataViewEvent &event)
 	}
 #endif
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_SELECTION_CHANGED, First selected Item: %s", title);
+	wxDataViewItem item = event.GetItem();
+
+	//PSUDataViewListModel* model = (PSUDataViewListModel*)this->m_dataViewCtrl->GetModel();
+
+	int row = m_list_model->GetRow(item);
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "Selected Row is : %d", row);
+	PSU_DEBUG_PRINT(MSG_ALERT, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
+
+	switch (this->m_PMBusData[row].m_access){
+
+	case cmd_access_read://cmd_access_br
+		if (this->m_subNotebook->GetPageCount() == 3){
+			this->m_subNotebook->RemovePage(2);
+		}
+		break;
+
+	case cmd_access_write://cmd_access_bw
+	case cmd_access_readwrite://cmd_access_brbw
+		if (this->m_subNotebook->GetPageCount() == 2){
+			this->m_subNotebook->AddPage(this->m_writePage, "Write");
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs, Access=%d", this->m_PMBusData[row].m_access);
+		break;
+	}
+
 }
 
 void MainFrame::OnDisableAll(wxCommandEvent& event){

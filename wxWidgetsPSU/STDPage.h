@@ -26,9 +26,6 @@ public:
 	 */
 	~STDPage();
 
-protected:
-
-private:
 	/**< Static Box */
 	wxStaticBox *m_staticBox;
 	
@@ -165,8 +162,10 @@ private:
 	/**< FAN4 TextCtrl */
 	wxTextCtrl *m_tcFAN4;
 
-};
+protected:
 
+private:
+};
 
 #endif
 

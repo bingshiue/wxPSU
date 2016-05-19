@@ -24,6 +24,12 @@ enum {
 	cmd_status_running,
 	cmd_status_success,
 	cmd_status_failure,
+	cmd_status_checksum_error
+};
+
+enum {
+	cmd_normal_read_data = 0,
+	cmd_also_send_write_data
 };
 
 #define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
@@ -43,7 +49,9 @@ typedef struct recvbuff_t {
  * @brief Struct for CMD Status
  */
 typedef struct cmdstatus_t {
-	unsigned char m_status;/**< Status of CMD */
+	unsigned char m_status;/**< Status of CMD (running, success, failure) */
+	unsigned char m_alsoSendWriteData;/**< Also Send Write Data */
+	unsigned char m_AddtionalData[2];/**< Addition Data */
 }CMDSTATUS_t;
 
 /**
