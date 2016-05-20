@@ -324,7 +324,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 	/*------------------------------------ Setting WaitComm() Event   ----------------------------------------*/
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Waiting for Data Reception \n");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Waiting for Data Reception");
 
 	do {
 
@@ -372,7 +372,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			switch (dwRes){
 
 			case WAIT_TIMEOUT:
-				PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject WAIT_TIMEOUT");
 				WaitCommEventTimeOutFlag = TRUE;
 				DumpComStat();
 				break;
@@ -399,7 +399,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			break;// while (bWaitRxCharEvent == false)
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_ALERT, "WaitCommEventTimeOutFlag = False");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEventTimeOutFlag = False");
 		}
 
 		/*-------------------------- Program will Wait here till a Character is received ------------------------*/
@@ -500,7 +500,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 					}
 					else{// if (ReadFileStatus == 0)
-						PSU_DEBUG_PRINT(MSG_DETAIL, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						if (NoBytesRead == 0){
 							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
 						}
@@ -518,6 +518,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 					//}
 
 					if (NoBytesRead > 0) {
+						PSU_DEBUG_PRINT(MSG_DEBUG, "NoBytesRead = %d", NoBytesRead);
 						i += NoBytesRead;
 					}
 

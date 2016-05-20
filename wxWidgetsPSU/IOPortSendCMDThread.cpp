@@ -240,7 +240,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	wchar_t CookStr[STR_LENGTH];
 	wchar_t RawStr[STR_LENGTH];
 	
-	PSU_DEBUG_PRINT(MSG_ALERT, "In Send Data Thread ");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "In Send Data Thread ");
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread started (priority = %u).", GetPriority());
 	PSU_DEBUG_PRINT(MSG_DEBUG, "RunMode is Continally ");
 	PSU_DEBUG_PRINT(MSG_DETAIL,"m_pollingTime=%d", this->m_pollingTime);
@@ -263,6 +263,81 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 					if (this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
 
+						// Check If Need Chane Page
+						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){
+							char cmdPageValue = this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage == 1 ? 0x01 : 0x00;
+							unsigned char pec = 0;;
+
+							unsigned char changePageSendBuffer[8] = {
+								0x41, 0x54, 0xB6, 0x00, cmdPageValue, 0x00,0x0D, 0x0A
+							};
+
+							pec = PMBusSlave_Crc8MakeBitwise(0, 7, changePageSendBuffer+2, 3);
+							PSU_DEBUG_PRINT(MSG_ALERT, "pec = %02xh", pec);
+
+							changePageSendBuffer[5] = pec;
+
+							PSU_DEBUG_PRINT(MSG_ALERT, "CMD %s Need To Change Page, NeedChangeage=%d, CMDPage=%d", this->m_pmBusCommand[idx].m_label, this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+
+							do {
+								// Send Data
+								sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(changePageSendBuffer, 8);
+								if (sendResult <= 0){
+									PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write Page CMD Failed, sendResult=%d", sendResult);
+									// Retry 
+									retry++;
+									if (retry >= 3){
+										PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Send Write Page CMD Failed, Retry Times = %d", retry);
+										sendRetryStillFailed = true;
+										break;
+									}
+									else{
+										PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Page CMD Retry Times = %d", retry);
+									}
+
+								}
+								else{
+									PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write Page CMD Success");
+								}
+
+							} while (sendResult <= 0);
+
+							if (sendRetryStillFailed == true){
+								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Page CMD Retry Send Still Failed, Exit Send Thread");
+								m_running = false;
+								break;
+							}
+
+							// Create IOPortReadCMDThread
+							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, BASE_RESPONSE_DATA_LENGTH);
+
+							// If Create Thread Success
+							if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+								PSU_DEBUG_PRINT(MSG_FATAL, "Can't create thread!");
+							}
+							else{
+								this->m_IOPortReadCMDThread->Run();
+							}
+
+							// Semaphore Wait for Read Thread Complete
+							PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
+							ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+							if (ret != wxSEMA_NO_ERROR){
+								PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+							}
+							else{
+								PSU_DEBUG_PRINT(MSG_ALERT, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
+								wxString writePageRes("");
+								for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
+									writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
+								}
+								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Page CMD Response : %s", writePageRes.c_str());
+							}
+
+						}//if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page)
+
+						/*--------------------------------------------------------------------------------------------------------------*/
+
 						// Update DataView Register Field Icon
 						this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
 						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RegisterIconText);
@@ -270,7 +345,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						// Prepare Send Buffer
 						this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
 
-						PSU_DEBUG_PRINT(MSG_ALERT, "Prepare To Send");
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Send");
 						// Sleep Polling Time
 						Sleep(*this->m_pollingTime);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
@@ -290,7 +365,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								sendDataLength = HID_SEND_DATA_SIZE;
 							}
 
-							PSU_DEBUG_PRINT(MSG_ALERT, "Send Data Length =%d", sendDataLength);
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
 
 							// Send Data
 							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
@@ -309,7 +384,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							}
 							else{
-								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Success");
+								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
 							}
 
 						} while (sendResult <= 0);
@@ -334,7 +409,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						//
 
 						// Semaphore Wait for Read Thread Complete
-						PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
 						ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 						if (ret != wxSEMA_NO_ERROR){
 							PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
@@ -489,11 +564,61 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 
 
 void IOPortSendCMDThread::UpdateSTDPage(void){
-	// Update 
 	// POUT
 	wxString pout = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_POUT);
 	this->m_stdPage->m_tcPOUT->SetValue(pout);
 	// PIN
 	wxString pin = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PIN);
 	this->m_stdPage->m_tcPIN->SetValue(pin);
+
+	// VIN
+	wxString vin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VIN);
+	this->m_stdPage->m_tcVIN->SetValue(vin);
+
+	// IIN
+	wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
+	this->m_stdPage->m_tcIIN->SetValue(iin);
+
+	// VOUT
+	wxString vout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VOUT);
+	this->m_stdPage->m_tcVOUT->SetValue(vout);
+
+	// IOUT
+	wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
+	this->m_stdPage->m_tcIOUT->SetValue(iout);
+
+	// VoSBY
+	wxString vosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VoSBY);
+	this->m_stdPage->m_tcVoSBY->SetValue(vosby);
+
+	// IoSBY
+	wxString iosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IoSBY);
+	this->m_stdPage->m_tcIoSBY->SetValue(iosby);
+
+	// VCAP
+	wxString vcap = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_VCAP);
+	this->m_stdPage->m_tcVCAP->SetValue(vcap);
+
+	// AMD(8D)
+	wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
+	this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
+
+	// SEC(8E)
+	wxString sec_8e = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_SEC_8E);
+	this->m_stdPage->m_tcSEC8E->SetValue(sec_8e);
+
+	// PRI(8F)
+	wxString pri_8f = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PRI_8F);
+	this->m_stdPage->m_tcPRI8F->SetValue(pri_8f);
+
+	// FAN1
+	wxString fan1 = wxString::Format("%5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
+	this->m_stdPage->m_tcFAN1->SetValue(fan1);
+
+	// FAN2
+
+	// FAN3
+
+	// FAN4
+
 }

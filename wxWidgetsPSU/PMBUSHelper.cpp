@@ -36,16 +36,16 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 	switch (N_sign){
 
 	case positive:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Positive N_sign = %d", N_sign);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Positive N_sign = %d", N_sign);
 		result = (double)(Y * pow(2.0f, N));
 		break;
 
 	case negative:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Negative N_sign = %d", N_sign);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Negative N_sign = %d", N_sign);
 
 		// If Negative
 		tempN = N | 0x80 | 0x60; 
-		PSU_DEBUG_PRINT(MSG_ALERT, "Temp N = %d", tempN);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Temp N = %d", tempN);
 
 		result = (double)(Y * pow(2.0f, tempN));
 
@@ -58,8 +58,8 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 	}
 
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "buffer[0]=%d,buffer[1]=%d,rawData=%d", buffer[0], buffer[1], rawData);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Y=%d,N=%d,Result=%4.2f",Y,N,result);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "buffer[0]=%d,buffer[1]=%d,rawData=%d", buffer[0], buffer[1], rawData);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Y=%d,N=%d,Result=%4.2f", Y, N, result);
 
 	return result;
 }

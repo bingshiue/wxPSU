@@ -33,15 +33,16 @@ int Cook_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
+	char page = 0;
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	page = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	wxstr += wxString::Format("%d", page);
+	PMBUSHelper::GetPMBusStatus()->m_currentPage = page;
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }
@@ -51,10 +52,12 @@ int Cook_01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
+	unsigned char operation = 0;
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	operation = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	wxstr += wxString::Format("%d", operation);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -136,8 +139,6 @@ int Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	unsigned char mode = 0;
 	char parameter = 0;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data[0]=%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
-
 	mode = pmbuscmd->m_recvBuff.m_dataBuff[0] & MODE_MASK;
 
 	sign = pmbuscmd->m_recvBuff.m_dataBuff[0] & SIGN_BIT;
@@ -149,8 +150,9 @@ int Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 		parameter = (pmbuscmd->m_recvBuff.m_dataBuff[0] & 0x0f) | 0xf0;
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT,"Mode=%d, sign=%d, parameter=%d",mode, sign, parameter);
+	PSU_DEBUG_PRINT(MSG_DEBUG,"Mode=%d, sign=%d, parameter=%d",mode, sign, parameter);
 
+	PMBUSHelper::GetPMBusStatus()->m_vout_mode_exponent = pow(2.0f,parameter);
 	wxstr += wxString::Format("Mode=%s, Exponent:=%d", Mode_Name[mode], parameter);
 
 	tmp_wchar = wxstr.wc_str();
@@ -311,6 +313,18 @@ int Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	/*
+	Bit Number      Status Bit Name                     Meaning
+     7                  BUSY              A fault was declared because the device was busy and unable to respond.
+     6                  OFF               This bit is asserted if the unit is not providing power to the output, regardless of the reason, including simply not being enabled.
+     5               VOUT_OV_FAULT        An output overvoltage fault has occurred
+     4               IOUT_OC_FAULT        An output overcurrent fault has occurred
+     3               VIN_UV_FAULT         An input undervoltage fault has occurred
+     2               TEMPERATURE          A temperature fault or warning has occurred
+     1                  CML               A communications, memory or logic fault has occurred
+     0               NONE OF THE ABOVE    A fault or warning not listed in bits [7:1] has occurred
+	 */
 
 	const wchar_t* tmp_wchar;
 
@@ -519,8 +533,8 @@ int Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	Energy_Count = ROLLOVER_COUNT * Maximum_Linear_Format_Value + accumulator;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
-	PSU_DEBUG_PRINT(MSG_ALERT, "%02xh", -1);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
 	wxstr += wxString::Format(" Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
@@ -580,8 +594,8 @@ int Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	Energy_Count = ROLLOVER_COUNT * Maximum_Linear_Format_Value + accumulator;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
-	PSU_DEBUG_PRINT(MSG_ALERT, "%02xh", -1);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
 	wxstr += wxString::Format(" Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
@@ -599,13 +613,14 @@ int Cook_88H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	
 	// 114.0V (Max:114.0, Min:113.5)
 	const wchar_t* tmp_wchar;
-	short voltage = 0;
+	double voltage = 0;
 
 	wxString wxstr("");
 
 	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-	wxstr += wxString::Format("%dV", voltage);
+	PMBUSHelper::GetPMBusStatus()->SaveVIN(voltage);
+	//  (Max:114.0, Min:113.5)
+	wxstr += wxString::Format("%4.5fV (Max:%4.1f, Min:%4.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VIN_Max, PMBUSHelper::GetPMBusStatus()->m_VIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -626,8 +641,9 @@ int Cook_89H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("");
 
 	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveIIN(current);
 
-	wxstr += wxString::Format("%4.5fA", current);
+	wxstr += wxString::Format("%4.5fA (Max:%4.5f, Min:%4.5f)", current, PMBUSHelper::GetPMBusStatus()->m_IIN_Max, PMBUSHelper::GetPMBusStatus()->m_IIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -643,13 +659,14 @@ int Cook_8aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	
 	// 360V (Max:360, Min:360)  
 	const wchar_t* tmp_wchar;
-	short voltage = 0;
+	double voltage = 0;
 
 	wxString wxstr("");
 
 	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveVCAP(voltage);
 
-	wxstr += wxString::Format("%dV", voltage);
+	wxstr += wxString::Format("%4.0fV (Max:%4.1f, Min:%4.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VCAP_Max, PMBUSHelper::GetPMBusStatus()->m_VCAP_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -663,12 +680,45 @@ int Cook_8b00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const wchar_t* tmp_wchar;
+	double voltage = 0;
+
+	wxString wxstr("");
+
+	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	voltage *= PMBUSHelper::GetPMBusStatus()->m_vout_mode_exponent;
+
+	PMBUSHelper::GetPMBusStatus()->SaveVOUT(voltage);
+	// 12.0625V (Max:12.19, Min:12.06) 
+	wxstr += wxString::Format("%4.4fV (Max:%4.2f, Min:%4.2f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VOUT_Max, PMBUSHelper::GetPMBusStatus()->m_VOUT_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_8c00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double current = 0;
+
+	wxString wxstr("");
+
+	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveIOUT(current);
+	// 0.000A (Max:0.484, Min:0.000) 
+	wxstr += wxString::Format("%4.3fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IOUT_Max, PMBUSHelper::GetPMBusStatus()->m_IOUT_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }
@@ -677,12 +727,46 @@ int Cook_8b01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const wchar_t* tmp_wchar;
+	double voltage = 0;
+
+	wxString wxstr("");
+
+	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	voltage *= PMBUSHelper::GetPMBusStatus()->m_vout_mode_exponent;
+
+	PMBUSHelper::GetPMBusStatus()->SaveVoSBY(voltage);
+
+	// 12.1875V (Max:12.19, Min:12.06)  
+	wxstr += wxString::Format("%4.4fV (Max:%4.2f, Min:%4.2f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VoSBY_Max, PMBUSHelper::GetPMBusStatus()->m_VoSBY_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_8c01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double current = 0;
+
+	wxString wxstr("");
+
+	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveIoSBY(current);
+	// 0.000A (Max:0.484, Min:0.000) 
+	wxstr += wxString::Format("%4.8fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Max, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }
@@ -693,13 +777,14 @@ int Cook_8dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	// 26.0C (Max:26.0, Min : 26.0)
 	const wchar_t* tmp_wchar;
-	short temperature = 0;
+	double temperature = 0;
 
 	wxString wxstr("");
 
 	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveAMD_8D(temperature);
 
-	wxstr += wxString::Format("%dC", temperature);
+	wxstr += wxString::Format("%4.0fC (Max:%4.1f, Min:%4.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Max, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -715,13 +800,14 @@ int Cook_8eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	
 	// 27.0C (Max:27.0, Min:27.0) 	
 	const wchar_t* tmp_wchar;
-	short temperature = 0;
+	double temperature = 0;
 
 	wxString wxstr("");
 
 	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveSEC_8E(temperature);
 
-	wxstr += wxString::Format("%dC", temperature);
+	wxstr += wxString::Format("%4.0fC (Max:%4.1f, Min:%4.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Max, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -737,13 +823,14 @@ int Cook_8fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	
 	// 32C (Max:32, Min:32)
 	const wchar_t* tmp_wchar;
-	short temperature = 0;
+	double temperature = 0;
 
 	wxString wxstr("");
 
 	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SavePRI_8F(temperature);
 
-	wxstr += wxString::Format("%dC", temperature);
+	wxstr += wxString::Format("%4.0fC (Max:%4.0f, Min:%4.0f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Max, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -759,13 +846,14 @@ int Cook_90H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	// 7008RPM (Max:7008, Min:7008)
 	const wchar_t* tmp_wchar;
-	short rpm = 0;
+	double rpm = 0;
 
 	wxString wxstr("");
 
 	rpm = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SaveFAN1(rpm);
 
-	wxstr += wxString::Format("%dRPM", rpm);
+	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN1_Max, PMBUSHelper::GetPMBusStatus()->m_FAN1_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -780,18 +868,17 @@ int Cook_96H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
-	short watt = 0;
+	double watt = 0;
 
 	wxString wxstr("");
 
 	watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	PMBUSHelper::GetPMBusStatus()->SavePOUT(watt);
 
-	wxstr += wxString::Format("%dW", watt);
+	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_POUT_Max, PMBUSHelper::GetPMBusStatus()->m_POUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
-
-	PMBUSHelper::GetPMBusStatus()->m_POUT = watt;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -803,46 +890,92 @@ int Cook_97H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
-	short watt = 0;
+	double watt = 0;
 
 	wxString wxstr("");
 
 	watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff,2);
+	PMBUSHelper::GetPMBusStatus()->SavePIN(watt);
 
-	wxstr += wxString::Format("%dW", watt);
+	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_PIN_Max, PMBUSHelper::GetPMBusStatus()->m_PIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
-
-	PMBUSHelper::GetPMBusStatus()->m_PIN = watt;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }
 
+#define PART_I_MASK (0xE0)
+#define PART_II_MASK (0x0F)
+#define REVISION_1_0 (0x00)
+#define REVISION_1_1 (0x01)
+#define REVISION_1_2 (0x02)
 int Cook_98H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Warning : This was not implemented completely
+	const wchar_t* tmp_wchar;
+	wxString wxstr("");
+	/*
+	Bits [7:5] Part I Revision  Bits [3:0] Part II Revision
+    0000           1.0            0000         1.0
+    0001           1.1            0001         1.1
+    0002           1.2            0002         1.2
+	*/
+
 	// B6-98-B7-22-DE
 	// Part I: 1.2, Part II: 1.2
+	unsigned char part_I = 0, part_II = 0;
+	part_I = pmbuscmd->m_recvBuff.m_dataBuff[0] & PART_I_MASK >> 4;
 
-	if (pmbuscmd->m_recvBuff.m_dataBuff[0]==0x22){
+	part_II = pmbuscmd->m_recvBuff.m_dataBuff[0] & PART_II_MASK;
 
-		const wchar_t* tmp_wchar;
+	PSU_DEBUG_PRINT(MSG_DETAIL, "part_I=%d, part_II= %d", part_I, part_II);
 
-		wxString wxstr("");
+	switch (part_I){
 
-		wxstr += wxString::Format("Part I: 1.2, Part II: 1.2");
+	case REVISION_1_0:
+		wxstr += wxString::Format("Part I: %s, ", "1.0");
+		break;
 
-		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+	case REVISION_1_1:
+		wxstr += wxString::Format("Part I: %s, ", "1.1");
+		break;
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-	
+	case REVISION_1_2:
+		wxstr += wxString::Format("Part I: %s, ", "1.2");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs, part_I = %d", part_I);
+		break;
 	}
+
+	switch (part_II){
+
+	case REVISION_1_0:
+		wxstr += wxString::Format("Part II: %s", "1.0");
+		break;
+
+	case REVISION_1_1:
+		wxstr += wxString::Format("Part II: %s", "1.1");
+		break;
+
+	case REVISION_1_2:
+		wxstr += wxString::Format("Part II: %s", "1.2");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs, part_II= %d", part_II);
+		break;
+	}
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
 	return EXIT_SUCCESS; 
 }

@@ -32,6 +32,11 @@ enum {
 	cmd_also_send_write_data
 };
 
+enum {
+	cmd_no_need_change_page = 0,
+	cmd_need_change_page
+};
+
 #define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
 typedef struct pmbuscmd_t;
@@ -52,6 +57,9 @@ typedef struct cmdstatus_t {
 	unsigned char m_status;/**< Status of CMD (running, success, failure) */
 	unsigned char m_alsoSendWriteData;/**< Also Send Write Data */
 	unsigned char m_AddtionalData[2];/**< Addition Data */
+	unsigned char m_NeedChangePage;/**< Need Change Page */
+	unsigned char m_cmdPage;/**< Command Page */
+
 }CMDSTATUS_t;
 
 /**
@@ -79,6 +87,7 @@ typedef struct cmdcbfunc_t {
 
 }CMDCBFUNC_t;
 
+#define LABEL_SIZE 16
 #define NAME_SIZE  64
 #define RAW_SIZE    8
 /**
@@ -86,8 +95,9 @@ typedef struct cmdcbfunc_t {
  */
 typedef struct pmbuscmd_t {
 	bool            m_toggle;/**< Enable/Disable */
+	char            m_label[LABEL_SIZE];/**< Label */
 	unsigned int    m_register;/**< Register */
-	         char   m_name[NAME_SIZE];/**< Name */
+	char            m_name[NAME_SIZE];/**< Name */
 	unsigned int    m_access;/**< Access */
 	unsigned int    m_query;/**< Query */
 	unsigned int    m_cook;/**< Cook */

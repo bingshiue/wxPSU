@@ -37,11 +37,10 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 	// Setup Register
 	m_registerColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
-		wxString tmpStr = wxString::Format(wxT("%02x"), pmBusCommand[idx].m_register);
-		tmpStr.UpperCase();
-		tmpStr += wxT("h");
+		wxString tmpStr = wxString::Format(wxT("%s"), pmBusCommand[idx].m_label);
+		//tmpStr.UpperCase();
+		//tmpStr += wxT("h");
 		m_registerColValues.push_back(tmpStr);
-		//PSU_DEBUG_PRINT("%s:Count of m_registerColValues = %d", __FUNCTIONW__,m_registerColValues.GetCount());
 	}
 	
 	// Setup Name

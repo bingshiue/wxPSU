@@ -17,6 +17,7 @@
 #include "PSUStatusBar.h"
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
+#include "PEC.h"
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Max Size */
 

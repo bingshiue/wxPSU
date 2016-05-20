@@ -225,6 +225,7 @@ void MainFrame::SetupPMBusCommandData(void){
 	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
 
 		this->m_PMBusData[idx].m_toggle = g_PMBUSCommand[idx].m_toggle;
+		sprintf(this->m_PMBusData[idx].m_label, g_PMBUSCommand[idx].m_label);
 		this->m_PMBusData[idx].m_register = g_PMBUSCommand[idx].m_register;
 		sprintf(this->m_PMBusData[idx].m_name, g_PMBUSCommand[idx].m_name);
 		this->m_PMBusData[idx].m_access = g_PMBUSCommand[idx].m_access;
