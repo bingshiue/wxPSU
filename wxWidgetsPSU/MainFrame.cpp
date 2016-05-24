@@ -204,12 +204,33 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_MENU(ID_HEX_TO_BIN, MainFrame::OnHexToBin)
-EVT_MENU(ID_Monitor, MainFrame::OnMonitor)
+EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmwarwe)
+EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
+EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
+EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
+EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
+EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
+EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
+EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
+EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)
+EVT_MENU(MENU_ID_EnableCalibration, MainFrame::OnEnableCalibration)
+EVT_MENU(MENU_ID_DisableCalibration, MainFrame::OnDisableCalibration)
+EVT_MENU(MENU_ID_Calibration, MainFrame::OnCalibration)
+EVT_MENU(MENU_ID_Administrant, MainFrame::OnAdministrant)
+EVT_MENU(MENU_ID_I2C_Interface, MainFrame::OnI2CInterface)
+EVT_MENU(MENU_ID_Enable_ALL, MainFrame::OnEnableAll)
+EVT_MENU(MENU_ID_Disable_ALL, MainFrame::OnDisableAll)
+EVT_MENU(MENU_ID_Continually, MainFrame::OnContinually)
+EVT_MENU(MENU_ID_Iterations, MainFrame::OnIterations)
+EVT_MENU(MENU_ID_Stop_An_Error, MainFrame::OnStopAnError)
+EVT_MENU(MENU_ID_ErrorLog_ALL, MainFrame::OnErrorLogALL)
+EVT_MENU(MENU_ID_ErrorLog_ErrorOnly, MainFrame::OnErrorLogErrorOnly)
+EVT_MENU(MENU_ID_Log_To_File, MainFrame::OnLogToFile)
+EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
+EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
+
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
-EVT_MENU(ID_Enable_ALL, MainFrame::OnEnableAll)
-EVT_MENU(ID_Disable_ALL, MainFrame::OnDisableAll)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
@@ -271,9 +292,89 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 		"Acbel", wxOK | wxICON_INFORMATION);
 }
 
-void MainFrame::OnHexToBin(wxCommandEvent& event)
+void MainFrame::OnSecondaryFirmwarwe(wxCommandEvent& event)
 {
 	PSU_DEBUG_PRINT(MSG_ALERT,"Not Implement");
+}
+
+void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnStopProgramming(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnEnableChecksum(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnClearErrorLog(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnResetMaxMinValue(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnResetRunTime(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnEnableCalibration(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnDisableCalibration(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnCalibration(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnAdministrant(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnI2CInterface(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnContinually(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnIterations(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnStopAnError(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnErrorLogALL(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnLogToFile(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnPMBus1_1(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnPMBus1_2(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
@@ -361,38 +462,218 @@ void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 }
 
 void MainFrame::SetupMenuBar(void){
-	// Create Menu Instance
-	wxMenu *menuFile = new wxMenu;
-	menuFile->Append(ID_HEX_TO_BIN, "&HEX_TO_BIN...\tCtrl-H",
-		"Help string shown in status bar for this menu item");
-	menuFile->AppendSeparator();
-	menuFile->Append(wxID_EXIT);
+	// Create Menu Bar and Its Components
+	// File Menu
+	/*
+	File
+	|- Hex To Bin -> Secondary Firmware
+	|------------------------------------
+	|- Exit
+	*/
+	this->m_fileMenu = new wxMenu();
+	this->m_hexToBinMenu = new wxMenu();
+	this->m_hexToBinMenu->Append(MENU_ID_Secondary_Firmware, "&Secondary Firmware...\tCtrl-S",
+		"Select Secondary Firmware");
+	
+	this->m_fileMenu->AppendSubMenu(this->m_hexToBinMenu,wxT("Hex to Bin"),wxT("Transform Hex into Bin"));
+	this->m_fileMenu->AppendSeparator();
+	this->m_fileMenu->Append(wxID_EXIT);
 
-	wxMenu *menuRun = new wxMenu;
-	menuRun->Append(ID_Monitor, "&Monitor...\tCtrl-M",
-		"Start Monitor");
+	// Run Menu
+	/*
+	Run
+	|- Monitor
+	|- In System Programming -> Update Secondary Firmware 
+	|- Stop Programming
+	|------------------------------------
+	|- I2C Fault Test
+	|- [V] Enable Checksum
+	|------------------------------------
+	|- Clear Error Log
+	|- Reset Max./Min. Value
+	|- Reset Run Time
 
-	wxMenu *menuPSU = new wxMenu;
 
-	wxMenu *menuOption = new wxMenu;
+	*/
+	this->m_runMenu = new wxMenu();
+	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, "&Monitor...\tCtrl-M",
+		"Start Monitor", wxITEM_NORMAL);
 
-	menuOption->Append(ID_Disable_ALL, "&Disable ALL",
+	this->m_runMenu->Append(this->m_monitorMenuItem);
+
+	this->m_inSystemProgrammingMenu = new wxMenu();
+
+	this->m_inSystemProgrammingMenu->Append(MENU_ID_Update_Secondary_Firmware, "&Update Secondary Firmware...\tCtrl-U",
+		"Update Secondary Firmware");
+
+	this->m_runMenu->AppendSubMenu(this->m_inSystemProgrammingMenu, wxT("In System Prpgramming"), wxT("In System Programming"));
+
+	this->m_stopProgrammingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_Programming, wxT("Stop Programming"),
+		"Stop Programming", wxITEM_NORMAL);
+
+	this->m_runMenu->Append(m_stopProgrammingMenuItem);
+	this->m_runMenu->AppendSeparator();
+
+	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"),
+		wxT("I2C Fault Test"), wxITEM_NORMAL);
+
+	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"),
+		wxT("Enable Checksum"), wxITEM_CHECK);
+
+	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
+	this->m_runMenu->Append(m_EnableChecksumMenuItem);
+	this->m_runMenu->AppendSeparator();
+
+	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"),
+		wxT("Clear Error Log"), wxITEM_NORMAL);
+
+	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"),
+		wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
+
+	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"),
+		wxT("Reset Run Time"), wxITEM_NORMAL);
+
+	this->m_runMenu->Append(this->m_ClearErrorLogMenuItem);
+	this->m_runMenu->Append(this->m_ResetMaxMinValueMenuItem);
+	this->m_runMenu->Append(this->m_ResetRunTimeMenuItem);
+
+	// PSU Menu
+	/*
+	PSU
+	|- Enable Calibration
+	|- Disable Calibration
+	|------------------------------------
+	|- Calibration
+	*/
+	this->m_psuMenu = new wxMenu();
+
+	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"),
+		wxT("Enable Calibration"), wxITEM_NORMAL);
+
+	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"),
+		wxT("Disable Calibration"), wxITEM_NORMAL);
+
+	this->m_psuMenu->Append(m_EnableCalibrationMenuItem);
+	this->m_psuMenu->Append(m_DisableCalibrationMenuItem);
+
+	this->m_psuMenu->AppendSeparator();
+
+	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"),
+		wxT("Calibration Setting"), wxITEM_NORMAL);
+
+	this->m_psuMenu->Append(m_CalibrationMenuItem);
+
+
+	// Option Menu
+	/*
+	Option
+	|- Administrant...
+	|------------------------------------
+	|- I2C  Interface...
+	|------------------------------------
+	|- Disable All
+	|- Enable All
+	|------------------------------------
+	|- Run Mode          -> [V] Continually
+	|                       [V] Interations
+	|                       [V] Stop An Error
+	|
+	|- Error Log Mode    -> [V] All
+	|                       [V] Error Only
+	|                       ---------------
+	|                       Log To File
+	|
+	|- PMBus Read Method -> [V] PMBus1.1 (Single Mode)
+	|                       [V] PMBus1.2 (Page Plus Mode)
+	|
+
+
+	*/
+	this->m_optionMenu = new wxMenu();
+
+	this->m_AdministrantMenuItem = m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
+		wxT("Administrant"), wxITEM_NORMAL);
+
+	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_I2CInterfaceMenuItem = m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
+		wxT("I2C Interface"), wxITEM_NORMAL);
+
+	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL...\tCtrl-D",
 		"Disable All Commands");
 
-	menuOption->Append(ID_Enable_ALL, "&Enable ALL",
+	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  "&Enable  ALL...\tCtrl-E",
 		"Enable All Commands");
 
-	wxMenu *menuHelp = new wxMenu;
-	menuHelp->Append(wxID_ABOUT);
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_runModeMenu = new wxMenu();
+	this->m_errorLogMenu = new wxMenu();
+	this->m_pmbusReadMethodMenu = new wxMenu();
+
+	this->m_continuallyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Continually, wxT("Continually"),
+		wxT("Continually"), wxITEM_CHECK);
+
+	this->m_iterationsMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Iterations, wxT("Iterations"),
+		wxT("Iterations"), wxITEM_CHECK);
+
+	this->m_stopAnErrorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_An_Error, wxT("Stop An Error"),
+		wxT("Stop An Error"), wxITEM_CHECK);
+
+	this->m_runModeMenu->Append(this->m_continuallyMenuItem);
+	this->m_runModeMenu->Append(this->m_iterationsMenuItem);
+	this->m_runModeMenu->Append(this->m_stopAnErrorMenuItem);
+
+	this->m_optionMenu->AppendSubMenu(this->m_runModeMenu, wxT("Run Mode"), wxT("Run Mode"));
+	
+	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"),
+		wxT("All"), wxITEM_CHECK);
+
+	this->m_errorOnlyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ErrorOnly, wxT("Error Only"),
+		wxT("Error Only"), wxITEM_CHECK);
+
+	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"),
+		wxT("Log To File"), wxITEM_NORMAL);
+
+	this->m_errorLogMenu->Append(this->m_allMenuItem);
+	this->m_errorLogMenu->Append(this->m_errorOnlyMenuItem);
+	this->m_errorLogMenu->Append(this->m_logToFileMenuItem);
+
+	this->m_optionMenu->AppendSubMenu(this->m_errorLogMenu, wxT("Error Log Mode"), wxT("Error Log Mode"));
+	
+	this->m_pmBus11MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_1, wxT("PMBus1.1 (Single Mode)"),
+		wxT("PMBus1.1 (Single Mode)"), wxITEM_CHECK);
+
+	this->m_pmBus12MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_2, wxT("PMBus1.2 (Page Plus Mode)"),
+		wxT("PMBus1.2 (Page Plus Mode)"), wxITEM_CHECK);
+
+	this->m_pmbusReadMethodMenu->Append(this->m_pmBus11MenuItem);
+	this->m_pmbusReadMethodMenu->Append(this->m_pmBus12MenuItem);
+
+	this->m_optionMenu->AppendSubMenu(this->m_pmbusReadMethodMenu, wxT("PMBus Read Method"), wxT("PMBus Read Method"));
+
+	// Help Menu
+	/*
+	Help
+	|- About
+	*/
+	this->m_helpMenu = new wxMenu();
+	this->m_helpMenu->Append(wxID_ABOUT);
 
 	// Create MenuBar Instance
-	wxMenuBar *menuBar = new wxMenuBar;
-	menuBar->Append(menuFile,   "&File");
-	menuBar->Append(menuRun,    "&Run");
-	menuBar->Append(menuPSU,    wxT("PSU"));
-	menuBar->Append(menuOption, wxT("Option"));
-	menuBar->Append(menuHelp,   "&Help");
-	SetMenuBar(menuBar);
+	this->m_menuBar = new wxMenuBar();
+	this->m_menuBar->Append(this->m_fileMenu,   wxT("File"));
+	this->m_menuBar->Append(this->m_runMenu,    wxT("Run"));
+	this->m_menuBar->Append(this->m_psuMenu,    wxT("PSU"));
+	this->m_menuBar->Append(this->m_optionMenu, wxT("Option"));
+	this->m_menuBar->Append(this->m_helpMenu,   wxT("Help"));
+
+	SetMenuBar(this->m_menuBar);
+
 }
 
 void MainFrame::SetupToolBar(void){
@@ -404,7 +685,7 @@ void MainFrame::SetupToolBar(void){
 	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
 
 	// Append Monitor Button
-	m_toolbar->AddTool(ID_Monitor, wxEmptyString, wxBITMAP(MONITOR), wxT("Monitor"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, wxBITMAP(MONITOR), wxT("Monitor"), wxITEM_NORMAL);
 
 	// Append Exit Button
 	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP(EXIT), wxT("Exit Program"), wxITEM_NORMAL);
@@ -600,8 +881,8 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	int row = m_list_model->GetRow(item);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Selected Row is : %d", row);
-	PSU_DEBUG_PRINT(MSG_ALERT, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Selected Row is : %d", row);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
 
 	switch (this->m_PMBusData[row].m_access){
 

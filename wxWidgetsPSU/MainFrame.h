@@ -30,11 +30,37 @@ enum {
 
 enum
 {
-	ID_HEX_TO_BIN = 1,
-	ID_Monitor,
+	MENU_ID_Secondary_Firmware = 1,
+	MENU_ID_Monitor,
 
-	ID_Enable_ALL,
-	ID_Disable_ALL,
+	MENU_ID_Update_Secondary_Firmware,
+	MENU_ID_Stop_Programming,
+	MENU_ID_I2C_Fault_Test,
+	MENU_ID_Enable_Checksum,
+	MENU_ID_Clear_Error_Log,
+	MENU_ID_Reset_MaxMin_Value,
+	MENU_ID_Reset_Run_Time,
+
+	MENU_ID_EnableCalibration,
+	MENU_ID_DisableCalibration,
+	MENU_ID_Calibration,
+
+	MENU_ID_Administrant,
+	MENU_ID_I2C_Interface,
+
+	MENU_ID_Enable_ALL,
+	MENU_ID_Disable_ALL,
+
+	MENU_ID_Continually,
+	MENU_ID_Iterations,
+	MENU_ID_Stop_An_Error,
+
+	MENU_ID_ErrorLog_ALL,
+	MENU_ID_ErrorLog_ErrorOnly ,
+	MENU_ID_Log_To_File,
+
+	MENU_ID_PMBUS_1_1,
+	MENU_ID_PMBUS_1_2,
 
 	ID_ATTR_CTRL = 51,
 
@@ -99,10 +125,56 @@ public:
 
 	//wxPanel    *STDPanel;
 	STDPage    *m_stdPage;
-
 	wxPanel    *ReadPanel;
 	BaseWritePage  *m_writePage;
 
+	// Menu Bar
+	wxMenuBar   *m_menuBar;
+
+	wxMenu      *m_fileMenu;
+	
+	wxMenu      *m_hexToBinMenu;
+	
+	wxMenu      *m_runMenu;
+
+	wxMenuItem  *m_monitorMenuItem;
+	wxMenu      *m_inSystemProgrammingMenu;
+	wxMenuItem  *m_stopProgrammingMenuItem;
+	wxMenuItem  *m_i2cFaultTestMenuItem;
+	wxMenuItem  *m_EnableChecksumMenuItem;
+	wxMenuItem  *m_ClearErrorLogMenuItem;
+	wxMenuItem  *m_ResetMaxMinValueMenuItem;
+	wxMenuItem  *m_ResetRunTimeMenuItem;
+
+	wxMenu      *m_psuMenu;
+
+	wxMenuItem  *m_EnableCalibrationMenuItem;
+	wxMenuItem  *m_DisableCalibrationMenuItem;
+	wxMenuItem  *m_CalibrationMenuItem;
+
+	wxMenu      *m_optionMenu;
+
+	wxMenuItem  *m_AdministrantMenuItem;
+	wxMenuItem  *m_I2CInterfaceMenuItem;
+
+	wxMenu      *m_runModeMenu;
+
+	wxMenuItem  *m_continuallyMenuItem;
+	wxMenuItem  *m_iterationsMenuItem;
+	wxMenuItem  *m_stopAnErrorMenuItem;
+
+	wxMenu      *m_errorLogMenu;
+
+	wxMenuItem  *m_allMenuItem;
+	wxMenuItem  *m_errorOnlyMenuItem;
+	wxMenuItem  *m_logToFileMenuItem;
+
+	wxMenu      *m_pmbusReadMethodMenu;
+
+	wxMenuItem  *m_pmBus11MenuItem;
+	wxMenuItem  *m_pmBus12MenuItem;
+
+	wxMenu      *m_helpMenu;
 
 	// Tool Bar
 	wxToolBar    *m_toolbar;
@@ -150,13 +222,38 @@ private:
 	void SetupStatusBar(void);
 	void SetupPSUDataView(wxPanel* parent);
 
-	void OnHexToBin(wxCommandEvent& event);
+	void OnSecondaryFirmwarwe(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
-	void OnExit(wxCommandEvent& event);
-	void OnAbout(wxCommandEvent& event);
+	void OnUpdateSecondaryFirmware(wxCommandEvent& event);
+	void OnStopProgramming(wxCommandEvent& event);
+	void OnI2CFaultTest(wxCommandEvent& event);
+	void OnEnableChecksum(wxCommandEvent& event);
+	void OnClearErrorLog(wxCommandEvent& event);
+	void OnResetMaxMinValue(wxCommandEvent& event);
+	void OnResetRunTime(wxCommandEvent& event);
+	void OnEnableCalibration(wxCommandEvent& event);
+	void OnDisableCalibration(wxCommandEvent& event);
+	void OnCalibration(wxCommandEvent& event);
+
+	void OnAdministrant(wxCommandEvent& event);
+	void OnI2CInterface(wxCommandEvent& event);
 
 	void OnDisableAll(wxCommandEvent& event);
 	void OnEnableAll(wxCommandEvent& event);
+
+	void OnContinually(wxCommandEvent& event);
+	void OnIterations(wxCommandEvent& event);
+	void OnStopAnError(wxCommandEvent& event);
+
+	void OnErrorLogALL(wxCommandEvent& event);
+	void OnErrorLogErrorOnly(wxCommandEvent& event);
+	void OnLogToFile(wxCommandEvent& event);
+
+	void OnPMBus1_1(wxCommandEvent& event);
+	void OnPMBus1_2(wxCommandEvent& event);
+
+	void OnExit(wxCommandEvent& event);
+	void OnAbout(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
 	void OnDVSelectionChanged(wxDataViewEvent &event);

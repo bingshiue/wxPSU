@@ -314,23 +314,50 @@ int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	/*
-	Bit Number      Status Bit Name                     Meaning
-     7                  BUSY              A fault was declared because the device was busy and unable to respond.
-     6                  OFF               This bit is asserted if the unit is not providing power to the output, regardless of the reason, including simply not being enabled.
-     5               VOUT_OV_FAULT        An output overvoltage fault has occurred
-     4               IOUT_OC_FAULT        An output overcurrent fault has occurred
-     3               VIN_UV_FAULT         An input undervoltage fault has occurred
-     2               TEMPERATURE          A temperature fault or warning has occurred
-     1                  CML               A communications, memory or logic fault has occurred
-     0               NONE OF THE ABOVE    A fault or warning not listed in bits [7:1] has occurred
-	 */
+	const unsigned char status[8] = {
+		STATUS_BYTE_BUSY,
+		STATUS_BYTE_OFF,
+		STATUS_BYTE_VOUT_OV_FAULT,
+		STATUS_BYTE_IOUT_OC_FAULT,
+		STATUS_BYTE_VIN_UV_FAULT,
+		STATUS_BYTE_TEMPERATURE,
+		STATUS_BYTE_CML,
+		STATUS_BYTE_NONE_OF_THE_ABOVE
+	};
+
+	const char *status_string[8] = {
+		STATUS_BYTE_BUSY_STRING,
+		STATUS_BYTE_OFF_STRING,
+		STATUS_BYTE_VOUT_OV_FAULT_STRING,
+		STATUS_BYTE_IOUT_OC_FAULT_STRING,
+		STATUS_BYTE_VIN_UV_FAULT_STRING,
+		STATUS_BYTE_TEMPERATURE_STRING,
+		STATUS_BYTE_CML_STRING,
+		STATUS_BYTE_NONE_OF_THE_ABOVE_STRING,
+	};
+
 
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_byte.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_BYTE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_byte.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_byte.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -344,11 +371,65 @@ int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned short status[16] = {
+		STATUS_WORD_HIGH_VOUT,
+		STATUS_WORD_HIGH_IOUTPOUT,
+		STATUS_WORD_HIGH_INPUT,
+		STATUS_WORD_HIGH_MFR_SPECIFIC,
+		STATUS_WORD_HIGH_POWERGOOD,
+		STATUS_WORD_HIGH_FANS,
+		STATUS_WORD_HIGH_OTHER,
+		STATUS_WORD_HIGH_UNKNOWN,
+		STATUS_WORD_LOW_BUSY,
+		STATUS_WORD_LOW_OFF,
+		STATUS_WORD_LOW_VOUT_OV_FAULT,
+		STATUS_WORD_LOW_IOUT_OC_FAULT,
+		STATUS_WORD_LOW_VIN_UV_FAULT,
+		STATUS_WORD_LOW_TEMPERATURE,
+		STATUS_WORD_LOW_CML,
+		STATUS_WORD_LOW_NONE_OF_THE_ABOVE
+	};
+
+	const char *status_string[16] = {
+		STATUS_WORD_HIGH_VOUT_STRING,
+		STATUS_WORD_HIGH_IOUTPOUT_STRING,
+		STATUS_WORD_HIGH_INPUT_STRING,
+		STATUS_WORD_HIGH_MFR_SPECIFIC_STRING,
+		STATUS_WORD_HIGH_POWERGOOD_STRING,
+		STATUS_WORD_HIGH_FANS_STRING,
+		STATUS_WORD_HIGH_OTHER_STRING,
+		STATUS_WORD_HIGH_UNKNOWN_STRING,
+		STATUS_BYTE_BUSY_LOW_STRING,
+		STATUS_BYTE_OF_LOWF_STRING,
+		STATUS_BYTE_VOUT_OV_FAULT_LOW_STRING,
+		STATUS_BYTE_IOUT_OC_FAULT_LOW_STRING,
+		STATUS_BYTE_VIN_UV_FAULT_LOW_STRING,
+		STATUS_BYTE_TEMPERATURE_LOW_STRING,
+		STATUS_BYTE_CML__LOWSTRING,
+		STATUS_BYTE_NONE_OF_THE_ABOVE_LOW_STRING
+	};
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_word.status = pmbuscmd->m_recvBuff.m_dataBuff[0] | (pmbuscmd->m_recvBuff.m_dataBuff[1] << 8);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_WORD = %04x", PMBUSHelper::GetPMBusStatus()->m_status_word.status);
+
+	for (unsigned int idx = 0; idx < 16; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -362,11 +443,49 @@ int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_VOUT_VOUT_OV_FAULT,
+		STATUS_VOUT_VOUT_OV_WARNING,
+		STATUS_VOUT_VOUT_UV_WARNING,
+		STATUS_VOUT_VOUT_UV_FAULT,
+		STATUS_VOUT_VOUT_MAX,
+		STATUS_VOUT_TON_MAX_FAULT,
+		STATUS_VOUT_TOFF_MAX_WARNING,
+		STATUS_VOUT_VOUT_Tracking_Error
+	};
+
+	const char *status_string[8] = {
+		STATUS_VOUT_VOUT_OV_FAULT_STRING,
+		STATUS_VOUT_VOUT_OV_WARNING_STRING,
+		STATUS_VOUT_VOUT_UV_WARNING_STRING,
+		STATUS_VOUT_VOUT_UV_FAULT_STRING,
+		STATUS_VOUT_VOUT_MAX_STRING,
+		STATUS_VOUT_TON_MAX_FAULT_STRING,
+		STATUS_VOUT_TOFF_MAX_WARNING_STRING,
+		STATUS_VOUT_VOUT_Tracking_Error_STRING
+	};
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_vout.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_VOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_vout.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -380,11 +499,51 @@ int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_IOUT_IOUT_OC_FAULT,
+		STATUS_IOUT_IOUT_OC_LV_FAULT,
+		STATUS_IOUT_IOUT_OC_WARNING,
+		STATUS_IOUT_IOUT_UC_FAULT,
+		STATUS_IOUT_Current_Share_Fault,
+		STATUS_IOUT_In_Power_Limiting_Mode,
+		STATUS_IOUT_POUT_OP_FAULT,
+		STATUS_IOUT_POUT_OP_WARNING
+	};
+
+	const char *status_string[8] = {
+		STATUS_IOUT_IOUT_OC_FAULT_STRING,
+		STATUS_IOUT_IOUT_OC_LV_FAULT_STRING,
+		STATUS_IOUT_IOUT_OC_WARNING_STRING,
+		STATUS_IOUT_IOUT_UC_FAULT_STRING,
+		STATUS_IOUT_Current_Share_Fault_STRING,
+		STATUS_IOUT_In_Power_Limiting_Mode_STRING,
+		STATUS_IOUT_POUT_OP_FAULT_STRING,
+		STATUS_IOUT_POUT_OP_WARNING_STRING
+	};
+
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+
+	PMBUSHelper::GetPMBusStatus()->m_status_iout.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_IOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_iout.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -398,11 +557,50 @@ int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_INPUT_VIN_OV_FAULT,
+		STATUS_INPUT_VIN_OV_WARNING,
+		STATUS_INPUT_VIN_UV_WARNING,
+		STATUS_INPUT_VIN_UV_FAULT,
+		STATUS_INPUT_Unit_Off_For_Insufficient_Input_Voltage,
+		STATUS_INPUT_IIN_OC_FAULT,
+		STATUS_INPUT_IIN_OC_WARNING,
+		STATUS_INPUT_PIN_OP_WARNING
+	};
+
+	const char *status_string[8] = {
+		STATUS_INPUT_VIN_OV_FAULT_STRING,
+		STATUS_INPUT_VIN_OV_WARNING_STRING,
+		STATUS_INPUT_VIN_UV_WARNING_STRING,
+		STATUS_INPUT_VIN_UV_FAULT_STRING,
+		STATUS_INPUT_Unit_Off_For_Insufficient_Input_Voltage_STRING,
+		STATUS_INPUT_IIN_OC_FAULT_STRING,
+		STATUS_INPUT_IIN_OC_WARNING_STRING,
+		STATUS_INPUT_PIN_OP_WARNING_STRING
+	};
+
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_input.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_INPUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_input.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_input.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -416,11 +614,49 @@ int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_TEMPERATURE_OT_FAULT,
+		STATUS_TEMPERATURE_OT_WARNING,
+		STATUS_TEMPERATURE_UT_WARNING,
+		STATUS_TEMPERATURE_UT_FAULT,
+		STATUS_TEMPERATURE_Reserved_3,
+		STATUS_TEMPERATURE_Reserved_2,
+		STATUS_TEMPERATURE_Reserved_1,
+		STATUS_TEMPERATURE_Reserved_0 
+	};
+
+	const char *status_string[8] = {
+		STATUS_TEMPERATURE_OT_FAULT_STRING,
+		STATUS_TEMPERATURE_OT_WARNING_STRING,
+		STATUS_TEMPERATURE_UT_WARNING_STRING,
+		STATUS_TEMPERATURE_UT_FAULT_STRING,
+		STATUS_TEMPERATURE_Reserved_3_STRING,
+		STATUS_TEMPERATURE_Reserved_2_STRING,
+		STATUS_TEMPERATURE_Reserved_1_STRING,
+		STATUS_TEMPERATURE_Reserved_0_STRING
+	};
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_temperature.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_TEMPERATURE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_temperature.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -434,11 +670,49 @@ int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_CML_Invalid_Or_Unsupported_Command_Received,
+		STATUS_CML_Invalid_Or_Unsupported_Data_Received,
+		STATUS_CML_Packet_Error_Check_Failed,
+		STATUS_CML_Memory_Fault_Detected,
+		STATUS_CML_Processor_Fault_Detected,
+		STATUS_CML_Reserved,
+		STATUS_CML_A_communication_fault,
+		STATUS_CML_Other_Memory_Or_Logic_Fault
+	};
+
+	const char *status_string[8] = {
+		STATUS_CML_Invalid_Or_Unsupported_Command_Received_STRING,
+		STATUS_CML_Invalid_Or_Unsupported_Data_Received_STRING,
+		STATUS_CML_Packet_Error_Check_Failed_STRING,
+		STATUS_CML_Memory_Fault_Detected_STRING,
+		STATUS_CML_Processor_Fault_Detected_STRING,
+		STATUS_CML_Reserved_STRING,
+		STATUS_CML_A_communication_fault_STRING,
+		STATUS_CML_Other_Memory_Or_Logic_Fault_STRING
+	};
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_cml.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_CML = %02x", PMBUSHelper::GetPMBusStatus()->m_status_cml.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -452,11 +726,50 @@ int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_OTHER_Reserved_2,
+		STATUS_OTHER_Reserved_1,
+		STATUS_OTHER_Input_A_Fuse_Or_Circuit_Breaker_Fault,
+		STATUS_OTHER_Input_B_Fuse_Or_Circuit_Breaker_Fault,
+		STATUS_OTHER_Input_A_ORing_Device_Fault,
+		STATUS_OTHER_Input_B_ORing_Device_Fault,
+		STATUS_OTHER_Output_ORing_Device_Fault,
+		STATUS_OTHER_Reserved_0 
+	};
+
+	const char *status_string[8] = {
+		STATUS_OTHER_Reserved_2_STRING,
+		STATUS_OTHER_Reserved_1_STRING,
+		STATUS_OTHER_Input_A_Fuse_Or_Circuit_Breaker_Fault_STRING,
+		STATUS_OTHER_Input_B_Fuse_Or_Circuit_Breaker_Fault_STRING,
+		STATUS_OTHER_Input_A_ORing_Device_Fault_STRING,
+		STATUS_OTHER_Input_B_ORing_Device_Fault_STRING,
+		STATUS_OTHER_Output_ORing_Device_Fault_STRING,
+		STATUS_OTHER_Reserved_0_STRING
+	};
+
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Status: [ ");
 
-	wxstr += wxString::Format("Status: [ ]");
+	PMBUSHelper::GetPMBusStatus()->m_status_other.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_OTHER = %02x", PMBUSHelper::GetPMBusStatus()->m_status_other.status);
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_other.status & status[idx]) == status[idx]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[idx]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[idx]);
+			}
+		}
+	}
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -470,11 +783,67 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const unsigned char status[8] = {
+		STATUS_FAN_1_2_Fan_1_Fault,
+		STATUS_FAN_1_2_Fan_2_Fault,
+		STATUS_FAN_1_2_Fan_1_Warning,
+		STATUS_FAN_1_2_Fan_2_Warning,
+		STATUS_FAN_1_2_Fan_1_Speed_Overridden,
+		STATUS_FAN_1_2_Fan_2_Speed_Overridden,
+		STATUS_FAN_1_2_Airflow_Fault,
+		STATUS_FAN_1_2_Airflow_Warning 
+	};
+
+	const char *status_string[8] = {
+		STATUS_FAN_1_2_Fan_1_Fault_STRING,
+		STATUS_FAN_1_2_Fan_2_Fault_STRING,
+		STATUS_FAN_1_2_Fan_1_Warning_STRING,
+		STATUS_FAN_1_2_Fan_2_Warning_STRING,
+		STATUS_FAN_1_2_Fan_1_Speed_Overridden_STRING,
+		STATUS_FAN_1_2_Fan_2_Speed_Overridden_STRING,
+		STATUS_FAN_1_2_Airflow_Fault_STRING,
+		STATUS_FAN_1_2_Airflow_Warning_STRING
+	};
+
+	char fan_1_check[5] = { 0, 2, 4, 6, 7 };
+	char fan_2_check[5] = { 1, 3, 5, 6, 7 };
+
 	const wchar_t* tmp_wchar;
-
 	wxString wxstr("");
+	bool bFirstError = false;
+	wxstr += wxString::Format("Fan 1: [ ");
 
-	wxstr += wxString::Format("Fan 1: [], Fan 2 : []");
+	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_FAN_1_2 = %02x", PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status);
+
+	for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[fan_1_check[idx]]) == status[fan_1_check[idx]]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[fan_1_check[idx]]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[fan_1_check[idx]]);
+			}
+		}
+	}
+
+	wxstr += wxString::Format(" ], Fan 2 : [ ");
+
+	for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[fan_2_check[idx]]) == status[fan_2_check[idx]]) {
+			if (bFirstError == false){
+				wxstr += wxString::Format(" %s ", status_string[fan_2_check[idx]]);
+				bFirstError = true;
+			}
+			else{
+				wxstr += wxString::Format(", %s ", status_string[fan_2_check[idx]]);
+			}
+		}
+	}
+
+	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
