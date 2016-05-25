@@ -25,6 +25,8 @@ public :
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
+	static long HexToDecimal(wxString string);
+
 protected :
 
 private :

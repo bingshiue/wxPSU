@@ -102,6 +102,26 @@
     <ClCompile Include="STDPage.cpp" />
     <ClCompile Include="BaseWritePage.cpp" />
     <ClCompile Include="WritePage00H.cpp" />
+    <ClCompile Include="WritePage01H.cpp" />
+    <ClCompile Include="WritePage02H.cpp" />
+    <ClCompile Include="WritePage03H.cpp" />
+    <ClCompile Include="WritePage1BH.cpp" />
+    <ClCompile Include="WritePage3AH.cpp" />
+    <ClCompile Include="WritePage3BH.cpp" />
+    <ClCompile Include="WritePage51H.cpp" />
+    <ClCompile Include="WritePage5DH.cpp" />
+    <ClCompile Include="WritePage6AH.cpp" />
+    <ClCompile Include="WritePage6BH.cpp" />
+    <ClCompile Include="WritePage99H.cpp" />
+    <ClCompile Include="WritePage9AH.cpp" />
+    <ClCompile Include="WritePage9BH.cpp" />
+    <ClCompile Include="WritePage9CH.cpp" />
+    <ClCompile Include="WritePage9DH.cpp" />
+    <ClCompile Include="WritePage9EH.cpp" />
+    <ClCompile Include="WritePageD0H.cpp" />
+    <ClCompile Include="WritePageDCH.cpp" />
+    <ClCompile Include="WritePageDDH.cpp" />
+    <ClCompile Include="WritePageFAH.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />

@@ -8,6 +8,11 @@
 #pragma warning(disable:4091)
 #endif
 
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
 #include "CommonDef.h"
 
 enum {
@@ -110,6 +115,8 @@ typedef struct pmbuscmd_t {
 	CMDSTATUS_t     m_cmdStatus;/**< CMD Status */
 
 	CMDCBFUNC_t     m_cmdCBFunc;/**< CallBack Function */
+
+	wxPanel        *m_writePage;/**< Write Page */
 
 } PMBUSCOMMAND_t;
 

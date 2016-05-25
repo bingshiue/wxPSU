@@ -5,11 +5,12 @@
 #define _PMBUSCOMMAND_H_
 
 #include "PMBUSCommandType.h"
+#include "PMBUSCMDWritePages.h"
 
 PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
-// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t
+// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t  wxPanel(Write Page)
 // 00H
-	{ true, "00H", 0x00, "PAGE", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
+	{ true, "00H", 0x00, "PAGE", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL },
 // 01H
 	{ true, "01H", 0x01, "OPERATION", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // 02H

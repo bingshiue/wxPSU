@@ -239,3 +239,9 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 
 	return 0;
 }
+
+long PMBUSHelper::HexToDecimal(wxString string){
+	long decimal = strtol(string.c_str(), NULL, 16);
+
+	return decimal;
+}

@@ -27,12 +27,6 @@ BaseWritePage::~BaseWritePage(){
 
 }
 
-long BaseWritePage::HexToDecimal(wxString string){
-	long decimal = strtol(string.c_str(),NULL,16);
-
-	return decimal;
-}
-
 void BaseWritePage::BaseLayOut(void){
 	// Initial Static Box
 	m_staticBox = new wxStaticBox(this, wxID_ANY, this->m_Label);

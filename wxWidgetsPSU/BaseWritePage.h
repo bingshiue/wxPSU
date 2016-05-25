@@ -22,8 +22,6 @@ public:
 	 */
 	~BaseWritePage();
 
-	long HexToDecimal(wxString string);
-
 protected:
 	enum {
 		PADDING_DEFAULT_HEIGHT = 10,
@@ -55,6 +53,8 @@ protected:
 
 	/**< Box Sizer */
 	wxStaticBoxSizer *m_staticBoxlSizer;
+
+	wxFlexGridSizer *m_flexGridSizer;
 
 	wxGridSizer *m_gridSizer_1;
 	wxGridSizer *m_gridSizer_2;

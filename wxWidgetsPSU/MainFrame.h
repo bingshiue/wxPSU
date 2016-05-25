@@ -206,6 +206,7 @@ public:
 	wxSemaphore *m_rxTxSemaphore;
 
 	unsigned int getCurrentUseIOInterface(void);
+	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
 
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
@@ -216,6 +217,7 @@ private:
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
 
 	void SetupPMBusCommandData(void);
+	void SetupPMBusCommandWritePage(void);
 
 	void SetupMenuBar(void);
 	void SetupToolBar(void);

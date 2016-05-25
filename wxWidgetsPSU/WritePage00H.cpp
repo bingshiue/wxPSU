@@ -7,15 +7,15 @@
 
 WritePage00H::WritePage00H(wxWindow* parent, wxString& label) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Page"));
+	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Page"), wxDefaultPosition, wxSize(-1, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY);
 
 	// Initial Sizer
 	this->m_horizonSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	
 	// Add Components To Sizer
-	this->m_horizonSizer2->Add(m_hintName, 3, wxALIGN_CENTER_VERTICAL);
-	this->m_horizonSizer2->Add(m_inputValue, 7, wxALIGN_CENTER_VERTICAL);
+	this->m_horizonSizer2->Add(m_hintName, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	this->m_horizonSizer2->Add(m_inputValue, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer2);
 
@@ -40,7 +40,7 @@ void WritePage00H::OnRadioButtonCook(wxCommandEvent& event){
 
 	if (this->m_inputValue->GetValue() == wxEmptyString) return;
 
-	long decimal = WritePage00H::HexToDecimal(this->m_inputValue->GetValue().c_str());
+	long decimal = PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
 
 	this->m_inputValue->SetValue(wxString::Format("%ld",decimal));
 
