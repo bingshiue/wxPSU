@@ -17,6 +17,7 @@
 #include "STDPage.h"
 #include "BaseWritePage.h"
 #include "PMBUSCMDWritePages.h"
+#include "PMBUSStatusPanel.h"
 #include "PMBUSHelper.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
@@ -118,7 +119,10 @@ public:
 
 	// Panel
 	wxPanel    *GeneralPanel;
-	wxPanel    *PMBusStatusPanel;
+
+	wxPanel    *debugLogPanel;
+
+	PMBUSStatusPanel    *PMBusStatusPanel;
 	wxPanel    *PMBusMFR;
 	wxPanel    *VerificationPanel;
 	wxPanel    *STATUSPanel;
@@ -194,7 +198,10 @@ public:
 	wxCheckBox   *m_a0_chkbox;
 
 	// Status Bar
-	PSUStatusBar  *m_status_bar;
+	PSUStatusBar *m_status_bar;
+
+	//
+	wxTextCtrl   *m_header;
 
 	// old log target, we replace it with one using m_txtctrl during this
 	// frame life time

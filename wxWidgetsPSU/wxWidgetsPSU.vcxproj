@@ -95,6 +95,7 @@
     <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="PMBusDataViewListModel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
+    <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PSUStatusBar.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PMBUSHelper.h" />
     <ClInclude Include="PMBUSStatus.h" />
+    <ClInclude Include="PMBUSStatusPanel.h" />
     <ClInclude Include="PSUStatusBar.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />

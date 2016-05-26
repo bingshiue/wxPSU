@@ -50,24 +50,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//CreateStatusBar();
 	//SetStatusText("PSU Tool");
 
-	// create the logging text control and a header showing the meaning of the
-	// different columns
-	wxTextCtrl *header = new wxTextCtrl(this, wxID_ANY, "",
-		wxDefaultPosition, wxDefaultSize,
-		wxTE_READONLY);
-	DoLogLine(header, "  Time", " Thread", "          Message");
-	m_txtctrl = new wxTextCtrl(this, wxID_ANY, "",
-		wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY);
-	wxLog::SetActiveTarget(this);
-
-	// use fixed width font to align output in nice columns
-	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
-		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	header->SetFont(font);
-	m_txtctrl->SetFont(font);
-	m_txtctrl->SetFocus();
-
 	//
 #if 0 /**< Grid */
 	m_grid = new wxGrid(this, wxID_ANY);
@@ -96,6 +78,27 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 
+	//this->debugLogPanel = new wxPanel(this->GeneralPanel,wxID_ANY);
+
+	// create the logging text control and a header showing the meaning of the
+	// different columns
+	m_header = new wxTextCtrl(this->GeneralPanel, wxID_ANY, "",
+		wxDefaultPosition, wxDefaultSize,
+		wxTE_READONLY);
+	DoLogLine(m_header, "  Time", " Thread", "          Message");
+	m_txtctrl = new wxTextCtrl(this->GeneralPanel, wxID_ANY, "",
+		wxDefaultPosition, wxDefaultSize,
+		wxTE_MULTILINE | wxTE_READONLY );
+	wxLog::SetActiveTarget(this);
+
+	// use fixed width font to align output in nice columns
+	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
+		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	m_header->SetFont(font);
+	m_txtctrl->SetFont(font);
+	m_txtctrl->SetFocus();
+
+
 	// Sub Notebook
 	this->m_subNotebook = new wxNotebook(this->GeneralPanel, wxID_ANY);
 
@@ -104,9 +107,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 	
 	SetupPSUDataView(GeneralPanel);
-	SetupPMBusCommandWritePage(); SetupPMBusCommandWritePage();
+	SetupPMBusCommandWritePage();
 
-	this->PMBusStatusPanel = new wxPanel(m_notebook, wxID_ANY);
+	this->PMBusStatusPanel = new PMBUSStatusPanel(m_notebook);
 
 	this->PMBusMFR = new wxPanel(m_notebook, wxID_ANY);
 
@@ -130,8 +133,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	//this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
 	this->m_topVeriticalSizer->Add(this->m_notebook, 7, wxEXPAND | wxALL, 1);
-	this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
-	this->m_topVeriticalSizer->Add(this->m_txtctrl, 2, wxEXPAND | wxALL, 1);//wxSizerFlags(1).Expand());
+	//this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
+	//this->m_topVeriticalSizer->Add(this->m_txtctrl, 2, wxEXPAND | wxALL, 1);//wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);
 
 	SetSizer(this->m_topVeriticalSizer);
@@ -1040,13 +1043,18 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
 
 	// Setup Sizer
+	wxSizer* GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
 	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
 	GeneralPanelSz->Add(m_subNotebook, 2, wxGROW | wxALL, 0);
 	GeneralPanelSz->Add(this->m_dataViewCtrl,8, wxGROW | wxALL, 0);
 
-	parent->SetSizerAndFit(GeneralPanelSz);
+	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(8).Expand());
+	GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
+	GeneralPanelTopLevelSizer->Add(this->m_txtctrl, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
+
+	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
 
 }
 
@@ -1105,7 +1113,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 			this->m_subNotebook->RemovePage(2);
 			if (this->m_PMBusData[row].m_writePage != NULL){
 				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
-				this->m_subNotebook->SetSelection(2);
+				//this->m_subNotebook->SetSelection(2);
 			}
 
 			break;
