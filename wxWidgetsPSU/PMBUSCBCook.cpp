@@ -342,7 +342,7 @@ int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_byte.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_byte.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_BYTE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_byte.status);
 
@@ -414,7 +414,7 @@ int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_word.status = pmbuscmd->m_recvBuff.m_dataBuff[0] | (pmbuscmd->m_recvBuff.m_dataBuff[1] << 8);
+	PMBUSHelper::GetPMBusStatus()->m_status_word.Save(pmbuscmd->m_recvBuff.m_dataBuff[0] | (pmbuscmd->m_recvBuff.m_dataBuff[1] << 8));
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_WORD = %04x", PMBUSHelper::GetPMBusStatus()->m_status_word.status);
 
@@ -470,7 +470,7 @@ int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_vout.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_vout.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_VOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_vout.status);
 
@@ -528,7 +528,7 @@ int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 
-	PMBUSHelper::GetPMBusStatus()->m_status_iout.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_iout.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_IOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_iout.status);
 
@@ -585,7 +585,7 @@ int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_input.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_input.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_INPUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_input.status);
 
@@ -641,7 +641,7 @@ int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_temperature.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_temperature.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_TEMPERATURE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_temperature.status);
 
@@ -697,7 +697,7 @@ int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_cml.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_cml.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_CML = %02x", PMBUSHelper::GetPMBusStatus()->m_status_cml.status);
 
@@ -754,7 +754,7 @@ int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Status: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_other.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_other.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_OTHER = %02x", PMBUSHelper::GetPMBusStatus()->m_status_other.status);
 
@@ -813,7 +813,7 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	bool bFirstError = false;
 	wxstr += wxString::Format("Fan 1: [ ");
 
-	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_FAN_1_2 = %02x", PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status);
 

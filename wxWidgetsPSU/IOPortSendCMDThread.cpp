@@ -18,7 +18,9 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	RECVBUFF_t *recvBuff,
 	wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
 	PSUStatusBar *status_bar,
-	STDPage* stdPage
+	STDPage* stdPage,
+	PMBUSStatusPanel* pmbusStatusPanel,
+	PMBUSStatusDCHPanel* pmbusStatusDCHPanel
 	)
 {
 	this->m_IOAccess = ioaccess;
@@ -31,6 +33,8 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	this->m_dataViewListCtrl = dataViewListModel;
 	this->m_status_bar = status_bar;
 	this->m_stdPage = stdPage;
+	this->m_pmbusStatusPanel = pmbusStatusPanel;
+	this->m_pmbusStatusDCHPanel = pmbusStatusDCHPanel;
 }
 
 IOPortSendCMDThread::~IOPortSendCMDThread() { }
@@ -513,6 +517,12 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				if (idx == (PMBUSCOMMAND_SIZE - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
+
+					// Update PMBUSStatus Panel
+					this->m_pmbusStatusPanel->UpdatePanel();
+
+					// Update PMBUSStatus Panel
+					this->m_pmbusStatusDCHPanel->UpdatePanel();
 				}
 
 			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)

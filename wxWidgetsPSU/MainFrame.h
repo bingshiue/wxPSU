@@ -18,6 +18,7 @@
 #include "BaseWritePage.h"
 #include "PMBUSCMDWritePages.h"
 #include "PMBUSStatusPanel.h"
+#include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
@@ -122,7 +123,9 @@ public:
 
 	wxPanel    *debugLogPanel;
 
-	PMBUSStatusPanel    *PMBusStatusPanel;
+	PMBUSStatusPanel  *PMBusStatusPanel;
+	PMBUSStatusDCHPanel  *PMBusStatusDCHPanel;
+
 	wxPanel    *PMBusMFR;
 	wxPanel    *VerificationPanel;
 	wxPanel    *STATUSPanel;

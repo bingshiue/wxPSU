@@ -115,14 +115,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->VerificationPanel = new wxPanel(m_notebook, wxID_ANY);
 
-	this->STATUSPanel = new wxPanel(m_notebook, wxID_ANY);
+	//this->STATUSPanel = new wxPanel(m_notebook, wxID_ANY);
+
+	this->PMBusStatusDCHPanel = new PMBUSStatusDCHPanel(m_notebook);
 
 	// Add each panl into notebook component
 	m_notebook->AddPage(this->GeneralPanel, "General");
 	m_notebook->AddPage(this->PMBusStatusPanel, "PM Bus Status");
 	m_notebook->AddPage(this->PMBusMFR, "PMBus MFR");
 	m_notebook->AddPage(this->VerificationPanel, "Verification");
-	m_notebook->AddPage(this->STATUSPanel, "STATUS(DCH)");
+	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 
 	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
 	//Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
@@ -600,7 +602,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success

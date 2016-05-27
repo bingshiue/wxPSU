@@ -13,6 +13,8 @@
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSDataViewListModel.h"
+#include "PMBUSStatusPanel.h"
+#include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
 #include "PSUStatusBar.h"
 #include "IOPortReadCMDThread.h"
@@ -47,7 +49,9 @@ public:
 		RECVBUFF_t *recvBuff,
 		wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
 		PSUStatusBar *status_bar,
-		STDPage* stdPage
+		STDPage* stdPage,
+		PMBUSStatusPanel* pmbusStatusPanel,
+		PMBUSStatusDCHPanel* pmbusStatusDCHPanel
 						);
 	virtual ~IOPortSendCMDThread();
 
@@ -61,6 +65,8 @@ public:
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
 	PSUStatusBar  *m_status_bar;
 	STDPage *m_stdPage;
+	PMBUSStatusPanel* m_pmbusStatusPanel;
+	PMBUSStatusDCHPanel* m_pmbusStatusDCHPanel;
 
 	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);

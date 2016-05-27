@@ -132,6 +132,9 @@
     <ClCompile Include="PMBUSStatusPanel.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PMBUSStatusDCHPanel.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -207,6 +210,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="PMBUSStatusPanel.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSStatusDCHPanel.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

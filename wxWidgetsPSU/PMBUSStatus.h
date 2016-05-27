@@ -322,6 +322,14 @@ typedef  struct status_byte_t {
 
 	unsigned char status;
 
+	unsigned char status_dch;
+
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
+
 	void Clear(void){
 		memset(this, 0, sizeof(status_byte_t));
 	}
@@ -337,6 +345,13 @@ typedef  struct status_word_t {
 
 	unsigned short status;
 
+	unsigned short status_dch;
+
+	void Save(unsigned short _status){
+		status = _status;
+		status_dch |= _status;
+	}
+
 	void Clear(void){
 		memset(this, 0, sizeof(status_word_t));
 	}
@@ -350,6 +365,13 @@ typedef  struct status_vout_t {
 	status_vout_t(){ this->Clear(); }
 
 	unsigned char status;
+
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
 
 	void Clear(void){
 		memset(this, 0, sizeof(status_vout_t));
@@ -365,6 +387,13 @@ typedef  struct status_iout_t {
 
 	unsigned char status;
 
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
+
 	void Clear(void){
 		memset(this, 0, sizeof(status_iout_t));
 	}
@@ -378,6 +407,13 @@ typedef  struct status_input_t {
 	status_input_t(){ this->Clear(); }
 
 	unsigned char status;
+
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
 
 	void Clear(void){
 		memset(this, 0, sizeof(status_input_t));
@@ -393,6 +429,13 @@ typedef  struct status_temperature_t {
 
 	unsigned char status;
 
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
+
 	void Clear(void){
 		memset(this, 0, sizeof(status_temperature_t));
 	}
@@ -406,6 +449,13 @@ typedef  struct status_cml_t {
 	status_cml_t(){ this->Clear(); }
 
 	unsigned char status;
+
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
 
 	void Clear(void){
 		memset(this, 0, sizeof(status_cml_t));
@@ -421,6 +471,13 @@ typedef  struct status_other_t {
 
 	unsigned char status;
 
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
+
 	void Clear(void){
 		memset(this, 0, sizeof(status_other_t));
 	}
@@ -434,6 +491,13 @@ typedef  struct status_fan_1_2_t {
 	status_fan_1_2_t(){ this->Clear(); }
 
 	unsigned char status;
+
+	unsigned char status_dch;
+
+	void Save(unsigned char _status){
+		status = _status;
+		status_dch |= _status;
+	}
 
 	void Clear(void){
 		memset(this, 0, sizeof(status_fan_1_2_t));

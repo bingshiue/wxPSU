@@ -2,19 +2,21 @@
  * @file PMBusStatusPanel.cpp
  */
 
+#include "PMBUSHelper.h"
+#include "PMBUSCBCook.h"
 #include "PMBUSStatusPanel.h"
 #include "green.xpm"
 #include "red.xpm"
 
-PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
+PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxScrolledWindow(parent) {
 	// Load Bitmap
 	m_green = new wxBitmap(green_xpm);
 	m_red = new wxBitmap(red_xpm);
 
 	// Status_WORD
 	this->m_statusWordSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_WORD"));
-	this->m_statusWord_GS_1 = new wxGridSizer(2, 4, 5, 5);
-	this->m_statusWord_GS_2 = new wxGridSizer(2, 4, 5, 5);
+	this->m_statusWord_GS_1 = new wxGridSizer(2, 4, 0, 0);
+	this->m_statusWord_GS_2 = new wxGridSizer(2, 4, 0, 0);
 
 	this->m_statusWord_HS_1 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_statusWord_HS_2 = new wxBoxSizer(wxHORIZONTAL);
@@ -34,90 +36,90 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 	this->m_statusWord_HS_15 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_statusWord_HS_16 = new wxBoxSizer(wxHORIZONTAL);
 
-	this->m_stbBUSY = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbOFF = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbVOUT_OV_FAULT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbIOUT_OC_FAULT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbVIN_UV_FAULT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbTEMPERATURE = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbCML = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbNONE_OF_THE_ABOVE = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbBUSY_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbOFF_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVOUT_OV_FAULT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIOUT_OC_FAULT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVIN_UV_FAULT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbTEMPERATURE_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbCML_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbNONE_OF_THE_ABOVE_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
 
-	this->m_stbVOUT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbIOUTPOUT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbINPUT = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbMFR_SPECIFIC = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbPOWER_GOOD = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbFANS = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbOTHER = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbUNKNOW = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVOUT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIOUTPOUT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINPUT_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbMFR_SPECIFIC_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPOWER_GOOD_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbFANS_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbOTHER_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbUNKNOW_Word = new wxStaticBitmap(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, *m_green);
 
-	m_stBUSY = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("BUSY(MSB)"));
-	m_stOFF = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("OFF"));
-	m_stVOUT_OV_FAULT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VOUT_OV_FAULT"));
-	m_stIOUT_OC_FAULT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_OC_FAULT"));
-	m_stVIN_UV_FAULT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_FAULT"));
-	m_stTEMPERATURE = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("TEMPERATURE"));
-	m_stCML = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("CML"));
-	m_stNONE_OF_THE_ABOVE = new wxStaticText(this, wxID_ANY, wxT("NONE_OF_THE_ABOVE(LSB)"));
+	m_stBUSY_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("BUSY(MSB)"));
+	m_stOFF_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("OFF"));
+	m_stVOUT_OV_FAULT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VOUT_OV_FAULT"));
+	m_stIOUT_OC_FAULT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_OC_FAULT"));
+	m_stVIN_UV_FAULT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_FAULT"));
+	m_stTEMPERATURE_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("TEMPERATURE"));
+	m_stCML_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("CML"));
+	m_stNONE_OF_THE_ABOVE_Word = new wxStaticText(this, wxID_ANY, wxT("NONE_OF_THE_ABOVE(LSB)"));
 
-	m_stVOUT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VOUT(MSB)"));
-	m_stIOUTPOUT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("IOUT/POUT"));
-	m_stINPUT = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("INPUT"));
-	m_stMFR_SPECIFIC = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("MFR_SPECIFIC"));
-	m_stPOWER_GOOD = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("POWER_GOOD"));
-	m_stFANS = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("FANS"));
-	m_stOTHER = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("OTHER"));
-	m_stUNKNOW = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("UNKNOW(LSB)"));
+	m_stVOUT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("VOUT(MSB)"));
+	m_stIOUTPOUT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("IOUT/POUT"));
+	m_stINPUT_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("INPUT"));
+	m_stMFR_SPECIFIC_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("MFR_SPECIFIC"));
+	m_stPOWER_GOOD_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("POWER_GOOD"));
+	m_stFANS_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("FANS"));
+	m_stOTHER_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("OTHER"));
+	m_stUNKNOW_Word = new wxStaticText(this->m_statusWordSBS->GetStaticBox(), wxID_ANY, wxT("UNKNOW(LSB)"));
 	                                          
 
-	m_statusWord_HS_1->Add(m_stbBUSY,0,wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_1->Add(m_stBUSY, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_1->Add(m_stbBUSY_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_1->Add(m_stBUSY_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_2->Add(m_stbOFF, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_2->Add(m_stOFF, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_2->Add(m_stbOFF_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_2->Add(m_stOFF_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_3->Add(m_stbVOUT_OV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_3->Add(m_stVOUT_OV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_3->Add(m_stbVOUT_OV_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_3->Add(m_stVOUT_OV_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_4->Add(m_stbIOUT_OC_FAULT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_4->Add(m_stIOUT_OC_FAULT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_4->Add(m_stbIOUT_OC_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_4->Add(m_stIOUT_OC_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_5->Add(m_stbVIN_UV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_5->Add(m_stVIN_UV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_5->Add(m_stbVIN_UV_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_5->Add(m_stVIN_UV_FAULT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_6->Add(m_stbTEMPERATURE, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_6->Add(m_stTEMPERATURE, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_6->Add(m_stbTEMPERATURE_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_6->Add(m_stTEMPERATURE_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_7->Add(m_stbCML, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_7->Add(m_stCML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_7->Add(m_stbCML_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_7->Add(m_stCML_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_8->Add(m_stbNONE_OF_THE_ABOVE, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_8->Add(m_stNONE_OF_THE_ABOVE, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_8->Add(m_stbNONE_OF_THE_ABOVE_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_8->Add(m_stNONE_OF_THE_ABOVE_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_9->Add(m_stbVOUT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_9->Add(m_stVOUT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_9->Add(m_stbVOUT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_9->Add(m_stVOUT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_10->Add(m_stbIOUTPOUT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_10->Add(m_stIOUTPOUT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_10->Add(m_stbIOUTPOUT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_10->Add(m_stIOUTPOUT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_11->Add(m_stbINPUT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_11->Add(m_stINPUT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_11->Add(m_stbINPUT_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_11->Add(m_stINPUT_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_12->Add(m_stbMFR_SPECIFIC, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_12->Add(m_stMFR_SPECIFIC, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_12->Add(m_stbMFR_SPECIFIC_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_12->Add(m_stMFR_SPECIFIC_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_13->Add(m_stbPOWER_GOOD, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_13->Add(m_stPOWER_GOOD, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_13->Add(m_stbPOWER_GOOD_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_13->Add(m_stPOWER_GOOD_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_14->Add(m_stbFANS, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_14->Add(m_stFANS, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_14->Add(m_stbFANS_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_14->Add(m_stFANS_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_15->Add(m_stbOTHER, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_15->Add(m_stOTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_15->Add(m_stbOTHER_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_15->Add(m_stOTHER_Word, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusWord_HS_16->Add(m_stbUNKNOW, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusWord_HS_16->Add(m_stUNKNOW, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_16->Add(m_stbUNKNOW_Word, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusWord_HS_16->Add(m_stUNKNOW_Word, 0, wxALIGN_CENTER_VERTICAL);
 
 	this->m_statusWord_GS_1->Add(m_statusWord_HS_1);
 	this->m_statusWord_GS_1->Add(m_statusWord_HS_2);
@@ -155,7 +157,7 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 	this->m_statusInputSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_INPUT"));
 	//m_statusInputSBS->GetStaticBox()->SetFont(wxFont(wxSWISS_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
-	this->m_statusInput_GS_1 = new wxGridSizer(2, 4, 5, 5);
+	this->m_statusInput_GS_1 = new wxGridSizer(2, 4, 0, 0);
 
 	this->m_statusInput_HS_1 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_statusInput_HS_2 = new wxBoxSizer(wxHORIZONTAL);
@@ -166,47 +168,47 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 	this->m_statusInput_HS_7 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_statusInput_HS_8 = new wxBoxSizer(wxHORIZONTAL);
 
-	this->m_stbVIN_OV_FAULT = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbVIN_OV_WARNING = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbVIN_UV_WARNING = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVIN_OV_FAULT_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVIN_OV_WARNING_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbVIN_UV_WARNING_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
 	this->m_stbVIN_UV_FAULT_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbUNIT_OFF = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbIIN_OC_FAULT = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbIIN_OC_WARNING = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
-	this->m_stbPIN_OP_WARNING = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbUNIT_OFF_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIIN_OC_FAULT_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIIN_OC_WARNING_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPIN_OP_WARNING_Input = new wxStaticBitmap(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, *m_green);
 
-	m_stVIN_OV_FAULT = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_OV_FAULT(MSB)"));
-	m_stVIN_OV_WARNING = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_OV_WARNING"));
-	m_stVIN_UV_WARNING = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_WARNING"));
-	m_stVIN_UV_FAULT_2 = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_FAULT"));
-	m_stUNIT_OFF = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("UNIT_OFF"));
-	m_stIIN_OC_FAULT = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("IIN_OC_FAULT"));
-	m_stIIN_OC_WARNING = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("IIN_OC_WARNING"));
-	m_stPIN_OP_WARNING = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("PIN_OP_WARNING(LSB)"));
+	m_stVIN_OV_FAULT_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_OV_FAULT(MSB)"));
+	m_stVIN_OV_WARNING_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_OV_WARNING"));
+	m_stVIN_UV_WARNING_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_WARNING"));
+	m_stVIN_UV_FAULT_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("VIN_UV_FAULT"));
+	m_stUNIT_OFF_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("UNIT_OFF"));
+	m_stIIN_OC_FAULT_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("IIN_OC_FAULT"));
+	m_stIIN_OC_WARNING_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("IIN_OC_WARNING"));
+	m_stPIN_OP_WARNING_Input = new wxStaticText(this->m_statusInputSBS->GetStaticBox(), wxID_ANY, wxT("PIN_OP_WARNING(LSB)"));
 																							
-	m_statusInput_HS_1->Add(m_stbVIN_OV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_1->Add(m_stVIN_OV_FAULT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_1->Add(m_stbVIN_OV_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_1->Add(m_stVIN_OV_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_2->Add(m_stbVIN_OV_WARNING, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_2->Add(m_stVIN_OV_WARNING, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_2->Add(m_stbVIN_OV_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_2->Add(m_stVIN_OV_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_3->Add(m_stbVIN_UV_WARNING, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_3->Add(m_stVIN_UV_WARNING, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_3->Add(m_stbVIN_UV_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_3->Add(m_stVIN_UV_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
 
 	m_statusInput_HS_4->Add(m_stbVIN_UV_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_4->Add(m_stVIN_UV_FAULT_2, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_4->Add(m_stVIN_UV_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_5->Add(m_stbUNIT_OFF, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_5->Add(m_stUNIT_OFF, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_5->Add(m_stbUNIT_OFF_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_5->Add(m_stUNIT_OFF_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_6->Add(m_stbIIN_OC_FAULT, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_6->Add(m_stIIN_OC_FAULT, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_6->Add(m_stbIIN_OC_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_6->Add(m_stIIN_OC_FAULT_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_7->Add(m_stbIIN_OC_WARNING, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_7->Add(m_stIIN_OC_WARNING, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_7->Add(m_stbIIN_OC_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_7->Add(m_stIIN_OC_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_statusInput_HS_8->Add(m_stbPIN_OP_WARNING, 0, wxALIGN_CENTER_VERTICAL);
-	m_statusInput_HS_8->Add(m_stPIN_OP_WARNING, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_8->Add(m_stbPIN_OP_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusInput_HS_8->Add(m_stPIN_OP_WARNING_Input, 0, wxALIGN_CENTER_VERTICAL);
 
 	this->m_statusInput_GS_1->Add(m_statusInput_HS_1);
 	this->m_statusInput_GS_1->Add(m_statusInput_HS_2);
@@ -222,9 +224,9 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 	/* ------------------------------------------------------------------------------ */
 
 	// Status_VOUT
-	this->m_statusVoutSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_INPUT"));
+	this->m_statusVoutSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_VOUT"));
 
-	this->m_statusVout_GS_1 = new wxGridSizer(2, 4, 5, 5);
+	this->m_statusVout_GS_1 = new wxGridSizer(2, 4, 0, 0);
 
 	this->m_statusVout_HS_1 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_statusVout_HS_2 = new wxBoxSizer(wxHORIZONTAL);
@@ -290,24 +292,279 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 
 	/* ------------------------------------------------------------------------------ */
 
-
 	// Status_IOUT
+	this->m_statusIoutSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_IOUT"));
 
+	this->m_statusIout_GS_1 = new wxGridSizer(2, 4, 0, 0);
+
+	this->m_statusIout_HS_1 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_2 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_3 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_4 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_5 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_6 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_7 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusIout_HS_8 = new wxBoxSizer(wxHORIZONTAL);
+
+	this->m_stbIOUT_OC_FAULT_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIOUT_OC_LV_FAULT_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIOUT_OC_WARNING_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIOUT_UC_FAULT_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbCURRENT_SHARE_FAULT_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbIN_POWER_LIMITING_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPOUT_OC_FAULT_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPOUT_OP_WARNING_Iout = new wxStaticBitmap(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, *m_green);
+
+	m_stIOUT_OC_FAULT_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_OC_FAULT(MSB)"));
+	m_stIOUT_OC_LV_FAULT_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_OC_LV_FAULT"));
+	m_stIOUT_OC_WARNING_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_OC_WARNING"));
+	m_stIOUT_UC_FAULT_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("IOUT_UC_FAULT"));
+	m_stCURRENT_SHARE_FAULT_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("CURRENT_SHARE_FAULT"));
+	m_stIN_POWER_LIMITING_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("IN_POWER_LIMITING"));
+	m_stPOUT_OC_FAULT_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("POUT_OC_FAULT"));
+	m_stPOUT_OP_WARNING_Iout = new wxStaticText(this->m_statusIoutSBS->GetStaticBox(), wxID_ANY, wxT("POUT_OP_WARNING(LSB)"));
+
+	m_statusIout_HS_1->Add(m_stbIOUT_OC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_1->Add(m_stIOUT_OC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_2->Add(m_stbIOUT_OC_LV_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_2->Add(m_stIOUT_OC_LV_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_3->Add(m_stbIOUT_OC_WARNING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_3->Add(m_stIOUT_OC_WARNING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_4->Add(m_stbIOUT_UC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_4->Add(m_stIOUT_UC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_5->Add(m_stbCURRENT_SHARE_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_5->Add(m_stCURRENT_SHARE_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_6->Add(m_stbIN_POWER_LIMITING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_6->Add(m_stIN_POWER_LIMITING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_7->Add(m_stbPOUT_OC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_7->Add(m_stPOUT_OC_FAULT_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusIout_HS_8->Add(m_stbPOUT_OP_WARNING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusIout_HS_8->Add(m_stPOUT_OP_WARNING_Iout, 0, wxALIGN_CENTER_VERTICAL);
+
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_1);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_2);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_3);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_4);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_5);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_6);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_7);
+	this->m_statusIout_GS_1->Add(m_statusIout_HS_8);
+
+	m_statusIoutSBS->Add(m_statusIout_GS_1, wxSizerFlags(1).Expand().Border(wxALL, 0));
 
 	/* ------------------------------------------------------------------------------ */
 
 	// Status_TEMPERATURE
+	this->m_statusTemperatureSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_TEMPERATURE"));
 
+	this->m_statusTemperature_GS_1 = new wxGridSizer(2, 4, 0, 0);
+
+	this->m_statusTemperature_HS_1 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_2 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_3 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_4 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_5 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_6 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_7 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusTemperature_HS_8 = new wxBoxSizer(wxHORIZONTAL);
+
+	this->m_stbOT_FAULT_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbOT_WARNING_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbUT_WARNING_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbUT_FAULT_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED3_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED2_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED1_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED0_Temperature = new wxStaticBitmap(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, *m_green);
+
+	m_stOT_FAULT_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("OT_FAULT(MSB)"));
+	m_stOT_WARNING_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("OT_WARNING"));
+	m_stUT_WARNING_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("UT_WARNING"));
+	m_stUT_FAULT_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("UT_FAULT"));
+	m_stRESERVED3_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED3"));
+	m_stRESERVED2_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED2"));
+	m_stRESERVED1_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED1"));
+	m_stRESERVED0_Temperature = new wxStaticText(this->m_statusTemperatureSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED0(LSB)"));
+
+	m_statusTemperature_HS_1->Add(m_stbOT_FAULT_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_1->Add(m_stOT_FAULT_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_2->Add(m_stbOT_WARNING_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_2->Add(m_stOT_WARNING_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_3->Add(m_stbUT_WARNING_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_3->Add(m_stUT_WARNING_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_4->Add(m_stbUT_FAULT_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_4->Add(m_stUT_FAULT_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_5->Add(m_stbRESERVED3_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_5->Add(m_stRESERVED3_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_6->Add(m_stbRESERVED2_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_6->Add(m_stRESERVED2_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_7->Add(m_stbRESERVED1_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_7->Add(m_stRESERVED1_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusTemperature_HS_8->Add(m_stbRESERVED0_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusTemperature_HS_8->Add(m_stRESERVED0_Temperature, 0, wxALIGN_CENTER_VERTICAL);
+
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_1);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_2);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_3);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_4);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_5);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_6);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_7);
+	this->m_statusTemperature_GS_1->Add(m_statusTemperature_HS_8);
+
+	m_statusTemperatureSBS->Add(m_statusTemperature_GS_1, wxSizerFlags(1).Expand().Border(wxALL, 0));
 
 	/* ------------------------------------------------------------------------------ */
 
 	// Status_CML
+	this->m_statusCMLSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_CML"));
 
+	this->m_statusCML_GS_1 = new wxGridSizer(2, 4, 0, 0);
+
+	this->m_statusCML_HS_1 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_2 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_3 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_4 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_5 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_6 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_7 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusCML_HS_8 = new wxBoxSizer(wxHORIZONTAL);
+
+	this->m_stbINVALID_COMMAND_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINVALID_DATA_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPEC_FAILED_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbMEMORY_FAULT_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbPROCESSOR_FAULT_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbCOMMUNICATION_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbOTHER_MEMORY_CML = new wxStaticBitmap(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, *m_green);
+
+	m_stINVALID_COMMAND_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("INVALID_COMMAND(MSB)"));
+	m_stINVALID_DATA_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("INVALID_DATA"));
+	m_stPEC_FAILED_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("PEC_FAILED"));
+	m_stMEMORY_FAULT_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("MEMORY_FAULT"));
+	m_stPROCESSOR_FAULT_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("PROCESSOR_FAULT"));
+	m_stRESERVED_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED"));
+	m_stCOMMUNICATION_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("COMMUNICATION"));
+	m_stOTHER_MEMORY_CML = new wxStaticText(this->m_statusCMLSBS->GetStaticBox(), wxID_ANY, wxT("OTHER_MEMORY(LSB)"));
+
+	m_statusCML_HS_1->Add(m_stbINVALID_COMMAND_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_1->Add(m_stINVALID_COMMAND_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_2->Add(m_stbINVALID_DATA_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_2->Add(m_stINVALID_DATA_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_3->Add(m_stbPEC_FAILED_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_3->Add(m_stPEC_FAILED_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_4->Add(m_stbMEMORY_FAULT_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_4->Add(m_stMEMORY_FAULT_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_5->Add(m_stbPROCESSOR_FAULT_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_5->Add(m_stPROCESSOR_FAULT_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_6->Add(m_stbRESERVED_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_6->Add(m_stRESERVED_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_7->Add(m_stbCOMMUNICATION_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_7->Add(m_stCOMMUNICATION_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusCML_HS_8->Add(m_stbOTHER_MEMORY_CML, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusCML_HS_8->Add(m_stOTHER_MEMORY_CML, 0, wxALIGN_CENTER_VERTICAL);
+
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_1);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_2);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_3);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_4);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_5);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_6);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_7);
+	this->m_statusCML_GS_1->Add(m_statusCML_HS_8);
+
+	m_statusCMLSBS->Add(m_statusCML_GS_1, wxSizerFlags(1).Expand().Border(wxALL, 0));
 
 	/* ------------------------------------------------------------------------------ */
 
 	// Status_OTHER
+	this->m_statusOTHERSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_OTHER"));
 
+	this->m_statusOTHER_GS_1 = new wxGridSizer(2, 4, 0, 0);
+
+	this->m_statusOTHER_HS_1 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_2 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_3 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_4 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_5 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_6 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_7 = new wxBoxSizer(wxHORIZONTAL);
+	this->m_statusOTHER_HS_8 = new wxBoxSizer(wxHORIZONTAL);
+
+	this->m_stbRESERVED7_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED6_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINPUT_A_FUSE_FAULT_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINPUT_B_FUSE_FAULT_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINPUT_A_ORING_FAULT_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbINPUT_B_ORING_FAULT_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbOUTPUT_ORING_FAULT_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+	this->m_stbRESERVED_OTHER = new wxStaticBitmap(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, *m_green);
+
+	m_stRESERVED7_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED7(MSB)"));
+	m_stRESERVED6_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED6"));
+	m_stINPUT_A_FUSE_FAULT_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("INPUT_A_FUSE_FAULT"));
+	m_stINPUT_B_FUSE_FAULT_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("INPUT_B_FUSE_FAULT"));
+	m_stINPUT_A_ORING_FAULT_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("INPUT_A_ORING_FAULT"));
+	m_stINPUT_B_ORING_FAULT_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("INPUT_B_ORING_FAULT"));
+	m_stOUTPUT_ORING_FAULT_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("OUTPUT_ORING_FAULT"));
+	m_stRESERVED_OTHER = new wxStaticText(this->m_statusOTHERSBS->GetStaticBox(), wxID_ANY, wxT("RESERVED(LSB)"));
+
+	m_statusOTHER_HS_1->Add(m_stbRESERVED7_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_1->Add(m_stRESERVED7_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_2->Add(m_stbRESERVED6_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_2->Add(m_stRESERVED6_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_3->Add(m_stbINPUT_A_FUSE_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_3->Add(m_stINPUT_A_FUSE_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_4->Add(m_stbINPUT_B_FUSE_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_4->Add(m_stINPUT_B_FUSE_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_5->Add(m_stbINPUT_A_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_5->Add(m_stINPUT_A_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_6->Add(m_stbINPUT_B_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_6->Add(m_stINPUT_B_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_7->Add(m_stbOUTPUT_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_7->Add(m_stOUTPUT_ORING_FAULT_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_statusOTHER_HS_8->Add(m_stbRESERVED_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+	m_statusOTHER_HS_8->Add(m_stRESERVED_OTHER, 0, wxALIGN_CENTER_VERTICAL);
+
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_1);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_2);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_3);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_4);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_5);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_6);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_7);
+	this->m_statusOTHER_GS_1->Add(m_statusOTHER_HS_8);
+
+	m_statusOTHERSBS->Add(m_statusOTHER_GS_1, wxSizerFlags(1).Expand().Border(wxALL, 0));
 
 	/* ------------------------------------------------------------------------------ */
 
@@ -316,10 +573,74 @@ PMBUSStatusPanel::PMBUSStatusPanel(wxWindow* parent) : wxPanel(parent) {
 	this->m_topLevelSizer->Add(m_statusWordSBS, wxSizerFlags(0).Expand());
 	this->m_topLevelSizer->Add(m_statusInputSBS, wxSizerFlags(0).Expand());
 	this->m_topLevelSizer->Add(m_statusVoutSBS, wxSizerFlags(0).Expand());
+	this->m_topLevelSizer->Add(m_statusIoutSBS, wxSizerFlags(0).Expand());
+	this->m_topLevelSizer->Add(m_statusTemperatureSBS, wxSizerFlags(0).Expand());
+	this->m_topLevelSizer->Add(m_statusCMLSBS, wxSizerFlags(0).Expand());
+	this->m_topLevelSizer->Add(m_statusOTHERSBS, wxSizerFlags(0).Expand());
 
 	SetSizer(this->m_topLevelSizer);
+
+	// this part makes the scrollbars show up
+	this->FitInside(); // ask the sizer about the needed size
+	this->SetScrollRate(5, 5);
 }
 
 PMBUSStatusPanel::~PMBUSStatusPanel(){
+
+}
+
+
+void PMBUSStatusPanel::UpdatePanel(void){
+	// Update Status WORD Field
+	Update_StatusWord();
+}
+
+void PMBUSStatusPanel::Update_StatusWord(void){
+	const unsigned short status[16] = {
+		STATUS_WORD_HIGH_VOUT,
+		STATUS_WORD_HIGH_IOUTPOUT,
+		STATUS_WORD_HIGH_INPUT,
+		STATUS_WORD_HIGH_MFR_SPECIFIC,
+		STATUS_WORD_HIGH_POWERGOOD,
+		STATUS_WORD_HIGH_FANS,
+		STATUS_WORD_HIGH_OTHER,
+		STATUS_WORD_HIGH_UNKNOWN,
+		STATUS_WORD_LOW_BUSY,
+		STATUS_WORD_LOW_OFF,
+		STATUS_WORD_LOW_VOUT_OV_FAULT,
+		STATUS_WORD_LOW_IOUT_OC_FAULT,
+		STATUS_WORD_LOW_VIN_UV_FAULT,
+		STATUS_WORD_LOW_TEMPERATURE,
+		STATUS_WORD_LOW_CML,
+		STATUS_WORD_LOW_NONE_OF_THE_ABOVE
+	};
+
+	wxStaticBitmap *sbArray[16] = {
+		this->m_stbVOUT_Word,
+		this->m_stbIOUTPOUT_Word,
+		this->m_stbINPUT_Word,
+		this->m_stbMFR_SPECIFIC_Word,
+		this->m_stbPOWER_GOOD_Word,
+		this->m_stbFANS_Word,
+		this->m_stbOTHER_Word,
+		this->m_stbUNKNOW_Word,
+		this->m_stbBUSY_Word,
+		this->m_stbOFF_Word,
+		this->m_stbVOUT_OV_FAULT_Word,
+		this->m_stbIOUT_OC_FAULT_Word,
+		this->m_stbVIN_UV_FAULT_Word,
+		this->m_stbTEMPERATURE_Word,
+		this->m_stbCML_Word,
+		this->m_stbNONE_OF_THE_ABOVE_Word,
+	};
+
+	for (unsigned int idx = 0; idx < 16; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
 
 }
