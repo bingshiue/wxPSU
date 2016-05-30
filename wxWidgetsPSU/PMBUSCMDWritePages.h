@@ -4,7 +4,9 @@
 #ifndef _PMBUSCMDWRITEPAGES_H_
 #define _PMBUSCMDWRITEPAGES_H_
 
+#include <vector>
 #include "CommonDef.h"
+#include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
 #include "BaseWritePage.h"
 
@@ -14,7 +16,7 @@ public :
 	/**
 	 * @brief Constructor.
 	 */
-	WritePage00H(wxWindow* parent, wxString& label);
+	WritePage00H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector);
 	/**
 	 * @brief Deconstructor.
 	 */
@@ -24,6 +26,10 @@ protected :
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
 
 private :
 
@@ -42,7 +48,7 @@ public:
     /**
 	 * @brief Constructor.
 	 */
-	WritePage01H(wxWindow* parent, wxString& label);
+	WritePage01H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector);
 	/**
 	 * @brief Deconstructor.
 	 */
@@ -52,6 +58,9 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
 private:
 
@@ -70,7 +79,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage02H(wxWindow* parent, wxString& label);
+	WritePage02H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -80,6 +89,9 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
 private:
 

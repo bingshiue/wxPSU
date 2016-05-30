@@ -51,7 +51,8 @@ public:
 		PSUStatusBar *status_bar,
 		STDPage* stdPage,
 		PMBUSStatusPanel* pmbusStatusPanel,
-		PMBUSStatusDCHPanel* pmbusStatusDCHPanel
+		PMBUSStatusDCHPanel* pmbusStatusDCHPanel,
+		std::vector<PMBUSSendCOMMAND_t> *sendCMDVector
 						);
 	virtual ~IOPortSendCMDThread();
 
@@ -67,6 +68,8 @@ public:
 	STDPage *m_stdPage;
 	PMBUSStatusPanel* m_pmbusStatusPanel;
 	PMBUSStatusDCHPanel* m_pmbusStatusDCHPanel;
+
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
 	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);

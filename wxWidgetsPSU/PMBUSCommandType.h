@@ -120,4 +120,11 @@ typedef struct pmbuscmd_t {
 
 } PMBUSCOMMAND_t;
 
+typedef struct pmbusSendcmd_t {
+	unsigned char m_sendData[256];
+
+
+
+} PMBUSSendCOMMAND_t;
+
 #endif

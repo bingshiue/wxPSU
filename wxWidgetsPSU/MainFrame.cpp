@@ -7,6 +7,7 @@
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
 #include "PMBusCMDGridTable.h"
+#include "Acbel.xpm"
 #include "sample.xpm"
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
@@ -30,7 +31,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
 
 	// Setup Icon
-	SetIcon(sample_xpm);
+	SetIcon(Acbel_xpm);
 
 	// Setup PMNBusCommand Data
 	SetupPMBusCommandData();
@@ -284,7 +285,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[0].m_writePage = new WritePage00H(this->m_subNotebook, label);
+	this->m_PMBusData[0].m_writePage = new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector);
 	this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -293,7 +294,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[1].m_writePage = new WritePage01H(this->m_subNotebook, label);
+	this->m_PMBusData[1].m_writePage = new WritePage01H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector);
 	this->m_subNotebook->AddPage(this->m_PMBusData[1].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -302,7 +303,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[2].m_writePage = new WritePage02H(this->m_subNotebook, label);
+	this->m_PMBusData[2].m_writePage = new WritePage02H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector);
 	this->m_subNotebook->AddPage(this->m_PMBusData[2].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -544,6 +545,10 @@ void MainFrame::OnDisableCalibration(wxCommandEvent& event){
 
 void MainFrame::OnCalibration(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+
+	CalibrationDialog calibrationDlg(this);
+	calibrationDlg.Centre();
+	calibrationDlg.ShowModal();
 }
 
 void MainFrame::OnAdministrant(wxCommandEvent& event){
@@ -602,7 +607,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success

@@ -4,6 +4,7 @@
 #ifndef _MAINFRAME_H_
 #define _MAINFRAME_H_
 
+#include <vector>
 #include "CommonDef.h"
 #include "main.h"
 #include "IOPortReadCMDThread.h"
@@ -20,6 +21,7 @@
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
+#include "CalibrationDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -93,6 +95,8 @@ public:
 	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle for IO Port Send Command Thread */
 
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
+
+	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vectorfor Send Write CMD */
 
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */

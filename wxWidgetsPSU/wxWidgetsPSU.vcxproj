@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="WritePageFAH.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="IOAccess.h" />
