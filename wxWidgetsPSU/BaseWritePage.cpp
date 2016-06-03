@@ -68,7 +68,7 @@ void BaseWritePage::BaseLayOut(void){
 }
 
 void BaseWritePage::SetupValidator(void){
-	DecimalCharIncludes = wxT("0123456789");
+	DecimalCharIncludes = wxT("0123456789.");
 	m_numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_numberValidator.SetCharIncludes(DecimalCharIncludes);
 

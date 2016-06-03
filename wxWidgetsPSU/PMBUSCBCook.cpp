@@ -293,6 +293,20 @@ int Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const wchar_t* tmp_wchar;
+	double iin = 0;
+
+	wxString wxstr("");
+
+	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	wxstr += wxString::Format("%dA", (long)iin);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s", wxstr.c_str());
+
 	return EXIT_SUCCESS; 
 }
 
@@ -300,12 +314,41 @@ int Cook_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	const wchar_t* tmp_wchar;
+	double pout = 0;
+
+	wxString wxstr("");
+
+	pout = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	wxstr += wxString::Format("%dW", (long)pout);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double pin = 0;
+
+	wxString wxstr("");
+
+	pin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	wxstr += wxString::Format("Value : %5.2f(W)", pin);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }
@@ -1816,28 +1859,45 @@ int Cook_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Status WORD : 2848h, VOUT_1 : 00h, VOUT_2 : 00h, IOUT_1 : 00h, IOUT_2 : 00h, INPUT : 10h, TEMP : 00h, CML : 00h, OTHER : 00h, FAN12 : 00h   
 	// 48 - 28 - 00 - 00 - 00 - 00 - 10 - 00 - 00 - 00 - 00
 	const wchar_t* tmp_wchar;
-	unsigned int status_word = 0;
+	unsigned short status_word = 0;
 
 	wxString wxstr("Status WORD :");
 
 	status_word = pmbuscmd->m_recvBuff.m_dataBuff[0] | pmbuscmd->m_recvBuff.m_dataBuff[1] << 8;
+	PMBUSHelper::GetPMBusStatus()->m_status_word.SaveDCH(status_word);
 	wxstr += wxString::Format(" %04xh,", status_word);
 
+	PMBUSHelper::GetPMBusStatus()->m_status_vout.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[2]);
 	wxstr += wxString::Format(" VOUT_1 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[2]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_vout2.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[3]);
 	wxstr += wxString::Format(" VOUT_2 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[3]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_iout.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[4]);
 	wxstr += wxString::Format(" IOUT_1 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[4]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_iout2.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[5]);
 	wxstr += wxString::Format(" IOUT_2 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[5]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_input.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[6]);
 	wxstr += wxString::Format(" INPUT : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[6]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_temperature.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[7]);
 	wxstr += wxString::Format(" TEMP : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[7]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_cml.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[8]);
 	wxstr += wxString::Format(" CML : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[8]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_other.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[9]);
 	wxstr += wxString::Format(" OTHER : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[9]);
+
+	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.SaveDCH(pmbuscmd->m_recvBuff.m_dataBuff[10]);
 	wxstr += wxString::Format(" FAN12 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[10]);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
 
 	return EXIT_SUCCESS; 
 }

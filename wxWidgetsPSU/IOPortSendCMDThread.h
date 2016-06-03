@@ -10,6 +10,8 @@
 #endif
 
 #include "wx/dataview.h"
+#include "CommonDef.h"
+#include "AppSettings.h"
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSDataViewListModel.h"
@@ -20,8 +22,6 @@
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
 #include "PEC.h"
-
-#define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Max Size */
 
 #define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
 #define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */
@@ -37,13 +37,14 @@ public:
 	unsigned int  m_register;/**< Register */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 	unsigned int  *m_pollingTime;/**< polling time */
+	BOOL          m_enumIOPort[IO_PORT_MAX_COUNT];
 
 	IOPortSendCMDThread(wxSemaphore* semaphore);
 	IOPortSendCMDThread(
 		IOACCESS*    ioaccess,
 		unsigned int* currentIO,
 		wxSemaphore* semaphore,
-		unsigned int* runMode,
+		AppSettings_t* appSettings,
 		unsigned int* pollingTime,
 		PMBUSCOMMAND_t *pmBusCommand,
 		RECVBUFF_t *recvBuff,
@@ -57,7 +58,7 @@ public:
 	virtual ~IOPortSendCMDThread();
 
 	wxSemaphore *m_rxTxSemaphore;
-	unsigned int *m_runMode;
+	AppSettings_t *m_appSettings;
 	PMBUSCOMMAND_t *m_pmBusCommand;
 	RECVBUFF_t *m_recvBuff;
 
@@ -75,6 +76,10 @@ public:
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);
 
 	void UpdateSTDPage(void);
+
+	void UpdateSTATUSPanel(unsigned int index);
+
+	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;

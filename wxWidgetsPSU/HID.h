@@ -24,6 +24,11 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray);
 
 /**
+ * @brief Get HID Device Status.
+ */
+int GetHIDDeviceStatus(void);
+
+/**
  * @brief Open HID Device
  */
 int OpenHIDDevice(BOOL *array, unsigned int sizeofArray);

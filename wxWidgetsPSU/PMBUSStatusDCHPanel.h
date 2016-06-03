@@ -29,7 +29,25 @@ public:
 
 	void UpdatePanel(void);
 
-	void Update_StatusWord(void);
+	void Update_StatusWORD(void);
+
+	void Update_StatusINPUT(void);
+
+	void Update_StatusVOUT(void);
+
+	void Update_StatusVOUT2(void);
+
+	void Update_StatusIOUT(void);
+
+	void Update_StatusIOUT2(void);
+
+	void Update_StatusTemperature(void);
+
+	void Update_StatusCML(void);
+
+	void Update_StatusOTHER(void);
+
+	void Update_StatusFAN12(void);
 
 	// Top Level Sizer
 	wxBoxSizer *m_topLevelSizer;

@@ -5,10 +5,14 @@
 #define _MAINFRAME_H_
 
 #include <vector>
+#include "TaskSystemEx.h"
+#include "Task.h"
 #include "CommonDef.h"
+#include "AppSettings.h"
 #include "main.h"
 #include "IOPortReadCMDThread.h"
 #include "IOPortSendCMDThread.h"
+#include "TaskSystemThread.h"
 #include "SerialPort.h"
 #include "HID.h"
 #include "IOAccess.h"
@@ -66,6 +70,8 @@ enum
 	MENU_ID_PMBUS_1_1,
 	MENU_ID_PMBUS_1_2,
 
+	TOOLBAR_ID_REFRESH_MAXMIN,
+
 	ID_ATTR_CTRL = 51,
 
 	ID_TOOLBAR = 500,
@@ -85,18 +91,24 @@ public:
 	IOACCESS m_IOAccess[IO_SIZE];
 	PMBUSCOMMAND_t m_PMBusData[PMBUSCOMMAND_SIZE];/**< PM Bus Data */
 
-	bool m_monitor_running;/**< Indicator for mobitor is running */
+	AppSettings_t m_appSettings;
 
-	unsigned int m_runMode = RunMode_Continally;
+	bool m_monitor_running;/**< Indicator for mobitor is running */
 
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 
-	IOPortReadCMDThread *m_IOPortReadCMDThread;/**< Handle for IO Port Read Command Thread */
-	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle for IO Port Send Command Thread */
+	IOPortReadCMDThread *m_IOPortReadCMDThread;/**< Handle of IO Port Read Command Thread */
+	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle of IO Port Send Command Thread */
+
+	TaskSystemThread *m_TaskSystemThread;/**< Handle of Task System Thread */
 
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
 	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vectorfor Send Write CMD */
+
+	// Bitmap 
+	wxBitmap *m_monitorBitmap;
+	wxBitmap *m_pauseBitmap;
 
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
@@ -222,6 +234,9 @@ public:
 	unsigned int getCurrentUseIOInterface(void);
 	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
 
+	TASKINITFUNCTION m_taskInitFunc;
+	void TaskInit(void);
+
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
@@ -268,7 +283,11 @@ private:
 	void OnPMBus1_1(wxCommandEvent& event);
 	void OnPMBus1_2(wxCommandEvent& event);
 
+	void OnResetMaxMin(wxCommandEvent& event);
+
 	void OnExit(wxCommandEvent& event);
+	void OnWindowClose(wxCloseEvent& event);
+
 	void OnAbout(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);

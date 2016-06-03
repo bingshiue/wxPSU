@@ -34,7 +34,7 @@ wxThread::ExitCode IOPortReadCMDThread::Entry()
 
 	//while (this->m_running == true){
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Read Data From Serisl Port :");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Read Data From I/O :");
 
 		// Read Data From IO
 		this->m_recvBuff->m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff->m_recvBuff,this->m_bytesToRead);

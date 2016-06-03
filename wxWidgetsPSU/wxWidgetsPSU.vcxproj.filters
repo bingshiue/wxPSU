@@ -138,6 +138,15 @@
     <ClCompile Include="CalibrationDialog.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SendWriteCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskSystemThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceiveWriteCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -219,6 +228,15 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="CalibrationDialog.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskSystemThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSettings.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

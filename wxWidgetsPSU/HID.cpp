@@ -5,6 +5,7 @@
 #include <iostream>
 using namespace std;
 
+#include "CommonDef.h"
 #include "HID.h"
 
 #define READ_OPERATION_BLOCKING
@@ -43,6 +44,15 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 	hid_free_enumeration(devs);
 
 	return EXIT_SUCCESS;
+}
+
+int GetHIDDeviceStatus(void){
+	if (handle == NULL){
+		return IODEVICE_CLOSE;
+	}
+	else{
+		return IODEVICE_OPEN;
+	}
 }
 
 int OpenHIDDevice(BOOL *array, unsigned int sizeofArray){
@@ -138,6 +148,8 @@ int CloseHIDDevice(void){
 
 	/* Close handle */
 	hid_close(handle);
+
+	handle = NULL;
 
 	/* Free static HIDAPI objects. */
 	ret = hid_exit();

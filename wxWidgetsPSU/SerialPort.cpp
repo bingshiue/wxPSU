@@ -6,6 +6,7 @@ using namespace std;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "CommonDef.h"
 #include "SerialPort.h"
 
 BOOL GetSerialPortName(wchar_t *buff, unsigned int sizeOfBuff, unsigned int num){
@@ -79,10 +80,46 @@ unsigned int GetFirstAvailableSerialPortIndex(BOOL *array, unsigned int sizeofAr
 }
 
 
+
+
 HANDLE hComm;/**< Handle for Serial Port */
 wchar_t ComPortName[] = L"COM3"; // Name of the Serial port to be opened,
 DCB dcbSerialParams = { 0 };/**< Initializing DCB structure */
-//OVERLAPPED g_ol;/**< Overlapped Sructure */
+OVERLAPPED ol_write;/**< Overlapped Write */
+OVERLAPPED ol_read;/**< Overlapped Read */
+OVERLAPPED ol_wait;/**< Overlapped Wait */
+
+
+int SetSerialPortTimeouts(void){
+
+	COMMTIMEOUTS timeouts = { 0 };
+
+	timeouts.ReadIntervalTimeout = MAXWORD;//50;
+	timeouts.ReadTotalTimeoutConstant = 0;//50;
+	timeouts.ReadTotalTimeoutMultiplier = 0;// 10;
+	timeouts.WriteTotalTimeoutConstant = 50;
+	timeouts.WriteTotalTimeoutMultiplier = 10;
+
+
+	if (SetCommTimeouts(hComm, &timeouts) == FALSE){
+		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting Time Outs");
+		return EXIT_FAILURE;
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Setting Serial Port Timeouts Successfull");
+	}
+
+	return EXIT_SUCCESS;
+}
+
+int GetSerialPortStatus(void){
+	if (hComm == NULL){
+		return IODEVICE_CLOSE;
+	}
+	else{
+		return IODEVICE_OPEN;
+	}
+}
 
 int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 {
@@ -146,22 +183,8 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 
 	/*------------------------------------ Setting Timeouts --------------------------------------------------*/
 
-	COMMTIMEOUTS timeouts = { 0 };
-
-	timeouts.ReadIntervalTimeout = 50;
-	timeouts.ReadTotalTimeoutConstant = 50;
-	timeouts.ReadTotalTimeoutMultiplier = 10;
-	timeouts.WriteTotalTimeoutConstant = 50;
-	timeouts.WriteTotalTimeoutMultiplier = 10;
-
 #if 1
-	if (SetCommTimeouts(hComm, &timeouts) == FALSE){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting Time Outs");
-		return EXIT_FAILURE;
-	}
-	else{
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Setting Serial Port Timeouts Successfull");
-	}
+	SetSerialPortTimeouts();
 #endif
 
 	return ret;
@@ -171,13 +194,15 @@ int DumpComStat(void){
 	DWORD dwErrors;
 	COMSTAT ComStat;
 
+	PSU_DEBUG_PRINT(MSG_FATAL, "DumpComStat");
+
 	ClearCommError(hComm, &dwErrors, &ComStat);
 
 	PSU_DEBUG_PRINT(MSG_FATAL, "dwErrors=%ld", dwErrors);
 	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
 	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbInQue=%ld", ComStat.cbInQue);
 
-	return EXIT_SUCCESS;
+	return ComStat.cbInQue;// Return how many data bytes in In-Queue
 }
 
 //#define WRITE_WAIT_INFINITE // Wait Infinite for Write Overlapped Operation
@@ -187,16 +212,16 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	BOOL Status;
 	DWORD  dNoOfBytesWritten = 0;
 	DWORD endtime; // For Compute Timeout
-	OVERLAPPED g_ol;/**< Overlapped Sructure */
+	//OVERLAPPED g_ol;/**< Overlapped Sructure */
 	int send_err;
 	DWORD send_size;
 
 	send_size = size;
 
-	ZeroMemory(&g_ol, sizeof(g_ol));
-	g_ol.Offset = 0;
-	g_ol.OffsetHigh = 0;
-	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ZeroMemory(&ol_write, sizeof(ol_write));
+	ol_write.Offset = 0;
+	ol_write.OffsetHigh = 0;
+	ol_write.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	// Purge CommPort
 	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_RXABORT);
@@ -206,7 +231,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 		buff,                // Data to be written to the port 
 		size,                // No of bytes to write into the port
 		&dNoOfBytesWritten,  // No of bytes written to the port
-		&g_ol);
+		&ol_write);
 
 	if (Status == 0){
 
@@ -221,15 +246,15 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 
 #else
 			endtime = GetTickCount() + 500;
-			while (!GetOverlappedResult(hComm, &g_ol, &dNoOfBytesWritten, FALSE)){
+			while (!GetOverlappedResult(hComm, &ol_write, &dNoOfBytesWritten, FALSE)){
 				if (GetTickCount() > endtime)
 				{
 					PSU_DEBUG_PRINT(MSG_ALERT, "GetOverlappedResult Timeout");
 					PSU_DEBUG_PRINT(MSG_ALERT, "dNoOfBytesWritten=%d", dNoOfBytesWritten);
 					DumpComStat();
 
-					ResetEvent(g_ol.hEvent);
-					CloseHandle(g_ol.hEvent);
+					ResetEvent(ol_write.hEvent);
+					CloseHandle(ol_write.hEvent);
 					return -3;
 
 					break;
@@ -242,15 +267,15 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 				PSU_DEBUG_PRINT(MSG_FATAL, "Send Size Unexpected ! dNoOfBytesWritten=%d", dNoOfBytesWritten);
 				DumpComStat();
 
-				ResetEvent(g_ol.hEvent);
-				CloseHandle(g_ol.hEvent);
+				ResetEvent(ol_write.hEvent);
+				CloseHandle(ol_write.hEvent);
 				return -2;
 			}
 			else{
 				PSU_DEBUG_PRINT(MSG_DEBUG, "dNoOfBytesWritten = %d", dNoOfBytesWritten);
 
-				ResetEvent(g_ol.hEvent);
-				CloseHandle(g_ol.hEvent);
+				ResetEvent(ol_write.hEvent);
+				CloseHandle(ol_write.hEvent);
 			}
 		}
 		else
@@ -259,8 +284,8 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 			// Get Error Information
 			DumpComStat();
 			
-			ResetEvent(g_ol.hEvent);
-			CloseHandle(g_ol.hEvent);
+			ResetEvent(ol_write.hEvent);
+			CloseHandle(ol_write.hEvent);
 			return -1;
 		}
 
@@ -284,8 +309,8 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
-	OVERLAPPED g_ol;                       // Overlapped Sructure */
-	OVERLAPPED g_ol2;                      // Overlapped Sructure */
+	//OVERLAPPED g_ol;                       // Overlapped Sructure */
+	//OVERLAPPED g_ol2;                      // Overlapped Sructure */
 	DWORD dwErrors;
 	COMSTAT ComStat;
 	BOOL bWaitForSingle;                   //
@@ -295,6 +320,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	unsigned int i = 0;
 	BOOL WaitCommEventTimeOutFlag = FALSE;
 	BOOL ReadFileOverlappedTimeOutFlag = FALSE;
+	int InQueue;
 
 
 	dwEventMask = 0x00000000;
@@ -302,13 +328,14 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	bWaitForSingle = false;
 	bWaitRxCharEvent = false;
 
+	InQueue = 0;
 	//
-	memset(&g_ol, 0, sizeof(OVERLAPPED));
-	g_ol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	memset(&ol_wait, 0, sizeof(OVERLAPPED));
+	ol_wait.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	//
-	memset(&g_ol2, 0, sizeof(OVERLAPPED));
-	g_ol2.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	memset(&ol_read, 0, sizeof(OVERLAPPED));
+	ol_read.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	/*------------------------------------ Setting Receive Mask ----------------------------------------------*/
 #if 0
@@ -350,7 +377,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 		dwEventMask = 0x00000000;
 		//ResetEvent(g_ol.hEvent);
 		//ResetEvent(g_ol2.hEvent);
-		Status = WaitCommEvent(hComm, &dwEventMask, &g_ol); //Wait for the character to be received
+		Status = WaitCommEvent(hComm, &dwEventMask, &ol_wait); //Wait for the character to be received
 
 		lastError = GetLastError();
 
@@ -367,14 +394,21 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			}
 #else
 
-			dwRes = WaitForSingleObject(g_ol.hEvent, WAITCOMMEVENT_TIMEOUT);
+			dwRes = WaitForSingleObject(ol_wait.hEvent, WAITCOMMEVENT_TIMEOUT);
 
 			switch (dwRes){
 
 			case WAIT_TIMEOUT:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject WAIT_TIMEOUT");
-				WaitCommEventTimeOutFlag = TRUE;
-				DumpComStat();
+				PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT");
+				InQueue = DumpComStat();
+				if (InQueue != bytesToRead){
+					WaitCommEventTimeOutFlag = TRUE;
+					PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT InQueue != bytesToRead");
+				}
+				else{
+					WaitCommEventTimeOutFlag = TRUE;
+					PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT InQueue = bytesToRead");
+				}
 				break;
 
 			case WAIT_OBJECT_0:
@@ -429,11 +463,12 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 				//do { // Read Until No Data Can be Read
 
+				SetSerialPortTimeouts();
 				do{
 					//NoBytesRead = 0;
 
 					// ReadFile return 0 if Operation failure
-					ReadFileStatus = ReadFile(hComm, buff + i, 1, &NoBytesRead, &g_ol2);
+					ReadFileStatus = ReadFile(hComm, buff + i, 1, &NoBytesRead, &ol_read);
 					//ReadFileStatus = ReadFile(hComm, buff, bytesToRead, &NoBytesRead, &g_ol2);
 					if (ReadFileStatus == 0){
 
@@ -445,6 +480,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 							GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, TRUE);
 #else
 							
+                            //#define USE_WaitForSingleObject_READ_FILE
 							#ifdef USE_WaitForSingleObject_READ_FILE
 							dwRes = WaitForSingleObject(g_ol2.hEvent, WAITCOMMEVENT_TIMEOUT);
 
@@ -459,10 +495,13 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 							case WAIT_OBJECT_0:
 								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : dwRes  = WAIT_OBJECT_0");
+								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : Again");
+								//ReadFile(hComm, buff + i, 1, &NoBytesRead, NULL);
 								break;
 
 							default:
 								PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile : dwRes != WAIT_OBJECT_0,dwRes=%ld", dwRes);
+								ReadFileOverlappedTimeOutFlag = TRUE;
 								DumpComStat();
 								break;
 						    }
@@ -471,7 +510,8 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 							#define USE_GETOVERLAPPEDRESULT_READ_FILE
                             #ifdef USE_GETOVERLAPPEDRESULT_READ_FILE
 							endtime = GetTickCount() + 500;
-							while (!GetOverlappedResult(hComm, &g_ol2, &NoBytesRead, FALSE)){
+							while (!GetOverlappedResult(hComm, &ol_read, &NoBytesRead, FALSE)){
+								
 								if (GetTickCount() > endtime)
 								{
 									PSU_DEBUG_PRINT(MSG_ALERT, "GetOverlappedResult Timeout");
@@ -489,7 +529,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 							PSU_DEBUG_PRINT(MSG_FATAL, "ReadFile lastError=%d", lastError);
 							NoBytesRead = 0;
 							DumpComStat();
-							//break;
+							break; // break while (i < bytesToRead);
 						}
 
 						// If Overlapped Timeout Occurs
@@ -500,9 +540,10 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 					}
 					else{// if (ReadFileStatus == 0)
-						PSU_DEBUG_PRINT(MSG_DEBUG, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
+						PSU_DEBUG_PRINT(MSG_ALERT, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						if (NoBytesRead == 0){
 							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
+							break; // break while (i < bytesToRead);
 						}
 					}
 
@@ -526,8 +567,8 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 					//} while (NoBytesRead > 0);
 				} while (i < bytesToRead);
 
-				ResetEvent(g_ol.hEvent);
-				ResetEvent(g_ol2.hEvent);
+				ResetEvent(ol_wait.hEvent);
+				ResetEvent(ol_read.hEvent);
 
 				bWaitRxCharEvent = true;
 
@@ -717,10 +758,10 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	} while (bWaitRxCharEvent == false);//i < 14);
 
 
-	ResetEvent(g_ol.hEvent);
-	ResetEvent(g_ol2.hEvent);
-	CloseHandle(g_ol.hEvent);
-	CloseHandle(g_ol2.hEvent);
+	ResetEvent(ol_wait.hEvent);
+	ResetEvent(ol_read.hEvent);
+	CloseHandle(ol_wait.hEvent);
+	CloseHandle(ol_read.hEvent);
 
 	return i;// Return how many bytes data readed
 }
@@ -731,6 +772,8 @@ int CloseSerialPort(void){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG ,"Close Serial Port %p", hComm);
 	CloseHandle(hComm);//Closing the Serial Port
+
+	hComm = NULL;
 
 	return ret;
 }

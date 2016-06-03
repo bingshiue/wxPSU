@@ -12,7 +12,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	IOACCESS*    ioaccess,
 	unsigned int* currentIO,
 	wxSemaphore* semaphore,
-	unsigned int* runMode,
+	AppSettings_t* appSettings,
 	unsigned int* pollingTime,
 	PMBUSCOMMAND_t *pmBusCommand,
 	RECVBUFF_t *recvBuff,
@@ -27,7 +27,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	this->m_IOAccess = ioaccess;
 	this->m_CurrentIO = currentIO;
 	this->m_rxTxSemaphore = semaphore;
-	this->m_runMode = runMode;
+	this->m_appSettings = appSettings;
 	this->m_pollingTime = pollingTime;
 	this->m_pmBusCommand = pmBusCommand;
 	this->m_recvBuff = recvBuff;
@@ -251,21 +251,35 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	PSU_DEBUG_PRINT(MSG_DEBUG, "RunMode is Continally ");
 	PSU_DEBUG_PRINT(MSG_DETAIL,"m_pollingTime=%d", this->m_pollingTime);
 
+#if 0
+	// Open IO Device
+	if (this->m_IOAccess[*this->m_CurrentIO].m_GetDeviceStatus() == IODEVICE_CLOSE){
+		this->m_IOAccess[*this->m_CurrentIO].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+		ret = this->m_IOAccess[*this->m_CurrentIO].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+		}
+	}
+#endif
+
 	m_running = true;
 
 	this->m_status_bar->getGauge()->Pulse();
 
-	switch (*this->m_runMode){
+	switch (this->m_appSettings->m_runMode){
 
-	case RunMode_Iteration:
-
-		break;
-
-	case RunMode_Continally:
+	case RunMode_StopAnError:
+	case RunMode_Iterations:
+	case RunMode_Continually:
 		// RunMode is Continally 
 		while (m_running){
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running==true; idx++){
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "TestDestory");
+				TestDestroy();
+
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
 					if (this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
@@ -344,6 +358,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						}//if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page)
 
 						/*--------------------------------------------------------------------------------------------------------------*/
+
+						iteration++;
 
 						// Update DataView Register Field Icon
 						this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
@@ -516,27 +532,21 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					for (sendCMDVector_Iterator = this->m_sendCMDVector->begin(); sendCMDVector_Iterator != this->m_sendCMDVector->end(); sendCMDVector_Iterator++)
 					{
 
+						retry = 0;
 						do {
 							// Send Data
-							unsigned char separate_pec = 0;;
-
-							separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, sendCMDVector_Iterator->m_sendData + 2, 3);
-							PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
-
-							sendCMDVector_Iterator->m_sendData[5] = separate_pec;
-
-							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(sendCMDVector_Iterator->m_sendData, 8);
+							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(sendCMDVector_Iterator->m_sendData, sendCMDVector_Iterator->m_sendDataLength);
 							if (sendResult <= 0){
 								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Separate Write CMD Failed, sendResult=%d", sendResult);
 								// Retry 
 								retry++;
 								if (retry >= 3){
-									PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Send Separate Write Page Failed, Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Separate Write CMD Failed, Retry Times = %d", retry);
 									sendRetryStillFailed = true;
 									break;
 								}
 								else{
-									PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write Page Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Retry Times = %d", retry);
 								}
 
 							}
@@ -554,7 +564,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						//
 						// Create IOPortReadCMDThread
-						this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, BASE_RESPONSE_DATA_LENGTH);
+						this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, sendCMDVector_Iterator->m_bytesToRead);
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
@@ -579,7 +589,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Response : %s", writePageRes.c_str());
 						}
 
-					}
+					}// for (sendCMDVector_Iterator = this->m_sendCMDVector->begin(); sendCMDVector_Iterator != this->m_sendCMDVector->end(); sendCMDVector_Iterator++)
 
 					// Clear Vector 
 					this->m_sendCMDVector->clear();
@@ -593,19 +603,24 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxString hex("h]");
 				this->m_status_bar->setMonitoringCMDName(monitor + cmd + hex);
 
-				iteration++;
 				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
 				this->m_status_bar->setMonitoringSummary(summary);
 
 				if (idx == (PMBUSCOMMAND_SIZE - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
+				}
 
-					// Update PMBUSStatus Panel
-					this->m_pmbusStatusPanel->UpdatePanel();
 
-					// Update PMBUSStatus Panel
-					this->m_pmbusStatusDCHPanel->UpdatePanel();
+				this->UpdateSTATUSPanel(idx);
+
+
+				if (this->m_appSettings->m_runMode == RunMode_Iterations){
+					if (iteration >= this->m_appSettings->m_IterationsSettingValue){
+						PSU_DEBUG_PRINT(MSG_ALERT, "IterationsSettingValue : %d, iteration : %d", this->m_appSettings->m_IterationsSettingValue, iteration);
+						this->m_running = false;
+						break;// for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++) 
+					}
 				}
 
 			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
@@ -615,14 +630,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 		break;
 
-	case RunMode_StopAnError:
-
-		break;
-
 	default:
 
 		break;
 	}
+
+#if 0
+	// Close Device
+	if (this->m_IOAccess[*this->m_CurrentIO].m_GetDeviceStatus() == IODEVICE_OPEN){
+		this->m_IOAccess[*this->m_CurrentIO].m_CloseDevice();
+	}
+#endif
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
 
@@ -713,5 +731,68 @@ void IOPortSendCMDThread::UpdateSTDPage(void){
 	// FAN3
 
 	// FAN4
+
+}
+
+unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register){
+
+	unsigned int index = 0;
+
+	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+		if (this->m_pmBusCommand[idx].m_register == cmd_register){
+			index = idx;
+			break;
+		}
+	}
+
+	return index;
+}
+
+void IOPortSendCMDThread::UpdateSTATUSPanel(unsigned int index){
+	
+	if (index == this->findPMBUSCMDIndex(0x79)){
+		// Update WORD Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusWORD();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7a)){
+		// Update VOUT Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusVOUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7b)){
+		// Update IOUT Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusIOUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7c)){
+		// Update INPUT Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusINPUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7d)){
+		// Update Temperature Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusTemperature();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7e)){
+		// Update CML Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusCML();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7f)){
+		// Update OTHER Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusOTHER();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x81)){
+		// Update OTHER Filed of PMBUSStatus Panel
+		this->m_pmbusStatusPanel->Update_StatusFAN12();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0xdc)){
+		// Update Total PMBUSStatusDCH Panel
+		this->m_pmbusStatusDCHPanel->UpdatePanel();
+	}
 
 }

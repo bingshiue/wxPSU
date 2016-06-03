@@ -18,11 +18,25 @@
 #include <wx/statline.h>
 
 #include "CommonDef.h"
+#include "PMBUSHelper.h"
+#include "Task.h"
+
+#define CALIBRATION_ITEM_SIZE  9
+
+typedef struct data_resolution_t {
+
+	double m_data1;/**< Data 1 */
+	double m_Resolution1;/**< Resolution 1 */
+	double m_data2;/**< Data 2 */ 
+	double m_Resolution2;/**< Resolution 2 */
+
+} DATA_RESOLUTION_t;
+
 
 class CalibrationDialog : public wxDialog
 {
 public:
-	CalibrationDialog(wxWindow *parent);
+	CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector);
 
 	void OnButton(wxCommandEvent& event);
 
@@ -34,6 +48,8 @@ public:
 
 		CID_CB_CALIBRATION_ITEM,
 		CID_CB_POINTER,
+
+		CID_TC_DATA_1,
 	};
 
 	enum {
@@ -53,9 +69,27 @@ public:
 		Pointer_Selection_1,
 		Pointer_Selection_2,
 		Pointer_Selection_3,
+		Pointer_Selection_4,
+		Pointer_Selection_5,
+		Pointer_Selection_6,
+		Pointer_Selection_7,
+		Pointer_Selection_8,
+		Pointer_Selection_9,
 	};
 
+	static unsigned char calibrationItemCommand[CALIBRATION_ITEM_SIZE];/**< Calibration Item Command */
+	static unsigned char calibrationItemPointerMask[CALIBRATION_ITEM_SIZE];/**< Calibration Item Pointer Mask Value */
+	static unsigned char CalibrationDialog::calibrationItemPointerValue[10];/**< Calibration Item Pointer Value */
+	static double defSelectablePointerCount[CALIBRATION_ITEM_SIZE];/**< Default Selectable Pointer Count */
+	static DATA_RESOLUTION_t m_dataResolution[CALIBRATION_ITEM_SIZE];/**< Data & Resolution */
+
 private:
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
 	wxButton *m_btnApply, *m_btnDone, *m_btnRead, *m_btnExit;
 
 	wxBoxSizer *m_bottonSizer;
@@ -92,6 +126,11 @@ private:
 	void OnBtnApply(wxCommandEvent& event);
 	void OnBtnDone(wxCommandEvent& event);
 	void OnBtnRead(wxCommandEvent& event);
+
+	void OnCBCalibrationItem(wxCommandEvent& event);
+	void OnCBPointer(wxCommandEvent& event);
+
+	void OnTCData1(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };

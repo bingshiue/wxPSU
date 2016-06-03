@@ -16,6 +16,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {	
 	int ret;
 	
+	// Reset AppSettings
+	this->m_appSettings.Reset();
+
 	// Setup IO Structure
 	this->DoSetupIOAccess();
 
@@ -29,6 +32,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->m_parent = new wxPanel(this, wxID_ANY);
 	this->m_topVeriticalSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
+
+	// Load Bitmaps
+	this->m_monitorBitmap = new wxBitmap(wxT("MONITOR"), wxBITMAP_TYPE_BMP_RESOURCE);
+	this->m_pauseBitmap = new wxBitmap(wxT("PAUSE"), wxBITMAP_TYPE_BMP_RESOURCE);
 
 	// Setup Icon
 	SetIcon(Acbel_xpm);
@@ -145,13 +152,28 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
-
+#if 1
 	// Open Device
-	this->m_IOAccess[this->m_CurrentUseIOInterface].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
-	ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+	if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_CLOSE){
+		this->m_IOAccess[this->m_CurrentUseIOInterface].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+		ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
 
-	if(ret != EXIT_SUCCESS){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+		}
+	}
+#endif
+
+	// Start Task System Thread
+
+	this->m_TaskSystemThread = new TaskSystemThread();
+	// If Create Thread Success
+	if (this->m_TaskSystemThread->Create() != wxTHREAD_NO_ERROR){
+		PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Task System Thread");
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ALERT, "Start Task System Thread");
+		this->m_TaskSystemThread->Run();
 	}
 
 #if 0 // Open Serial Port
@@ -243,12 +265,15 @@ EVT_MENU(MENU_ID_ErrorLog_ErrorOnly, MainFrame::OnErrorLogErrorOnly)
 EVT_MENU(MENU_ID_Log_To_File, MainFrame::OnLogToFile)
 EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
 EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
+EVT_TOOL(TOOLBAR_ID_REFRESH_MAXMIN, MainFrame::OnResetMaxMin)
 
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
+
+EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()
 
 MainFrame::~MainFrame()
@@ -285,7 +310,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[0].m_writePage = new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector);
+	this->m_PMBusData[0].m_writePage = new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -294,7 +319,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[1].m_writePage = new WritePage01H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector);
+	this->m_PMBusData[1].m_writePage = new WritePage01H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[1].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -303,7 +328,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[2].m_writePage = new WritePage02H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector);
+	this->m_PMBusData[2].m_writePage = new WritePage02H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[2].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -312,7 +337,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[3].m_writePage = new WritePage03H(this->m_subNotebook, label);
+	this->m_PMBusData[3].m_writePage = new WritePage03H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[3].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -330,7 +355,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3AH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -339,7 +364,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3BH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -348,7 +373,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage51H(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage51H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -357,7 +382,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage5DH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage5DH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -366,7 +391,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6AH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -375,7 +400,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6BH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -438,7 +463,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageD0H(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePageD0H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -447,7 +472,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDCH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDCH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -456,7 +481,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDDH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDDH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -465,7 +490,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
 	label.UpperCase();
 	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageFAH(this->m_subNotebook, label);
+	this->m_PMBusData[cmdIndex].m_writePage = new WritePageFAH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
 	this->m_subNotebook->RemovePage(2);
 
@@ -473,6 +498,8 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
+	
+#if 0
 	if (this->m_monitor_running == true){
 
 		wxMessageDialog *closeWarning = new wxMessageDialog(NULL, L"Monitor Still Running, Please Stop It !", L"Warning", wxOK | wxICON_WARNING);
@@ -480,20 +507,59 @@ void MainFrame::OnExit(wxCommandEvent& event)
 
 		return;
 	}
-	
-	//this->m_IOPortReadCMDThread->m_running = false;
-
-	//this->m_IOPortReadCMDThread->Kill();
-	
-	// Close IO Device
-	this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
-
-#if 0
-	// Close Serial Port
-	CloseSerialPort();
 #endif
+		
+	// Close IO Device
+	if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
+		this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
+	}
+
+	// Release Task List
+	// TaskEx::ReleaseTaskList();
+
+	Sleep(3000);
 
 	Close(true);
+}
+
+void MainFrame::OnWindowClose(wxCloseEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Close Window");
+
+	// Monitor is Running
+	if (this->m_monitor_running == true) {
+		this->m_monitor_running = false;
+		// IOPortSendCMDThread is Running
+		if (this->m_IOPortSendCMDThread->m_running == true){
+			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running");
+			wxThreadError error = this->m_IOPortSendCMDThread->Delete();
+
+			//if (error != wxTHREAD_NO_ERROR){
+				//PSU_DEBUG_PRINT(MSG_ALERT, "wxThreadError = %d", error);
+			//}
+		}
+	}
+
+	// Check TaskSystem Have Task or Not
+	int cnt = Task::GetCount();
+
+	while (cnt != 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
+		cnt = Task::GetCount();
+
+		Sleep(1000);
+	}
+
+	// Release Task List
+	TaskEx::ReleaseTaskList();
+
+
+	// Close IO Device
+	if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
+		this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
+	}
+
+	Destroy();
+	//event.Skip();
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)
@@ -544,9 +610,8 @@ void MainFrame::OnDisableCalibration(wxCommandEvent& event){
 }
 
 void MainFrame::OnCalibration(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
-
-	CalibrationDialog calibrationDlg(this);
+	// Show Calibration Dialog
+	CalibrationDialog calibrationDlg(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, &this->m_sendCMDVector);
 	calibrationDlg.Centre();
 	calibrationDlg.ShowModal();
 }
@@ -560,15 +625,27 @@ void MainFrame::OnI2CInterface(wxCommandEvent& event){
 }
 
 void MainFrame::OnContinually(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	this->m_appSettings.m_runMode = RunMode_Continually;
+
+	this->m_continuallyMenuItem->Check(true);
+	this->m_iterationsMenuItem->Check(false);
+	this->m_stopAnErrorMenuItem->Check(false);
 }
 
 void MainFrame::OnIterations(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	this->m_appSettings.m_runMode = RunMode_Iterations;
+
+	this->m_continuallyMenuItem->Check(false);
+	this->m_iterationsMenuItem->Check(true);
+	this->m_stopAnErrorMenuItem->Check(false);
 }
 
 void MainFrame::OnStopAnError(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	this->m_appSettings.m_runMode = RunMode_StopAnError;
+
+	this->m_continuallyMenuItem->Check(false);
+	this->m_iterationsMenuItem->Check(false);
+	this->m_stopAnErrorMenuItem->Check(true);
 }
 
 void MainFrame::OnErrorLogALL(wxCommandEvent& event){
@@ -591,6 +668,11 @@ void MainFrame::OnPMBus1_2(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
+void MainFrame::OnResetMaxMin(wxCommandEvent& event){
+	PMBUSHelper::GetPMBusStatus()->ResetMaxMin();
+}
+
+
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
@@ -603,11 +685,15 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	// Start Send Data Thread
 	if (this->m_monitor_running == false){
 		this->m_monitor_running = true;
+
+		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
+		this->m_toolbar->Realize();
+
 		(this->m_status_bar->getTimer())->Start();
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_runMode, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
@@ -621,6 +707,10 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	}
 	else{ // One Send Command Thread is Running
 		this->m_monitor_running = false;
+
+		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
+		this->m_toolbar->Realize();
+
 		(this->m_status_bar->getTimer())->Stop();
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
 		this->m_IOPortSendCMDThread->m_running = false;
@@ -842,6 +932,25 @@ void MainFrame::SetupMenuBar(void){
 	this->m_runModeMenu->Append(this->m_iterationsMenuItem);
 	this->m_runModeMenu->Append(this->m_stopAnErrorMenuItem);
 
+	switch (this->m_appSettings.m_runMode){
+
+	case RunMode_Iterations:
+		this->m_iterationsMenuItem->Check(true);
+		break;
+
+	case RunMode_Continually:
+		this->m_continuallyMenuItem->Check(true);
+		break;
+
+	case RunMode_StopAnError:
+		this->m_stopAnErrorMenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !");
+		break;
+	}
+
 	this->m_optionMenu->AppendSubMenu(this->m_runModeMenu, wxT("Run Mode"), wxT("Run Mode"));
 	
 	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"),
@@ -891,6 +1000,7 @@ void MainFrame::SetupMenuBar(void){
 }
 
 void MainFrame::SetupToolBar(void){
+	
 	// Setup Tool Bar
 	long style = TOOLBAR_STYLE;
 	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
@@ -899,10 +1009,13 @@ void MainFrame::SetupToolBar(void){
 	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
 
 	// Append Monitor Button
-	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, wxBITMAP(MONITOR), wxT("Monitor"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
 
 	// Append Exit Button
 	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP(EXIT), wxT("Exit Program"), wxITEM_NORMAL);
+
+	// Append Refresh MAX/MIN Button
+	m_toolbar->AddTool(TOOLBAR_ID_REFRESH_MAXMIN, wxEmptyString, wxBITMAP(REFRESH), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
 
 	// Append Separator
 	m_toolbar->AddSeparator();
@@ -911,8 +1024,10 @@ void MainFrame::SetupToolBar(void){
 	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
 	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
 
+	wxString iterations_times = wxString::Format("%d",this->m_appSettings.m_IterationsSettingValue);
+
 	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
-	m_iteration_input->SetLabel(wxT("100"));
+	m_iteration_input->SetLabel(iterations_times);
 	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
 
 	// Append Polling Time
@@ -1101,6 +1216,9 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 		if (this->m_subNotebook->GetPageCount() == 3){
 			this->m_subNotebook->RemovePage(2);
 		}
+
+		this->m_subNotebook->SetSelection(0);
+
 		break;
 
 	case cmd_access_write://cmd_access_bw
@@ -1111,8 +1229,10 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 		case 2:
 			if (this->m_PMBusData[row].m_writePage != NULL){
 				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
-
+				this->m_subNotebook->SetSelection(2);
 			}
+
+
 			break;
 
 		case 3:
@@ -1120,7 +1240,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 			this->m_subNotebook->RemovePage(2);
 			if (this->m_PMBusData[row].m_writePage != NULL){
 				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
-				//this->m_subNotebook->SetSelection(2);
+				this->m_subNotebook->SetSelection(2);
 			}
 
 			break;
@@ -1175,6 +1295,7 @@ void MainFrame::DoSetupIOAccess(void){
 	// Setup IOAccess Sturct Member
 	// Serial Port
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_EnumerateAvailableDevice = EnumerateAvailableSerialPort;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_GetDeviceStatus = GetSerialPortStatus;
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_OpenDevice = OpenSerialPort;
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_CloseDevice = CloseSerialPort;
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceSendData = SerialSendData;
@@ -1182,6 +1303,7 @@ void MainFrame::DoSetupIOAccess(void){
 
 	// HID
 	this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice = EnumerateAvailableHIDDevice;
+	this->m_IOAccess[IOACCESS_HID].m_GetDeviceStatus = GetHIDDeviceStatus;
 	this->m_IOAccess[IOACCESS_HID].m_OpenDevice = OpenHIDDevice;
 	this->m_IOAccess[IOACCESS_HID].m_CloseDevice = CloseHIDDevice;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceSendData = HIDSendData;
@@ -1200,4 +1322,8 @@ unsigned int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 	}
 
 	return index;
+}
+
+void MainFrame::TaskInit(void){
+	// Task Init 
 }

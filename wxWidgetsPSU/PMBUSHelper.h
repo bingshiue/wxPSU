@@ -23,6 +23,7 @@ public :
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
 
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
+	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
 	static long HexToDecimal(wxString string);

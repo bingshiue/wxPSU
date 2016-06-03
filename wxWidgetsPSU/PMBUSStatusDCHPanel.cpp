@@ -804,10 +804,28 @@ PMBUSStatusDCHPanel::~PMBUSStatusDCHPanel(){
 
 void PMBUSStatusDCHPanel::UpdatePanel(void){
 	// Update Status WORD Field
-	Update_StatusWord();
+	Update_StatusWORD();
+	// Update Status Input Field
+	Update_StatusINPUT();
+	// Update Status VOUT Field
+	Update_StatusVOUT();
+	// Update Status VOUT2 Field
+	Update_StatusVOUT2();
+	// Update Status IOUT Field
+	Update_StatusIOUT();
+	// Update Status IOUT2 Field
+	Update_StatusIOUT2();
+	// Update Status TEMPERATURE Field
+	Update_StatusTemperature();
+	// Update Status CML Field
+	Update_StatusCML();
+	// Update Status OTHER Field
+	Update_StatusOTHER();
+	// Update Status FAN12 Field
+	Update_StatusFAN12();
 }
 
-void PMBUSStatusDCHPanel::Update_StatusWord(void){
+void PMBUSStatusDCHPanel::Update_StatusWORD(void){
 	const unsigned short status[16] = {
 		STATUS_WORD_HIGH_VOUT,
 		STATUS_WORD_HIGH_IOUTPOUT,
@@ -848,6 +866,303 @@ void PMBUSStatusDCHPanel::Update_StatusWord(void){
 
 	for (unsigned int idx = 0; idx < 16; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_word.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusINPUT(void){
+	const unsigned char status[8] = {
+		STATUS_INPUT_VIN_OV_FAULT,
+		STATUS_INPUT_VIN_OV_WARNING,
+		STATUS_INPUT_VIN_UV_WARNING,
+		STATUS_INPUT_VIN_UV_FAULT,
+		STATUS_INPUT_Unit_Off_For_Insufficient_Input_Voltage,
+		STATUS_INPUT_IIN_OC_FAULT,
+		STATUS_INPUT_IIN_OC_WARNING,
+		STATUS_INPUT_PIN_OP_WARNING,
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbVIN_OV_FAULT_Input,
+		m_stbVIN_OV_WARNING_Input,
+		m_stbVIN_UV_WARNING_Input,
+		m_stbVIN_UV_FAULT_Input,
+		m_stbUNIT_OFF_Input,
+		m_stbIIN_OC_FAULT_Input,
+		m_stbIIN_OC_WARNING_Input,
+		m_stbPIN_OP_WARNING_Input
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_input.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusVOUT(void){
+	const unsigned char status[8] = {
+		STATUS_VOUT_VOUT_OV_FAULT,
+		STATUS_VOUT_VOUT_OV_WARNING,
+		STATUS_VOUT_VOUT_UV_WARNING,
+		STATUS_VOUT_VOUT_UV_FAULT,
+		STATUS_VOUT_VOUT_MAX,
+		STATUS_VOUT_TON_MAX_FAULT,
+		STATUS_VOUT_TOFF_MAX_WARNING,
+		STATUS_VOUT_VOUT_Tracking_Error
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbVOUT_OV_FAULT_Vout1,
+		m_stbVOUT_OV_WARNING_Vout1,
+		m_stbVOUT_UV_WARNING_Vout1,
+		m_stbVOUT_UV_FAULT_Vout1,
+		m_stbVOUT_MAX_Vout1,
+		m_stbTON_MAX_FAULT_Vout1,
+		m_stbTOFF_MAX_WARNING_Vout1,
+		m_stbVOUT_TRACKING_ERROR_Vout1
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusVOUT2(void){
+	const unsigned char status[8] = {
+		STATUS_VOUT_VOUT_OV_FAULT,
+		STATUS_VOUT_VOUT_OV_WARNING,
+		STATUS_VOUT_VOUT_UV_WARNING,
+		STATUS_VOUT_VOUT_UV_FAULT,
+		STATUS_VOUT_VOUT_MAX,
+		STATUS_VOUT_TON_MAX_FAULT,
+		STATUS_VOUT_TOFF_MAX_WARNING,
+		STATUS_VOUT_VOUT_Tracking_Error
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbVOUT_OV_FAULT_Vout2,
+		m_stbVOUT_OV_WARNING_Vout2,
+		m_stbVOUT_UV_WARNING_Vout2,
+		m_stbVOUT_UV_FAULT_Vout2,
+		m_stbVOUT_MAX_Vout1,
+		m_stbTON_MAX_FAULT_Vout2,
+		m_stbTOFF_MAX_WARNING_Vout2,
+		m_stbVOUT_TRACKING_ERROR_Vout2
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout2.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusIOUT(void){
+	const unsigned char status[8] = {
+		STATUS_IOUT_IOUT_OC_FAULT,
+		STATUS_IOUT_IOUT_OC_LV_FAULT,
+		STATUS_IOUT_IOUT_OC_WARNING,
+		STATUS_IOUT_IOUT_UC_FAULT,
+		STATUS_IOUT_Current_Share_Fault,
+		STATUS_IOUT_In_Power_Limiting_Mode,
+		STATUS_IOUT_POUT_OP_FAULT,
+		STATUS_IOUT_POUT_OP_WARNING
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbIOUT_OC_FAULT_Iout1,
+		m_stbIOUT_OC_LV_FAULT_Iout1,
+		m_stbIOUT_OC_WARNING_Iout1,
+		m_stbIOUT_UC_FAULT_Iout1,
+		m_stbCURRENT_SHARE_FAULT_Iout1,
+		m_stbIN_POWER_LIMITING_Iout1,
+		m_stbPOUT_OC_FAULT_Iout1,
+		m_stbPOUT_OP_WARNING_Iout1
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusIOUT2(void){
+	const unsigned char status[8] = {
+		STATUS_IOUT_IOUT_OC_FAULT,
+		STATUS_IOUT_IOUT_OC_LV_FAULT,
+		STATUS_IOUT_IOUT_OC_WARNING,
+		STATUS_IOUT_IOUT_UC_FAULT,
+		STATUS_IOUT_Current_Share_Fault,
+		STATUS_IOUT_In_Power_Limiting_Mode,
+		STATUS_IOUT_POUT_OP_FAULT,
+		STATUS_IOUT_POUT_OP_WARNING
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbIOUT_OC_FAULT_Iout2,
+		m_stbIOUT_OC_LV_FAULT_Iout2,
+		m_stbIOUT_OC_WARNING_Iout2,
+		m_stbIOUT_UC_FAULT_Iout2,
+		m_stbCURRENT_SHARE_FAULT_Iout2,
+		m_stbIN_POWER_LIMITING_Iout2,
+		m_stbPOUT_OC_FAULT_Iout2,
+		m_stbPOUT_OP_WARNING_Iout2
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout2.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusTemperature(void){
+	const unsigned char status[8] = {
+		STATUS_TEMPERATURE_OT_FAULT,
+		STATUS_TEMPERATURE_OT_WARNING,
+		STATUS_TEMPERATURE_UT_WARNING,
+		STATUS_TEMPERATURE_UT_FAULT,
+		STATUS_TEMPERATURE_Reserved_3,
+		STATUS_TEMPERATURE_Reserved_2,
+		STATUS_TEMPERATURE_Reserved_1,
+		STATUS_TEMPERATURE_Reserved_0
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbOT_FAULT_Temperature,
+		m_stbOT_WARNING_Temperature,
+		m_stbUT_WARNING_Temperature,
+		m_stbUT_FAULT_Temperature,
+		m_stbRESERVED3_Temperature,
+		m_stbRESERVED2_Temperature,
+		m_stbRESERVED1_Temperature,
+		m_stbRESERVED0_Temperature
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusCML(void){
+	const unsigned char status[8] = {
+		STATUS_CML_Invalid_Or_Unsupported_Command_Received,
+		STATUS_CML_Invalid_Or_Unsupported_Data_Received,
+		STATUS_CML_Packet_Error_Check_Failed,
+		STATUS_CML_Memory_Fault_Detected,
+		STATUS_CML_Processor_Fault_Detected,
+		STATUS_CML_Reserved,
+		STATUS_CML_A_communication_fault,
+		STATUS_CML_Other_Memory_Or_Logic_Fault
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbINVALID_COMMAND_CML,
+		m_stbINVALID_DATA_CML,
+		m_stbPEC_FAILED_CML,
+		m_stbMEMORY_FAULT_CML,
+		m_stbPROCESSOR_FAULT_CML,
+		m_stbRESERVED_CML,
+		m_stbCOMMUNICATION_CML,
+		m_stbOTHER_MEMORY_CML
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusOTHER(void){
+	const unsigned char status[8] = {
+		STATUS_OTHER_Reserved_2,
+		STATUS_OTHER_Reserved_1,
+		STATUS_OTHER_Input_A_Fuse_Or_Circuit_Breaker_Fault,
+		STATUS_OTHER_Input_B_Fuse_Or_Circuit_Breaker_Fault,
+		STATUS_OTHER_Input_A_ORing_Device_Fault,
+		STATUS_OTHER_Input_B_ORing_Device_Fault,
+		STATUS_OTHER_Output_ORing_Device_Fault,
+		STATUS_OTHER_Reserved_0
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbRESERVED7_OTHER,
+		m_stbRESERVED6_OTHER,
+		m_stbINPUT_A_FUSE_FAULT_OTHER,
+		m_stbINPUT_B_FUSE_FAULT_OTHER,
+		m_stbINPUT_A_ORING_FAULT_OTHER,
+		m_stbINPUT_B_ORING_FAULT_OTHER,
+		m_stbOUTPUT_ORING_FAULT_OTHER,
+		m_stbRESERVED_OTHER
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_other.status_dch & status[idx]) == status[idx]) {
+			sbArray[idx]->SetBitmap(*m_red);
+		}
+		else{
+			sbArray[idx]->SetBitmap(*m_green);
+		}
+	}
+}
+
+void PMBUSStatusDCHPanel::Update_StatusFAN12(void){
+	const unsigned char status[8] = {
+		STATUS_FAN_1_2_Fan_1_Fault,
+		STATUS_FAN_1_2_Fan_2_Fault,
+		STATUS_FAN_1_2_Fan_1_Warning,
+		STATUS_FAN_1_2_Fan_2_Warning,
+		STATUS_FAN_1_2_Fan_1_Speed_Overridden,
+		STATUS_FAN_1_2_Fan_2_Speed_Overridden,
+		STATUS_FAN_1_2_Airflow_Fault,
+		STATUS_FAN_1_2_Airflow_Warning
+	};
+
+	wxStaticBitmap *sbArray[8] = {
+		m_stbFAN_1_FAULT_FAN12,
+		m_stbFAN_2_FAULT_FAN12,
+		m_stbFAN_1_WARNING_FAN12,
+		m_stbFAN_2_WARNING_FAN12,
+		m_stbFAN_1_SPEED_OVERRIDDEN_FAN12,
+		m_stbFAN_2_SPEED_OVERRIDDEN_FAN12,
+		m_stbAIRFLOW_FAULT_FAN12,
+		m_stbAIRFLOW_WARNING_OTHER
+	};
+
+	for (unsigned int idx = 0; idx < 8; idx++){
+		if ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
 		}
 		else{

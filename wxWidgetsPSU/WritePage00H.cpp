@@ -7,7 +7,7 @@
 
 #define DEFULT_PAGE 0x00
 
-WritePage00H::WritePage00H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector) : BaseWritePage(parent, label){
+WritePage00H::WritePage00H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Page"), wxDefaultPosition, wxSize(-1, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY);
@@ -34,6 +34,9 @@ WritePage00H::WritePage00H(wxWindow* parent, wxString& label, bool* monitor_runn
 	// Save Member
 	this->m_monitor_running = monitor_running;
 	this->m_sendCMDVector = sendCMDVector;
+
+	this->m_ioaccess = ioaccess;
+	this->m_currentIO = currentIO;
 
 }
 
@@ -67,6 +70,7 @@ void WritePage00H::OnRadioButtonRaw(wxCommandEvent& event){
 
 }
 
+#define CMD_00H_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage00H::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "");
 
@@ -85,8 +89,17 @@ void WritePage00H::OnButtonWrite(wxCommandEvent& event){
 		0x41, 0x54, 0xB6, 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
 	};
 
+	unsigned char separate_pec = 0;;
+
+	separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, changePageSendBuffer + 2, 3);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+	changePageSendBuffer[5] = separate_pec;
+
 	PMBUSSendCOMMAND_t CMD00H;
 
+	CMD00H.m_sendDataLength = sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]);
+	CMD00H.m_bytesToRead = CMD_00H_BYTES_TO_READ;
 	for (unsigned idx = 0; idx < sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]); idx++){
 		CMD00H.m_sendData[idx] = changePageSendBuffer[idx];
 	}
@@ -99,6 +112,10 @@ void WritePage00H::OnButtonWrite(wxCommandEvent& event){
 	}
 	else{
 		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD00H);
 	}
 	
 }

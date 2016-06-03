@@ -327,7 +327,11 @@ typedef  struct status_byte_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+		//status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -349,7 +353,11 @@ typedef  struct status_word_t {
 
 	void Save(unsigned short _status){
 		status = _status;
-		status_dch |= _status;
+		//status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned short _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -370,7 +378,11 @@ typedef  struct status_vout_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+		//status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -391,7 +403,11 @@ typedef  struct status_iout_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+		//status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -412,7 +428,11 @@ typedef  struct status_input_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+		//status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -433,7 +453,10 @@ typedef  struct status_temperature_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -454,7 +477,10 @@ typedef  struct status_cml_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -475,7 +501,10 @@ typedef  struct status_other_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -496,7 +525,10 @@ typedef  struct status_fan_1_2_t {
 
 	void Save(unsigned char _status){
 		status = _status;
-		status_dch |= _status;
+	}
+
+	void SaveDCH(unsigned char _status){
+		status_dch = _status;
 	}
 
 	void Clear(void){
@@ -517,7 +549,9 @@ typedef struct pmbusStatus_t {
 	STATUS_BYTE_t m_status_byte;
 	STATUS_WORD_t m_status_word;
 	STATUS_VOUT_t m_status_vout;
+	STATUS_VOUT_t m_status_vout2;
 	STATUS_IOUT_t m_status_iout;
+	STATUS_IOUT_t m_status_iout2;
 	STATUS_INPUT_t m_status_input;
 	STATUS_TEMPERATURE_t m_status_temperature;
 	STATUS_CML_t m_status_cml;
@@ -604,6 +638,59 @@ typedef struct pmbusStatus_t {
 	double m_IoSBY_Min;
 	char   m_IoSBY_Set;
 
+	void ResetMaxMin(void){
+		this->m_VIN_Max = 0;
+		this->m_VIN_Min = 0;
+		this->m_VIN_Set = 0;
+
+		this->m_IIN_Max = 0;
+		this->m_IIN_Min = 0;
+		this->m_IIN_Set = 0;
+
+		this->m_VCAP_Max = 0;
+		this->m_VCAP_Min = 0;
+		this->m_VCAP_Set = 0;
+
+		this->m_AMD_8D_Max = 0;
+		this->m_AMD_8D_Min = 0;
+		this->m_AMD_8D_Set = 0;
+
+		this->m_SEC_8E_Max = 0;
+		this->m_SEC_8E_Min = 0;
+		this->m_SEC_8E_Set = 0;
+
+		this->m_PRI_8F_Max = 0;
+		this->m_PRI_8F_Min = 0;
+		this->m_PRI_8F_Set = 0;
+
+		this->m_FAN1_Max = 0;
+		this->m_FAN1_Min = 0;
+		this->m_FAN1_Set = 0;
+
+		this->m_POUT_Max = 0;
+		this->m_POUT_Min = 0;
+		this->m_POUT_Set = 0;
+
+		this->m_PIN_Max = 0;
+		this->m_PIN_Min = 0;
+		this->m_PIN_Set = 0;
+
+		this->m_VOUT_Max = 0;
+		this->m_VOUT_Min = 0;
+		this->m_VOUT_Set = 0;
+
+		this->m_IOUT_Max = 0;
+		this->m_IOUT_Min = 0;
+		this->m_IOUT_Set = 0;
+
+		this->m_VoSBY_Max = 0;
+		this->m_VoSBY_Min = 0;
+		this->m_VoSBY_Set = 0;
+
+		this->m_IoSBY_Max = 0;
+		this->m_IoSBY_Min = 0;
+		this->m_IoSBY_Set = 0;
+	}
 
 	void SaveIoSBY(double ioSBY){
 		this->m_IoSBY = ioSBY;

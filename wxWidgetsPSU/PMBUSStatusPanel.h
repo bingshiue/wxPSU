@@ -29,7 +29,21 @@ public:
 
 	void UpdatePanel(void);
 
-	void Update_StatusWord(void);
+	void Update_StatusWORD(void);
+
+	void Update_StatusINPUT(void);
+
+	void Update_StatusVOUT(void);
+
+	void Update_StatusIOUT(void);
+
+	void Update_StatusTemperature(void);
+
+	void Update_StatusCML(void);
+
+	void Update_StatusOTHER(void);
+
+	void Update_StatusFAN12(void);
 
 	// Top Level Sizer
 	wxBoxSizer *m_topLevelSizer;
@@ -287,6 +301,37 @@ public:
 	wxStaticText *m_stINPUT_B_ORING_FAULT_OTHER;
 	wxStaticText *m_stOUTPUT_ORING_FAULT_OTHER;
 	wxStaticText *m_stRESERVED_OTHER;
+
+	// Status_FAN12
+	wxGridSizer *m_statusFAN12_GS_1;
+	wxStaticBoxSizer *m_statusFAN12SBS;
+
+	wxBoxSizer *m_statusFAN12_HS_1;
+	wxBoxSizer *m_statusFAN12_HS_2;
+	wxBoxSizer *m_statusFAN12_HS_3;
+	wxBoxSizer *m_statusFAN12_HS_4;
+	wxBoxSizer *m_statusFAN12_HS_5;
+	wxBoxSizer *m_statusFAN12_HS_6;
+	wxBoxSizer *m_statusFAN12_HS_7;
+	wxBoxSizer *m_statusFAN12_HS_8;
+
+	wxStaticBitmap *m_stbFAN_1_FAULT_FAN12;
+	wxStaticBitmap *m_stbFAN_2_FAULT_FAN12;
+	wxStaticBitmap *m_stbFAN_1_WARNING_FAN12;
+	wxStaticBitmap *m_stbFAN_2_WARNING_FAN12;
+	wxStaticBitmap *m_stbFAN_1_SPEED_OVERRIDDEN_FAN12;
+	wxStaticBitmap *m_stbFAN_2_SPEED_OVERRIDDEN_FAN12;
+	wxStaticBitmap *m_stbAIRFLOW_FAULT_FAN12;
+	wxStaticBitmap *m_stbAIRFLOW_WARNING_OTHER;
+
+	wxStaticText *m_stFAN_1_FAULT_FAN12;
+	wxStaticText *m_stFAN_2_FAULT_FAN12;
+	wxStaticText *m_stFAN_1_WARNING_FAN12;
+	wxStaticText *m_stFAN_2_WARNING_FAN12;
+	wxStaticText *m_stFAN_1_SPEED_OVERRIDDEN_FAN12;
+	wxStaticText *m_stFAN_2_SPEED_OVERRIDDEN_FAN12;
+	wxStaticText *m_stAIRFLOW_FAULT_FAN12;
+	wxStaticText *m_stAIRFLOW_WARNING_OTHER;
 
 protected:
 

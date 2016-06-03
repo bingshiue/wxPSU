@@ -40,17 +40,25 @@ enum DEBUG_MSG_LEVEL {
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
 
+#define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Max Size */
+
 #define SERIALPORT_RECV_BUFF_SIZE  256
+
+#define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
+
+enum {
+	IOACCESS_SERIALPORT = 0,
+	IOACCESS_HID
+};
+
+enum {
+	IODEVICE_CLOSE = 0,
+	IODEVICE_OPEN
+};
 
 enum {
 	FAILURE = 0,/**< FAILURE */
 	SUCCESS     /**< SUCCESS */
-};
-
-enum RUNMODE {
-	RunMode_Iteration = 0,
-	RunMode_Continally,
-	RunMode_StopAnError
 };
 
 #endif

@@ -102,6 +102,21 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 
 }
 
+
+int PMBUSHelper::ProductFakeLinearData(unsigned char *dest, double value, double scale){
+	short result = 0;
+
+	result = (short)(value / scale);
+
+	dest[0] = *((char*)&result);
+	dest[1] = *((char*)&result+1);
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "dest[0]=%02x, dest[1]=%02x", dest[0], dest[1]);
+
+	return 0;
+}
+
+
 /**
  * @brief ProductLinearData
  *
@@ -202,8 +217,15 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 
 	// If Wrong Scale Value (Scale Value Must be (2 pow 15) ~ (2 pow -15))
 	if (save_idx == -1){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Wrong Scale Value !");
-		return 1;
+
+		// Exception : if input scale is 0, use 2^0 as default
+		if (scale == 0){
+			save_idx = 15;
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_ALERT, "Wrong Scale Value !");
+			return 1;
+		}
 	}
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "save_idx = %d", save_idx);

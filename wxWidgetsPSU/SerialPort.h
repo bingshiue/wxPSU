@@ -21,6 +21,11 @@
 int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray);
 
 /**
+ * @brief Get Serial Port Status.
+ */
+int GetSerialPortStatus(void);
+
+/**
  * @brief Open Serial Port
  */
 int OpenSerialPort(BOOL *array, unsigned int sizeofArray);
