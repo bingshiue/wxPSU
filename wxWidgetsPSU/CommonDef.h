@@ -5,8 +5,17 @@
 #ifndef _COMMONDEF_H_
 #define _COMMONDEF_H_
 
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
+
 
 #define PSU_PRINT(fmt, ...)  \
 		wxLogMessage(fmt,__VA_ARGS__);

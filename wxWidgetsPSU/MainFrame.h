@@ -102,6 +102,8 @@ public:
 
 	TaskSystemThread *m_TaskSystemThread;/**< Handle of Task System Thread */
 
+	bool m_sendThreadStopFlag;
+
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
 	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vectorfor Send Write CMD */
@@ -113,6 +115,12 @@ public:
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
 	wxSizer* m_hbox;/**< Horizontal Sizer */
+
+	wxSizer *GeneralPanelTopLevelSizer;
+	wxSizer *GeneralPanelSz;
+
+	wxSizer* CMDListSizer;
+	wxSizer* DebugLogSizer;
 
 	//
 #if 0
@@ -136,8 +144,8 @@ public:
 
 	// Panel
 	wxPanel    *GeneralPanel;
-
-	wxPanel    *debugLogPanel;
+	wxPanel    *CMDListPanel;
+	wxPanel    *DebugLogPanel;
 
 	PMBUSStatusPanel  *PMBusStatusPanel;
 	PMBUSStatusDCHPanel  *PMBusStatusDCHPanel;
@@ -294,6 +302,10 @@ private:
 	void OnDVSelectionChanged(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
+
+	void OnSendThreadCompletion(wxThreadEvent& event);
+
+	void OnSendThreadUpdate(wxThreadEvent& event);
 
 	// logging helper
 	void DoLogLine(wxTextCtrl *text,

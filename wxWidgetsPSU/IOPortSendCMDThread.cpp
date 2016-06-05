@@ -3,12 +3,14 @@
 */
 
 #include "IOPortSendCMDThread.h"
+#include "MainFrame.h"
 
 IOPortSendCMDThread::IOPortSendCMDThread(wxSemaphore* semaphore){
 	this->m_rxTxSemaphore = semaphore;
 }
 
 IOPortSendCMDThread::IOPortSendCMDThread(
+	MainFrame*   pHandler,
 	IOACCESS*    ioaccess,
 	unsigned int* currentIO,
 	wxSemaphore* semaphore,
@@ -24,6 +26,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	std::vector<PMBUSSendCOMMAND_t> *sendCMDVector
 	)
 {
+	this->m_pHandler = pHandler;
 	this->m_IOAccess = ioaccess;
 	this->m_CurrentIO = currentIO;
 	this->m_rxTxSemaphore = semaphore;
@@ -39,7 +42,9 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	this->m_sendCMDVector = sendCMDVector;
 }
 
-IOPortSendCMDThread::~IOPortSendCMDThread() { }
+IOPortSendCMDThread::~IOPortSendCMDThread() {
+	this->m_pHandler->m_sendThreadStopFlag = true;
+}
 
 
 void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength){
@@ -277,8 +282,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running==true; idx++){
 
-				PSU_DEBUG_PRINT(MSG_ALERT, "TestDestory");
-				TestDestroy();
+				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD,wxEVT_COMMAND_SENDTHREAD_UPDATE));
 
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
@@ -642,6 +646,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	}
 #endif
 
+	wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_COMPLETED));
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
 
 	return NULL;

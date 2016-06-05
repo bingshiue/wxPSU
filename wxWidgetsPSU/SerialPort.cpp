@@ -297,7 +297,8 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 //#define WAIT_INFINITE                  // Wait Infinite for Overlapped Operation
 
 #define NUMBER_OF_BYTES_TO_READ    1   // Number of Bytes To Read
-#define WAITCOMMEVENT_TIMEOUT   1000   // Milliseconds   
+#define WAITCOMMEVENT_TIMEOUT    300   // Milliseconds
+#define READ_OVERLAPPED_TIMEOUT  500   // Milliseconds
 #define STATUS_CHECK_TIMEOUT      50   // Milliseconds
 int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	//wxString outputMsg("");                // Output Messages
@@ -509,7 +510,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 							
 							#define USE_GETOVERLAPPEDRESULT_READ_FILE
                             #ifdef USE_GETOVERLAPPEDRESULT_READ_FILE
-							endtime = GetTickCount() + 500;
+							endtime = GetTickCount() + READ_OVERLAPPED_TIMEOUT;
 							while (!GetOverlappedResult(hComm, &ol_read, &NoBytesRead, FALSE)){
 								
 								if (GetTickCount() > endtime)

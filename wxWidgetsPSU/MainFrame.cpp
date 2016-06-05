@@ -86,7 +86,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 
-	//this->debugLogPanel = new wxPanel(this->GeneralPanel,wxID_ANY);
+	// Sub Notebook
+	this->m_subNotebook = new wxNotebook(this->GeneralPanel, wxID_ANY);
+	this->CMDListPanel = new wxPanel(this->GeneralPanel, wxID_ANY);
+	this->DebugLogPanel = new wxPanel(this->GeneralPanel, wxID_ANY);
+
+	this->m_stdPage = new STDPage(this->m_subNotebook);
+	this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
+	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 
 	// create the logging text control and a header showing the meaning of the
 	// different columns
@@ -94,7 +101,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_READONLY);
 	DoLogLine(m_header, "  Time", " Thread", "          Message");
-	m_txtctrl = new wxTextCtrl(this->GeneralPanel, wxID_ANY, "",
+	m_txtctrl = new wxTextCtrl(this->DebugLogPanel, wxID_ANY, "",
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY );
 	wxLog::SetActiveTarget(this);
@@ -105,14 +112,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_header->SetFont(font);
 	m_txtctrl->SetFont(font);
 	m_txtctrl->SetFocus();
-
-
-	// Sub Notebook
-	this->m_subNotebook = new wxNotebook(this->GeneralPanel, wxID_ANY);
-
-	this->m_stdPage = new STDPage(this->m_subNotebook);
-	this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
-	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 	
 	SetupPSUDataView(GeneralPanel);
 	SetupPMBusCommandWritePage();
@@ -235,10 +234,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	/wxLog::SetActiveTarget(new wxLogStderr());
 #endif
 
+	m_sendThreadStopFlag = true;
+
 	// Put Window in Center
 	Centre();
 
 }
+
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmwarwe)
@@ -272,6 +276,9 @@ EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
+
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()
@@ -509,15 +516,8 @@ void MainFrame::OnExit(wxCommandEvent& event)
 	}
 #endif
 		
-	// Close IO Device
-	if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
-		this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
-	}
-
-	// Release Task List
-	// TaskEx::ReleaseTaskList();
-
-	Sleep(3000);
+	wxMessageDialog *closeWarning = new wxMessageDialog(NULL, L"OnExit !", L"Warning", wxOK | wxICON_WARNING);
+	closeWarning->ShowModal();
 
 	Close(true);
 }
@@ -529,15 +529,25 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	if (this->m_monitor_running == true) {
 		this->m_monitor_running = false;
 		// IOPortSendCMDThread is Running
-		if (this->m_IOPortSendCMDThread->m_running == true){
+		if (this->m_IOPortSendCMDThread->m_running == true && this->m_IOPortSendCMDThread->IsRunning() == true){
 			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running");
-			wxThreadError error = this->m_IOPortSendCMDThread->Delete();
+			
+			this->m_IOPortSendCMDThread->m_running = false;
+
+			Sleep(1000);
+
+			//while (!this->m_sendThreadStopFlag) { PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running"); };
+
+			//wxThreadError error = this->m_IOPortSendCMDThread->Delete();
 
 			//if (error != wxTHREAD_NO_ERROR){
 				//PSU_DEBUG_PRINT(MSG_ALERT, "wxThreadError = %d", error);
 			//}
 		}
 	}
+
+	//
+	this->m_sendCMDVector.clear();
 
 	// Check TaskSystem Have Task or Not
 	int cnt = Task::GetCount();
@@ -693,7 +703,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
@@ -702,6 +712,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		}
 		else{
 			this->m_IOPortSendCMDThread->Run();
+			this->m_sendThreadStopFlag = false;
 		}
 
 	}
@@ -1082,7 +1093,7 @@ void MainFrame::SetupStatusBar(void){
 void MainFrame::SetupPSUDataView(wxPanel* parent){
 	
 	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
-	this->m_dataViewCtrl = new wxDataViewCtrl(parent, ID_ATTR_CTRL, wxDefaultPosition,
+	this->m_dataViewCtrl = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	m_list_model = new PSUDataViewListModel(this->m_PMBusData);
@@ -1164,17 +1175,30 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	//this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write"); // Don't show write page after APP initialized
 	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
 
-	// Setup Sizer
-	wxSizer* GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
-	wxSizer *GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
 	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
-	GeneralPanelSz->Add(m_subNotebook, 2, wxGROW | wxALL, 0);
-	GeneralPanelSz->Add(this->m_dataViewCtrl,8, wxGROW | wxALL, 0);
+
+	// Setup Sizer
+	GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
+	GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
+	
+	CMDListSizer = new wxBoxSizer(wxHORIZONTAL);
+	CMDListSizer->Add(this->m_dataViewCtrl, 1, wxEXPAND | wxALL);
+
+	this->CMDListPanel->SetSizerAndFit(CMDListSizer);
+
+	DebugLogSizer = new wxBoxSizer(wxHORIZONTAL);
+	DebugLogSizer->Add(this->m_txtctrl, 1, wxEXPAND | wxALL);
+
+	this->DebugLogPanel->SetSizerAndFit(DebugLogSizer);
+
+
+	GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
 
 	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(8).Expand());
 	GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
-	GeneralPanelTopLevelSizer->Add(this->m_txtctrl, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
+	GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
 
 	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
 
@@ -1326,4 +1350,14 @@ unsigned int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 
 void MainFrame::TaskInit(void){
 	// Task Init 
+}
+
+void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
+{
+	PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread exited!");
+	this->m_sendThreadStopFlag = true;
+}
+void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
+{
+	PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update!");
 }

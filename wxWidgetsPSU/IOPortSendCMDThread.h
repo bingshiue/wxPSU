@@ -26,11 +26,14 @@
 #define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
 #define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */
 
+class MainFrame;
+
 /**
 @brief Serial Port Send Thread.
 */
 class IOPortSendCMDThread : public wxThread {
 public:
+	MainFrame    *m_pHandle;/**<  Handle of MainFrame */
 	IOACCESS     *m_IOAccess;/**< IO Access */
 	unsigned int *m_CurrentIO;/**< Current IO */
 	bool          m_running;/**< Indicate thread is running */
@@ -41,6 +44,7 @@ public:
 
 	IOPortSendCMDThread(wxSemaphore* semaphore);
 	IOPortSendCMDThread(
+		MainFrame*   pHandler,
 		IOACCESS*    ioaccess,
 		unsigned int* currentIO,
 		wxSemaphore* semaphore,
@@ -56,6 +60,8 @@ public:
 		std::vector<PMBUSSendCOMMAND_t> *sendCMDVector
 						);
 	virtual ~IOPortSendCMDThread();
+
+	MainFrame*   m_pHandler;
 
 	wxSemaphore *m_rxTxSemaphore;
 	AppSettings_t *m_appSettings;
