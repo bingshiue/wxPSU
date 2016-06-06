@@ -86,22 +86,26 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 
+	m_splitterWindow = new wxSplitterWindow(this->GeneralPanel, SplitterWindowID);
+
 	// Sub Notebook
-	this->m_subNotebook = new wxNotebook(this->GeneralPanel, wxID_ANY);
-	this->CMDListPanel = new wxPanel(this->GeneralPanel, wxID_ANY);
+	this->m_subNotebook = new wxNotebook(this->m_splitterWindow, wxID_ANY);
+	this->CMDListPanel = new wxPanel(this->m_splitterWindow, wxID_ANY);
 	this->DebugLogPanel = new wxPanel(this->GeneralPanel, wxID_ANY);
 
 	this->m_stdPage = new STDPage(this->m_subNotebook);
 	this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
 	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 
+	this->m_debugLogStaticBoxSizer = new wxStaticBoxSizer(wxVERTICAL, this->DebugLogPanel, wxT("Error Log"));
+
 	// create the logging text control and a header showing the meaning of the
 	// different columns
-	m_header = new wxTextCtrl(this->GeneralPanel, wxID_ANY, "",
-		wxDefaultPosition, wxDefaultSize,
-		wxTE_READONLY);
-	DoLogLine(m_header, "  Time", " Thread", "          Message");
-	m_txtctrl = new wxTextCtrl(this->DebugLogPanel, wxID_ANY, "",
+	//m_header = new wxTextCtrl(this->GeneralPanel, wxID_ANY, "",
+		//wxDefaultPosition, wxDefaultSize,
+		//wxTE_READONLY);
+	//DoLogLine(m_header, "  Time", " Thread", "          Message");
+	m_txtctrl = new wxTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), wxID_ANY, "",//this->DebugLogPanel, wxID_ANY, "",
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY );
 	wxLog::SetActiveTarget(this);
@@ -109,7 +113,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// use fixed width font to align output in nice columns
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
 		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	m_header->SetFont(font);
+	//m_header->SetFont(font);
 	m_txtctrl->SetFont(font);
 	m_txtctrl->SetFocus();
 	
@@ -234,6 +238,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	/wxLog::SetActiveTarget(new wxLogStderr());
 #endif
 
+	m_destroying = 0;
 	m_sendThreadStopFlag = true;
 
 	// Put Window in Center
@@ -515,15 +520,21 @@ void MainFrame::OnExit(wxCommandEvent& event)
 		return;
 	}
 #endif
-		
+	
+#if 0
 	wxMessageDialog *closeWarning = new wxMessageDialog(NULL, L"OnExit !", L"Warning", wxOK | wxICON_WARNING);
 	closeWarning->ShowModal();
+#endif
 
 	Close(true);
 }
 
 void MainFrame::OnWindowClose(wxCloseEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Close Window");
+
+	if (m_destroying > 0) return;
+
+	m_destroying++;
 
 	// Monitor is Running
 	if (this->m_monitor_running == true) {
@@ -534,7 +545,9 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 			
 			this->m_IOPortSendCMDThread->m_running = false;
 
-			Sleep(1000);
+			wxThread::Yield();
+
+			Sleep(2000);
 
 			//while (!this->m_sendThreadStopFlag) { PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running"); };
 
@@ -1182,24 +1195,28 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
 	GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
 	
+	// Setup CMDListPanel
 	CMDListSizer = new wxBoxSizer(wxHORIZONTAL);
 	CMDListSizer->Add(this->m_dataViewCtrl, 1, wxEXPAND | wxALL);
 
 	this->CMDListPanel->SetSizerAndFit(CMDListSizer);
 
-	DebugLogSizer = new wxBoxSizer(wxHORIZONTAL);
-	DebugLogSizer->Add(this->m_txtctrl, 1, wxEXPAND | wxALL);
+	// Setup DebugLogPanel
+	m_debugLogStaticBoxSizer->Add(this->m_txtctrl, 1, wxEXPAND | wxALL);
 
-	this->DebugLogPanel->SetSizerAndFit(DebugLogSizer);
+	this->DebugLogPanel->SetSizerAndFit(this->m_debugLogStaticBoxSizer);
 
+	//
+	m_splitterWindow->SplitVertically(m_subNotebook, this->CMDListPanel, 300);// Add SubNoteBook & CMDListPanel to Splitter Window
 
-	GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
-	GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
+	//GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
+	//GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(m_splitterWindow, 1, wxEXPAND);
 
 	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(8).Expand());
-	GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
+	//GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
 	GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
-
+	
 	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
 
 }
@@ -1359,5 +1376,5 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 }
 void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update!");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update!");
 }

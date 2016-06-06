@@ -79,7 +79,9 @@ enum
 	CID_CHECKBOX_A1,
 	CID_CHECKBOX_A0,
 
-	ID_POLLING_TIME_COMBO = 1000
+	ID_POLLING_TIME_COMBO = 1000,
+
+	SplitterWindowID
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -104,9 +106,14 @@ public:
 
 	bool m_sendThreadStopFlag;
 
+	unsigned char m_destroying;
+
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
 	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vectorfor Send Write CMD */
+
+	// Splitter Window
+	wxSplitterWindow* m_splitterWindow;
 
 	// Bitmap 
 	wxBitmap *m_monitorBitmap;
@@ -120,7 +127,8 @@ public:
 	wxSizer *GeneralPanelSz;
 
 	wxSizer* CMDListSizer;
-	wxSizer* DebugLogSizer;
+
+	wxStaticBoxSizer* m_debugLogStaticBoxSizer;
 
 	//
 #if 0
