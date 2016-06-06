@@ -21,8 +21,6 @@
 #include "PMBUSHelper.h"
 #include "Task.h"
 
-#define CALIBRATION_ITEM_SIZE  9
-
 typedef struct data_resolution_t {
 
 	double m_data1;/**< Data 1 */
@@ -61,7 +59,9 @@ public:
 		AC_Vin_Current_110V_AC,
 		AC_Vin_Current_220V_AC,
 		AC_Vin_Power_110V_AC,
-		AC_Vin_Power_220V_AC
+		AC_Vin_Power_220V_AC,
+		ACS_SETPOINT,
+		CALIBRATION_ITEM_SIZE
 	};
 
 	enum {

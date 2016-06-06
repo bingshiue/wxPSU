@@ -81,7 +81,8 @@ enum
 
 	ID_POLLING_TIME_COMBO = 1000,
 
-	SplitterWindowID
+	SplitterWindowID,
+	SplitterWindowTopLevelID
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -114,6 +115,7 @@ public:
 
 	// Splitter Window
 	wxSplitterWindow* m_splitterWindow;
+	wxSplitterWindow* m_splitterWindowTopLevel;
 
 	// Bitmap 
 	wxBitmap *m_monitorBitmap;

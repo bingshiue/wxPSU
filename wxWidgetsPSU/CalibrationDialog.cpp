@@ -15,7 +15,8 @@ unsigned char CalibrationDialog::calibrationItemCommand[CALIBRATION_ITEM_SIZE] =
 	0x30,
 	0x30,
 	0x32,
-	0x32
+	0x32,
+	0x09
 };
 
 unsigned char CalibrationDialog::calibrationItemPointerMask[CALIBRATION_ITEM_SIZE] = {
@@ -27,7 +28,8 @@ unsigned char CalibrationDialog::calibrationItemPointerMask[CALIBRATION_ITEM_SIZ
 	0x00,
 	0x10,
 	0x00,
-	0x10
+	0x10,
+	0x00
 };
 
 unsigned char CalibrationDialog::calibrationItemPointerValue[10] = {
@@ -52,21 +54,23 @@ double CalibrationDialog::defSelectablePointerCount[CALIBRATION_ITEM_SIZE] = {
 	6,
 	6,
 	6,
-	6
+	6,
+	1
 };
 
 DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 	/* Data1  Resolution1  Data2  Resolution2 */
-	{  0.0000, 0.12500000, 0.0000, 0.12500000 },
-	{  0.0000, 0.00390625, 0.0000, 0.00390625 },
-	{  0.0000, 0.10000000, 0.0000, 0.10000000 },
-	{  0.0000, 0.10000000, 0.0000, 0.10000000 },
-	{  0.0000, 0.10000000, 0.0000, 0.10000000 },
-	{  0.0000, 0.01562500, 0.0000, 0.01562500 },
-	{  0.0000, 0.01562500, 0.0000, 0.01562500 },
-	{  0.0000, 0.25000000, 0.0000, 0.25000000 },
-	{ 64.0000, 0.25000000, 0.0000, 0.25000000 }
+	{   0.0000, 0.12500000, 0.0000, 0.12500000 },
+	{   0.0000, 0.00390625, 0.0000, 0.00390625 },
+	{   0.0000, 0.10000000, 0.0000, 0.10000000 },
+	{   0.0000, 0.10000000, 0.0000, 0.10000000 },
+	{   0.0000, 0.10000000, 0.0000, 0.10000000 },
+	{   0.0000, 0.01562500, 0.0000, 0.01562500 },
+	{   0.0000, 0.01562500, 0.0000, 0.01562500 },
+	{   0.0000, 0.25000000, 0.0000, 0.25000000 },
+	{  64.0000, 0.25000000, 0.0000, 0.25000000 },
+	{2250.0000, 1.00000000, 0.0000, 1.00000000 },
 
 };
 
@@ -101,6 +105,7 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_calibrationItemCB->Append(wxT("AC Vin Current 220V AC"));
 	m_calibrationItemCB->Append(wxT("AC Vin Power 110V AC"));
 	m_calibrationItemCB->Append(wxT("AC Vin Power 220V AC"));
+	m_calibrationItemCB->Append(wxT("ACS SET Pointer"));
 	m_calibrationItemCB->SetSelection(0);
 
 	m_calibrationItemSizer->Add(m_calibrationItemST, wxSizerFlags().Border(wxALL, 5));
@@ -328,16 +333,24 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	double resolution1 = 0;
 	this->m_resolution1TC->GetValue().ToDouble(&resolution1);
 
+#ifdef USE_LINEAR_DATA_FORMAT
 	PMBUSHelper::ProductLinearData(SendBuffer + INDEX_DATA_1_START, value1, resolution1);
+#else
+	PMBUSHelper::ProductFakeLinearData(SendBuffer + INDEX_DATA_1_START, value1, resolution1);
+#endif
 
 	// Data 2
 	double value2 = 0;
-	this->m_data1TC->GetValue().ToDouble(&value2);
+	this->m_data2TC->GetValue().ToDouble(&value2);
 
 	double resolution2 = 0;
-	this->m_resolution1TC->GetValue().ToDouble(&resolution2);
+	this->m_resolution2TC->GetValue().ToDouble(&resolution2);
 
+#ifdef USE_LINEAR_DATA_FORMAT
 	PMBUSHelper::ProductLinearData(SendBuffer + INDEX_DATA_2_START, value2, resolution2);
+#else
+	PMBUSHelper::ProductFakeLinearData(SendBuffer + INDEX_DATA_2_START, value2, resolution2);
+#endif
 
 	unsigned char separate_pec = 0;;
 
@@ -620,6 +633,32 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 		this->m_data2TC->SetValue(tmp);
 
 		tmp = wxString::Format("%5.8f", m_dataResolution[AC_Vin_Power_220V_AC].m_Resolution2);
+		this->m_resolution2TC->SetValue(tmp);
+
+		break;
+
+	case ACS_SETPOINT:
+		// Set Pinter CB Field
+		this->m_pointerCB->Clear();
+
+		for (unsigned int idx = 0; idx < defSelectablePointerCount[ACS_SETPOINT]; idx++){
+			pointer_label = wxString::Format("%d", idx);
+			this->m_pointerCB->Append(pointer_label);
+		}
+
+		this->m_pointerCB->SetSelection(0);
+
+		// Set Data & Resolution
+		tmp = wxString::Format("%5.4f", m_dataResolution[ACS_SETPOINT].m_data1);
+		this->m_data1TC->SetValue(tmp);
+
+		tmp = wxString::Format("%5.8f", m_dataResolution[ACS_SETPOINT].m_Resolution1);
+		this->m_resolution1TC->SetValue(tmp);
+
+		tmp = wxString::Format("%5.4f", m_dataResolution[ACS_SETPOINT].m_data2);
+		this->m_data2TC->SetValue(tmp);
+
+		tmp = wxString::Format("%5.8f", m_dataResolution[ACS_SETPOINT].m_Resolution2);
 		this->m_resolution2TC->SetValue(tmp);
 
 		break;

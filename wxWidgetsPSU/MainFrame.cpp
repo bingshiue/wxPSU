@@ -86,12 +86,18 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 
-	m_splitterWindow = new wxSplitterWindow(this->GeneralPanel, SplitterWindowID);
+	m_splitterWindowTopLevel = new wxSplitterWindow(this->GeneralPanel, SplitterWindowTopLevelID);
+
+	m_splitterWindowTopLevel->SetSashGravity(0.8);
+
+	m_splitterWindow = new wxSplitterWindow(this->m_splitterWindowTopLevel, SplitterWindowID);
+
+	m_splitterWindow->SetSashGravity(0.3);
 
 	// Sub Notebook
 	this->m_subNotebook = new wxNotebook(this->m_splitterWindow, wxID_ANY);
 	this->CMDListPanel = new wxPanel(this->m_splitterWindow, wxID_ANY);
-	this->DebugLogPanel = new wxPanel(this->GeneralPanel, wxID_ANY);
+	this->DebugLogPanel = new wxPanel(this->m_splitterWindowTopLevel, wxID_ANY);
 
 	this->m_stdPage = new STDPage(this->m_subNotebook);
 	this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
@@ -145,7 +151,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->m_topVeriticalSizer->Add(this->m_toolbar);
 	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	//this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
-	this->m_topVeriticalSizer->Add(this->m_notebook, 7, wxEXPAND | wxALL, 1);
+	this->m_topVeriticalSizer->Add(this->m_notebook, 1, wxEXPAND | wxALL, 1);
 	//this->m_topVeriticalSizer->Add(header, wxSizerFlags(0).Expand());
 	//this->m_topVeriticalSizer->Add(this->m_txtctrl, 2, wxEXPAND | wxALL, 1);//wxSizerFlags(1).Expand());
 	//this->m_parent->SetSizer(this->m_topVeriticalSizer, true);
@@ -1207,15 +1213,17 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	this->DebugLogPanel->SetSizerAndFit(this->m_debugLogStaticBoxSizer);
 
 	//
-	m_splitterWindow->SplitVertically(m_subNotebook, this->CMDListPanel, 300);// Add SubNoteBook & CMDListPanel to Splitter Window
+	m_splitterWindow->SplitVertically(m_subNotebook, this->CMDListPanel, 0);// Add SubNoteBook & CMDListPanel to Splitter Window
+
+	m_splitterWindowTopLevel->SplitHorizontally(m_splitterWindow, this->DebugLogPanel, 0);
 
 	//GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
 	//GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
-	GeneralPanelSz->Add(m_splitterWindow, 1, wxEXPAND);
+	GeneralPanelSz->Add(m_splitterWindowTopLevel, 1, wxEXPAND);
 
-	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(8).Expand());
+	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(1).Expand());
 	//GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
-	GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
+	//GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
 	
 	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
 
