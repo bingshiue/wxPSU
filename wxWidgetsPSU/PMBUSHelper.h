@@ -28,6 +28,8 @@ public :
 
 	static long HexToDecimal(wxString string);
 
+	static void GetNowDateTimeString(wxString& string);
+
 protected :
 
 private :

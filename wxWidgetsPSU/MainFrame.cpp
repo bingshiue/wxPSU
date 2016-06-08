@@ -1,7 +1,6 @@
 /**
  * @file MainFrame.cpp
  */
-
 #include "MainFrame.h"
 #include "MyListStoreDerivedModel.h"
 #include "PMBUSCommand.h"
@@ -48,6 +47,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	
 	// Setup Menu
 	SetupMenuBar();
+
+	this->m_cmdListPopupMenu = new wxMenu();
+	this->m_popupFontMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_FONT, wxT("Font"), wxT("Font"), wxITEM_NORMAL);
+	this->m_popupPrintScreenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_PRINT_SCREEN, wxT("Print Screen"), wxT("Print Screen"), wxITEM_NORMAL);
+
+	this->m_popupPrintScreenMenuItem->SetBitmap(wxBITMAP(PRINTSCREEN_16));
+
+	this->m_cmdListPopupMenu->Append(this->m_popupFontMenuItem);
+	this->m_cmdListPopupMenu->Append(this->m_popupPrintScreenMenuItem);
 
 	// Setup ToolBar
 	SetupToolBar();
@@ -273,10 +281,13 @@ EVT_MENU(MENU_ID_ErrorLog_ErrorOnly, MainFrame::OnErrorLogErrorOnly)
 EVT_MENU(MENU_ID_Log_To_File, MainFrame::OnLogToFile)
 EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
 EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
+EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
+EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
 
 EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
+EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_ATTR_CTRL, MainFrame::OnContextMenu)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 
@@ -598,7 +609,17 @@ void MainFrame::OnSecondaryFirmwarwe(wxCommandEvent& event)
 }
 
 void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	
+	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
+	
+	// If the user changed idea...
+	if (LoadHexFileDialog.ShowModal() == wxID_CANCEL){
+		return;
+	}
+
+	// Load HEX File
+	wxString path = LoadHexFileDialog.GetPath();
+	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
 }
 
 void MainFrame::OnStopProgramming(wxCommandEvent& event){
@@ -614,7 +635,6 @@ void MainFrame::OnEnableChecksum(wxCommandEvent& event){
 }
 
 void MainFrame::OnClearErrorLog(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 	this->m_debugLogTC->Clear();
 }
 
@@ -709,6 +729,40 @@ void MainFrame::OnPMBus1_1(wxCommandEvent& event){
 
 void MainFrame::OnPMBus1_2(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnPopupFont(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
+
+	wxString dateStr("");
+	PMBUSHelper::GetNowDateTimeString(dateStr);
+
+	wxFileDialog SaveCDMListDialog(this, L"Save To", "", dateStr, "TXT files (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	// If the user changed idea...
+	if (SaveCDMListDialog.ShowModal() == wxID_CANCEL){
+		return;
+	}
+
+	// Save CMD List To File
+	wxString SavePath = SaveCDMListDialog.GetPath();
+	PSU_DEBUG_PRINT(MSG_ALERT, "Save List To : %s", SavePath.c_str());
+
+	wxFFileOutputStream fileOutStream(SavePath);
+
+	if (!fileOutStream.IsOk()){
+		wxLogError("Can not Save List To %s", SavePath);
+		return;
+	}
+
+	wxTextOutputStream textOutputStream(fileOutStream);
+	// Call our save function
+	this->SaveCMDListToFile(textOutputStream);
+
+	textOutputStream.Flush();
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
@@ -1264,6 +1318,11 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 
 }
 
+void MainFrame::OnContextMenu(wxDataViewEvent &event){
+	// Show Popup Menu
+	this->m_dataViewCtrl->PopupMenu(this->m_cmdListPopupMenu);
+}
+
 unsigned int MainFrame::getCurrentUseIOInterface(void){
 	return this->m_CurrentUseIOInterface;
 }
@@ -1396,7 +1455,7 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_HID].m_DeviceReadData = HIDReadData;
 }
 
-void  MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
+void MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
 	this->m_status_bar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
 }
 
@@ -1483,7 +1542,56 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 
 	(this->m_status_bar->getTimer())->Stop();
 }
+
 void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 {
 	//PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update!");
+}
+
+int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
+	//"Register    Name                          Access   Query   Cook                                                                                                                              Raw" 
+
+	wxVariant Value;
+	wxString registerValue("");
+	wxString line("");
+	wxDataViewItem dataViewItem;
+
+	char* format[6] = {
+		"%-12s",
+		"%-30s",
+		"%-9s",
+		"%-8s",
+		"%-140s",
+		"%s"
+	};
+
+	wxString header = wxString::Format("%-12s%-30s%-9s%-8s%-140s%s", "Register", "Name", "Access", "Query", "Cook", "Raw");
+
+	textOutputStream << header;
+	textOutputStream << endl;
+
+	for (unsigned int row_idx = 0; row_idx < PMBUSCOMMAND_SIZE; row_idx++){
+
+		registerValue = wxString::Format("%02x", this->m_PMBusData[row_idx].m_register);
+		registerValue.UpperCase();
+		registerValue += "h";
+
+		line += wxString::Format(format[0], registerValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "%-12s", registerValue.c_str());
+
+		for (unsigned int column_idx = 2; column_idx < PSUDataViewListModel::Col_Max-3; column_idx++){
+			this->m_list_model->GetValueByRow(Value, row_idx, column_idx);
+			
+			line += wxString::Format(format[column_idx-1], Value.GetString().c_str());
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", Value.GetString().c_str());
+		}
+
+		textOutputStream << line;
+		textOutputStream << endl;
+
+		line.Clear();
+	}
+
+	return EXIT_SUCCESS;
 }

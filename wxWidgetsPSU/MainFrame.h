@@ -4,6 +4,8 @@
 #ifndef _MAINFRAME_H_
 #define _MAINFRAME_H_
 
+#include <iostream>
+#include <iomanip>
 #include <vector>
 #include "TaskSystemEx.h"
 #include "Task.h"
@@ -70,6 +72,9 @@ enum
 
 	MENU_ID_PMBUS_1_1,
 	MENU_ID_PMBUS_1_2,
+
+	MENU_ID_POPUP_FONT,
+	MENU_ID_POPUP_PRINT_SCREEN,
 
 	TOOLBAR_ID_RESET_RUN_TIME,
 	TOOLBAR_ID_REFRESH_MAXMIN,
@@ -221,6 +226,12 @@ public:
 
 	wxMenu      *m_helpMenu;
 
+	// CMD List Popup Menu
+	wxMenu      *m_cmdListPopupMenu;
+
+	wxMenuItem  *m_popupFontMenuItem;
+	wxMenuItem  *m_popupPrintScreenMenuItem;
+
 	// Tool Bar
 	wxToolBar    *m_toolbar;
 
@@ -305,6 +316,9 @@ private:
 	void OnPMBus1_1(wxCommandEvent& event);
 	void OnPMBus1_2(wxCommandEvent& event);
 
+	void OnPopupFont(wxCommandEvent& event);
+	void OnPopupPrintScreen(wxCommandEvent& event);
+
 	void OnExit(wxCommandEvent& event);
 	void OnWindowClose(wxCloseEvent& event);
 
@@ -314,6 +328,8 @@ private:
 	void OnDVSelectionChanged(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
+
+	void OnContextMenu(wxDataViewEvent &event);
 
 	void OnSendThreadCompletion(wxThreadEvent& event);
 
@@ -331,6 +347,8 @@ private:
 	int CloseIODevice(void);
 
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
+
+	int SaveCMDListToFile(wxTextOutputStream& textOutputStream);
 
 	wxDECLARE_EVENT_TABLE();
 

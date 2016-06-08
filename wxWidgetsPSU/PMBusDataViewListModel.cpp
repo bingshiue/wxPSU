@@ -64,6 +64,12 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 		}
 	}
 
+	// Setup Query
+	m_queryColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
+	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+		m_queryColValues.push_back(wxT(""));
+	}
+
 	// Setup Cook
 	m_cookColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
 	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
@@ -224,6 +230,7 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 		break;
 
 	case Col_QueryText:
+		variant = m_queryColValues[row];
 
 		break;
 	case Col_CookText:

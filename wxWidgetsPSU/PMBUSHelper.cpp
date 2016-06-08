@@ -267,3 +267,17 @@ long PMBUSHelper::HexToDecimal(wxString string){
 
 	return decimal;
 }
+
+void PMBUSHelper::GetNowDateTimeString(wxString& string){	
+	wxDateTime datetime = wxDateTime::Now();
+
+	string += wxString::Format("%d", datetime.GetYear());
+	string += "-";
+	string += wxString::Format("%02d", datetime.GetMonth() + 1);
+	string += "-";
+	string += wxString::Format("%02d", datetime.GetDay());
+	string += "-";
+	string += wxString::Format("%02d", datetime.GetHour());
+	string += "-";
+	string += wxString::Format("%02d", datetime.GetMinute());
+}

@@ -24,6 +24,11 @@
 #include "wx/spinctrl.h"
 #include "wx/imaglist.h"
 #include "wx/notebook.h"
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
+#include <wx/datstrm.h>
+#include <wx/textfile.h>
+#include <wx/tokenzr.h>
 
 #include "wx/grid.h"
 #include "wx/headerctrl.h"
