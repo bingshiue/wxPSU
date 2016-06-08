@@ -17,6 +17,7 @@ using namespace std;
 hid_device *handle;/**< HID Device Handle */
 
 wchar_t wstr[MAX_STR];
+wchar_t productString[MAX_STR] = L"USB";
 
 int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 
@@ -47,12 +48,16 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 }
 
 int GetHIDDeviceStatus(void){
-	if (handle == NULL){
+	if (handle <= 0){
 		return IODEVICE_CLOSE;
 	}
 	else{
 		return IODEVICE_OPEN;
 	}
+}
+
+wchar_t* GetHIDOpenDeviceName(void){
+	return productString;
 }
 
 int OpenHIDDevice(BOOL *array, unsigned int sizeofArray){

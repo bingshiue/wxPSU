@@ -32,8 +32,8 @@ public:
 	/**< Box Sizer */
 	wxStaticBoxSizer *m_staticBoxlSizer;
 
-	wxGridSizer *m_gridSizer_1;
-	wxGridSizer *m_gridSizer_2;
+	wxFlexGridSizer *m_gridSizer_1;
+	wxFlexGridSizer *m_gridSizer_2;
 
 	wxBoxSizer *m_horizonSizer1;
 	wxBoxSizer *m_horizonSizer2;

@@ -18,7 +18,7 @@
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
-#include "PSUStatusBar.h"
+#include "PMBUSStatusBar.h"
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
 #include "PEC.h"
@@ -53,7 +53,7 @@ public:
 		PMBUSCOMMAND_t *pmBusCommand,
 		RECVBUFF_t *recvBuff,
 		wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
-		PSUStatusBar *status_bar,
+		PMBUSStatusBar *status_bar,
 		STDPage* stdPage,
 		PMBUSStatusPanel* pmbusStatusPanel,
 		PMBUSStatusDCHPanel* pmbusStatusDCHPanel,
@@ -71,7 +71,7 @@ public:
 	IOPortReadCMDThread *m_IOPortReadCMDThread;
 
 	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
-	PSUStatusBar  *m_status_bar;
+	PMBUSStatusBar  *m_status_bar;
 	STDPage *m_stdPage;
 	PMBUSStatusPanel* m_pmbusStatusPanel;
 	PMBUSStatusDCHPanel* m_pmbusStatusDCHPanel;
@@ -81,11 +81,11 @@ public:
 	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);
 
-	void UpdateSTDPage(void);
+	void UpdateSTDPage(unsigned int index);
 
 	void UpdateSTATUSPanel(unsigned int index);
 
-	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
+	unsigned int findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage = 0);
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;

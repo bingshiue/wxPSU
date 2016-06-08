@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="main.cpp" />
@@ -98,7 +99,7 @@
     <ClCompile Include="PMBUSHelper.cpp" />
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
-    <ClCompile Include="PSUStatusBar.cpp" />
+    <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="WritePageFAH.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
@@ -152,7 +154,7 @@
     <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PMBUSStatusDCHPanel.h" />
     <ClInclude Include="PMBUSStatusPanel.h" />
-    <ClInclude Include="PSUStatusBar.h" />
+    <ClInclude Include="PMBUSStatusBar.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />
     <ClInclude Include="IOPortSendCMDThread.h" />

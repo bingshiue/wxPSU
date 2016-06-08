@@ -20,8 +20,8 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	// Initial Sizer 
 	m_staticBoxlSizer = new wxStaticBoxSizer(this->m_staticBox,wxVERTICAL);
 
-	m_gridSizer_1 = new wxGridSizer(4, 4, 1, 1);
-	m_gridSizer_2 = new wxGridSizer(4, 4, 1, 1);
+	m_gridSizer_1 = new wxFlexGridSizer(4, 4, 1, 1);
+	m_gridSizer_2 = new wxFlexGridSizer(4, 4, 1, 1);
 
 	m_horizonSizer1 = new wxBoxSizer(wxHORIZONTAL);
 

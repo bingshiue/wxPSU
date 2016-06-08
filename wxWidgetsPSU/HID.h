@@ -29,6 +29,11 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray);
 int GetHIDDeviceStatus(void);
 
 /**
+ * @brief Get HID Open Device Name.
+ */
+wchar_t* GetHIDOpenDeviceName(void);
+
+/**
  * @brief Open HID Device
  */
 int OpenHIDDevice(BOOL *array, unsigned int sizeofArray);

@@ -26,6 +26,11 @@ int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray);
 int GetSerialPortStatus(void);
 
 /**
+ * @brief Get Serial Port Open Device Name.
+ */
+wchar_t* GetSerialPortOpenDeviceName(void);
+
+/**
  * @brief Open Serial Port
  */
 int OpenSerialPort(BOOL *array, unsigned int sizeofArray);

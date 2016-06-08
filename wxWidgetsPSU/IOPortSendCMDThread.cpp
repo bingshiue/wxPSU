@@ -19,7 +19,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	PMBUSCOMMAND_t *pmBusCommand,
 	RECVBUFF_t *recvBuff,
 	wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
-	PSUStatusBar *status_bar,
+	PMBUSStatusBar *status_bar,
 	STDPage* stdPage,
 	PMBUSStatusPanel* pmbusStatusPanel,
 	PMBUSStatusDCHPanel* pmbusStatusDCHPanel,
@@ -610,12 +610,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
 				this->m_status_bar->setMonitoringSummary(summary);
 
+				#if 0
 				if (idx == (PMBUSCOMMAND_SIZE - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
 				}
+				#endif
 
+				// Update STD Page
+				this->UpdateSTDPage(idx);
 
+				// Update Status Panel
 				this->UpdateSTATUSPanel(idx);
 
 
@@ -679,57 +684,85 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 }
 
 
-void IOPortSendCMDThread::UpdateSTDPage(void){
-	// POUT
-	wxString pout = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_POUT);
-	this->m_stdPage->m_tcPOUT->SetValue(pout);
+void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
+	
 	// PIN
-	wxString pin = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PIN);
-	this->m_stdPage->m_tcPIN->SetValue(pin);
+	if (index == this->findPMBUSCMDIndex(0x97)){
+		wxString pin = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PIN);
+		this->m_stdPage->m_tcPIN->SetValue(pin);
+	}
+	
+	// POUT
+	if (index == this->findPMBUSCMDIndex(0x96)){
+		wxString pout = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_POUT);
+		this->m_stdPage->m_tcPOUT->SetValue(pout);
+	}
 
 	// VIN
-	wxString vin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VIN);
-	this->m_stdPage->m_tcVIN->SetValue(vin);
+	if (index == this->findPMBUSCMDIndex(0x88)){
+		wxString vin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VIN);
+		this->m_stdPage->m_tcVIN->SetValue(vin);
+	}
 
 	// IIN
-	wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
-	this->m_stdPage->m_tcIIN->SetValue(iin);
+	if (index == this->findPMBUSCMDIndex(0x89)){
+		wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
+		this->m_stdPage->m_tcIIN->SetValue(iin);
+	}
 
 	// VOUT
-	wxString vout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VOUT);
-	this->m_stdPage->m_tcVOUT->SetValue(vout);
+	if (index == this->findPMBUSCMDIndex(0x8b,0)){
+		wxString vout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VOUT);
+		this->m_stdPage->m_tcVOUT->SetValue(vout);
+	}
 
 	// IOUT
-	wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
-	this->m_stdPage->m_tcIOUT->SetValue(iout);
+	if (index == this->findPMBUSCMDIndex(0x8c, 0)){
+		wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
+		this->m_stdPage->m_tcIOUT->SetValue(iout);
+	}
 
 	// VoSBY
-	wxString vosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VoSBY);
-	this->m_stdPage->m_tcVoSBY->SetValue(vosby);
+	if (index == this->findPMBUSCMDIndex(0x8b, 1)){
+		wxString vosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VoSBY);
+		this->m_stdPage->m_tcVoSBY->SetValue(vosby);
+	}
 
 	// IoSBY
-	wxString iosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IoSBY);
-	this->m_stdPage->m_tcIoSBY->SetValue(iosby);
+	if (index == this->findPMBUSCMDIndex(0x8c, 1)){
+		wxString iosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IoSBY);
+		this->m_stdPage->m_tcIoSBY->SetValue(iosby);
+	}
 
 	// VCAP
-	wxString vcap = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_VCAP);
-	this->m_stdPage->m_tcVCAP->SetValue(vcap);
+	if (index == this->findPMBUSCMDIndex(0x8a)){
+		wxString vcap = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_VCAP);
+		this->m_stdPage->m_tcVCAP->SetValue(vcap);
+	}
 
 	// AMD(8D)
-	wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
-	this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
+	if (index == this->findPMBUSCMDIndex(0x8d)){
+		wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
+		this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
+	}
 
 	// SEC(8E)
-	wxString sec_8e = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_SEC_8E);
-	this->m_stdPage->m_tcSEC8E->SetValue(sec_8e);
+	if (index == this->findPMBUSCMDIndex(0x8e)){
+		wxString sec_8e = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_SEC_8E);
+		this->m_stdPage->m_tcSEC8E->SetValue(sec_8e);
+	}
 
 	// PRI(8F)
-	wxString pri_8f = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PRI_8F);
-	this->m_stdPage->m_tcPRI8F->SetValue(pri_8f);
+	if (index == this->findPMBUSCMDIndex(0x8f)){
+		wxString pri_8f = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PRI_8F);
+		this->m_stdPage->m_tcPRI8F->SetValue(pri_8f);
+	}
 
 	// FAN1
-	wxString fan1 = wxString::Format("%5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
-	this->m_stdPage->m_tcFAN1->SetValue(fan1);
+	if (index == this->findPMBUSCMDIndex(0x90)){
+		wxString fan1 = wxString::Format("%5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
+		this->m_stdPage->m_tcFAN1->SetValue(fan1);
+	}
 
 	// FAN2
 
@@ -739,14 +772,17 @@ void IOPortSendCMDThread::UpdateSTDPage(void){
 
 }
 
-unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register){
+unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage){
 
 	unsigned int index = 0;
 
 	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
-		if (this->m_pmBusCommand[idx].m_register == cmd_register){
-			index = idx;
-			break;
+		if (this->m_pmBusCommand[idx].m_register == cmd_register)
+		{
+			if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == need_changePage){
+				index = idx;
+				break;
+			}
 		}
 	}
 

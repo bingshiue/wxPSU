@@ -24,7 +24,7 @@
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
-#include "PSUStatusBar.h"
+#include "PMBUSStatusBar.h"
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
 #include "PEC.h"

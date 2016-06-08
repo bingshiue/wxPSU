@@ -17,7 +17,7 @@
 #include "HID.h"
 #include "IOAccess.h"
 #include "PMBusDataViewListModel.h"
-#include "PSUStatusBar.h"
+#include "PMBUSStatusBar.h"
 #include "PMBUSCommandType.h"
 #include "STDPage.h"
 #include "BaseWritePage.h"
@@ -26,6 +26,7 @@
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
 #include "CalibrationDialog.h"
+#include "AboutDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -70,6 +71,7 @@ enum
 	MENU_ID_PMBUS_1_1,
 	MENU_ID_PMBUS_1_2,
 
+	TOOLBAR_ID_RESET_RUN_TIME,
 	TOOLBAR_ID_REFRESH_MAXMIN,
 
 	ID_ATTR_CTRL = 51,
@@ -96,6 +98,7 @@ public:
 
 	AppSettings_t m_appSettings;
 
+	bool m_ioDeviceOpen;/**< Indicator for IO Device Open */
 	bool m_monitor_running;/**< Indicator for mobitor is running */
 
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
@@ -145,8 +148,8 @@ public:
 
 	wxDataViewColumn* m_attributes;
 
-	// just some place to put our messages in
-	wxTextCtrl *m_txtctrl;
+	// Error Log
+	wxTextCtrl *m_debugLogTC;
 
 	// Note Book
 	wxNotebook *m_notebook;
@@ -180,6 +183,7 @@ public:
 
 	wxMenuItem  *m_monitorMenuItem;
 	wxMenu      *m_inSystemProgrammingMenu;
+	wxMenuItem  *m_updateSecondaryFirmwareMenuItem;
 	wxMenuItem  *m_stopProgrammingMenuItem;
 	wxMenuItem  *m_i2cFaultTestMenuItem;
 	wxMenuItem  *m_EnableChecksumMenuItem;
@@ -235,7 +239,7 @@ public:
 	wxCheckBox   *m_a0_chkbox;
 
 	// Status Bar
-	PSUStatusBar *m_status_bar;
+	PMBUSStatusBar *m_status_bar;
 
 	//
 	wxTextCtrl   *m_header;
@@ -301,8 +305,6 @@ private:
 	void OnPMBus1_1(wxCommandEvent& event);
 	void OnPMBus1_2(wxCommandEvent& event);
 
-	void OnResetMaxMin(wxCommandEvent& event);
-
 	void OnExit(wxCommandEvent& event);
 	void OnWindowClose(wxCloseEvent& event);
 
@@ -324,6 +326,11 @@ private:
 		const wxString& msg);
 
 	void DoSetupIOAccess(void);
+
+	int OpenIODevice(void);
+	int CloseIODevice(void);
+
+	void UpdateStatusBarIOSettingFiled(wxString io_string);
 
 	wxDECLARE_EVENT_TABLE();
 

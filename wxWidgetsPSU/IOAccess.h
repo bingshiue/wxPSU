@@ -18,6 +18,8 @@ typedef int (*EnumerateAvailableDevice)(BOOL *, unsigned int);/**< Funtion Point
 
 typedef int (*GetDeviceStatus)(void);/**< Get Device Status (Open/Close) */
 
+typedef wchar_t* (*GetOpenDeviceName)(void);/**< Get Open Device Name */
+
 typedef int (*OpenDevice)(BOOL *, unsigned int);/**< Funtion Pointer Type For Open Device */
 
 typedef int (*DeviceSendData)(unsigned char*, unsigned int);/**< Funtion Pointer Type For Device Send Data */
@@ -32,6 +34,7 @@ typedef int (*CloseDevice)(void);/**< Funtion Pointer Type For Close Device */
 typedef struct _IOACCESS {
 	EnumerateAvailableDevice m_EnumerateAvailableDevice;
 	GetDeviceStatus m_GetDeviceStatus;
+	GetOpenDeviceName m_GetOpenDeviceName;
 	OpenDevice m_OpenDevice;
 	DeviceSendData m_DeviceSendData;
 	DeviceReadData m_DeviceReadData;
