@@ -56,11 +56,20 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 		if (pmBusCommand[idx].m_access == cmd_access_readwrite){
 			m_accessColValues.push_back(wxT("R/W"));
 		}
+		else if (pmBusCommand[idx].m_access == cmd_access_brbw){
+			m_accessColValues.push_back(wxT("BR/BW"));
+		}
 		else if (pmBusCommand[idx].m_access == cmd_access_read){
 			m_accessColValues.push_back(wxT("R"));
 		}
+		else if (pmBusCommand[idx].m_access == cmd_access_br){
+			m_accessColValues.push_back(wxT("BR"));
+		}
 		else if (pmBusCommand[idx].m_access == cmd_access_write){
 			m_accessColValues.push_back(wxT("W"));
+		}
+		else if (pmBusCommand[idx].m_access == cmd_access_bw){
+			m_accessColValues.push_back(wxT("BW"));
 		}
 	}
 

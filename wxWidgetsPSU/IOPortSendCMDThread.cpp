@@ -357,6 +357,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
 								}
 								PSU_DEBUG_PRINT(MSG_DEBUG, "Send Write Page CMD Response : %s", writePageRes.c_str());
+
+								if (this->m_appSettings->m_runMode == RunMode_StopAnError){
+									m_running = false;
+									break;
+								}
 							}
 
 						}//if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page)
@@ -516,6 +521,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								else{
 									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
 									this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
+
+									if (this->m_appSettings->m_runMode == RunMode_StopAnError){
+										m_running = false;
+										break;
+									}
 								}
 							}
 						} // else if (ret != wxSEMA_NO_ERROR)
@@ -591,6 +601,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
 							}
 							PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Response : %s", writePageRes.c_str());
+
+							if (this->m_appSettings->m_runMode == RunMode_StopAnError){
+								m_running = false;
+								break;
+							}
 						}
 
 					}// for (sendCMDVector_Iterator = this->m_sendCMDVector->begin(); sendCMDVector_Iterator != this->m_sendCMDVector->end(); sendCMDVector_Iterator++)
@@ -625,6 +640,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 
 				if (this->m_appSettings->m_runMode == RunMode_Iterations){
+
+					this->m_appSettings->m_IterationsSettingValue = wxAtoi(this->m_pHandler->m_iteration_input->GetValue());
+
 					if (iteration >= this->m_appSettings->m_IterationsSettingValue){
 						PSU_DEBUG_PRINT(MSG_ALERT, "IterationsSettingValue : %d, iteration : %d", this->m_appSettings->m_IterationsSettingValue, iteration);
 						this->m_running = false;

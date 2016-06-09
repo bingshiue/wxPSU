@@ -948,7 +948,7 @@ int Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
-	wxstr += wxString::Format(" Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
+	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1009,7 +1009,7 @@ int Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
-	wxstr += wxString::Format(" Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
+	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

@@ -49,9 +49,9 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	m_comboBox->SetSelection(0);
 
 	// Initail Static Line
-	m_staticLine_1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(280, -1));
-	m_staticLine_2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(280, -1));
-	m_staticLine_3 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(280, -1));
+	m_staticLine_1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition);
+	m_staticLine_2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition);
+	m_staticLine_3 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition);
 	
 	// Initail Static Text
 	m_stPIN = new wxStaticText(this, wxID_ANY, wxString("PIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
@@ -140,7 +140,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	m_staticBoxlSizer->Add(m_stPadding_1);// Padding Static Text
 
-	m_staticBoxlSizer->Add(m_staticLine_1);
+	m_staticBoxlSizer->Add(m_staticLine_1, wxSizerFlags().Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_2);// Padding Static Text
 
@@ -148,7 +148,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	m_staticBoxlSizer->Add(m_stPadding_3);// Padding Static Text
 
-	m_staticBoxlSizer->Add(m_staticLine_2);
+	m_staticBoxlSizer->Add(m_staticLine_2, wxSizerFlags().Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_4);// Padding Static Text
 
@@ -156,7 +156,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	m_staticBoxlSizer->Add(m_stPadding_5);// Padding Static Text
 
-	m_staticBoxlSizer->Add(m_staticLine_3);
+	m_staticBoxlSizer->Add(m_staticLine_3, wxSizerFlags().Expand());
 
 	SetSizer(m_staticBoxlSizer);
 }

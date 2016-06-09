@@ -52,6 +52,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_popupFontMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_FONT, wxT("Font"), wxT("Font"), wxITEM_NORMAL);
 	this->m_popupPrintScreenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_PRINT_SCREEN, wxT("Print Screen"), wxT("Print Screen"), wxITEM_NORMAL);
 
+	this->m_popupFontMenuItem->SetBitmap(wxBITMAP(FONT_16));
 	this->m_popupPrintScreenMenuItem->SetBitmap(wxBITMAP(PRINTSCREEN_16));
 
 	this->m_cmdListPopupMenu->Append(this->m_popupFontMenuItem);
@@ -693,6 +694,8 @@ void MainFrame::OnContinually(wxCommandEvent& event){
 	this->m_continuallyMenuItem->Check(true);
 	this->m_iterationsMenuItem->Check(false);
 	this->m_stopAnErrorMenuItem->Check(false);
+
+	this->m_status_bar->SetStatusText(wxT("Continually"), PMBUSStatusBar::Field_Run_Mode);
 }
 
 void MainFrame::OnIterations(wxCommandEvent& event){
@@ -701,6 +704,8 @@ void MainFrame::OnIterations(wxCommandEvent& event){
 	this->m_continuallyMenuItem->Check(false);
 	this->m_iterationsMenuItem->Check(true);
 	this->m_stopAnErrorMenuItem->Check(false);
+
+	this->m_status_bar->SetStatusText(wxT("Iterations"), PMBUSStatusBar::Field_Run_Mode);
 }
 
 void MainFrame::OnStopAnError(wxCommandEvent& event){
@@ -709,6 +714,8 @@ void MainFrame::OnStopAnError(wxCommandEvent& event){
 	this->m_continuallyMenuItem->Check(false);
 	this->m_iterationsMenuItem->Check(false);
 	this->m_stopAnErrorMenuItem->Check(true);
+
+	this->m_status_bar->SetStatusText(wxT("Stop An Error"), PMBUSStatusBar::Field_Run_Mode);
 }
 
 void MainFrame::OnErrorLogALL(wxCommandEvent& event){
@@ -732,7 +739,14 @@ void MainFrame::OnPMBus1_2(wxCommandEvent& event){
 }
 
 void MainFrame::OnPopupFont(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	
+	wxFont font;
+
+	font = wxGetFontFromUser();
+	
+	if (font.IsOk()){
+		this->m_dataViewCtrl->SetFont(font);
+	}
 }
 
 void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
@@ -1147,7 +1161,14 @@ void MainFrame::SetupToolBar(void){
 	wxString iterations_times = wxString::Format("%d",this->m_appSettings.m_IterationsSettingValue);
 
 	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
-	m_iteration_input->SetLabel(iterations_times);
+	m_iteration_input->SetValue(iterations_times);
+
+	wxTextValidator numberValidator;
+	numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	numberValidator.SetCharIncludes(wxT("0123456789"));
+
+	m_iteration_input->SetValidator(numberValidator);
+
 	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
 
 	// Append Polling Time
@@ -1355,7 +1376,8 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	switch (this->m_PMBusData[row].m_access){
 
-	case cmd_access_read://cmd_access_br
+	case cmd_access_read:
+	case cmd_access_br:
 		if (this->m_subNotebook->GetPageCount() == 3){
 			this->m_subNotebook->RemovePage(2);
 		}
@@ -1364,8 +1386,10 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 		break;
 
-	case cmd_access_write://cmd_access_bw
-	case cmd_access_readwrite://cmd_access_brbw
+	case cmd_access_write:
+	case cmd_access_bw:
+	case cmd_access_readwrite:
+	case cmd_access_brbw:
 
 		switch (this->m_subNotebook->GetPageCount()){
 		
@@ -1549,8 +1573,6 @@ void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 }
 
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
-	//"Register    Name                          Access   Query   Cook                                                                                                                              Raw" 
-
 	wxVariant Value;
 	wxString registerValue("");
 	wxString line("");
@@ -1572,19 +1594,17 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 
 	for (unsigned int row_idx = 0; row_idx < PMBUSCOMMAND_SIZE; row_idx++){
 
-		registerValue = wxString::Format("%02x", this->m_PMBusData[row_idx].m_register);
-		registerValue.UpperCase();
-		registerValue += "h";
+		registerValue = wxString::Format("%-12s", this->m_PMBusData[row_idx].m_label);
 
 		line += wxString::Format(format[0], registerValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "%-12s", registerValue.c_str());
+		PSU_DEBUG_PRINT(MSG_DEBUG, "%-12s", registerValue.c_str());
 
 		for (unsigned int column_idx = 2; column_idx < PSUDataViewListModel::Col_Max-3; column_idx++){
 			this->m_list_model->GetValueByRow(Value, row_idx, column_idx);
 			
 			line += wxString::Format(format[column_idx-1], Value.GetString().c_str());
 
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", Value.GetString().c_str());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "%s", Value.GetString().c_str());
 		}
 
 		textOutputStream << line;

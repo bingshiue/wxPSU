@@ -33,7 +33,7 @@ class MainFrame;
 */
 class IOPortSendCMDThread : public wxThread {
 public:
-	MainFrame    *m_pHandle;/**<  Handle of MainFrame */
+	MainFrame*    m_pHandler;/**<  Handle of MainFrame */
 	IOACCESS     *m_IOAccess;/**< IO Access */
 	unsigned int *m_CurrentIO;/**< Current IO */
 	bool          m_running;/**< Indicate thread is running */
@@ -60,8 +60,6 @@ public:
 		std::vector<PMBUSSendCOMMAND_t> *sendCMDVector
 						);
 	virtual ~IOPortSendCMDThread();
-
-	MainFrame*   m_pHandler;
 
 	wxSemaphore *m_rxTxSemaphore;
 	AppSettings_t *m_appSettings;
