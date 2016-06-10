@@ -24,6 +24,7 @@
 #include "STDPage.h"
 #include "BaseWritePage.h"
 #include "PMBUSCMDWritePages.h"
+#include "PMBUSMFRPanel.h"
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
@@ -168,7 +169,7 @@ public:
 	PMBUSStatusPanel  *PMBusStatusPanel;
 	PMBUSStatusDCHPanel  *PMBusStatusDCHPanel;
 
-	wxPanel    *PMBusMFR;
+	PMBUSMFRPanel    *PMBusMFRPanel;
 	wxPanel    *VerificationPanel;
 	wxPanel    *STATUSPanel;
 

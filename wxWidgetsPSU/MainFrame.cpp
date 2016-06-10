@@ -134,7 +134,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->PMBusStatusPanel = new PMBUSStatusPanel(m_notebook);
 
-	this->PMBusMFR = new wxPanel(m_notebook, wxID_ANY);
+	this->PMBusMFRPanel = new PMBUSMFRPanel(m_notebook);
 
 	this->VerificationPanel = new wxPanel(m_notebook, wxID_ANY);
 
@@ -145,7 +145,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Add each panl into notebook component
 	m_notebook->AddPage(this->GeneralPanel, "General");
 	m_notebook->AddPage(this->PMBusStatusPanel, "PM Bus Status");
-	m_notebook->AddPage(this->PMBusMFR, "PMBus MFR");
+	m_notebook->AddPage(this->PMBusMFRPanel, "PMBus MFR");
 	m_notebook->AddPage(this->VerificationPanel, "Verification");
 	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 
