@@ -45,6 +45,7 @@ private:
 	wxStaticText *m_line4ST;
 	wxStaticText *m_line5ST;
 	wxStaticText *m_line6ST;
+	wxStaticText *m_buildDateST;
 
 	wxStaticLine *m_sl;
 

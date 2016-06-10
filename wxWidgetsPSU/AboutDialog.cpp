@@ -5,7 +5,7 @@
 #include "AboutDialog.h"
 #include "acbel_large.xpm"
 
-AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About dialog")), wxDefaultPosition, wxSize(310, 280))
+AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About")), wxDefaultPosition, wxSize(300, 300))
 {
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -13,6 +13,11 @@ AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString
 
 	m_line1ST = new wxStaticText(this, wxID_ANY, wxT("PSU Monitor"), wxDefaultPosition, wxDefaultSize);
 	m_line2ST = new wxStaticText(this, wxID_ANY, wxT("Version: 1.0.0.0"), wxDefaultPosition, wxDefaultSize);
+	
+	wxString buildDate = wxString::Format("%s", __DATE__);
+	m_buildDateST = new wxStaticText(this, wxID_ANY, buildDate, wxDefaultPosition, wxDefaultSize);
+	
+	
 	m_line3ST = new wxStaticText(this, wxID_ANY, wxT("Copyright 2015, AcBel Polytech Inc."), wxDefaultPosition, wxDefaultSize);
 	m_line4ST = new wxStaticText(this, wxID_ANY, wxT("PROPRIETARY NOTICE"), wxDefaultPosition, wxDefaultSize);
 	wxFont font = m_line4ST->GetFont();
@@ -35,6 +40,7 @@ AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString
 
 	m_topLevelSizer->Add(m_line1ST, wxSizerFlags(0).Align(wxCENTER));
 	m_topLevelSizer->Add(m_line2ST, wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(m_buildDateST, wxSizerFlags(0).Align(wxCENTER));
 	m_topLevelSizer->Add(m_line3ST, wxSizerFlags(0).Align(wxCENTER));
 	m_topLevelSizer->Add(m_line4ST, wxSizerFlags(0).Align(wxCENTER));
 	m_topLevelSizer->Add(m_line5ST, wxSizerFlags(0).Align(wxCENTER));
