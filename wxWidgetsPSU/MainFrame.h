@@ -30,6 +30,7 @@
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
 #include "CalibrationDialog.h"
+#include "I2CInterfaceDialog.h"
 #include "AboutDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864

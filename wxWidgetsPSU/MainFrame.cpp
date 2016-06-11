@@ -683,7 +683,11 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CInterface(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this);
+	i2cIFDialog->Centre();
+	i2cIFDialog->ShowModal();
+
+	delete i2cIFDialog;
 }
 
 void MainFrame::OnContinually(wxCommandEvent& event){

@@ -87,6 +87,7 @@
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="HID.cpp" />
+    <ClCompile Include="I2CInterfaceDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MyListStoreDerivedModel.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="HID.h" />
+    <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="IOAccess.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
