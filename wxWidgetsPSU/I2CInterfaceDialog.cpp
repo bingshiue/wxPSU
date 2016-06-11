@@ -6,6 +6,12 @@
 
 I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
 	
+	wxIcon icon;
+	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
+
+	this->SetIcon(icon);
+	this->SetBackgroundColour(wxColour(255, 255, 255));
+
 	m_TopLevelSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_LeftSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -36,14 +42,14 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 	m_WriteCycleTimeST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Write Cycle Time (ms)"));
 	m_PollingCycleTimeST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Polling Cycle Time (ms)"));
 
-	m_RegisterAddrLengthCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_RegisterAddrLengthCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_RegisterAddrLengthCB->Append("1");
 	m_RegisterAddrLengthCB->Append("2");
 	m_RegisterAddrLengthCB->Append("3");
 	m_RegisterAddrLengthCB->Append("4");
 	m_RegisterAddrLengthCB->SetSelection(0);
 
-	m_MaxReadBytesCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_MaxReadBytesCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_MaxReadBytesCB->Append("1");
 	m_MaxReadBytesCB->Append("4");
 	m_MaxReadBytesCB->Append("8");
@@ -52,7 +58,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 	m_MaxReadBytesCB->Append("64");
 	m_MaxReadBytesCB->SetSelection(4);
 
-	m_MaxWriteBytesCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_MaxWriteBytesCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_MaxWriteBytesCB->Append("1");
 	m_MaxWriteBytesCB->Append("4");
 	m_MaxWriteBytesCB->Append("8");
@@ -61,7 +67,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 	m_MaxWriteBytesCB->Append("64");
 	m_MaxWriteBytesCB->SetSelection(4);
 
-	m_TrasmitTimeoutCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_TrasmitTimeoutCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_TrasmitTimeoutCB->Append("100");
 	m_TrasmitTimeoutCB->Append("200");
 	m_TrasmitTimeoutCB->Append("500");
@@ -70,7 +76,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 	m_TrasmitTimeoutCB->Append("2000");
 	m_TrasmitTimeoutCB->SetSelection(1);
 
-	m_WriteCycleTimeCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_WriteCycleTimeCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_WriteCycleTimeCB->Append("0");
 	m_WriteCycleTimeCB->Append("5");
 	m_WriteCycleTimeCB->Append("10");
@@ -79,7 +85,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 	m_WriteCycleTimeCB->Append("30");
 	m_WriteCycleTimeCB->SetSelection(2);
 
-	m_PollingCycleTimeCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""));
+	m_PollingCycleTimeCB = new wxComboBox(m_generalPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
 	m_PollingCycleTimeCB->Append("0");
 	m_PollingCycleTimeCB->Append("5");
 	m_PollingCycleTimeCB->Append("10");
@@ -111,10 +117,13 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID
 
 	m_generalNB->AddPage(m_generalPanel, wxT("General"));
 
-	m_OkButton = new wxButton(this, wxID_ANY, wxT("OK"));
-	m_CancelButton = new wxButton(this, wxID_ANY, wxT("Cancel"));
-	m_ComportButton = new wxButton(this, CID_COMPORT_BUTTOUN, wxT("Comport"));
-	m_USBSettingButton = new wxButton(this, wxID_ANY, wxT("Setting"));
+	m_OkButton = new wxButton(this, wxID_ANY, wxT("OK"), wxDefaultPosition, wxSize(80, -1));
+	m_CancelButton = new wxButton(this, wxID_ANY, wxT("Cancel"), wxDefaultPosition, wxSize(80, -1));
+	m_ComportButton = new wxButton(this, CID_COMPORT_BUTTOUN, wxT("Comport"), wxDefaultPosition, wxSize(80, -1));
+	m_ComportButton->SetBitmap(wxBITMAP_PNG(COMPLUG_16));
+
+	m_USBSettingButton = new wxButton(this, wxID_ANY, wxT("Setting"), wxDefaultPosition, wxSize(80, -1));
+	m_USBSettingButton->SetBitmap(wxBITMAP_PNG(USB_16));
 
 	m_ButtonSizer->Add(m_OkButton, wxSizerFlags().Align(wxCENTER).Border());
 	m_ButtonSizer->Add(m_CancelButton, wxSizerFlags().Align(wxCENTER).Border());
@@ -138,7 +147,11 @@ I2CInterfaceDialog::~I2CInterfaceDialog(){
 }
 
 void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	ComportDialog* comportDialog = new ComportDialog(this);
+	comportDialog->Centre();
+	comportDialog->ShowModal();
+
+	delete comportDialog;
 }
 
 wxBEGIN_EVENT_TABLE(I2CInterfaceDialog, wxDialog)

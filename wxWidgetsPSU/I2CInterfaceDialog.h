@@ -18,6 +18,7 @@
 #include "wx/notebook.h"
 
 #include "CommonDef.h"
+#include "ComportDialog.h"
 
 class I2CInterfaceDialog : public wxDialog
 {

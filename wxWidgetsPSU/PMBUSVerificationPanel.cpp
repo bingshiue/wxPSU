@@ -58,7 +58,7 @@ PMBUSVerificationPanel::PMBUSVerificationPanel(wxWindow* parent) : wxScrolledWin
 	m_loggingFileNameST = new wxStaticText(m_configurationSBS->GetStaticBox(), wxID_ANY, wxT("Logging File Name"));
 	m_loggingFileNameTC = new wxTextCtrl(m_configurationSBS->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(600, -1));
 
-	m_floppyLoadBB = new wxBitmapButton(m_configurationSBS->GetStaticBox(), wxID_ANY, wxBITMAP(FLOPPY_16));
+	m_floppyLoadBB = new wxBitmapButton(m_configurationSBS->GetStaticBox(), wxID_ANY, wxBITMAP_PNG(FLOPPY_16));
 
 	m_horizonBox2->Add(m_loggingFileNameST, wxSizerFlags().Border().Align(wxCENTER));
 	m_horizonBox2->Add(m_loggingFileNameTC, wxSizerFlags().Border().Align(wxCENTER));

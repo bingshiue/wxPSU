@@ -13,6 +13,8 @@ static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
+	wxInitAllImageHandlers();
+	
 	this->m_ioDeviceOpen = false;
 
 	// Reset AppSettings
@@ -52,8 +54,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_popupFontMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_FONT, wxT("Font"), wxT("Font"), wxITEM_NORMAL);
 	this->m_popupPrintScreenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_PRINT_SCREEN, wxT("Print Screen"), wxT("Print Screen"), wxITEM_NORMAL);
 
-	this->m_popupFontMenuItem->SetBitmap(wxBITMAP(FONT_16));
-	this->m_popupPrintScreenMenuItem->SetBitmap(wxBITMAP(PRINTSCREEN_16));
+	this->m_popupFontMenuItem->SetBitmap(wxBITMAP_PNG(FONT_16));
+	this->m_popupPrintScreenMenuItem->SetBitmap(wxBITMAP_PNG(PRINTSCREEN_16));
 
 	this->m_cmdListPopupMenu->Append(this->m_popupFontMenuItem);
 	this->m_cmdListPopupMenu->Append(this->m_popupPrintScreenMenuItem);
@@ -758,6 +760,8 @@ void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
 
 	wxFileDialog SaveCDMListDialog(this, L"Save To", "", dateStr, "TXT files (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
+	SaveCDMListDialog.Centre();
+
 	// If the user changed idea...
 	if (SaveCDMListDialog.ShowModal() == wxID_CANCEL){
 		return;
@@ -1022,14 +1026,16 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_optionMenu = new wxMenu();
 
-	this->m_AdministrantMenuItem = m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
+	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
 		wxT("Administrant"), wxITEM_NORMAL);
 
 	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
 	this->m_optionMenu->AppendSeparator();
 
-	this->m_I2CInterfaceMenuItem = m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
+	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
 		wxT("I2C Interface"), wxITEM_NORMAL);
+
+	this->m_I2CInterfaceMenuItem->SetBitmap(wxBITMAP_PNG(HWINFO_16));
 
 	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
 	this->m_optionMenu->AppendSeparator();

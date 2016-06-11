@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
+    <ClCompile Include="ComportDialog.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="I2CInterfaceDialog.cpp" />
     <ClCompile Include="main.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
+    <ClInclude Include="ComportDialog.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="IOAccess.h" />
