@@ -153,6 +153,9 @@
     <ClCompile Include="PMBUSMFRPanel.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PMBUSVerificationPanel.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -249,6 +252,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="PMBUSMFRPanel.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSVerificationPanel.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

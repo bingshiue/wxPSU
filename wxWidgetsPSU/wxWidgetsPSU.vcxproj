@@ -101,6 +101,7 @@
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
+    <ClCompile Include="PMBUSVerificationPanel.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="PMBUSStatusDCHPanel.h" />
     <ClInclude Include="PMBUSStatusPanel.h" />
     <ClInclude Include="PMBUSStatusBar.h" />
+    <ClInclude Include="PMBUSVerificationPanel.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />
     <ClInclude Include="IOPortSendCMDThread.h" />

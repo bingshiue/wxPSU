@@ -20,12 +20,12 @@ PMBUSMFRPanel::PMBUSMFRPanel(wxWindow* parent) : wxScrolledWindow(parent) {
 	m_buttonSizer->Add(m_readButton);
 	m_buttonSizer->Add(m_verifyButton);
 
-	m_sl = new wxStaticLine(this);
+	m_sl = new wxStaticLine(m_upSBS->GetStaticBox());
 
 	m_barCodeLabelSNSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	m_barCodeLabelSNST = new wxStaticText(this, wxID_ANY, wxT("Bar-Code Label S/N"), wxDefaultPosition, wxSize(300,-1));
-	m_barCodeLabelSNTC = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(500,-1));
+	m_barCodeLabelSNST = new wxStaticText(m_upSBS->GetStaticBox(), wxID_ANY, wxT("Bar-Code Label S/N"), wxDefaultPosition, wxSize(300, -1));
+	m_barCodeLabelSNTC = new wxTextCtrl(m_upSBS->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(500, -1));
 	m_barCodeLabelSNTC->SetBackgroundColour(wxColour(248, 220, 133));
 
 	m_barCodeLabelSNSizer->Add(m_barCodeLabelSNST);

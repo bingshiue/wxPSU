@@ -136,9 +136,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->PMBusMFRPanel = new PMBUSMFRPanel(m_notebook);
 
-	this->VerificationPanel = new wxPanel(m_notebook, wxID_ANY);
-
-	//this->STATUSPanel = new wxPanel(m_notebook, wxID_ANY);
+	this->PMBusVerificationPanel = new PMBUSVerificationPanel(m_notebook);
 
 	this->PMBusStatusDCHPanel = new PMBUSStatusDCHPanel(m_notebook);
 
@@ -146,7 +144,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_notebook->AddPage(this->GeneralPanel, "General");
 	m_notebook->AddPage(this->PMBusStatusPanel, "PM Bus Status");
 	m_notebook->AddPage(this->PMBusMFRPanel, "PMBus MFR");
-	m_notebook->AddPage(this->VerificationPanel, "Verification");
+	m_notebook->AddPage(this->PMBusVerificationPanel, "Verification");
 	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 
 	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
