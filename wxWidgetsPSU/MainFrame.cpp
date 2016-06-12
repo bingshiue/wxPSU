@@ -35,8 +35,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
 
 	// Load Bitmaps
-	this->m_monitorBitmap = new wxBitmap(wxT("MONITOR"), wxBITMAP_TYPE_BMP_RESOURCE);
-	this->m_pauseBitmap = new wxBitmap(wxT("PAUSE"), wxBITMAP_TYPE_BMP_RESOURCE);
+	this->m_monitorBitmap = new wxBitmap(wxT("MONITOR_32"), wxBITMAP_TYPE_PNG_RESOURCE);
+	this->m_pauseBitmap = new wxBitmap(wxT("PAUSE_32"), wxBITMAP_TYPE_PNG_RESOURCE);
+
+	this->m_monitor16Bitmap = new wxBitmap(wxT("MONITOR_16"), wxBITMAP_TYPE_PNG_RESOURCE);
+	this->m_pause16Bitmap = new wxBitmap(wxT("PAUSE_16"), wxBITMAP_TYPE_PNG_RESOURCE);
 
 	// Setup Icon
 	SetIcon(Acbel_xpm);
@@ -284,8 +287,8 @@ EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
 EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
 EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
 EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
+EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 
-EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_ATTR_CTRL, MainFrame::OnContextMenu)
@@ -802,6 +805,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_monitor_running = true;
 
 		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
+		this->m_monitorMenuItem->SetBitmap(*m_pause16Bitmap);
 		this->m_toolbar->Realize();
 
 		(this->m_status_bar->getTimer())->Start();
@@ -825,6 +829,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_monitor_running = false;
 
 		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
+		this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 		this->m_toolbar->Realize();
 
 		(this->m_status_bar->getTimer())->Stop();
@@ -897,7 +902,14 @@ void MainFrame::SetupMenuBar(void){
 	
 	this->m_fileMenu->AppendSubMenu(this->m_hexToBinMenu,wxT("Hex to Bin"),wxT("Transform Hex into Bin"));
 	this->m_fileMenu->AppendSeparator();
-	this->m_fileMenu->Append(wxID_EXIT);
+
+	this->m_exitMenuItem = new wxMenuItem((wxMenu*)0, wxID_EXIT, wxT("Exit"),
+		wxT("Exit"), wxITEM_NORMAL);
+
+	this->m_exitMenuItem->SetBitmap(wxBITMAP_PNG(EXIT_16));
+
+	this->m_fileMenu->Append(m_exitMenuItem);
+
 
 	// Run Menu
 	/*
@@ -919,17 +931,19 @@ void MainFrame::SetupMenuBar(void){
 	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, "&Monitor...\tCtrl-M",
 		"Start Monitor", wxITEM_NORMAL);
 
+	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
+
 	this->m_runMenu->Append(this->m_monitorMenuItem);
 
 	this->m_inSystemProgrammingMenu = new wxMenu();
 
 	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("&Update Secondary Firmware...\tCtrl-U"), "Update Secnondary Firmware", wxITEM_NORMAL);
 
-	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP(UPGRADE_16));
+	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
 	this->m_inSystemProgrammingMenu->Append(m_updateSecondaryFirmwareMenuItem);
 
-	this->m_runMenu->AppendSubMenu(this->m_inSystemProgrammingMenu, wxT("In System Prpgramming"), wxT("In System Programming"));
+	this->m_runMenu->AppendSubMenu(this->m_inSystemProgrammingMenu, wxT("In System Programming"), wxT("In System Programming"));
 
 	this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, false);
 
@@ -952,17 +966,17 @@ void MainFrame::SetupMenuBar(void){
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"),
 		wxT("Clear Error Log"), wxITEM_NORMAL);
 
-	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP(CLEAR_16));
+	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
 
 	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"),
 		wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
 
-	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP(REFRESH2_16));
+	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP_PNG(REFRESH_16));
 
 	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"),
 		wxT("Reset Run Time"), wxITEM_NORMAL);
 
-	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP(REFRESH_16));
+	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP_PNG(TIMER_16));
 
 	this->m_runMenu->Append(this->m_ClearErrorLogMenuItem);
 	this->m_runMenu->Append(this->m_ResetMaxMinValueMenuItem);
@@ -981,12 +995,12 @@ void MainFrame::SetupMenuBar(void){
 	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"),
 		wxT("Enable Calibration"), wxITEM_NORMAL);
 
-	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP(ENABLE_16));
+	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(ENABLE_16));
 
 	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"),
 		wxT("Disable Calibration"), wxITEM_NORMAL);
 
-	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP(DISEABLE_16));
+	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(DISABLE_16));
 
 	this->m_psuMenu->Append(m_EnableCalibrationMenuItem);
 	this->m_psuMenu->Append(m_DisableCalibrationMenuItem);
@@ -995,6 +1009,8 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"),
 		wxT("Calibration Setting"), wxITEM_NORMAL);
+
+	this->m_CalibrationMenuItem->SetBitmap(wxBITMAP_PNG(CALIBRATION_16));
 
 	this->m_psuMenu->Append(m_CalibrationMenuItem);
 
@@ -1028,6 +1044,8 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
 		wxT("Administrant"), wxITEM_NORMAL);
+
+	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
 
 	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
 	this->m_optionMenu->AppendSeparator();
@@ -1118,7 +1136,13 @@ void MainFrame::SetupMenuBar(void){
 	|- About
 	*/
 	this->m_helpMenu = new wxMenu();
-	this->m_helpMenu->Append(wxID_ABOUT);
+
+	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"),
+		wxT("About"), wxITEM_NORMAL);
+
+	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
+
+	this->m_helpMenu->Append(this->m_aboutMenuItem);
 
 	// Create MenuBar Instance
 	this->m_menuBar = new wxMenuBar();
@@ -1142,22 +1166,22 @@ void MainFrame::SetupToolBar(void){
 	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
 
 	// Append Exit Button
-	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP(EXIT), wxT("Exit Program"), wxITEM_NORMAL);
+	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP_PNG(EXIT_32), wxT("Exit Program"), wxITEM_NORMAL);
 
 	// Append Monitor Button
 	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
 
 	// Append Enable Calibration Button
-	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP(ENABLE), wxT("Enable Calibration"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP_PNG(ENABLE_32), wxT("Enable Calibration"), wxITEM_NORMAL);
 
 	// Append Reset Run Time Button
-	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, wxBITMAP(REFRESH), wxT("Reset Run Time"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, wxBITMAP_PNG(TIMER_32), wxT("Reset Run Time"), wxITEM_NORMAL);
 
 	// Append Refresh MAX/MIN Button
-	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, wxBITMAP(REFRESH2), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, wxBITMAP_PNG(REFRESH_32), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
 
 	// Append Clear Error Log Button 
-	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, wxBITMAP(CLEAR), wxT("Clear Error Log"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, wxBITMAP_PNG(CLEAR_32), wxT("Clear Error Log"), wxITEM_NORMAL);
 
 	// Append Separator
 	m_toolbar->AddSeparator();
@@ -1570,6 +1594,7 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 	this->m_monitor_running = false;
 
 	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
+	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 	this->m_toolbar->Realize();
 
 	(this->m_status_bar->getTimer())->Stop();

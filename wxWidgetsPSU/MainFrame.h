@@ -76,6 +76,8 @@ enum
 	MENU_ID_PMBUS_1_1,
 	MENU_ID_PMBUS_1_2,
 
+	MENU_ID_ABOUT,
+
 	MENU_ID_POPUP_FONT,
 	MENU_ID_POPUP_PRINT_SCREEN,
 
@@ -132,6 +134,9 @@ public:
 	wxBitmap *m_monitorBitmap;
 	wxBitmap *m_pauseBitmap;
 
+	wxBitmap *m_monitor16Bitmap;
+	wxBitmap *m_pause16Bitmap;
+
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
 	wxSizer* m_hbox;/**< Horizontal Sizer */
@@ -186,7 +191,8 @@ public:
 	wxMenu      *m_fileMenu;
 	
 	wxMenu      *m_hexToBinMenu;
-	
+	wxMenuItem  *m_exitMenuItem;
+
 	wxMenu      *m_runMenu;
 
 	wxMenuItem  *m_monitorMenuItem;
@@ -228,6 +234,8 @@ public:
 	wxMenuItem  *m_pmBus12MenuItem;
 
 	wxMenu      *m_helpMenu;
+
+	wxMenuItem  *m_aboutMenuItem;
 
 	// CMD List Popup Menu
 	wxMenu      *m_cmdListPopupMenu;

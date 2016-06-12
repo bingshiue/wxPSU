@@ -126,7 +126,7 @@ public:
 		XPM_red = 0,
 		XPM_green,
 		XPM_yellow,
-		XPM_gray
+		XPM_grey
 	};
 
 	PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand);

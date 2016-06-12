@@ -21,6 +21,7 @@ static int my_sort(int *v1, int *v2)
 	return *v1 - *v2;
 }
 
+#define USE_PNG
 #define INITIAL_NUMBER_OF_ITEMS  (PMBUSCOMMAND_SIZE)
 
 PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
@@ -92,11 +93,27 @@ PSUDataViewListModel::PSUDataViewListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDat
 		m_rawColValues.push_back(wxT(""));
 	}
 
+#ifdef USE_PNG
 	// Setup Icon
-	m_icon[XPM_red]    = wxIcon(red_xpm);
-	m_icon[XPM_green]  = wxIcon(green_xpm);
+	m_icon[XPM_red].CopyFromBitmap(wxBITMAP_PNG(STATUS_RED));    //= wxIcon(red_xpm);
+
+	m_icon[XPM_green].CopyFromBitmap(wxBITMAP_PNG(STATUS_GREEN));  //= wxIcon(green_xpm);
+
+	m_icon[XPM_yellow].CopyFromBitmap(wxBITMAP_PNG(STATUS_YELLOW)); //= wxIcon(yellow_xpm);
+
+	m_icon[XPM_grey].CopyFromBitmap(wxBITMAP_PNG(STATUS_GREY)); //= wxIcon(gray_xpm);
+
+#else
+	// Setup Icon
+	m_icon[XPM_red] = wxIcon(red_xpm);
+
+	m_icon[XPM_green] = wxIcon(green_xpm);
+
 	m_icon[XPM_yellow] = wxIcon(yellow_xpm);
-	m_icon[XPM_gray]   = wxIcon(gray_xpm);
+
+	m_icon[XPM_grey] = wxIcon(gray_xpm);
+
+#endif
 
 	// Save PMBus Command Handle
 	m_pmBusCommand = pmBusCommand;
@@ -195,7 +212,7 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 					variant << wxDataViewIconText(text, m_icon[XPM_red]);
 				}
 				else{
-					variant << wxDataViewIconText(text, m_icon[XPM_gray]);
+					variant << wxDataViewIconText(text, m_icon[XPM_grey]);
 				}
 				break;
 
@@ -219,7 +236,7 @@ void PSUDataViewListModel::GetValueByRow(wxVariant &variant,unsigned int row, un
 			}
 		}
 		else{
-			variant << wxDataViewIconText(text, m_icon[XPM_gray]);
+			variant << wxDataViewIconText(text, m_icon[XPM_grey]);
 		}
 
 	}

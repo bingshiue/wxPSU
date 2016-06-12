@@ -7,6 +7,11 @@
 
 AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About")), wxDefaultPosition, wxSize(300, 300))
 {
+	wxIcon icon;
+	icon.CopyFromBitmap(wxBITMAP_PNG(ABOUT_16));
+
+	this->SetIcon(icon);
+	
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 
 	m_acbelLogoSB = new wxStaticBitmap(this, wxID_ANY, wxBitmap(Acbel_large_xpm));
