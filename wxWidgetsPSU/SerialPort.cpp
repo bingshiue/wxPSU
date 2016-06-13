@@ -544,7 +544,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 					}
 					else{// if (ReadFileStatus == 0)
-						PSU_DEBUG_PRINT(MSG_ALERT, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						if (NoBytesRead == 0){
 							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
 							break; // break while (i < bytesToRead);

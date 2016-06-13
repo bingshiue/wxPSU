@@ -14,6 +14,8 @@ static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
 	wxInitAllImageHandlers();
+
+	CheckConfig();
 	
 	this->m_ioDeviceOpen = false;
 
@@ -1647,4 +1649,25 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	}
 
 	return EXIT_SUCCESS;
+}
+
+void MainFrame::CheckConfig(void){
+	
+wxConfigBase::
+
+	wxConfigBase::Set(new wxFileConfig(wxT(""), wxT(""), wxT("psu.ini"), wxT(""), wxCONFIG_USE_RELATIVE_PATH));
+
+	wxConfigBase *pConfig = wxConfigBase::Get();
+
+	//pConfig->DeleteAll();
+
+	pConfig->SetPath(wxT("/Controls"));
+
+	//bool bFirstRunChecked = false;
+	//pConfig->Read(wxT("FirstRun"), &bFirstRunChecked);
+
+	//PSU_DEBUG_PRINT(MSG_ALERT, "bFirstRunChecked=%d", bFirstRunChecked);
+	
+
+	pConfig->Write(wxT("FirstRun"), true);
 }

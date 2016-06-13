@@ -34,14 +34,21 @@
 #include "wx/headerctrl.h"
 #include "wx/generic/gridctrl.h"
 #include "wx/generic/grideditors.h"
+#include "wx/config.h"
+#include "wx/fileconf.h"
 
-class MyApp : public wxApp
+class WXPSU : public wxApp
 {
 public:
 	/**
 	 * @brief OnInit.
 	 */
 	virtual bool OnInit() wxOVERRIDE;
+
+	/**
+	 * @brief OnExit.
+	 */
+	virtual int OnExit() wxOVERRIDE;
 };
 
 
