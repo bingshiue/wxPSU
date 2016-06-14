@@ -24,7 +24,8 @@ class I2CInterfaceDialog : public wxDialog
 {
 public:
 	enum {
-		CID_COMPORT_BUTTOUN = 7001,
+		CID_OK_BUTTOUN      = 7001,
+		CID_COMPORT_BUTTOUN,
 	};
 
 	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings);
@@ -69,6 +70,7 @@ public:
 
 private:
 
+	void OnOKButton(wxCommandEvent& event);
 	void OnComportButton(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();

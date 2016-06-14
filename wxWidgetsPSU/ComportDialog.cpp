@@ -31,55 +31,134 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 	m_DataBitsST = new wxStaticText(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT("Data Bits"));
 	m_StopBitsST = new wxStaticText(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT("Stop Bits"));
 
+	// Comport Number
 	m_ComportNumberCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1));
-	m_ComportNumberCB->Append("1");
-	m_ComportNumberCB->Append("2");
-	m_ComportNumberCB->Append("3");
-	m_ComportNumberCB->Append("4");
-	m_ComportNumberCB->Append("5");
-	m_ComportNumberCB->Append("6");
-	m_ComportNumberCB->Append("7");
-	m_ComportNumberCB->Append("8");
-	m_ComportNumberCB->SetSelection(0);
 
+	unsigned long comportNumberArray[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+		m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray[idx]));
+	}
+
+	unsigned int select = 0;
+	for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+		if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray[idx]){
+			select = idx;
+			break;
+		}
+	}
+
+	m_ComportNumberCB->SetSelection(select);
+
+	// Buad Rate
 	m_BuadRateCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
-	m_BuadRateCB->Append("110");
-	m_BuadRateCB->Append("300");
-	m_BuadRateCB->Append("600");
-	m_BuadRateCB->Append("1200");
-	m_BuadRateCB->Append("2400");
-	m_BuadRateCB->Append("4800");
-	m_BuadRateCB->Append("9600");
-	m_BuadRateCB->Append("11400");
-	m_BuadRateCB->Append("19200");
-	m_BuadRateCB->Append("38400");
-	m_BuadRateCB->Append("56000");
-	m_BuadRateCB->Append("57600");
-	m_BuadRateCB->Append("115200");
-	m_BuadRateCB->SetSelection(6);
 
+	typedef struct {
+		         char *m_label;
+		unsigned long  m_value;
+	} BuadRateArray;
 
+	BuadRateArray buadRatedArray[13] = {
+		{ "110" ,   110    },
+		{ "300",    300    },
+		{ "600",    600    },
+		{ "1200",   1200   },
+		{ "2400",   2400   },
+		{ "4800",   4800   },
+		{ "9600",   9600   },
+		{ "11400",  11400  },
+		{ "19200",  19200  },
+		{ "38400",  38400  },
+		{ "56000",  56000  },
+		{ "57600",  57600  },
+		{ "115200", 115200 }
+	};
+
+	for (unsigned int idx = 0; idx < sizeof(buadRatedArray) / sizeof(buadRatedArray[0]); idx++){
+		m_BuadRateCB->Append(buadRatedArray[idx].m_label);
+	}
+
+	for (unsigned int idx = 0; idx < sizeof(buadRatedArray) / sizeof(buadRatedArray[0]); idx++){
+		if (this->m_appSettings->m_comportSetting.m_buadRate == buadRatedArray[idx].m_value){
+			select = idx;
+			break;
+		}
+	}
+
+	m_BuadRateCB->SetSelection(select);
+
+	// Parity Check
 	m_ParityCheckCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
-	m_ParityCheckCB->Append("N");
-	m_ParityCheckCB->Append("O");
-	m_ParityCheckCB->Append("E");
-	m_ParityCheckCB->Append("M");
-	m_ParityCheckCB->Append("S");
-	m_ParityCheckCB->SetSelection(0);
 
+	typedef struct {
+		         char *m_label;
+		unsigned long  m_value;
+	} ParityCheckArray;
 
+	ParityCheckArray parityCheckArray[5] = {
+		{ "N", 0 },
+		{ "O", 1 },
+		{ "E", 2 },
+		{ "M", 3 },
+		{ "S", 4 }
+	};
+
+	for (unsigned int idx = 0; idx < sizeof(parityCheckArray) / sizeof(parityCheckArray[0]); idx++){
+		m_ParityCheckCB->Append(parityCheckArray[idx].m_label);
+	}
+
+	for (unsigned int idx = 0; idx < sizeof(parityCheckArray) / sizeof(parityCheckArray[0]); idx++){
+		if (this->m_appSettings->m_comportSetting.m_parityCheck == parityCheckArray[idx].m_value){
+			select = idx;
+			break;
+		}
+	}
+
+	m_ParityCheckCB->SetSelection(select);
+
+	// Data Bits
 	m_DataBitsCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
-	m_DataBitsCB->Append("5");
-	m_DataBitsCB->Append("6");
-	m_DataBitsCB->Append("7");
-	m_DataBitsCB->Append("8");
-	m_DataBitsCB->SetSelection(3);
 
+	unsigned long dataBitsArray[4] = { 5, 6, 7, 8 };
+
+	for (unsigned int idx = 0; idx < sizeof(dataBitsArray) / sizeof(dataBitsArray[0]); idx++){
+		m_DataBitsCB->Append(wxString::Format("%d", dataBitsArray[idx]));
+	}
+
+	for (unsigned int idx = 0; idx < sizeof(dataBitsArray) / sizeof(dataBitsArray[0]); idx++){
+		if (this->m_appSettings->m_comportSetting.m_byteSize == dataBitsArray[idx]){
+			select = idx;
+			break;
+		}
+	}
+
+	m_DataBitsCB->SetSelection(select);
+
+	// Stop Bits 
 	m_StopBitsCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));
-	m_StopBitsCB->Append("1");
-	m_StopBitsCB->Append("1.5");
-	m_StopBitsCB->Append("2");
-	m_StopBitsCB->SetSelection(0);
+
+	typedef struct {
+		         char *m_label;
+		unsigned long  m_value;
+	} StopBitsArray;
+
+	StopBitsArray stopBitsArray[3] = {
+		{ "1",   0 },
+		{ "1.5", 1 },
+		{ "2",   2 },
+	};
+
+	for (unsigned int idx = 0; idx < sizeof(stopBitsArray) / sizeof(stopBitsArray[0]); idx++){
+		m_StopBitsCB->Append(stopBitsArray[idx].m_label);
+	}
+
+	for (unsigned int idx = 0; idx < sizeof(stopBitsArray) / sizeof(stopBitsArray[0]); idx++){
+		if (this->m_appSettings->m_comportSetting.m_stopBits== stopBitsArray[idx].m_value){
+			select = idx;
+			break;
+		}
+	}
+
+	m_StopBitsCB->SetSelection(select);
 
 	m_SettingFGS->Add(m_ComportNumberST, wxSizerFlags().Align(wxCENTER).Border());
 	m_SettingFGS->Add(m_ComportNumberCB, wxSizerFlags().Align(wxCENTER).Border());
