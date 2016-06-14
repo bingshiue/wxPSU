@@ -1653,8 +1653,6 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 
 void MainFrame::CheckConfig(void){
 	
-wxConfigBase::
-
 	wxConfigBase::Set(new wxFileConfig(wxT(""), wxT(""), wxT("psu.ini"), wxT(""), wxCONFIG_USE_RELATIVE_PATH));
 
 	wxConfigBase *pConfig = wxConfigBase::Get();
