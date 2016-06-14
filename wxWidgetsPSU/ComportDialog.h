@@ -18,6 +18,8 @@
 #include "wx/notebook.h"
 
 #include "CommonDef.h"
+#include "IOAccess.h"
+#include "AppSettings.h"
 
 class ComportDialog : public wxDialog {
 public:
@@ -26,11 +28,13 @@ public:
 		CID_OK_BUTTOUN = 7051,
 	};
 
-	ComportDialog(wxWindow *parent);
+	ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings);
 
 	~ComportDialog();
 
 	wxWindow *m_parent;
+	IOACCESS *m_ioaccess;
+	AppSettings_t *m_appSettings;
 
 	wxBoxSizer *m_TopLevelSizer;
 

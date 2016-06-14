@@ -27,9 +27,12 @@ public:
 		CID_COMPORT_BUTTOUN = 7001,
 	};
 
-	I2CInterfaceDialog(wxWindow *parent);
+	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings);
 
 	~I2CInterfaceDialog();
+
+	IOACCESS *m_ioaccess;
+	AppSettings_t *m_appSettings;
 
 	wxBoxSizer *m_TopLevelSizer;
 	wxBoxSizer *m_LeftSizer;

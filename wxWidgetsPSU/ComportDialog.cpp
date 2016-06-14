@@ -4,7 +4,7 @@
 
 #include "ComportDialog.h"
 
-ComportDialog::ComportDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("Com Port"))) {
+ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings) : wxDialog(parent, wxID_ANY, wxString(wxT("Com Port"))) {
 
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(COMPLUG_16));
@@ -13,6 +13,8 @@ ComportDialog::ComportDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxSt
 	this->SetBackgroundColour(wxColour(255, 255, 255));
 
 	m_parent = parent;
+	m_ioaccess = ioaccess;
+	m_appSettings = appSettings;
 
 	m_TopLevelSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -125,7 +127,118 @@ ComportDialog::~ComportDialog(){
 }
 
 void ComportDialog::OnOKButton(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	int select = 0;
+	
+	// Comport Number
+	this->m_appSettings->m_comportSetting.m_comportNumber = wxAtoi(m_ComportNumberCB->GetValue());
+
+	// BuadRate
+	select = m_BuadRateCB->GetSelection();
+
+	switch (select){
+
+	case 0:// "110"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_110;
+		break;
+	case 1:// "300"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_300;
+		break;
+	case 2:// "600"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_600;
+		break;
+	case 3:// "1200"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_1200;
+		break;
+	case 4:// "2400"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_2400;
+		break;
+	case 5:// "4800"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_4800;
+		break;
+	case 6:// "9600"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_9600;
+		break;
+	case 7:// "11400"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_14400;
+		break;
+	case 8:// "19200"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_19200;
+		break;
+	case 9:// "38400"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_38400;
+		break;
+	case 10://"56000"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_56000;
+		break;
+	case 11://"57600"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_57600;
+		break;
+	case 12://"115200"
+		this->m_appSettings->m_comportSetting.m_buadRate = CBR_115200;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+	// Byte Size
+	this->m_appSettings->m_comportSetting.m_byteSize = wxAtoi(m_DataBitsCB->GetValue());
+
+	// Stop Bits
+	select = m_StopBitsCB->GetSelection();
+
+	switch (select){
+	case 0 :// "1"
+		this->m_appSettings->m_comportSetting.m_stopBits = ONESTOPBIT;
+		break;
+
+	case 1: // "1.5"
+		this->m_appSettings->m_comportSetting.m_stopBits = ONE5STOPBITS;
+
+		break;
+
+	case 2: // "2"
+		this->m_appSettings->m_comportSetting.m_stopBits = TWOSTOPBITS;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+	// Parity Size
+	select = m_ParityCheckCB->GetSelection();
+
+	switch (select){
+
+	case 0: // "N"
+		this->m_appSettings->m_comportSetting.m_parityCheck = NOPARITY;
+		break;
+
+	case 1: // "O"
+		this->m_appSettings->m_comportSetting.m_parityCheck = ODDPARITY;
+		break;
+
+	case 2: // "E"
+		this->m_appSettings->m_comportSetting.m_parityCheck = EVENPARITY;
+		break;
+
+	case 3: // "M"
+		this->m_appSettings->m_comportSetting.m_parityCheck = MARKPARITY;
+		break;
+
+	case 4: //"S"
+		this->m_appSettings->m_comportSetting.m_parityCheck = SPACEPARITY;
+		break;
+
+	default :
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+	this->EndModal(0);
 }
 
 wxBEGIN_EVENT_TABLE(ComportDialog, wxDialog)

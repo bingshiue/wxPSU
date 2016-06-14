@@ -641,10 +641,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 				if (this->m_appSettings->m_runMode == RunMode_Iterations){
 
-					this->m_appSettings->m_IterationsSettingValue = wxAtoi(this->m_pHandler->m_iteration_input->GetValue());
+					this->m_appSettings->m_IterationsValue = wxAtoi(this->m_pHandler->m_iteration_input->GetValue());
 
-					if (iteration >= this->m_appSettings->m_IterationsSettingValue){
-						PSU_DEBUG_PRINT(MSG_ALERT, "IterationsSettingValue : %d, iteration : %d", this->m_appSettings->m_IterationsSettingValue, iteration);
+					if (iteration >= this->m_appSettings->m_IterationsValue){
+						PSU_DEBUG_PRINT(MSG_ALERT, "IterationsSettingValue : %d, iteration : %d", this->m_appSettings->m_IterationsValue, iteration);
 						this->m_running = false;
 						break;// for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++) 
 					}

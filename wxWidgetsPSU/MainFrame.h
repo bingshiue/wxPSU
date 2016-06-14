@@ -361,7 +361,9 @@ private:
 
 	int SaveCMDListToFile(wxTextOutputStream& textOutputStream);
 
-	void CheckConfig(void);
+	void CheckAndLoadConfig(void);
+
+	void SaveConfig(void);
 
 	wxDECLARE_EVENT_TABLE();
 

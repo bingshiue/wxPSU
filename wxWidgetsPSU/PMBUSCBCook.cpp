@@ -1929,9 +1929,9 @@ int Cook_f1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	//B6 - F1 - 04 - [1] [2] [3] [4] [pec] : PRI : [1].[2], SEC : [3].[4]
 	wxString wxstr("FW Ver. PRI : ");
 
-	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[0], pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[1], pmbuscmd->m_recvBuff.m_dataBuff[2]);
 
-	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[2], pmbuscmd->m_recvBuff.m_dataBuff[3]);
+	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

@@ -15,12 +15,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {	
 	wxInitAllImageHandlers();
 
-	CheckConfig();
-	
+	CheckAndLoadConfig();
+
 	this->m_ioDeviceOpen = false;
 
 	// Reset AppSettings
-	this->m_appSettings.Reset();
+	//this->m_appSettings.Reset();
 
 	// Setup IO Structure
 	this->DoSetupIOAccess();
@@ -306,6 +306,9 @@ wxEND_EVENT_TABLE()
 MainFrame::~MainFrame()
 {		
 	wxLog::SetActiveTarget(m_oldLogger);
+
+	// Save Config
+	this->SaveConfig();
 }
 
 void MainFrame::SetupPMBusCommandData(void){
@@ -690,7 +693,7 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CInterface(wxCommandEvent& event){
-	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this);
+	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_appSettings);
 	i2cIFDialog->Centre();
 	i2cIFDialog->ShowModal();
 
@@ -704,6 +707,8 @@ void MainFrame::OnContinually(wxCommandEvent& event){
 	this->m_iterationsMenuItem->Check(false);
 	this->m_stopAnErrorMenuItem->Check(false);
 
+	this->m_iteration_input->Disable();
+
 	this->m_status_bar->SetStatusText(wxT("Continually"), PMBUSStatusBar::Field_Run_Mode);
 }
 
@@ -714,6 +719,8 @@ void MainFrame::OnIterations(wxCommandEvent& event){
 	this->m_iterationsMenuItem->Check(true);
 	this->m_stopAnErrorMenuItem->Check(false);
 
+	this->m_iteration_input->Enable();
+
 	this->m_status_bar->SetStatusText(wxT("Iterations"), PMBUSStatusBar::Field_Run_Mode);
 }
 
@@ -723,6 +730,8 @@ void MainFrame::OnStopAnError(wxCommandEvent& event){
 	this->m_continuallyMenuItem->Check(false);
 	this->m_iterationsMenuItem->Check(false);
 	this->m_stopAnErrorMenuItem->Check(true);
+
+	this->m_iteration_input->Disable();
 
 	this->m_status_bar->SetStatusText(wxT("Stop An Error"), PMBUSStatusBar::Field_Run_Mode);
 }
@@ -1192,7 +1201,7 @@ void MainFrame::SetupToolBar(void){
 	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
 	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
 
-	wxString iterations_times = wxString::Format("%d",this->m_appSettings.m_IterationsSettingValue);
+	wxString iterations_times = wxString::Format("%d",this->m_appSettings.m_IterationsValue);
 
 	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
 	m_iteration_input->SetValue(iterations_times);
@@ -1202,6 +1211,10 @@ void MainFrame::SetupToolBar(void){
 	numberValidator.SetCharIncludes(wxT("0123456789"));
 
 	m_iteration_input->SetValidator(numberValidator);
+
+	if (this->m_iterationsMenuItem->IsChecked() == false){
+		m_iteration_input->Disable();
+	}
 
 	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
 
@@ -1651,21 +1664,145 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	return EXIT_SUCCESS;
 }
 
-void MainFrame::CheckConfig(void){
+void MainFrame::CheckAndLoadConfig(void){
 	
 	wxConfigBase::Set(new wxFileConfig(wxT(""), wxT(""), wxT("psu.ini"), wxT(""), wxCONFIG_USE_RELATIVE_PATH));
 
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
-	//pConfig->DeleteAll();
-
-	pConfig->SetPath(wxT("/Controls"));
-
-	//bool bFirstRunChecked = false;
-	//pConfig->Read(wxT("FirstRun"), &bFirstRunChecked);
-
-	//PSU_DEBUG_PRINT(MSG_ALERT, "bFirstRunChecked=%d", bFirstRunChecked);
+	pConfig->SetPath(wxT("/APP"));
 	
+	// I2C Slave Address
+	long i2cSlaveAddr;
+	if (pConfig->Read(wxT("I2CSlaveAddress"), &i2cSlaveAddr) == false){
+		pConfig->Write(wxT("I2CSlaveAddress"), DEFAULT_I2C_SLAVEADDRESS);
+		this->m_appSettings.m_I2CSlaveAddress = DEFAULT_I2C_SLAVEADDRESS;
+	}
+	else{
+		this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
+	}
 
-	pConfig->Write(wxT("FirstRun"), true);
+	// Run Mode
+	long runMode;
+	if (pConfig->Read(wxT("RunMode"), &runMode) == false){
+		pConfig->Write(wxT("RunMode"), DEFAULT_RUN_MODE);
+		this->m_appSettings.m_runMode = DEFAULT_RUN_MODE;
+	}
+	else{
+		this->m_appSettings.m_runMode = runMode;
+	}
+
+	// Iterations
+	long iterationsValue;
+	if (pConfig->Read(wxT("Iterations"), &iterationsValue) == false){
+		pConfig->Write(wxT("Iterations"), DEFAULT_ITERATIONS_VALUE);
+		this->m_appSettings.m_IterationsValue = DEFAULT_ITERATIONS_VALUE;
+	}
+	else{
+		this->m_appSettings.m_IterationsValue = iterationsValue;
+	}
+
+	pConfig->SetPath(wxT("/COMPORT"));
+
+	// Comport Number
+	long comportNumber;
+	if (pConfig->Read(wxT("NUMBER"), &comportNumber) == false){
+		pConfig->Write(wxT("NUMBER"), DEFAULT_COMPORT_NUM);
+		this->m_appSettings.m_comportSetting.m_comportNumber = DEFAULT_COMPORT_NUM;
+	}
+	else{
+		this->m_appSettings.m_comportSetting.m_comportNumber = comportNumber;
+	}
+
+	// Buad Rate
+	long buadRate;
+	if (pConfig->Read(wxT("BUADRATE"), &buadRate) == false){
+		pConfig->Write(wxT("BUADRATE"), DEFAULT_COMPORT_BUADRATE);
+		this->m_appSettings.m_comportSetting.m_buadRate = DEFAULT_COMPORT_BUADRATE;
+	}
+	else{
+		this->m_appSettings.m_comportSetting.m_buadRate = buadRate;
+	}
+
+	// Byte Size
+	long byteSize;
+	if (pConfig->Read(wxT("BYTESIZE"), &byteSize) == false){
+		pConfig->Write(wxT("BYTESIZE"), DEFAULT_COMPORT_BYTESIZE);
+		this->m_appSettings.m_comportSetting.m_byteSize = DEFAULT_COMPORT_BYTESIZE;
+	}
+	else{
+		this->m_appSettings.m_comportSetting.m_byteSize = byteSize;
+	}
+
+	// Stop Bits
+	long stopBits;
+	if (pConfig->Read(wxT("STOPBITS"), &stopBits) == false){
+		pConfig->Write(wxT("STOPBITS"), DEFAULT_COMPORT_STOPBITS);
+		this->m_appSettings.m_comportSetting.m_stopBits = DEFAULT_COMPORT_STOPBITS;
+	}
+	else{
+		this->m_appSettings.m_comportSetting.m_stopBits = stopBits;
+	}
+
+	// Parity Check
+	long parityCheck;
+	if (pConfig->Read(wxT("PARITYCHECK"), &parityCheck) == false){
+		pConfig->Write(wxT("PARITYCHECK"), DEFAULT_COMPORT_PARITYCHECK);
+		this->m_appSettings.m_comportSetting.m_parityCheck = DEFAULT_COMPORT_PARITYCHECK;
+	}
+	else{
+		this->m_appSettings.m_comportSetting.m_parityCheck = parityCheck;
+	}
+
+	pConfig->SetPath(wxT("/MISC"));
+	
+	bool firstRun;
+	if (pConfig->Read(wxT("First"), &firstRun) == false){
+		pConfig->Write(wxT("FirstRun"), true);
+		#if 0
+		wxMessageBox(
+		wxT("This is The Fisrt Time You Run This Program \n")
+		wxT(""), wxT("INFORMATION"),
+		wxICON_INFORMATION | wxOK);
+		#endif
+	}
+}
+
+void MainFrame::SaveConfig(void){
+
+	wxConfigBase *pConfig = wxConfigBase::Get();
+
+	if (pConfig==NULL) return;
+
+	pConfig->SetPath(wxT("/APP"));
+
+	// I2C Slave Address
+	pConfig->Write(wxT("I2CSlaveAddress"), wxAtoi(this->m_address_input->GetValue()));
+
+	// Run Mode
+	pConfig->Write(wxT("RunMode"), this->m_appSettings.m_runMode);
+
+	// Iterations
+	pConfig->Write(wxT("Iterations"), this->m_appSettings.m_IterationsValue);
+
+	pConfig->SetPath(wxT("/COMPORT"));
+
+	// Comport Number
+	pConfig->Write(wxT("NUMBER"), this->m_appSettings.m_comportSetting.m_comportNumber);
+
+	// Buad Rate
+	pConfig->Write(wxT("BUADRATE"), this->m_appSettings.m_comportSetting.m_buadRate);
+
+	// Byte Size
+	pConfig->Write(wxT("BYTESIZE"), this->m_appSettings.m_comportSetting.m_byteSize);
+
+	// Stop Bits
+	pConfig->Write(wxT("STOPBITS"), this->m_appSettings.m_comportSetting.m_stopBits);
+
+	// Parity Check
+	pConfig->Write(wxT("PARITYCHECK"), this->m_appSettings.m_comportSetting.m_parityCheck);
+
+	// Delete wxConfig Object
+	delete wxConfigBase::Set((wxConfigBase *)NULL);
+
 }

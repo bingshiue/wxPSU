@@ -4,13 +4,16 @@
 
 #include "I2CInterfaceDialog.h"
 
-I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
+I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
 	
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
 
 	this->SetIcon(icon);
 	this->SetBackgroundColour(wxColour(255, 255, 255));
+
+	m_ioaccess = ioaccess;
+	m_appSettings = appSettings;
 
 	m_TopLevelSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_LeftSizer = new wxBoxSizer(wxVERTICAL);
@@ -147,7 +150,7 @@ I2CInterfaceDialog::~I2CInterfaceDialog(){
 }
 
 void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
-	ComportDialog* comportDialog = new ComportDialog(this);
+	ComportDialog* comportDialog = new ComportDialog(this, this->m_ioaccess, this->m_appSettings);
 	comportDialog->Centre();
 	comportDialog->ShowModal();
 
