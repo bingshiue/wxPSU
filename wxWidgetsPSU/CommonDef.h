@@ -33,9 +33,15 @@ enum DEBUG_MSG_LEVEL {
 #define DEFAULT_DEBUG_MSG_LEVEL  MSG_ALERT /**< Default Debug Message Level */
 
 #ifdef PSU_DEBUG_MSG
+#ifdef _DEBUG
 #define PSU_DEBUG_PRINT(level,fmt, ...)  \
 		if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
-			wxLogMessage("%s():"fmt,__FUNCTIONW__,## __VA_ARGS__);
+			wxLogMessage("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);
+#else
+#define PSU_DEBUG_PRINT(level,fmt, ...)  \
+		if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
+			wxLogMessage(fmt,__VA_ARGS__);
+#endif
 #else
 #define PSU_DEBUG_PRINT(fmt, ...)  \
 		while(0) ;

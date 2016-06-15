@@ -5,7 +5,16 @@
 #include "math.h"
 #include "PMBUSHelper.h"
 
+unsigned char PMBUSHelper::m_slaveAddress;
 PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
+
+void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
+	m_slaveAddress = slaveAddress;
+}
+
+unsigned char& PMBUSHelper::GetSlaveAddress(void){
+	return m_slaveAddress;
+}
 
 PMBUSSTATUS_t* PMBUSHelper::GetPMBusStatus(void){
 	return &m_pmbusStatus;

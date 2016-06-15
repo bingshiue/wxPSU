@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "CommonDef.h"
+#include "PMBUSHelper.h"
 #include "HID.h"
 
 #define READ_OPERATION_BLOCKING
@@ -60,7 +61,7 @@ wchar_t* GetHIDOpenDeviceName(void){
 	return productString;
 }
 
-int OpenHIDDevice(BOOL *array, unsigned int sizeofArray){
+int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting){
 
 #ifdef WIN32
 	UNREFERENCED_PARAMETER(array);
@@ -176,7 +177,7 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 	buffer[1] = 0x0a;
 	buffer[2] = 0x41;
 	buffer[3] = 0x44;
-	buffer[4] = 0xb6;
+	buffer[4] = PMBUSHelper::GetSlaveAddress();
 	buffer[5] = command;        // Command is 0x3a
 	buffer[6] = 0x0d;
 	buffer[7] = 0x0a;

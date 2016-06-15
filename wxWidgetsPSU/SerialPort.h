@@ -9,6 +9,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "CommonDef.h"
+#include "IOAccess.h"
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -33,7 +34,7 @@ wchar_t* GetSerialPortOpenDeviceName(void);
 /**
  * @brief Open Serial Port
  */
-int OpenSerialPort(BOOL *array, unsigned int sizeofArray);
+int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting);
 
 /**
  * @brief Serial Port Send Data

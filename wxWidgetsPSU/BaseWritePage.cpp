@@ -72,7 +72,7 @@ void BaseWritePage::SetupValidator(void){
 	m_numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_numberValidator.SetCharIncludes(DecimalCharIncludes);
 
-	HexCharIncludes = wxT("0123456789abcdef");
+	HexCharIncludes = wxT("0123456789abcdefABCDEF");
 	m_hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_hexValidator.SetCharIncludes(HexCharIncludes);
 }

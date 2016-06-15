@@ -18,6 +18,7 @@
 #include "wx/notebook.h"
 
 #include "CommonDef.h"
+#include "PMBUSStatusBar.h"
 #include "ComportDialog.h"
 
 class I2CInterfaceDialog : public wxDialog
@@ -28,12 +29,13 @@ public:
 		CID_COMPORT_BUTTOUN,
 	};
 
-	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings);
+	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
 
 	~I2CInterfaceDialog();
 
 	IOACCESS *m_ioaccess;
 	AppSettings_t *m_appSettings;
+	PMBUSStatusBar *m_pmbusStatusBar;
 
 	wxBoxSizer *m_TopLevelSizer;
 	wxBoxSizer *m_LeftSizer;

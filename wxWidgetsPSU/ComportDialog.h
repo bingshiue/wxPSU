@@ -20,6 +20,7 @@
 #include "CommonDef.h"
 #include "IOAccess.h"
 #include "AppSettings.h"
+#include "PMBUSStatusBar.h"
 
 class ComportDialog : public wxDialog {
 public:
@@ -28,13 +29,17 @@ public:
 		CID_OK_BUTTOUN = 7051,
 	};
 
-	ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings);
+	ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
 
 	~ComportDialog();
 
 	wxWindow *m_parent;
 	IOACCESS *m_ioaccess;
 	AppSettings_t *m_appSettings;
+	PMBUSStatusBar *m_pmbusStatusBar;
+
+	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
+	PORT_SETTING_t m_portSetting;
 
 	wxBoxSizer *m_TopLevelSizer;
 
@@ -65,6 +70,11 @@ public:
 	wxCheckBox *m_TurnOnDTR;
 
 private:
+
+	void UpdateStatusBarIOSettingFiled(wxString io_string);
+	int SetIODeviceOption(void);
+	int OpenIODevice(void);
+	int CloseIODevice(void);
 
 	void OnOKButton(wxCommandEvent& event);
 

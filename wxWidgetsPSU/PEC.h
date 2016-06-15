@@ -23,7 +23,7 @@ unsigned char crc8 = 0;
 
 //B6-00-B7-01-CF // For Test
 
-data[0] = 0xB6;
+data[0] = 0xB6; // Slave Address
 data[1] = 0x00;
 data[2] = 0xB7;
 data[3] = 0x01;

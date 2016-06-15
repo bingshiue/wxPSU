@@ -14,13 +14,23 @@
 #include <wx/wx.h>
 #endif
 
+typedef struct port_setting_t {
+	/* Comport Setting Value */
+	unsigned long m_comportNumber;
+	unsigned long m_buadRate;
+	unsigned long m_byteSize;
+	unsigned long m_stopBits;
+	unsigned long m_parityCheck;
+
+} PORT_SETTING_t;
+
 typedef int (*EnumerateAvailableDevice)(BOOL *, unsigned int);/**< Funtion Pointer Type For Enumerate Available Device */
 
 typedef int (*GetDeviceStatus)(void);/**< Get Device Status (Open/Close) */
 
 typedef wchar_t* (*GetOpenDeviceName)(void);/**< Get Open Device Name */
 
-typedef int (*OpenDevice)(BOOL *, unsigned int);/**< Funtion Pointer Type For Open Device */
+typedef int(*OpenDevice)(BOOL *, unsigned int, PORT_SETTING_t*);/**< Funtion Pointer Type For Open Device */
 
 typedef int (*DeviceSendData)(unsigned char*, unsigned int);/**< Funtion Pointer Type For Device Send Data */
 

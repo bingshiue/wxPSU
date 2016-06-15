@@ -205,7 +205,7 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 	buffer[1] = 0x0a;
 	buffer[2] = 0x41;
 	buffer[3] = 0x44;
-	buffer[4] = 0xb6;
+	buffer[4] = 0xb6;           // Slave Address
 	buffer[5] = command;        // Command is 0x3a
 	buffer[6] = 0x0d;
 	buffer[7] = 0x0a;
@@ -275,7 +275,7 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 	buf[1] = 0x0a;
 	buf[2] = 0x41;
 	buf[3] = 0x44;
-	buf[4] = 0xb6;
+	buf[4] = 0xb6; // Slave Address
 	buf[5] = 0x3a; // Command is 0x3a
 	buf[6] = 0x0d;
 	buf[7] = 0x0a;

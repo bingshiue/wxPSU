@@ -4,7 +4,7 @@
 
 #include "ComportDialog.h"
 
-ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings) : wxDialog(parent, wxID_ANY, wxString(wxT("Com Port"))) {
+ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("Com Port"))) {
 
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(COMPLUG_16));
@@ -15,6 +15,7 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 	m_parent = parent;
 	m_ioaccess = ioaccess;
 	m_appSettings = appSettings;
+	m_pmbusStatusBar = pmbusStatusBar;
 
 	m_TopLevelSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -205,6 +206,63 @@ ComportDialog::~ComportDialog(){
 
 }
 
+void ComportDialog::UpdateStatusBarIOSettingFiled(wxString io_string){
+	this->m_pmbusStatusBar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
+}
+
+int ComportDialog::SetIODeviceOption(void){
+	this->m_portSetting.m_comportNumber = this->m_appSettings->m_comportSetting.m_comportNumber;
+	this->m_portSetting.m_buadRate = this->m_appSettings->m_comportSetting.m_buadRate;
+	this->m_portSetting.m_byteSize = this->m_appSettings->m_comportSetting.m_byteSize;
+	this->m_portSetting.m_parityCheck = this->m_appSettings->m_comportSetting.m_parityCheck;
+	this->m_portSetting.m_stopBits = this->m_appSettings->m_comportSetting.m_stopBits;
+
+	return EXIT_SUCCESS;
+}
+
+int ComportDialog::OpenIODevice(void){
+	int ret = EXIT_FAILURE;
+
+	// Open Device
+	PSU_DEBUG_PRINT(MSG_DEBUG, "this->m_CurrentUseIOInterface].m_GetDeviceStatus() = %d", this->m_ioaccess[0].m_GetDeviceStatus());
+
+	if (this->m_ioaccess[0].m_GetDeviceStatus() == IODEVICE_CLOSE) {
+
+		this->SetIODeviceOption();
+		ret = this->m_ioaccess[0].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT, &this->m_portSetting);
+
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed !");
+		}
+		else{
+			//this->m_ioDeviceOpen = true;
+			wxString openDeviceName(this->m_ioaccess[0].m_GetOpenDeviceName());
+			openDeviceName += wxT("-9600-N81");
+
+			this->UpdateStatusBarIOSettingFiled(openDeviceName);
+		}
+	}
+
+	return ret;
+}
+
+int ComportDialog::CloseIODevice(void){
+	int ret = EXIT_FAILURE;
+
+	if (this->m_ioaccess[0].m_GetDeviceStatus() == IODEVICE_OPEN){
+		ret = this->m_ioaccess[0].m_CloseDevice();
+	
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
+		}
+		else{
+			this->UpdateStatusBarIOSettingFiled(wxString("Disconnect"));
+		}
+	}
+
+	return ret;
+}
+
 void ComportDialog::OnOKButton(wxCommandEvent& event){
 	int select = 0;
 	
@@ -316,6 +374,10 @@ void ComportDialog::OnOKButton(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
 	}
+
+
+	this->CloseIODevice();
+	this->OpenIODevice();
 
 	this->EndModal(0);
 }

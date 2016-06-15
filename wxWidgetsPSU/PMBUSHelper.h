@@ -20,6 +20,8 @@ public :
 		negative
 	};
 
+	static void SetSlaveAddress(unsigned char slaveAddress);
+	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
 
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
@@ -33,6 +35,7 @@ public :
 protected :
 
 private :
+	static unsigned char m_slaveAddress;
 
 	static PMBUSSTATUS_t m_pmbusStatus;
 };

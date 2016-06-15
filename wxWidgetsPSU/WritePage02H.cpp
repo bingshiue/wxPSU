@@ -86,7 +86,7 @@ void WritePage02H::OnButtonWrite(wxCommandEvent& event){
 	}
 
 	unsigned char SendBuffer[8] = {
-		0x41, 0x54, 0xB6, 0x02, cmdOnOffConfigValue, 0x00, 0x0D, 0x0A
+		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x02, cmdOnOffConfigValue, 0x00, 0x0D, 0x0A
 	};
 
 	unsigned char separate_pec = 0;;

@@ -17,7 +17,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	CheckAndLoadConfig();
 
-	this->m_ioDeviceOpen = false;
+	//this->m_ioDeviceOpen = false;
 
 	// Reset AppSettings
 	//this->m_appSettings.Reset();
@@ -71,30 +71,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup StatusBar
 	SetupStatusBar();
 
-	//
-#if 0 /**< Grid */
-	m_grid = new wxGrid(this, wxID_ANY);
-	m_table = new PMBusCMDGridTable();
-	m_table->SetAttrProvider(new MyGridCellAttrProvider);
-	m_grid->SetTable(m_table, true);
-
-	wxGridCellAttr *attrRO = new wxGridCellAttr,
-		*attrRangeEditor = new wxGridCellAttr,
-		*attrCombo = new wxGridCellAttr;
-
-	attrRO->SetReadOnly();
-	attrRangeEditor->SetEditor(new wxGridCellNumberEditor(1, 5));
-	attrCombo->SetEditor(new wxGridCellChoiceEditor(WXSIZEOF(severities),
-		severities));
-
-	m_grid->SetColAttr(Col_Id, attrRO);
-	m_grid->SetColAttr(Col_Priority, attrRangeEditor);
-	m_grid->SetColAttr(Col_Severity, attrCombo);
-
-	m_grid->Fit();
-	//SetClientSize(m_grid->GetSize());
-#endif
-
 	this->m_notebook = new wxNotebook(this, wxID_ANY);
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
@@ -132,6 +108,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// use fixed width font to align output in nice columns
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
 		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+
 	//m_header->SetFont(font);
 	this->m_debugLogTC->SetFont(font);
 	this->m_debugLogTC->SetFocus();
@@ -172,11 +149,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 
-#if 1
-	// Open IO Device
-	this->OpenIODevice();
-#endif
-
 	// Start Task System Thread
 
 	this->m_TaskSystemThread = new TaskSystemThread();
@@ -185,22 +157,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Task System Thread");
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "Start Task System Thread");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
 		this->m_TaskSystemThread->Run();
 	}
-
-#if 0 // Open Serial Port
-	// Enumerate Serial Port
-	EnumerateAvailableSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
-
-	// Initial Serial Port
-	ret = OpenSerialPort(this->m_enumSerialPort, SERIAL_PORT_MAX_COUNT);
-
-	// If Open Serial Port Failed
-	if (ret != EXIT_SUCCESS){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Open Serial Port Failed ! Need add error handle mechanism here");
-	}
-#endif
 
 #if 0 // Test HID 
 	EnumerateAvailableHIDDevice(NULL,0);
@@ -253,6 +212,21 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);
+
+#if 1
+	// Open IO Device
+	int retval;
+	retval = this->OpenIODevice();
+	if (retval == EXIT_FAILURE){
+		if (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) {
+			ComportDialog* comportDialog = new ComportDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
+			comportDialog->Centre(wxCENTER_ON_SCREEN);
+			comportDialog->ShowModal();
+
+			delete comportDialog;
+		}
+	}
+#endif
 	
 	// Put Window in Center
 	Centre();
@@ -296,6 +270,7 @@ EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_ATTR_CTRL, MainFrame::OnContextMenu)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
+EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
 
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
@@ -656,11 +631,11 @@ void MainFrame::OnResetRunTime(wxCommandEvent& event){
 }
 
 void MainFrame::OnEnableCalibration(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnDisableCalibration(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnCalibration(wxCommandEvent& event){
@@ -693,7 +668,7 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CInterface(wxCommandEvent& event){
-	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_appSettings);
+	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
 	i2cIFDialog->Centre();
 	i2cIFDialog->ShowModal();
 
@@ -737,23 +712,23 @@ void MainFrame::OnStopAnError(wxCommandEvent& event){
 }
 
 void MainFrame::OnErrorLogALL(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnLogToFile(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnPMBus1_1(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnPMBus1_2(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 }
 
 void MainFrame::OnPopupFont(wxCommandEvent& event){
@@ -809,7 +784,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
 
 	// If IO Device not Open, Open IO Device Here
-	OpenIODevice();
+	this->OpenIODevice();
 
 	// Start Send Data Thread
 	if (this->m_monitor_running == false){
@@ -893,8 +868,15 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
-	PSU_DEBUG_PRINT(MSG_ALERT, "Select Polling Time is %d", this->m_polling_time);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Select Polling Time is %d", this->m_polling_time);
 	this->m_dataViewCtrl->SetFocus();
+}
+
+void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
+	this->m_appSettings.m_I2CSlaveAddress = PMBUSHelper::HexToDecimal(this->m_address_input->GetValue().c_str());
+	PMBUSHelper::GetSlaveAddress() = this->m_appSettings.m_I2CSlaveAddress;
+	wxString hex = (wxString::Format("%2x", PMBUSHelper::GetSlaveAddress())).Upper();
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Change Slave Address To %s", hex.c_str());
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -1237,23 +1219,40 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_combobox->SetSelection(2);
 	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
 
+	// Append Separator
+	m_toolbar->AddSeparator();
+
 	// Append Address 
-	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Address"));
+	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("I2C Slave Address"));
 	m_toolbar->AddControl(m_address_text, wxEmptyString);
 
 	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
-	m_address_input->SetLabel(wxT("B0"));
+
+	wxString SlaveAddressHex = (wxString::Format("%02lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
+	m_address_input->SetLabel(SlaveAddressHex);
+
+	wxTextValidator hexValidator;
+	hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	hexValidator.SetCharIncludes(wxT("0123456789abcdefABCDEF"));
+
+	m_address_input->SetValidator(hexValidator);
+
 	m_toolbar->AddControl(m_address_input, wxEmptyString);
 
+
+	// Append Address Set Button
+	m_addressSetButton = new wxButton(m_toolbar, CID_SLAVE_ADDRESS_SET_BUTTON, wxT("Set"));
+	m_toolbar->AddControl(m_addressSetButton, wxEmptyString);
+
 	// Append A2 A1 A0 Check Box
-	m_a2_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A2, wxT("A2"), wxDefaultPosition, wxDefaultSize);
-	m_toolbar->AddControl(m_a2_chkbox, wxEmptyString);
+	//m_a2_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A2, wxT("A2"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a2_chkbox, wxEmptyString);
 
-	m_a1_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A1, wxT("A1"), wxDefaultPosition, wxDefaultSize);
-	m_toolbar->AddControl(m_a1_chkbox, wxEmptyString);
+	//m_a1_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A1, wxT("A1"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a1_chkbox, wxEmptyString);
 
-	m_a0_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A0, wxT("A0"), wxDefaultPosition, wxDefaultSize);
-	m_toolbar->AddControl(m_a0_chkbox, wxEmptyString);
+	//m_a0_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A0, wxT("A0"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a0_chkbox, wxEmptyString);
 
 	m_toolbar->Realize();
 }
@@ -1530,54 +1529,68 @@ void MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
 	this->m_status_bar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
 }
 
+int MainFrame::SetIODeviceOption(void){
+
+	this->m_portSetting.m_comportNumber = this->m_appSettings.m_comportSetting.m_comportNumber;
+	this->m_portSetting.m_buadRate = this->m_appSettings.m_comportSetting.m_buadRate;
+	this->m_portSetting.m_byteSize = this->m_appSettings.m_comportSetting.m_byteSize;
+	this->m_portSetting.m_parityCheck = this->m_appSettings.m_comportSetting.m_parityCheck;
+	this->m_portSetting.m_stopBits = this->m_appSettings.m_comportSetting.m_stopBits;
+
+	return EXIT_SUCCESS;
+}
+
 int MainFrame::OpenIODevice(void){
 	
 	int ret = EXIT_FAILURE;
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "m_ioDeviceOpen = %d", m_ioDeviceOpen);
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "m_ioDeviceOpen = %d", m_ioDeviceOpen);
 
-	if (this->m_ioDeviceOpen == false){
+	//if (this->m_ioDeviceOpen == false){
 		// Open Device
 		PSU_DEBUG_PRINT(MSG_DEBUG, "this->m_CurrentUseIOInterface].m_GetDeviceStatus() = %d", this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus());
 
 		if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_CLOSE) {
 			this->m_IOAccess[this->m_CurrentUseIOInterface].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
-			ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+
+			this->SetIODeviceOption();
+			ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT, &this->m_portSetting);
 
 			if (ret != EXIT_SUCCESS){
-				PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "Open IO Device Failed !");
 			}
 			else{
-				this->m_ioDeviceOpen = true;
+				//this->m_ioDeviceOpen = true;
 				wxString openDeviceName(this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetOpenDeviceName());
 				openDeviceName += wxT("-9600-N81");
 
 				this->UpdateStatusBarIOSettingFiled(openDeviceName);
 			}
 		}
-	}
+	//}
 
 	return ret;
 }
 
 int MainFrame::CloseIODevice(void){
 	
-	int ret;
+	int ret = EXIT_FAILURE;
 
-	if (this->m_ioDeviceOpen == true){
+	//if (this->m_ioDeviceOpen == true){
 		// Close IO Device
 		if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
 			ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
+
+			if (ret != EXIT_SUCCESS){
+				PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed ! Need add error handle mechanism here");
+			}
+			else{
+				//this->m_ioDeviceOpen = false;
+				this->UpdateStatusBarIOSettingFiled(wxString("Disconnect"));
+			}
 		}
 
-		if (ret != EXIT_SUCCESS){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed ! Need add error handle mechanism here");
-		}
-		else{
-			this->m_ioDeviceOpen = false;
-			this->UpdateStatusBarIOSettingFiled(wxString("Disconnect"));
-		}
-	}
+	//}
 
 	return ret;
 }
@@ -1602,7 +1615,7 @@ void MainFrame::TaskInit(void){
 
 void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread exited!");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 	this->m_sendThreadStopFlag = true;
 
 	// Reset Monitor Parameters
@@ -1681,6 +1694,7 @@ void MainFrame::CheckAndLoadConfig(void){
 	else{
 		this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
 	}
+	PMBUSHelper::SetSlaveAddress(this->m_appSettings.m_I2CSlaveAddress);
 
 	// Run Mode
 	long runMode;
@@ -1777,7 +1791,7 @@ void MainFrame::SaveConfig(void){
 	pConfig->SetPath(wxT("/APP"));
 
 	// I2C Slave Address
-	pConfig->Write(wxT("I2CSlaveAddress"), wxAtoi(this->m_address_input->GetValue()));
+	pConfig->Write(wxT("I2CSlaveAddress"), this->m_appSettings.m_I2CSlaveAddress);
 
 	// Run Mode
 	pConfig->Write(wxT("RunMode"), this->m_appSettings.m_runMode);

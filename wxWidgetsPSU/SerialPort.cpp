@@ -125,17 +125,20 @@ wchar_t* GetSerialPortOpenDeviceName(){
 	return ComPortName;
 }
 
-int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
+int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting)
 {
 	int ret = EXIT_SUCCESS;
 	BOOL Status;
 
+    #if 0
 	unsigned int availableIndex = GetFirstAvailableSerialPortIndex(array, sizeofArray);
 	GetSerialPortName(ComPortName, sizeof(ComPortName) / sizeof(wchar_t), availableIndex);
+    #endif
 
+	GetSerialPortName(ComPortName, sizeof(ComPortName) / sizeof(wchar_t), (portSetting->m_comportNumber - 1));
 
 	hComm = CreateFile(
-		ComPortName,                    // Name of the Port to be Opened
+		ComPortName,                       // Name of the Port to be Opened
 		GENERIC_READ | GENERIC_WRITE,      // Read/Write Access
 		0,                                 // No Sharing, ports cant be shared
 		NULL,                              // No Security
@@ -161,10 +164,10 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 		return EXIT_FAILURE;
 	}
 
-	dcbSerialParams.BaudRate = CBR_9600;      // Setting BaudRate = 9600
-	dcbSerialParams.ByteSize = 8;             // Setting ByteSize = 8
-	dcbSerialParams.StopBits = ONESTOPBIT;    // Setting StopBits = 1
-	dcbSerialParams.Parity   = NOPARITY;      // Setting Parity   = None
+	dcbSerialParams.BaudRate = portSetting->m_buadRate;   //CBR_9600;      // Setting BaudRate = 9600
+	dcbSerialParams.ByteSize = portSetting->m_byteSize;   //8;             // Setting ByteSize = 8
+	dcbSerialParams.StopBits = portSetting->m_stopBits;   //ONESTOPBIT;    // Setting StopBits = 1
+	dcbSerialParams.Parity   = portSetting->m_parityCheck;//NOPARITY;      // Setting Parity   = None
 
 	//dcbSerialParams.EofChar = '\n';
 
@@ -177,11 +180,11 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray)//int PortNum)
 	}
 	else
 	{
-		PSU_DEBUG_PRINT(MSG_ALERT, "Setting DCB Structure Successfull");
-		PSU_DEBUG_PRINT(MSG_ALERT, "Baudrate = %d", dcbSerialParams.BaudRate);
-		PSU_DEBUG_PRINT(MSG_ALERT, "ByteSize = %d", dcbSerialParams.ByteSize);
-		PSU_DEBUG_PRINT(MSG_ALERT, "StopBits = %d", dcbSerialParams.StopBits);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Parity   = %d", dcbSerialParams.Parity);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Setting DCB Structure Successfull");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Baudrate = %d", dcbSerialParams.BaudRate);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ByteSize = %d", dcbSerialParams.ByteSize);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "StopBits = %d", dcbSerialParams.StopBits);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Parity   = %d", dcbSerialParams.Parity);
 	}
 
 	/*------------------------------------ Setting Timeouts --------------------------------------------------*/

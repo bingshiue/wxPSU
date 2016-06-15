@@ -87,6 +87,7 @@ enum
 	ID_ATTR_CTRL = 51,
 
 	ID_TOOLBAR = 500,
+	CID_SLAVE_ADDRESS_SET_BUTTON,
 	CID_CHECKBOX_A2,
 	CID_CHECKBOX_A1,
 	CID_CHECKBOX_A0,
@@ -103,12 +104,13 @@ public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	virtual ~MainFrame();
 
+	PORT_SETTING_t m_portSetting;
 	IOACCESS m_IOAccess[IO_SIZE];
 	PMBUSCOMMAND_t m_PMBusData[PMBUSCOMMAND_SIZE];/**< PM Bus Data */
 
 	AppSettings_t m_appSettings;
 
-	bool m_ioDeviceOpen;/**< Indicator for IO Device Open */
+	//bool m_ioDeviceOpen;/**< Indicator for IO Device Open */
 	bool m_monitor_running;/**< Indicator for mobitor is running */
 
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
@@ -148,14 +150,6 @@ public:
 
 	wxStaticBoxSizer* m_debugLogStaticBoxSizer;
 
-	//
-#if 0
-	wxGrid *m_grid;
-	wxGridTableBase *m_table;
-#endif
-	//
-
-	//
 	wxDataViewCtrl *m_dataViewCtrl;
 	wxObjectDataPtr<PSUDataViewListModel> m_list_model;
 
@@ -256,6 +250,8 @@ public:
 	// Combo Box
 	wxComboBox   *m_polling_time_combobox;
 
+
+	wxButton     *m_addressSetButton;
 	wxCheckBox   *m_a2_chkbox;
 	wxCheckBox   *m_a1_chkbox;
 	wxCheckBox   *m_a0_chkbox;
@@ -339,6 +335,7 @@ private:
 	void OnDVSelectionChanged(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
+	void OnSlaveAddressSetButton(wxCommandEvent& event);
 
 	void OnContextMenu(wxDataViewEvent &event);
 
@@ -354,6 +351,7 @@ private:
 
 	void DoSetupIOAccess(void);
 
+	int SetIODeviceOption(void);
 	int OpenIODevice(void);
 	int CloseIODevice(void);
 

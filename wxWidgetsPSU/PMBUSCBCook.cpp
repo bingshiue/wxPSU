@@ -305,7 +305,7 @@ int Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", wxstr.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS; 
 }

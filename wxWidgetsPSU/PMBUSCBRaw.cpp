@@ -35,7 +35,7 @@ int Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 	wxString wxstr("");
 
 	// I2C Address
-	wxstr += L"B6";
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress()).Upper();
 
 	wxstr += "-";
 
@@ -151,7 +151,7 @@ int Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLeng
 	wxString wxstr("");
 
 	// I2C Address
-	wxstr += L"B6";
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress()).Upper();
 
 	wxstr += "-";
 

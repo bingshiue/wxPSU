@@ -5,6 +5,7 @@
 #define _PMBUSCBCOOK_H_
 
 #include "PMBUSCommandType.h"
+#include "PMBUSHelper.h"
 
 // Declare Cook CB Functions
 int Cook_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);

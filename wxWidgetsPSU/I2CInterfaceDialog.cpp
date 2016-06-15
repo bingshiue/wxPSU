@@ -4,7 +4,7 @@
 
 #include "I2CInterfaceDialog.h"
 
-I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
+I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
 	
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
@@ -14,6 +14,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, App
 
 	m_ioaccess = ioaccess;
 	m_appSettings = appSettings;
+	m_pmbusStatusBar = pmbusStatusBar;
 
 	m_TopLevelSizer = new wxBoxSizer(wxHORIZONTAL);
 	m_LeftSizer = new wxBoxSizer(wxVERTICAL);
@@ -155,7 +156,7 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 }
 
 void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
-	ComportDialog* comportDialog = new ComportDialog(this, this->m_ioaccess, this->m_appSettings);
+	ComportDialog* comportDialog = new ComportDialog(this, this->m_ioaccess, this->m_appSettings, this->m_pmbusStatusBar);
 	comportDialog->Centre();
 	comportDialog->ShowModal();
 

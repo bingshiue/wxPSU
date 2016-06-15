@@ -56,7 +56,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 			this->m_sendBuff[0] = 0x41;
 			this->m_sendBuff[1] = 0x44;
-			this->m_sendBuff[2] = 0xb6;
+			this->m_sendBuff[2] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[3] = command;
 			this->m_sendBuff[4] = 0x0d;
 			this->m_sendBuff[5] = 0x0a;
@@ -69,7 +69,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			
 			this->m_sendBuff[0] = 0x41;
 			this->m_sendBuff[1] = 0x44;
-			this->m_sendBuff[2] = 0xb6;
+			this->m_sendBuff[2] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[3] = command;
 			this->m_sendBuff[4] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
 			this->m_sendBuff[5] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
@@ -91,7 +91,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[1] = 0x0a;
 			this->m_sendBuff[2] = 0x41;
 			this->m_sendBuff[3] = 0x44;
-			this->m_sendBuff[4] = 0xb6;
+			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[5] = command;        // Command is 0x3a
 			this->m_sendBuff[6] = 0x0d;
 			this->m_sendBuff[7] = 0x0a;
@@ -160,7 +160,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[1] = 0x0c;
 			this->m_sendBuff[2] = 0x41;
 			this->m_sendBuff[3] = 0x44;
-			this->m_sendBuff[4] = 0xb6;
+			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[5] = command;        // Command is 0x3a
 			this->m_sendBuff[6] = 0x01;
 			this->m_sendBuff[7] = 0x78;
@@ -244,17 +244,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int retry = 0;
 	int sendDataLength = 0;
 	bool sendRetryStillFailed = false;
-	DWORD iteration=0;
-	DWORD success=0;
+	DWORD iteration = 0;
+	DWORD success = 0;
 	DWORD timeout = 0;
 	wchar_t QueryStr[STR_LENGTH];
 	wchar_t CookStr[STR_LENGTH];
 	wchar_t RawStr[STR_LENGTH];
-	
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "In Send Data Thread ");
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread started (priority = %u).", GetPriority());
 	PSU_DEBUG_PRINT(MSG_DEBUG, "RunMode is Continally ");
-	PSU_DEBUG_PRINT(MSG_DETAIL,"m_pollingTime=%d", this->m_pollingTime);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "m_pollingTime=%d", this->m_pollingTime);
 
 #if 0
 	// Open IO Device
@@ -280,9 +280,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 		// RunMode is Continally 
 		while (m_running){
 
-			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running==true; idx++){
+			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running == true; idx++){
 
-				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD,wxEVT_COMMAND_SENDTHREAD_UPDATE));
+				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE));
 
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
@@ -294,10 +294,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							unsigned char pec = 0;;
 
 							unsigned char changePageSendBuffer[8] = {
-								0x41, 0x54, 0xB6, 0x00, cmdPageValue, 0x00,0x0D, 0x0A
+								0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
 							};
 
-							pec = PMBusSlave_Crc8MakeBitwise(0, 7, changePageSendBuffer+2, 3);
+							pec = PMBusSlave_Crc8MakeBitwise(0, 7, changePageSendBuffer + 2, 3);
 							PSU_DEBUG_PRINT(MSG_DEBUG, "pec = %02xh", pec);
 
 							changePageSendBuffer[5] = pec;
@@ -614,7 +614,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					this->m_sendCMDVector->clear();
 				}
 				/*--------------------------------------------------------------------------------------------------------------*/
-				
+
 
 				// Set Monitoring Name / Monitoring Summary of Status Bar
 				wxString monitor("Monitoring...[");
@@ -625,12 +625,12 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
 				this->m_status_bar->setMonitoringSummary(summary);
 
-				#if 0
+#if 0
 				if (idx == (PMBUSCOMMAND_SIZE - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
 				}
-				#endif
+#endif
 
 				// Update STD Page
 				this->UpdateSTDPage(idx);
@@ -662,10 +662,12 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 		break;
 	}
 
-#if 0
-	// Close Device
-	if (this->m_IOAccess[*this->m_CurrentIO].m_GetDeviceStatus() == IODEVICE_OPEN){
-		this->m_IOAccess[*this->m_CurrentIO].m_CloseDevice();
+#if 1
+	if(sendRetryStillFailed==true){
+		// Close Device
+		if (this->m_IOAccess[*this->m_CurrentIO].m_GetDeviceStatus() == IODEVICE_OPEN){
+			this->m_IOAccess[*this->m_CurrentIO].m_CloseDevice();
+		}
 	}
 #endif
 

@@ -10,6 +10,7 @@
 #include<stdlib.h>
 #include "hidapi.h"
 #include "CommonDef.h"
+#include "IOAccess.h"
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -36,7 +37,7 @@ wchar_t* GetHIDOpenDeviceName(void);
 /**
  * @brief Open HID Device
  */
-int OpenHIDDevice(BOOL *array, unsigned int sizeofArray);
+int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting);
 
 /**
 * @brief HID Send Data
