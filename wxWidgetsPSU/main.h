@@ -36,6 +36,7 @@
 #include "wx/generic/grideditors.h"
 #include "wx/config.h"
 #include "wx/fileconf.h"
+#include "wx/infobar.h"
 
 class WXPSU : public wxApp
 {

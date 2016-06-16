@@ -181,7 +181,7 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 	buffer[5] = command;        // Command is 0x3a
 	buffer[6] = 0x0d;
 	buffer[7] = 0x0a;
-	buffer[8] = 0xb7;
+	buffer[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
 	buffer[9] = responseLength; // Response Data Length
 	buffer[10] = 0x0d;
 	buffer[11] = 0x0a;
@@ -204,12 +204,12 @@ void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsig
 	buffer[27] = 0x00;
 	buffer[28] = 0x00;
 	buffer[29] = 0x02;
-	buffer[30] = 0xb7;
+	buffer[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
 	buffer[31] = responseLength; // Response Data Length
 
 	buffer[32] = 0x00;
 	buffer[33] = 0x01; //
-	buffer[34] = 0xb7; //
+	buffer[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
 	buffer[35] = 0x00;
 	buffer[36] = 0x00;
 	buffer[37] = 0x00;

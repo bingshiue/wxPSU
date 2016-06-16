@@ -131,11 +131,19 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_notebook->AddPage(this->PMBusVerificationPanel, "Verification");
 	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 
+	m_infoBar = new wxInfoBar(this);
+	m_infoBar->SetFont(GetFont().Bold().Larger());
+	m_infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_LEFT, wxSHOW_EFFECT_SLIDE_TO_RIGHT);
+	m_infoBar->SetEffectDuration(250);
+
+	m_infoBarTimer = new wxTimer(this);
+
 	//Connect(ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnHello));
 	//Connect(ID_Monitor, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnMonitor));
 	//Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnAbout));
 	//Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrame::OnExit));
 
+	this->m_topVeriticalSizer->Add(m_infoBar, wxSizerFlags().Expand());
 	//this->m_topVeriticalSizer->Add(this->m_toolbar);
 	//this->m_topVeriticalSizer->Add(this->m_hbox, wxSizerFlags(1).Expand());//1, wxEXPAND | (wxALL & ~wxLEFT), 1);
 	//this->m_topVeriticalSizer->Add(this->m_dataViewCtrl, wxSizerFlags(1).Expand());
@@ -271,6 +279,8 @@ EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_ATTR_CTRL, MainFrame::OnContextMenu)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
+
+EVT_TIMER(wxID_ANY, MainFrame::OnInfoBarTimer)
 
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
@@ -774,6 +784,12 @@ void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
 	textOutputStream.Flush();
 }
 
+void MainFrame::OnInfoBarTimer(wxTimerEvent& WXUNUSED(event)){
+	if (this->m_infoBar->IsShown() == true){
+		this->m_infoBar->Dismiss();
+	}
+}
+
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
@@ -877,6 +893,14 @@ void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
 	PMBUSHelper::GetSlaveAddress() = this->m_appSettings.m_I2CSlaveAddress;
 	wxString hex = (wxString::Format("%2x", PMBUSHelper::GetSlaveAddress())).Upper();
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Change Slave Address To %s", hex.c_str());
+
+	this->m_infoBar->SetBackgroundColour(wxColour( 0, 255, 0));
+
+	this->m_infoBar->ShowMessage(
+		wxString::Format("Change Slave Address To %s", hex.c_str()), wxICON_INFORMATION
+	);
+
+	this->m_infoBarTimer->Start(3000, true);
 }
 
 void MainFrame::SetupMenuBar(void){

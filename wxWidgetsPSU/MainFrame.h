@@ -132,6 +132,9 @@ public:
 	wxSplitterWindow* m_splitterWindow;
 	wxSplitterWindow* m_splitterWindowTopLevel;
 
+	wxInfoBar *m_infoBar;
+	wxTimer *m_infoBarTimer;
+
 	// Bitmap 
 	wxBitmap *m_monitorBitmap;
 	wxBitmap *m_pauseBitmap;
@@ -342,6 +345,8 @@ private:
 	void OnSendThreadCompletion(wxThreadEvent& event);
 
 	void OnSendThreadUpdate(wxThreadEvent& event);
+
+	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 
 	// logging helper
 	void DoLogLine(wxTextCtrl *text,

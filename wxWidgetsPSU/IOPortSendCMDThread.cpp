@@ -60,7 +60,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[3] = command;
 			this->m_sendBuff[4] = 0x0d;
 			this->m_sendBuff[5] = 0x0a;
-			this->m_sendBuff[6] = 0xb7;
+			this->m_sendBuff[6] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[7] = responseDataLength;
 			this->m_sendBuff[8] = 0x0d;
 			this->m_sendBuff[9] = 0x0a;
@@ -76,7 +76,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 			this->m_sendBuff[6] = 0x0d;
 			this->m_sendBuff[7] = 0x0a;
-			this->m_sendBuff[8] = 0xb7;
+			this->m_sendBuff[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[9] = responseDataLength;
 			this->m_sendBuff[10] = 0x0d;
 			this->m_sendBuff[11] = 0x0a;
@@ -95,7 +95,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[5] = command;        // Command is 0x3a
 			this->m_sendBuff[6] = 0x0d;
 			this->m_sendBuff[7] = 0x0a;
-			this->m_sendBuff[8] = 0xb7;
+			this->m_sendBuff[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[9] = responseDataLength; // Response Data Length
 			this->m_sendBuff[10] = 0x0d;
 			this->m_sendBuff[11] = 0x0a;
@@ -118,12 +118,12 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[27] = 0x00;
 			this->m_sendBuff[28] = 0x00;
 			this->m_sendBuff[29] = 0x02;
-			this->m_sendBuff[30] = 0xb7;
+			this->m_sendBuff[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[31] = responseDataLength; // Response Data Length
 
 			this->m_sendBuff[32] = 0x00;
 			this->m_sendBuff[33] = 0x01; //
-			this->m_sendBuff[34] = 0xb7; //
+			this->m_sendBuff[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[35] = 0x00;
 			this->m_sendBuff[36] = 0x00;
 			this->m_sendBuff[37] = 0x00;
@@ -166,7 +166,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[7] = 0x78;
 			this->m_sendBuff[8] = 0x0d;
 			this->m_sendBuff[9] = 0x0a;
-			this->m_sendBuff[10] = 0xb7;
+			this->m_sendBuff[10] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[11] = responseDataLength; // Response Data Length
 			this->m_sendBuff[12] = 0x0d;
 			this->m_sendBuff[13] = 0x0a;
@@ -187,12 +187,12 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[27] = 0x00;
 			this->m_sendBuff[28] = 0x00;
 			this->m_sendBuff[29] = 0x02;
-			this->m_sendBuff[30] = 0xb7;
+			this->m_sendBuff[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[31] = responseDataLength; // Response Data Length
 
 			this->m_sendBuff[32] = 0x00;
 			this->m_sendBuff[33] = 0x01; //
-			this->m_sendBuff[34] = 0xb7; //
+			this->m_sendBuff[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[35] = 0x00;
 			this->m_sendBuff[36] = 0x00;
 			this->m_sendBuff[37] = 0x00;
@@ -236,6 +236,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 #define BASE_RESPONSE_DATA_LENGTH  6
 #define STR_LENGTH  256
+//#define PRINT_RAW_IN_FEILD
 wxThread::ExitCode IOPortSendCMDThread::Entry()
 {
 	int ret;
@@ -479,7 +480,6 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									// Call Raw Data CB Function
 									this->m_pmBusCommand[idx].m_cmdCBFunc.m_rawCBFunc(&(this->m_pmBusCommand[idx]), RawStr, this->m_pmBusCommand[idx].m_responseDataLength);
 
-									//#define PRINT_RAW_IN_FEILD
 #ifdef PRINT_RAW_IN_FEILD
 									wxString RawMsg("");
 									for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
@@ -519,8 +519,24 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								}
 								//
 								else{
-									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
+									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d(ExpectReceiveDataLength=%d)", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length, ExpectReceiveDataLength);
+									// 0d  0a  4e  47  0d  0a : May Receive Response as left when I2C Slave Address was wrong
+									
+									wxString receive("");
+									for (unsigned int index = 0; index < this->m_recvBuff->m_length; index++){
+										receive += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[index]);
+									}
+									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", receive.c_str());
+
 									this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
+
+									if (this->m_recvBuff->m_recvBuff[2] == 0x4e && this->m_recvBuff->m_recvBuff[3] == 0x47) {
+										wxString NotFoundMsg(wxT("(I2C Interface Not Found)"));
+										wxVariant variantNotFound = NotFoundMsg;
+
+										this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PSUDataViewListModel::Col_RawText);
+										this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
+									}
 
 									if (this->m_appSettings->m_runMode == RunMode_StopAnError){
 										m_running = false;

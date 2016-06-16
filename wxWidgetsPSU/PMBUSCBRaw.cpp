@@ -52,7 +52,8 @@ int Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 	wxstr += "-";
 
 	// Read Command
-	wxstr += L"B7";
+	//wxstr += L"B7";
+	wxstr += wxString::Format("%02x", PMBUSHelper::GetSlaveAddress() | 0x01).Upper();
 
 	for (unsigned int idx = 0; idx < dataBytesLength; idx++){
 		wxstr += "-";
@@ -161,7 +162,7 @@ int Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLeng
 	wxstr += "-";
 
 	// Read Command
-	wxstr += L"B7";
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress() | 0x01).Upper();
 
 	for (unsigned int idx = 0; idx < dataBytesLength; idx++){
 		wxstr += "-";
