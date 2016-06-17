@@ -237,7 +237,117 @@ int ComportDialog::OpenIODevice(void){
 		else{
 			//this->m_ioDeviceOpen = true;
 			wxString openDeviceName(this->m_ioaccess[0].m_GetOpenDeviceName());
-			openDeviceName += wxT("-9600-N81");
+			//openDeviceName += wxT("-9600-N81");
+
+			// Append BuadRate
+			switch (this->m_appSettings->m_comportSetting.m_buadRate){
+
+			case CBR_110:
+				openDeviceName += wxString::Format("-%d-", 110);
+				break;
+
+			case CBR_300:
+				openDeviceName += wxString::Format("-%d-", 300);
+				break;
+
+			case CBR_600:
+				openDeviceName += wxString::Format("-%d-", 600);
+				break;
+
+			case CBR_1200:
+				openDeviceName += wxString::Format("-%d-", 1200);
+				break;
+
+			case CBR_2400:
+				openDeviceName += wxString::Format("-%d-", 2400);
+				break;
+
+			case CBR_4800:
+				openDeviceName += wxString::Format("-%d-", 4800);
+				break;
+
+			case CBR_9600:
+				openDeviceName += wxString::Format("-%d-", 9600);
+				break;
+
+			case CBR_14400:
+				openDeviceName += wxString::Format("-%d-", 14400);
+				break;
+
+			case CBR_19200:
+				openDeviceName += wxString::Format("-%d-", 19200);
+				break;
+
+			case CBR_38400:
+				openDeviceName += wxString::Format("-%d-", 38400);
+				break;
+
+			case CBR_56000:
+				openDeviceName += wxString::Format("-%d-", 56000);
+				break;
+
+			case CBR_57600:
+				openDeviceName += wxString::Format("-%d-", 57600);
+				break;
+
+			case CBR_115200:
+				openDeviceName += wxString::Format("-%d-", 115200);
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+				break;
+			}
+
+			// Append Parity Check
+			switch (this->m_appSettings->m_comportSetting.m_parityCheck){
+
+			case NOPARITY:
+				openDeviceName += wxString::Format("%s", "N");
+				break;
+
+			case ODDPARITY:
+				openDeviceName += wxString::Format("%s", "O");
+				break;
+
+			case EVENPARITY:
+				openDeviceName += wxString::Format("%s", "E");
+				break;
+
+			case MARKPARITY:
+				openDeviceName += wxString::Format("%s", "M");
+				break;
+			case SPACEPARITY:
+				openDeviceName += wxString::Format("%s", "S");
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+				break;
+			}
+
+			// Append Byte Bits
+			openDeviceName += wxString::Format("%d", this->m_appSettings->m_comportSetting.m_byteSize);
+
+			// Append Stop Bits
+			switch (this->m_appSettings->m_comportSetting.m_stopBits){
+
+			case ONESTOPBIT:
+				openDeviceName += wxString::Format("%d", 1);
+				break;
+
+			case ONE5STOPBITS:
+				openDeviceName += wxString::Format("%f", 1.5);
+				break;
+
+			case TWOSTOPBITS:
+				openDeviceName += wxString::Format("%d", 2);
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+				break;
+			}
 
 			this->UpdateStatusBarIOSettingFiled(openDeviceName);
 		}
@@ -247,7 +357,7 @@ int ComportDialog::OpenIODevice(void){
 }
 
 int ComportDialog::CloseIODevice(void){
-	int ret = EXIT_FAILURE;
+	int ret = EXIT_SUCCESS;
 
 	if (this->m_ioaccess[0].m_GetDeviceStatus() == IODEVICE_OPEN){
 		ret = this->m_ioaccess[0].m_CloseDevice();
@@ -377,6 +487,7 @@ void ComportDialog::OnOKButton(wxCommandEvent& event){
 
 
 	this->CloseIODevice();
+	wxMilliSleep(200);
 	this->OpenIODevice();
 
 	this->EndModal(0);

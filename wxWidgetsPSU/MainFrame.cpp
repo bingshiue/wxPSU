@@ -221,6 +221,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);
 
+	// Set Art Provider
+	wxArtProvider::Push(new PMBUSArtProvider);
+
 #if 1
 	// Open IO Device
 	int retval;
@@ -894,7 +897,7 @@ void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
 	wxString hex = (wxString::Format("%2x", PMBUSHelper::GetSlaveAddress())).Upper();
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Change Slave Address To %s", hex.c_str());
 
-	this->m_infoBar->SetBackgroundColour(wxColour( 0, 255, 0));
+	this->m_infoBar->SetBackgroundColour(wxColour( 127, 246, 85));
 
 	this->m_infoBar->ShowMessage(
 		wxString::Format("Change Slave Address To %s", hex.c_str()), wxICON_INFORMATION
@@ -1585,8 +1588,120 @@ int MainFrame::OpenIODevice(void){
 			}
 			else{
 				//this->m_ioDeviceOpen = true;
+
+				// Append Comport Number
 				wxString openDeviceName(this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetOpenDeviceName());
-				openDeviceName += wxT("-9600-N81");
+				//openDeviceName += wxT("-9600-N81");
+				
+				// Append BuadRate
+				switch (this->m_appSettings.m_comportSetting.m_buadRate){
+	
+				case CBR_110:
+					openDeviceName += wxString::Format("-%d-", 110);
+					break;
+
+				case CBR_300:
+					openDeviceName += wxString::Format("-%d-", 300);
+					break;
+
+				case CBR_600:
+					openDeviceName += wxString::Format("-%d-", 600);
+					break;
+
+				case CBR_1200:
+					openDeviceName += wxString::Format("-%d-", 1200);
+					break;
+
+				case CBR_2400:
+					openDeviceName += wxString::Format("-%d-", 2400);
+					break;
+
+				case CBR_4800:
+					openDeviceName += wxString::Format("-%d-", 4800);
+					break;
+
+				case CBR_9600:
+					openDeviceName += wxString::Format("-%d-", 9600);
+					break;
+
+				case CBR_14400:
+					openDeviceName += wxString::Format("-%d-", 14400);
+					break;
+
+				case CBR_19200:
+					openDeviceName += wxString::Format("-%d-", 19200);
+					break;
+
+				case CBR_38400:
+					openDeviceName += wxString::Format("-%d-", 38400);
+					break;
+
+				case CBR_56000:
+					openDeviceName += wxString::Format("-%d-", 56000);
+					break;
+
+				case CBR_57600:
+					openDeviceName += wxString::Format("-%d-", 57600);
+					break;
+	
+				case CBR_115200:
+					openDeviceName += wxString::Format("-%d-", 115200);
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
+
+				// Append Parity Check
+				switch (this->m_appSettings.m_comportSetting.m_parityCheck){
+
+				case NOPARITY:
+					openDeviceName += wxString::Format("%s", "N");
+					break;
+
+				case ODDPARITY:
+					openDeviceName += wxString::Format("%s", "O");
+					break;
+
+				case EVENPARITY:
+					openDeviceName += wxString::Format("%s", "E");
+					break;
+
+				case MARKPARITY:
+					openDeviceName += wxString::Format("%s", "M");
+					break;
+				case SPACEPARITY:
+					openDeviceName += wxString::Format("%s", "S");
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
+				
+				// Append Byte Bits
+				openDeviceName += wxString::Format("%d", this->m_appSettings.m_comportSetting.m_byteSize);
+
+				// Append Stop Bits
+				switch (this->m_appSettings.m_comportSetting.m_stopBits){
+
+				case ONESTOPBIT:
+					openDeviceName += wxString::Format("%d", 1);
+					break;
+
+				case ONE5STOPBITS:
+					openDeviceName += wxString::Format("%f", 1.5);
+					break;
+
+				case TWOSTOPBITS:
+					openDeviceName += wxString::Format("%d", 2);
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
 
 				this->UpdateStatusBarIOSettingFiled(openDeviceName);
 			}
@@ -1606,7 +1721,7 @@ int MainFrame::CloseIODevice(void){
 			ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
 
 			if (ret != EXIT_SUCCESS){
-				PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed ! Need add error handle mechanism here");
+				PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
 			}
 			else{
 				//this->m_ioDeviceOpen = false;

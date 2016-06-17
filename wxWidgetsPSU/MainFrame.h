@@ -28,7 +28,9 @@
 #include "PMBUSVerificationPanel.h"
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
+#include "PMBUSHexDumpPanel.h"
 #include "PMBUSHelper.h"
+#include "PMBUSArtProv.h"
 #include "CalibrationDialog.h"
 #include "I2CInterfaceDialog.h"
 #include "AboutDialog.h"
@@ -170,14 +172,15 @@ public:
 	wxPanel    *CMDListPanel;
 	wxPanel    *DebugLogPanel;
 
-	PMBUSStatusPanel  *PMBusStatusPanel;
-	PMBUSStatusDCHPanel  *PMBusStatusDCHPanel;
+	PMBUSStatusPanel *PMBusStatusPanel;
+	PMBUSStatusDCHPanel *PMBusStatusDCHPanel;
 
-	PMBUSMFRPanel    *PMBusMFRPanel;
-	PMBUSVerificationPanel    *PMBusVerificationPanel;
-	//wxPanel    *STATUSPanel;
+	PMBUSMFRPanel *PMBusMFRPanel;
+	PMBUSVerificationPanel *PMBusVerificationPanel;
 
-	//wxPanel    *STDPanel;
+	PMBUSHexDumpPanel *PMBusHexDumpPanel;
+
+
 	STDPage    *m_stdPage;
 	wxPanel    *ReadPanel;
 	BaseWritePage  *m_writePage;

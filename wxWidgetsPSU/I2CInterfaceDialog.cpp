@@ -122,7 +122,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, App
 	m_generalNB->AddPage(m_generalPanel, wxT("General"));
 
 	m_OkButton = new wxButton(this, CID_OK_BUTTOUN, wxT("OK"), wxDefaultPosition, wxSize(80, -1));
-	m_CancelButton = new wxButton(this, wxID_ANY, wxT("Cancel"), wxDefaultPosition, wxSize(80, -1));
+	m_CancelButton = new wxButton(this, CID_CANCEL_BUTTON, wxT("Cancel"), wxDefaultPosition, wxSize(80, -1));
 	m_ComportButton = new wxButton(this, CID_COMPORT_BUTTOUN, wxT("Comport"), wxDefaultPosition, wxSize(80, -1));
 	m_ComportButton->SetBitmap(wxBITMAP_PNG(COMPLUG_16));
 
@@ -155,6 +155,10 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	this->EndModal(0);
 }
 
+void I2CInterfaceDialog::OnCancelButton(wxCommandEvent& event){
+	this->EndModal(0);
+}
+
 void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
 	ComportDialog* comportDialog = new ComportDialog(this, this->m_ioaccess, this->m_appSettings, this->m_pmbusStatusBar);
 	comportDialog->Centre();
@@ -165,5 +169,6 @@ void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
 
 wxBEGIN_EVENT_TABLE(I2CInterfaceDialog, wxDialog)
 EVT_BUTTON(CID_OK_BUTTOUN, I2CInterfaceDialog::OnOKButton)
+EVT_BUTTON(CID_CANCEL_BUTTON, I2CInterfaceDialog::OnCancelButton)
 EVT_BUTTON(CID_COMPORT_BUTTOUN, I2CInterfaceDialog::OnComportButton)
 wxEND_EVENT_TABLE()

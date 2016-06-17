@@ -176,6 +176,7 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 	if (Status == FALSE)
 	{
 		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting DCB Structure");
+		PSU_DEBUG_PRINT(MSG_FATAL, "GetLastError() = %d", GetLastError());
 		return EXIT_FAILURE;
 	}
 	else
@@ -777,7 +778,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 int CloseSerialPort(void){
 	int ret = SUCCESS;
 
-	PSU_DEBUG_PRINT(MSG_DEBUG ,"Close Serial Port %p", hComm);
+	PSU_DEBUG_PRINT(MSG_ALERT ,"Close Serial Port %p", hComm);
 	CloseHandle(hComm);//Closing the Serial Port
 
 	hComm = INVALID_HANDLE_VALUE;

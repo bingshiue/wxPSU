@@ -93,12 +93,14 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MyListStoreDerivedModel.cpp" />
     <ClCompile Include="PEC.cpp" />
+    <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSCBCook.cpp" />
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
     <ClCompile Include="PMBusCMDGridTable.cpp" />
     <ClCompile Include="PMBusDataViewListModel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
+    <ClCompile Include="PMBUSHexDumpPanel.cpp" />
     <ClCompile Include="PMBUSMFRPanel.cpp" />
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
@@ -147,6 +149,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MyListStoreDerivedModel.h" />
     <ClInclude Include="PEC.h" />
+    <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSCBCook.h" />
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />
@@ -157,6 +160,7 @@
     <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBusDataViewListModel.h" />
     <ClInclude Include="PMBUSHelper.h" />
+    <ClInclude Include="PMBUSHexDumpPanel.h" />
     <ClInclude Include="PMBUSMFRPanel.h" />
     <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PMBUSStatusDCHPanel.h" />

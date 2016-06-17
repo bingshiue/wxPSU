@@ -74,8 +74,8 @@ enum {
 };
 
 enum {
-	FAILURE = 0,/**< FAILURE */
-	SUCCESS     /**< SUCCESS */
+	SUCCESS = EXIT_SUCCESS,    /**< SUCCESS */
+	FAILURE = EXIT_FAILURE,    /**< FAILURE */
 };
 
 #endif

@@ -19,7 +19,7 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 #endif
 {
 	int widths[Field_Max];
-	widths[Field_IO_Setting] = 120;
+	widths[Field_IO_Setting] = 130;
 	widths[Field_I2C_Clock] = 50;
 	widths[Field_Run_Mode] = 100;
 	widths[Field_Monitoring_Command] = 150;
