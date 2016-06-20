@@ -29,6 +29,7 @@
 #include <wx/datstrm.h>
 #include <wx/textfile.h>
 #include <wx/tokenzr.h>
+#include <wx/aui/aui.h>
 
 #include "wx/grid.h"
 #include "wx/headerctrl.h"

@@ -71,7 +71,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup StatusBar
 	SetupStatusBar();
 
-	this->m_notebook = new wxNotebook(this, wxID_ANY);
+	this->m_notebook = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP);
 
 	this->GeneralPanel = new wxPanel(m_notebook, wxID_ANY);
 

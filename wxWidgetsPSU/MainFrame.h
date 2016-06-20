@@ -164,7 +164,7 @@ public:
 	wxTextCtrl *m_debugLogTC;
 
 	// Note Book
-	wxNotebook *m_notebook;
+	wxAuiNotebook *m_notebook;
 	wxNotebook *m_subNotebook;
 
 	// Panel
