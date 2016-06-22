@@ -630,6 +630,20 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
 void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	
+	// 
+	if (this->PMBusSecondaryFWUpdatePanel) {
+		//
+		unsigned int deleteIndex = this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook();
+
+		this->m_notebook->SetSelection(0);
+
+		this->m_notebook->RemovePage(deleteIndex);
+
+		wxDELETE(this->PMBusSecondaryFWUpdatePanel);
+
+	}
+	//
+
 	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 	
 	LoadHexFileDialog.Centre();
@@ -655,25 +669,33 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	}
 
 	/* Decode file                                                            */
-	TIHexInput >> m_SecondaryTIHexFileStat;
+	TIHexFileParser tiHexFileStat;
+	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
 
 	/* Fill Blank Address                                                     */
-	m_SecondaryTIHexFileStat.fillBlankAddr(0xffff);
+	tiHexFileStat.fillBlankAddr(0xffff);
 
-	m_SecondaryTIHexFileStat.begin();
-	unsigned long startAddress = m_SecondaryTIHexFileStat.currentAddress();
+#if 0
+	tiHexFileStat.begin();
+	unsigned long startAddress = tiHexFileStat.currentAddress();
 
-	m_SecondaryTIHexFileStat.end();
-	unsigned long endAddress = m_SecondaryTIHexFileStat.currentAddress();
+	tiHexFileStat.end();
+	unsigned long endAddress = tiHexFileStat.currentAddress();
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "startAddress = 0x%08x", startAddress);
 	PSU_DEBUG_PRINT(MSG_ALERT, "EndAddress   = 0x%08x", endAddress);
 	PSU_DEBUG_PRINT(MSG_ALERT, "Address Range= %d", endAddress - startAddress + 1UL);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data Bytes   = %d", m_SecondaryTIHexFileStat.size());
+	PSU_DEBUG_PRINT(MSG_ALERT, "Data Bytes   = %d", tiHexFileStat.size());
+#endif
 
-	if (!this->SecondaryFWUpdatePanel) this->SecondaryFWUpdatePanel = new wxPanel(m_notebook);
-	this->SetupTIHexMMAPDVL(this->SecondaryFWUpdatePanel, &this->m_SecondaryTIHexFileStat);
-
+	if (!this->PMBusSecondaryFWUpdatePanel){
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat);
+	}
+	
+	// Add page to NoteBook
+	m_notebook->AddPage(this->PMBusSecondaryFWUpdatePanel, "Secondary FW MMAP", true);
+	// Save Index Of Notebook
+	this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook() = (m_notebook->GetPageCount() - 1);
 }
 
 void MainFrame::OnStopProgramming(wxCommandEvent& event){
@@ -1568,48 +1590,6 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 
 }
 
-void MainFrame::SetupTIHexMMAPDVL(wxPanel* parent, TIHexFileParser* tiHexFileParser){
-	
-	wxASSERT(!this->m_tiHexMMAPDVC && !this->m_tiHexMMAPModel);
-	
-	this->m_tiHexMMAPDVC = new wxDataViewCtrl(parent, ID_ATTR_CTRL, wxDefaultPosition, wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
-
-	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	this->m_tiHexMMAPDVC->SetFont(font);
-
-	this->m_tiHexMMAPModel = new TIHexMMAPModel( 1024, &this->m_SecondaryTIHexFileStat);
-	this->m_tiHexMMAPDVC->AssociateModel(m_tiHexMMAPModel.get());
-
-	this->m_tiHexMMAPDVC->AppendTextColumn("ADDRESS", TIHexMMAPModel::Col_ADDRESS, wxDATAVIEW_CELL_ACTIVATABLE, 200, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("00H", TIHexMMAPModel::Col_00H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("01H", TIHexMMAPModel::Col_01H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("02H", TIHexMMAPModel::Col_02H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("03H", TIHexMMAPModel::Col_03H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("04H", TIHexMMAPModel::Col_04H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("05H", TIHexMMAPModel::Col_05H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("06H", TIHexMMAPModel::Col_06H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("07H", TIHexMMAPModel::Col_07H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("08H", TIHexMMAPModel::Col_08H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("09H", TIHexMMAPModel::Col_09H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0AH", TIHexMMAPModel::Col_0AH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0BH", TIHexMMAPModel::Col_0BH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0CH", TIHexMMAPModel::Col_0CH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0DH", TIHexMMAPModel::Col_0DH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0EH", TIHexMMAPModel::Col_0EH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("0FH", TIHexMMAPModel::Col_0FH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	this->m_tiHexMMAPDVC->AppendTextColumn("", TIHexMMAPModel::Col_ASCII, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT);
-
-	this->m_secondaryFWMMAPPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
-
-	this->m_secondaryFWMMAPPanelTopLevelSizer->Add(this->m_tiHexMMAPDVC, wxSizerFlags(1).Expand());
-
-	parent->SetSizerAndFit(this->m_secondaryFWMMAPPanelTopLevelSizer);
-
-	// Add page to NoteBook
-	m_notebook->AddPage(parent, "Secondary FW MMAP", true);
-
-}
-
 void MainFrame::OnContextMenu(wxDataViewEvent &event){
 	// Show Popup Menu
 	this->m_cmdListDVC->PopupMenu(this->m_cmdListPopupMenu);
@@ -2257,4 +2237,5 @@ void MainFrame::ReInitLogFileOutputStream(wxString dirPath){
 	}
 
 }
+
 

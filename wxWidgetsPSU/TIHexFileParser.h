@@ -892,6 +892,31 @@ public:
 
 	void blankFillAddressLowByte(unsigned long endAddress);
 
+	void ClearALL(void) {
+		/* Initialise the segment base address to zero                    */
+		segmentBaseAddress = 0;
+		/* Clear content of register variables used with the 'Start Segment'
+		*  and 'Start Linear' address records                             */
+		startSegmentAddress.ipRegister = 0;
+		startSegmentAddress.csRegister = 0;
+		startSegmentAddress.exists = false;
+		startLinearAddress.eipRegister = 0;
+		startLinearAddress.exists = false;
+		/* Set up error and warning handling variables                    */
+		msgWarning.noOfWarnings = 0;
+		msgError.noOfErrors = 0;
+		/* Note that the EOF record has not been found yet                */
+		foundEof = false;
+		/* Set verbose mode to off                                        */
+		verbose = false;
+		/* Set segment address mode to false (default)                    */
+		segmentAddressMode = false;
+		/* Ensure ihContent is cleared and point ihIterator at it         */
+		ihContent.clear();
+		ihContent.begin();
+		ihIterator = ihContent.begin();
+	}
+
 	/**********************************************************************/
 	/*! \brief Returns number of unread warning messages.
 	*

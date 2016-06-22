@@ -159,9 +159,6 @@
     <ClCompile Include="PMBUSArtProv.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="PMBUSHexDumpPanel.cpp">
-      <Filter>原始程式檔</Filter>
-    </ClCompile>
     <ClCompile Include="TIHexFileParser.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
@@ -169,6 +166,9 @@
       <Filter>原始程式檔</Filter>
     </ClCompile>
     <ClCompile Include="TIHexMMAPModel.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSFWUpdatePanel.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
@@ -275,9 +275,6 @@
     <ClInclude Include="PMBUSArtProv.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="PMBUSHexDumpPanel.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
     <ClInclude Include="TIHexFileParser.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
@@ -288,6 +285,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="PMBUSLog.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSFWUpdatePanel.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

@@ -98,8 +98,8 @@
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
     <ClCompile Include="PMBUSCMDListModel.cpp" />
+    <ClCompile Include="PMBUSFWUpdatePanel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
-    <ClCompile Include="PMBUSHexDumpPanel.cpp" />
     <ClCompile Include="PMBUSMFRPanel.cpp" />
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
@@ -159,8 +159,8 @@
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBUSCMDListModel.h" />
+    <ClInclude Include="PMBUSFWUpdatePanel.h" />
     <ClInclude Include="PMBUSHelper.h" />
-    <ClInclude Include="PMBUSHexDumpPanel.h" />
     <ClInclude Include="PMBUSLog.h" />
     <ClInclude Include="PMBUSMFRPanel.h" />
     <ClInclude Include="PMBUSStatus.h" />

@@ -30,7 +30,7 @@
 #include "PMBUSVerificationPanel.h"
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
-#include "PMBUSHexDumpPanel.h"
+#include "PMBUSFWUpdatePanel.h"
 #include "PMBUSHelper.h"
 #include "PMBUSArtProv.h"
 #include "CalibrationDialog.h"
@@ -102,7 +102,8 @@ enum
 	ID_POLLING_TIME_COMBO = 1000,
 
 	SplitterWindowID,
-	SplitterWindowTopLevelID
+	SplitterWindowTopLevelID,
+
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -189,10 +190,11 @@ public:
 	PMBUSMFRPanel *PMBusMFRPanel;
 	PMBUSVerificationPanel *PMBusVerificationPanel;
 
-	PMBUSHexDumpPanel *PMBusHexDumpPanel;
+	PMBUSFWUpdatePanel *PMBusPrimaryFWUpdatePanel;
+	PMBUSFWUpdatePanel *PMBusSecondaryFWUpdatePanel;
 
-	wxPanel *PrimaryFWUpdatePanel;
-	wxPanel *SecondaryFWUpdatePanel;
+	//wxPanel *PrimaryFWUpdatePanel;
+	//wxPanel *SecondaryFWUpdatePanel;
 
 	STDPage    *m_stdPage;
 	wxPanel    *ReadPanel;
@@ -301,7 +303,7 @@ public:
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
-	TIHexFileParser m_SecondaryTIHexFileStat;
+	//TIHexFileParser m_SecondaryTIHexFileStat;
 
 private:
 
@@ -319,7 +321,6 @@ private:
 	void SetupToolBar(void);
 	void SetupStatusBar(void);
 	void SetupCMDListDVL(wxPanel* parent);
-	void SetupTIHexMMAPDVL(wxPanel* parent, TIHexFileParser* tiHexFileParser);
 
 	void OnSecondaryFirmwarwe(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
