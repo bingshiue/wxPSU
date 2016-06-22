@@ -14,7 +14,7 @@
 #include "AppSettings.h"
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
-#include "PMBUSDataViewListModel.h"
+#include "PMBUSCMDListModel.h"
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"
@@ -52,7 +52,7 @@ public:
 		unsigned int* pollingTime,
 		PMBUSCOMMAND_t *pmBusCommand,
 		RECVBUFF_t *recvBuff,
-		wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
+		wxObjectDataPtr<PMBUSCMDListModel>* dataViewListModel,
 		PMBUSStatusBar *status_bar,
 		STDPage* stdPage,
 		PMBUSStatusPanel* pmbusStatusPanel,
@@ -68,7 +68,7 @@ public:
 
 	IOPortReadCMDThread *m_IOPortReadCMDThread;
 
-	wxObjectDataPtr<PSUDataViewListModel> *m_dataViewListCtrl;
+	wxObjectDataPtr<PMBUSCMDListModel> *m_dataViewListCtrl;
 	PMBUSStatusBar  *m_status_bar;
 	STDPage *m_stdPage;
 	PMBUSStatusPanel* m_pmbusStatusPanel;

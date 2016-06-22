@@ -97,8 +97,7 @@
     <ClCompile Include="PMBUSCBCook.cpp" />
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
-    <ClCompile Include="PMBusCMDGridTable.cpp" />
-    <ClCompile Include="PMBusDataViewListModel.cpp" />
+    <ClCompile Include="PMBUSCMDListModel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
     <ClCompile Include="PMBUSHexDumpPanel.cpp" />
     <ClCompile Include="PMBUSMFRPanel.cpp" />
@@ -114,6 +113,8 @@
     <ClCompile Include="STDPage.cpp" />
     <ClCompile Include="BaseWritePage.cpp" />
     <ClCompile Include="TaskSystemThread.cpp" />
+    <ClCompile Include="TIHexFileParser.cpp" />
+    <ClCompile Include="TIHexMMAPModel.cpp" />
     <ClCompile Include="WritePage00H.cpp" />
     <ClCompile Include="WritePage01H.cpp" />
     <ClCompile Include="WritePage02H.cpp" />
@@ -154,13 +155,13 @@
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
-    <ClInclude Include="PMBusCMDGridTable.h" />
     <ClInclude Include="PMBUSCMDWritePages.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
-    <ClInclude Include="PMBusDataViewListModel.h" />
+    <ClInclude Include="PMBUSCMDListModel.h" />
     <ClInclude Include="PMBUSHelper.h" />
     <ClInclude Include="PMBUSHexDumpPanel.h" />
+    <ClInclude Include="PMBUSLog.h" />
     <ClInclude Include="PMBUSMFRPanel.h" />
     <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PMBUSStatusDCHPanel.h" />
@@ -174,6 +175,8 @@
     <ClInclude Include="BaseWritePage.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskSystemThread.h" />
+    <ClInclude Include="TIHexFileParser.h" />
+    <ClInclude Include="TIHexMMAPModel.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

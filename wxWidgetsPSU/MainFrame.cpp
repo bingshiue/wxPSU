@@ -5,7 +5,6 @@
 #include "MyListStoreDerivedModel.h"
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
-#include "PMBusCMDGridTable.h"
 #include "Acbel.xpm"
 #include "sample.xpm"
 
@@ -48,9 +47,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	// Setup PMNBusCommand Data
 	SetupPMBusCommandData();
-
-	// Get old logger
-	m_oldLogger = wxLog::GetActiveTarget();
 	
 	// Setup Menu
 	SetupMenuBar();
@@ -103,7 +99,26 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_debugLogTC = new wxTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), wxID_ANY, "",//this->DebugLogPanel, wxID_ANY, "",
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY );
+	
+	// Get old logger
+	m_oldLogger = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);
+
+	switch (this->m_appSettings.m_logMode){
+
+	case Log_Mode_Log_ALL:
+		wxLog::SetLogLevel(wxLOG_Message);
+		break;
+
+	case Log_Mode_Log_Error_Only:
+		wxLog::SetLogLevel(wxLOG_Warning);
+		break;
+
+	default:
+
+		break;
+	}
+
 
 	// use fixed width font to align output in nice columns
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
@@ -113,7 +128,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_debugLogTC->SetFont(font);
 	this->m_debugLogTC->SetFocus();
 	
-	SetupPSUDataView(GeneralPanel);
+	SetupCMDListDVL(GeneralPanel);
 	SetupPMBusCommandWritePage();
 
 	this->PMBusStatusPanel = new PMBUSStatusPanel(m_notebook);
@@ -250,6 +265,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmwarwe)
 EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
+EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
 EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
 EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
 EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
@@ -294,6 +310,9 @@ wxEND_EVENT_TABLE()
 MainFrame::~MainFrame()
 {		
 	wxLog::SetActiveTarget(m_oldLogger);
+
+	if (this->m_logFileFFileOutputStream) { delete this->m_logFileFFileOutputStream; }
+	if (this->m_logFileTextOutputStream) { delete this->m_logFileTextOutputStream; }
 
 	// Save Config
 	this->SaveConfig();
@@ -605,10 +624,16 @@ void MainFrame::OnSecondaryFirmwarwe(wxCommandEvent& event)
 	PSU_DEBUG_PRINT(MSG_ALERT,"Not Implement");
 }
 
+void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
 void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	
 	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 	
+	LoadHexFileDialog.Centre();
+
 	// If the user changed idea...
 	if (LoadHexFileDialog.ShowModal() == wxID_CANCEL){
 		return;
@@ -617,6 +642,38 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	// Load HEX File
 	wxString path = LoadHexFileDialog.GetPath();
 	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
+
+	// Create an input stream
+	ifstream TIHexInput;
+
+	// Create a variable for the intel hex data
+	TIHexInput.open(path.c_str().AsChar(), ifstream::in);
+
+	if (!TIHexInput.good())
+	{
+		PSU_DEBUG_PRINT(MSG_ALERT, "Error: couldn't open file %s", path.c_str());
+	}
+
+	/* Decode file                                                            */
+	TIHexInput >> m_SecondaryTIHexFileStat;
+
+	/* Fill Blank Address                                                     */
+	m_SecondaryTIHexFileStat.fillBlankAddr(0xffff);
+
+	m_SecondaryTIHexFileStat.begin();
+	unsigned long startAddress = m_SecondaryTIHexFileStat.currentAddress();
+
+	m_SecondaryTIHexFileStat.end();
+	unsigned long endAddress = m_SecondaryTIHexFileStat.currentAddress();
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "startAddress = 0x%08x", startAddress);
+	PSU_DEBUG_PRINT(MSG_ALERT, "EndAddress   = 0x%08x", endAddress);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Address Range= %d", endAddress - startAddress + 1UL);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Data Bytes   = %d", m_SecondaryTIHexFileStat.size());
+
+	if (!this->SecondaryFWUpdatePanel) this->SecondaryFWUpdatePanel = new wxPanel(m_notebook);
+	this->SetupTIHexMMAPDVL(this->SecondaryFWUpdatePanel, &this->m_SecondaryTIHexFileStat);
+
 }
 
 void MainFrame::OnStopProgramming(wxCommandEvent& event){
@@ -669,7 +726,8 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 
 	if (password.compare(ADMINISTRATOR_PASSWORD) == 0){
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Password = %s", password.c_str());
-		// Enable Update Second Firmware
+		// Enable Update Firmware
+		this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, true);
 		this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, true);
 
 	}
@@ -725,23 +783,63 @@ void MainFrame::OnStopAnError(wxCommandEvent& event){
 }
 
 void MainFrame::OnErrorLogALL(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+
+	this->m_appSettings.m_logMode = Log_Mode_Log_ALL;
+	this->m_allMenuItem->Check(true);
+	this->m_errorOnlyMenuItem->Check(false);
 }
 
 void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	
+	this->m_appSettings.m_logMode = Log_Mode_Log_Error_Only;
+	this->m_allMenuItem->Check(false);
+	this->m_errorOnlyMenuItem->Check(true);
 }
 
 void MainFrame::OnLogToFile(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		this->m_logToFileMenuItem->Check(false);
+		this->m_appSettings.m_logToFile = Generic_Disable;
+	}
+	else{
+		this->m_logToFileMenuItem->Check(true);
+		this->m_appSettings.m_logToFile = Generic_Enable;
+
+		wxDirDialog *dirDialog = new wxDirDialog(this, wxT("Please Select A Directory"), wxT("C:\\"));
+		dirDialog->Centre(wxCENTER_ON_SCREEN);
+		dirDialog->ShowModal();
+
+		// 
+		wxString logFileDirPath("");
+		logFileDirPath = dirDialog->GetPath();
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", dirDialog->GetPath());
+
+		// Set Log File's Save Directory Path
+		this->m_appSettings.m_logFilePath = dirDialog->GetPath();
+
+		// No more need
+		delete dirDialog;
+		
+		// Init Output Stream
+		this->ReInitLogFileOutputStream(logFileDirPath);
+
+	}
 }
 
 void MainFrame::OnPMBus1_1(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	this->m_appSettings.m_pmbusReadMethod = PMBUS_ReadMethod_1_1;
+
+	this->m_pmBus11MenuItem->Check(true);
+	this->m_pmBus12MenuItem->Check(false);
 }
 
 void MainFrame::OnPMBus1_2(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	this->m_appSettings.m_pmbusReadMethod = PMBUS_ReadMethod_1_2;
+
+	this->m_pmBus11MenuItem->Check(false);
+	this->m_pmBus12MenuItem->Check(true);
 }
 
 void MainFrame::OnPopupFont(wxCommandEvent& event){
@@ -751,7 +849,7 @@ void MainFrame::OnPopupFont(wxCommandEvent& event){
 	font = wxGetFontFromUser();
 	
 	if (font.IsOk()){
-		this->m_dataViewCtrl->SetFont(font);
+		this->m_cmdListDVC->SetFont(font);
 	}
 }
 
@@ -765,7 +863,7 @@ void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
 	SaveCDMListDialog.Centre();
 
 	// If the user changed idea...
-	if (SaveCDMListDialog.ShowModal() == wxID_CANCEL){
+	if (SaveCDMListDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
 
@@ -817,7 +915,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_list_model, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
+		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_cmdListModel, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
 		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
 
 		// If Create Thread Success
@@ -844,43 +942,46 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 }
 
-void MainFrame::DoLogLine(wxTextCtrl *text,
-const wxString& timestr,
-const wxString& threadstr,
-const wxString& msg)
+void MainFrame::DoLogLine(wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
 {
 	text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s %10s           %s", timestr, threadstr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
 }
 
-void
-MainFrame::DoLogRecord(wxLogLevel level,
-const wxString& msg,
-const wxLogRecordInfo& info)
+void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info)
 {
 	// let the default GUI logger treat warnings and errors as they should be
 	// more noticeable than just another line in the log window and also trace
 	// messages as there may be too many of them
+#if 0
 	if (level <= wxLOG_Warning || level == wxLOG_Trace)
 	{
 		m_oldLogger->LogRecord(level, msg, info);
 		return;
 	}
+#endif
 
-	DoLogLine
-		(
+	DoLogLine(
 		this->m_debugLogTC,
 		wxDateTime(info.timestamp).FormatISOTime(),
 		info.threadId == wxThread::GetMainId()
 		? wxString("main")
 		: wxString::Format("%lx", info.threadId),
 		msg + "\n"
-		);
+	);
 }
 
 void MainFrame::OnValueChanged(wxDataViewEvent &event)
 {
 	/*wxString title*/ 
-	unsigned int row = m_list_model->GetRow(event.GetItem());//GetTitle(event.GetItem());
+	unsigned int row = m_cmdListModel->GetRow(event.GetItem());//GetTitle(event.GetItem());
 	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
 	//title, event.GetColumn());
 }
@@ -888,7 +989,7 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Select Polling Time is %d", this->m_polling_time);
-	this->m_dataViewCtrl->SetFocus();
+	this->m_cmdListDVC->SetFocus();
 }
 
 void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
@@ -935,7 +1036,8 @@ void MainFrame::SetupMenuBar(void){
 	/*
 	Run
 	|- Monitor
-	|- In System Programming -> Update Secondary Firmware 
+	|- In System Programming -> |- Update Primary Firmware
+	|                           |- Update Secondary Firmware 
 	|- Stop Programming
 	|------------------------------------
 	|- I2C Fault Test
@@ -955,17 +1057,29 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_runMenu->Append(this->m_monitorMenuItem);
 
-	this->m_inSystemProgrammingMenu = new wxMenu();
+	this->m_inSystemProgrammingMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("In System Programming"), wxT("In System Programming"), wxITEM_NORMAL);
+
+	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+
+	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("&Update Primary Firmware...\tCtrl-P"), "Update Primary Firmware", wxITEM_NORMAL);
+	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
 	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("&Update Secondary Firmware...\tCtrl-U"), "Update Secnondary Firmware", wxITEM_NORMAL);
-
 	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
-	this->m_inSystemProgrammingMenu->Append(m_updateSecondaryFirmwareMenuItem);
+	this->m_ispMenu = new wxMenu();
 
-	this->m_runMenu->AppendSubMenu(this->m_inSystemProgrammingMenu, wxT("In System Programming"), wxT("In System Programming"));
+	this->m_ispMenu->Append(this->m_updatePrimaryFirmwareMenuItem);
+	this->m_ispMenu->Append(this->m_updateSecondaryFirmwareMenuItem);
 
+	this->m_inSystemProgrammingMenuItem->SetSubMenu(this->m_ispMenu);
+
+	this->m_runMenu->Append(this->m_inSystemProgrammingMenuItem);
+
+#ifdef DEFAULT_LOCK_UPDATE_FW
 	this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, false);
+	this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, false);
+#endif
 
 	this->m_stopProgrammingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_Programming, wxT("Stop Programming"),
 		"Stop Programming", wxITEM_NORMAL);
@@ -1131,11 +1245,36 @@ void MainFrame::SetupMenuBar(void){
 		wxT("Error Only"), wxITEM_CHECK);
 
 	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"),
-		wxT("Log To File"), wxITEM_NORMAL);
+		wxT("Log To File"), wxITEM_CHECK);
 
 	this->m_errorLogMenu->Append(this->m_allMenuItem);
 	this->m_errorLogMenu->Append(this->m_errorOnlyMenuItem);
+	this->m_errorLogMenu->AppendSeparator();
 	this->m_errorLogMenu->Append(this->m_logToFileMenuItem);
+
+	switch (this->m_appSettings.m_logMode){
+
+	case Log_Mode_Log_ALL:
+		this->m_allMenuItem->Check(true);
+		this->m_errorOnlyMenuItem->Check(false);
+		break;
+
+	case Log_Mode_Log_Error_Only:
+		this->m_allMenuItem->Check(false);
+		this->m_errorOnlyMenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+		break;
+	}
+
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		this->m_logToFileMenuItem->Check(true);
+	}
+	else{
+		this->m_logToFileMenuItem->Check(false);
+	}
 
 	this->m_optionMenu->AppendSubMenu(this->m_errorLogMenu, wxT("Error Log Mode"), wxT("Error Log Mode"));
 	
@@ -1147,6 +1286,23 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_pmbusReadMethodMenu->Append(this->m_pmBus11MenuItem);
 	this->m_pmbusReadMethodMenu->Append(this->m_pmBus12MenuItem);
+
+	switch (this->m_appSettings.m_pmbusReadMethod){
+
+	case PMBUS_ReadMethod_1_1:
+		this->m_pmBus11MenuItem->Check(true);
+		this->m_pmBus12MenuItem->Check(false);
+		break;
+
+	case PMBUS_ReadMethod_1_2:
+		this->m_pmBus11MenuItem->Check(false);
+		this->m_pmBus12MenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+		break;
+	}
 
 	this->m_optionMenu->AppendSubMenu(this->m_pmbusReadMethodMenu, wxT("PMBus Read Method"), wxT("PMBus Read Method"));
 
@@ -1292,61 +1448,61 @@ void MainFrame::SetupStatusBar(void){
 	PositionStatusBar();
 }
 
-void MainFrame::SetupPSUDataView(wxPanel* parent){
+void MainFrame::SetupCMDListDVL(wxPanel* parent){
 	
-	wxASSERT(!this->m_dataViewCtrl && !m_list_model);
-	this->m_dataViewCtrl = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
+	wxASSERT(!this->m_cmdListDVC && !m_cmdListModel);
+	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
-	m_list_model = new PSUDataViewListModel(this->m_PMBusData);
-	this->m_dataViewCtrl->AssociateModel(m_list_model.get());
+	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData);
+	this->m_cmdListDVC->AssociateModel(m_cmdListModel.get());
 
 	// the various columns
-	this->m_dataViewCtrl->AppendToggleColumn("",
-		PSUDataViewListModel::Col_Toggle,
+	this->m_cmdListDVC->AppendToggleColumn("",
+		PMBUSCMDListModel::Col_Toggle,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxDVC_TOGGLE_DEFAULT_WIDTH,
 		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_REORDERABLE
 		);
 
-	this->m_dataViewCtrl->AppendIconTextColumn("Register",
-		PSUDataViewListModel::Col_RegisterIconText,
+	this->m_cmdListDVC->AppendIconTextColumn("Register",
+		PMBUSCMDListModel::Col_RegisterIconText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
 
-	this->m_dataViewCtrl->AppendTextColumn("Name",
-		PSUDataViewListModel::Col_NameText,
+	this->m_cmdListDVC->AppendTextColumn("Name",
+		PMBUSCMDListModel::Col_NameText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_NOT,
 		wxDATAVIEW_COL_SORTABLE);
 
-	this->m_dataViewCtrl->AppendTextColumn("Access",
-		PSUDataViewListModel::Col_AccessText,
+	this->m_cmdListDVC->AppendTextColumn("Access",
+		PMBUSCMDListModel::Col_AccessText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_SORTABLE);
 
-	this->m_dataViewCtrl->AppendTextColumn("Query",
-		PSUDataViewListModel::Col_QueryText,
+	this->m_cmdListDVC->AppendTextColumn("Query",
+		PMBUSCMDListModel::Col_QueryText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_CENTER_HORIZONTAL,
 		wxDATAVIEW_COL_SORTABLE);
 
-	this->m_dataViewCtrl->AppendTextColumn("Cook",
-		PSUDataViewListModel::Col_CookText,
+	this->m_cmdListDVC->AppendTextColumn("Cook",
+		PMBUSCMDListModel::Col_CookText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		350,
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);
 
-	this->m_dataViewCtrl->AppendTextColumn("Raw",
-		PSUDataViewListModel::Col_RawText,
+	this->m_cmdListDVC->AppendTextColumn("Raw",
+		PMBUSCMDListModel::Col_RawText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_LEFT,
@@ -1378,7 +1534,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
 
 	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
-	this->m_dataViewCtrl->SetMinSize(wxSize(-1, 200));
+	this->m_cmdListDVC->SetMinSize(wxSize(-1, 200));
 
 	// Setup Sizer
 	GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -1386,7 +1542,7 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 	
 	// Setup CMDListPanel
 	CMDListSizer = new wxBoxSizer(wxHORIZONTAL);
-	CMDListSizer->Add(this->m_dataViewCtrl, 1, wxEXPAND | wxALL);
+	CMDListSizer->Add(this->m_cmdListDVC, 1, wxEXPAND | wxALL);
 
 	this->CMDListPanel->SetSizerAndFit(CMDListSizer);
 
@@ -1412,9 +1568,51 @@ void MainFrame::SetupPSUDataView(wxPanel* parent){
 
 }
 
+void MainFrame::SetupTIHexMMAPDVL(wxPanel* parent, TIHexFileParser* tiHexFileParser){
+	
+	wxASSERT(!this->m_tiHexMMAPDVC && !this->m_tiHexMMAPModel);
+	
+	this->m_tiHexMMAPDVC = new wxDataViewCtrl(parent, ID_ATTR_CTRL, wxDefaultPosition, wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
+
+	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	this->m_tiHexMMAPDVC->SetFont(font);
+
+	this->m_tiHexMMAPModel = new TIHexMMAPModel( 1024, &this->m_SecondaryTIHexFileStat);
+	this->m_tiHexMMAPDVC->AssociateModel(m_tiHexMMAPModel.get());
+
+	this->m_tiHexMMAPDVC->AppendTextColumn("ADDRESS", TIHexMMAPModel::Col_ADDRESS, wxDATAVIEW_CELL_ACTIVATABLE, 200, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("00H", TIHexMMAPModel::Col_00H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("01H", TIHexMMAPModel::Col_01H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("02H", TIHexMMAPModel::Col_02H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("03H", TIHexMMAPModel::Col_03H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("04H", TIHexMMAPModel::Col_04H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("05H", TIHexMMAPModel::Col_05H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("06H", TIHexMMAPModel::Col_06H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("07H", TIHexMMAPModel::Col_07H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("08H", TIHexMMAPModel::Col_08H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("09H", TIHexMMAPModel::Col_09H, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0AH", TIHexMMAPModel::Col_0AH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0BH", TIHexMMAPModel::Col_0BH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0CH", TIHexMMAPModel::Col_0CH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0DH", TIHexMMAPModel::Col_0DH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0EH", TIHexMMAPModel::Col_0EH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("0FH", TIHexMMAPModel::Col_0FH, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	this->m_tiHexMMAPDVC->AppendTextColumn("", TIHexMMAPModel::Col_ASCII, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT);
+
+	this->m_secondaryFWMMAPPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
+
+	this->m_secondaryFWMMAPPanelTopLevelSizer->Add(this->m_tiHexMMAPDVC, wxSizerFlags(1).Expand());
+
+	parent->SetSizerAndFit(this->m_secondaryFWMMAPPanelTopLevelSizer);
+
+	// Add page to NoteBook
+	m_notebook->AddPage(parent, "Secondary FW MMAP", true);
+
+}
+
 void MainFrame::OnContextMenu(wxDataViewEvent &event){
 	// Show Popup Menu
-	this->m_dataViewCtrl->PopupMenu(this->m_cmdListPopupMenu);
+	this->m_cmdListDVC->PopupMenu(this->m_cmdListPopupMenu);
 }
 
 unsigned int MainFrame::getCurrentUseIOInterface(void){
@@ -1442,7 +1640,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	//PSUDataViewListModel* model = (PSUDataViewListModel*)this->m_dataViewCtrl->GetModel();
 
-	int row = m_list_model->GetRow(item);
+	int row = m_cmdListModel->GetRow(item);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Selected Row is : %d", row);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
@@ -1510,8 +1708,8 @@ void MainFrame::OnDisableAll(wxCommandEvent& event){
 	variant = false;
 
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
-		this->m_list_model->SetValueByRow(variant, idx, PSUDataViewListModel::Col_Toggle);
-		this->m_list_model->RowValueChanged(idx, PSUDataViewListModel::Col_Toggle);
+		this->m_cmdListModel->SetValueByRow(variant, idx, PMBUSCMDListModel::Col_Toggle);
+		this->m_cmdListModel->RowValueChanged(idx, PMBUSCMDListModel::Col_Toggle);
 	}
 }
 
@@ -1526,8 +1724,8 @@ void MainFrame::OnEnableAll(wxCommandEvent& event){
 	variant = true;
 
 	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
-		this->m_list_model->SetValueByRow(variant, idx, PSUDataViewListModel::Col_Toggle);
-		this->m_list_model->RowValueChanged(idx, PSUDataViewListModel::Col_Toggle);
+		this->m_cmdListModel->SetValueByRow(variant, idx, PMBUSCMDListModel::Col_Toggle);
+		this->m_cmdListModel->RowValueChanged(idx, PMBUSCMDListModel::Col_Toggle);
 	}
 }
 
@@ -1799,8 +1997,8 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 		line += wxString::Format(format[0], registerValue);
 		PSU_DEBUG_PRINT(MSG_DEBUG, "%-12s", registerValue.c_str());
 
-		for (unsigned int column_idx = 2; column_idx < PSUDataViewListModel::Col_Max-3; column_idx++){
-			this->m_list_model->GetValueByRow(Value, row_idx, column_idx);
+		for (unsigned int column_idx = 2; column_idx < PMBUSCMDListModel::Col_Max - 3; column_idx++){
+			this->m_cmdListModel->GetValueByRow(Value, row_idx, column_idx);
 			
 			line += wxString::Format(format[column_idx-1], Value.GetString().c_str());
 
@@ -1853,6 +2051,52 @@ void MainFrame::CheckAndLoadConfig(void){
 	}
 	else{
 		this->m_appSettings.m_IterationsValue = iterationsValue;
+	}
+
+	pConfig->SetPath(wxT("/LOG"));
+	
+	// Log Mode
+	long logMode;
+	if (pConfig->Read(wxT("LogMode"), &logMode) == false){
+		pConfig->Write(wxT("LogMode"), DEFAULT_LOG_MODE);
+		this->m_appSettings.m_logMode = DEFAULT_LOG_MODE;
+	}
+	else{
+		this->m_appSettings.m_logMode = logMode;
+	}
+
+	// Log To File
+	long logToFile;
+	if (pConfig->Read(wxT("LogToFile"), &logToFile) == false){
+		pConfig->Write(wxT("LogToFile"), DEFAULT_LOG_TO_FILE);
+		this->m_appSettings.m_logToFile = DEFAULT_LOG_TO_FILE;
+	}
+	else{
+		this->m_appSettings.m_logToFile = logToFile;
+	}
+
+	// Log File Path
+	wxString logFilePath;
+	if (pConfig->Read(wxT("LogFilePath"), &logFilePath) == false){
+		pConfig->Write(wxT("LogFilePath"), DEFAULT_LOG_FILE_PATH);
+		this->m_appSettings.m_logFilePath = wxString::Format("%s", DEFAULT_LOG_FILE_PATH);
+	}
+	else{
+		this->m_appSettings.m_logFilePath = wxString::Format("%s", logFilePath);
+	}
+
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		this->ReInitLogFileOutputStream(this->m_appSettings.m_logFilePath);
+	}
+
+	pConfig->SetPath(wxT("/PMBUS"));
+	long pmbusReadMethod;
+	if (pConfig->Read(wxT("PMBUSReadMethod"), &pmbusReadMethod) == false){
+		pConfig->Write(wxT("PMBUSReadMethod"), DEFAULT_PMBUS_READ_METHOD);
+		this->m_appSettings.m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
+	}
+	else{
+		this->m_appSettings.m_pmbusReadMethod = pmbusReadMethod;
 	}
 
 	pConfig->SetPath(wxT("/COMPORT"));
@@ -1938,6 +2182,22 @@ void MainFrame::SaveConfig(void){
 	// Iterations
 	pConfig->Write(wxT("Iterations"), this->m_appSettings.m_IterationsValue);
 
+	pConfig->SetPath(wxT("/LOG"));
+
+	// Log Mode
+	pConfig->Write(wxT("LogMode"), this->m_appSettings.m_logMode);
+	
+	// Log To File
+	pConfig->Write(wxT("LogToFile"), this->m_appSettings.m_logToFile);
+
+	// Log File Path
+	pConfig->Write(wxT("LogFilePath"), this->m_appSettings.m_logFilePath);
+
+	pConfig->SetPath(wxT("/PMBUS"));
+
+	// PM Bus Read Method
+	pConfig->Write(wxT("PMBUSReadMethod"), this->m_appSettings.m_pmbusReadMethod);
+
 	pConfig->SetPath(wxT("/COMPORT"));
 
 	// Comport Number
@@ -1959,3 +2219,42 @@ void MainFrame::SaveConfig(void){
 	delete wxConfigBase::Set((wxConfigBase *)NULL);
 
 }
+
+void MainFrame::ReInitLogFileOutputStream(wxString dirPath){
+
+	wxString logFilePath = dirPath;
+
+	wxString logFileName("Log-");
+
+	wxString dateStr("");
+	PMBUSHelper::GetNowDateTimeString(dateStr);
+
+	logFileName += dateStr;
+
+	logFilePath += logFileName;
+
+	logFilePath += wxT(".txt");
+
+	//PSU_DEBUG_PRINT(MSG_ALERT, "logFilePath=%s", logFilePath.c_str());
+
+	if (this->m_logFileFFileOutputStream) delete this->m_logFileFFileOutputStream;
+	if (this->m_logFileTextOutputStream) delete this->m_logFileTextOutputStream;
+
+	if (!this->m_logFileFFileOutputStream){
+		this->m_logFileFFileOutputStream = new wxFFileOutputStream(logFilePath);
+
+		if (!this->m_logFileFFileOutputStream->IsOk()){
+			//PSU_DEBUG_PRINT(MSG_ALERT, "Cann't Open Log File : %s", logFilePath.c_str());
+		}
+
+		if (!this->m_logFileTextOutputStream){
+			this->m_logFileTextOutputStream = new wxTextOutputStream(*this->m_logFileFFileOutputStream);
+		}
+		
+		// Test
+		//*this->m_logFileTextOutputStream << "TEST LOG File" << endl;
+		//this->m_logFileTextOutputStream->Flush();
+	}
+
+}
+

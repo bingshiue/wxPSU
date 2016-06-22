@@ -18,7 +18,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	unsigned int* pollingTime,
 	PMBUSCOMMAND_t *pmBusCommand,
 	RECVBUFF_t *recvBuff,
-	wxObjectDataPtr<PSUDataViewListModel>* dataViewListModel,
+	wxObjectDataPtr<PMBUSCMDListModel>* dataViewListModel,
 	PMBUSStatusBar *status_bar,
 	STDPage* stdPage,
 	PMBUSStatusPanel* pmbusStatusPanel,
@@ -373,7 +373,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// Update DataView Register Field Icon
 						this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
-						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RegisterIconText);
+						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RegisterIconText);
 
 						// Prepare Send Buffer
 						this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
@@ -497,8 +497,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 										this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
 									}
 									PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
-									this->m_dataViewListCtrl->get()->SetValueByRow(variantRaw, idx, PSUDataViewListModel::Col_RawText);
-									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
+									this->m_dataViewListCtrl->get()->SetValueByRow(variantRaw, idx, PMBUSCMDListModel::Col_RawText);
+									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
 
@@ -511,8 +511,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									wxVariant variantCook;
 									variantCook = CookMsg;
 
-									this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PSUDataViewListModel::Col_CookText);
-									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_CookText);
+									this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PMBUSCMDListModel::Col_CookText);
+									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
 
@@ -534,8 +534,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 										wxString NotFoundMsg(wxT("(I2C Interface Not Found)"));
 										wxVariant variantNotFound = NotFoundMsg;
 
-										this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PSUDataViewListModel::Col_RawText);
-										this->m_dataViewListCtrl->get()->RowValueChanged(idx, PSUDataViewListModel::Col_RawText);
+										this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PMBUSCMDListModel::Col_RawText);
+										this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
 									}
 
 									if (this->m_appSettings->m_runMode == RunMode_StopAnError){

@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <cstdlib>
 #include <vector>
 #include "TaskSystemEx.h"
 #include "Task.h"
@@ -18,7 +20,7 @@
 #include "SerialPort.h"
 #include "HID.h"
 #include "IOAccess.h"
-#include "PMBusDataViewListModel.h"
+#include "PMBUSCMDListModel.h"
 #include "PMBUSStatusBar.h"
 #include "PMBUSCommandType.h"
 #include "STDPage.h"
@@ -34,6 +36,8 @@
 #include "CalibrationDialog.h"
 #include "I2CInterfaceDialog.h"
 #include "AboutDialog.h"
+#include "TIHexFileParser.h"
+#include "TIHexMMAPModel.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -49,6 +53,7 @@ enum
 	MENU_ID_Secondary_Firmware = 1,
 	MENU_ID_Monitor,
 
+	MENU_ID_Update_Primary_Firmware,
 	MENU_ID_Update_Secondary_Firmware,
 	MENU_ID_Stop_Programming,
 	MENU_ID_I2C_Fault_Test,
@@ -153,10 +158,16 @@ public:
 
 	wxSizer* CMDListSizer;
 
+	wxSizer* m_primaryFWMMAPPanelTopLevelSizer;
+	wxSizer* m_secondaryFWMMAPPanelTopLevelSizer;
+
 	wxStaticBoxSizer* m_debugLogStaticBoxSizer;
 
-	wxDataViewCtrl *m_dataViewCtrl;
-	wxObjectDataPtr<PSUDataViewListModel> m_list_model;
+	wxDataViewCtrl *m_cmdListDVC;
+	wxObjectDataPtr<PMBUSCMDListModel> m_cmdListModel;
+
+	wxDataViewCtrl *m_tiHexMMAPDVC;
+	wxObjectDataPtr<TIHexMMAPModel> m_tiHexMMAPModel;
 
 	wxDataViewColumn* m_attributes;
 
@@ -180,6 +191,8 @@ public:
 
 	PMBUSHexDumpPanel *PMBusHexDumpPanel;
 
+	wxPanel *PrimaryFWUpdatePanel;
+	wxPanel *SecondaryFWUpdatePanel;
 
 	STDPage    *m_stdPage;
 	wxPanel    *ReadPanel;
@@ -196,7 +209,9 @@ public:
 	wxMenu      *m_runMenu;
 
 	wxMenuItem  *m_monitorMenuItem;
-	wxMenu      *m_inSystemProgrammingMenu;
+	wxMenu      *m_ispMenu;
+	wxMenuItem  *m_inSystemProgrammingMenuItem;
+	wxMenuItem  *m_updatePrimaryFirmwareMenuItem;
 	wxMenuItem  *m_updateSecondaryFirmwareMenuItem;
 	wxMenuItem  *m_stopProgrammingMenuItem;
 	wxMenuItem  *m_i2cFaultTestMenuItem;
@@ -286,7 +301,13 @@ public:
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
+	TIHexFileParser m_SecondaryTIHexFileStat;
+
 private:
+
+	wxFFileOutputStream *m_logFileFFileOutputStream;
+	wxTextOutputStream *m_logFileTextOutputStream;
+
 
 	unsigned int m_CurrentUseIOInterface;/**< Current Use IO Interface */
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
@@ -297,10 +318,12 @@ private:
 	void SetupMenuBar(void);
 	void SetupToolBar(void);
 	void SetupStatusBar(void);
-	void SetupPSUDataView(wxPanel* parent);
+	void SetupCMDListDVL(wxPanel* parent);
+	void SetupTIHexMMAPDVL(wxPanel* parent, TIHexFileParser* tiHexFileParser);
 
 	void OnSecondaryFirmwarwe(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
+	void OnUpdatePrimaryFirmware(wxCommandEvent& event);
 	void OnUpdateSecondaryFirmware(wxCommandEvent& event);
 	void OnStopProgramming(wxCommandEvent& event);
 	void OnI2CFaultTest(wxCommandEvent& event);
@@ -370,6 +393,8 @@ private:
 	void CheckAndLoadConfig(void);
 
 	void SaveConfig(void);
+
+	void ReInitLogFileOutputStream(wxString dirPath);
 
 	wxDECLARE_EVENT_TABLE();
 

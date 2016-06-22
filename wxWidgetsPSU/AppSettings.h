@@ -5,6 +5,7 @@
 #define _APPSETTINGS_H_
 
 #include <Windows.h>
+#include <wx/wx.h>
 
 enum {
 	RunMode_Iterations = 0,
@@ -12,9 +13,30 @@ enum {
 	RunMode_StopAnError
 };
 
+enum {
+	Log_Mode_Log_ALL = 0,
+	Log_Mode_Log_Error_Only
+};
+
+enum {
+	Generic_Disable = 0,
+	Generic_Enable
+};
+
+enum {
+	PMBUS_ReadMethod_1_1 = 0,
+	PMBUS_ReadMethod_1_2
+};
+
 #define DEFAULT_I2C_SLAVEADDRESS  0xb6
 #define DEFAULT_RUN_MODE          (unsigned long)(RunMode_Continually)//0x01 //RunMode_Continually
 #define DEFAULT_ITERATIONS_VALUE  10000
+
+#define DEFAULT_LOG_MODE          (unsigned long)Log_Mode_Log_ALL
+#define DEFAULT_LOG_TO_FILE       (unsigned long)Generic_Disable
+#define DEFAULT_LOG_FILE_PATH     ""
+
+#define DEFAULT_PMBUS_READ_METHOD     (unsigned long)PMBUS_ReadMethod_1_1
 
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600
@@ -46,6 +68,10 @@ typedef struct appSettings_t {
 	unsigned long m_I2CSlaveAddress;/**< I2C Slave Address */
 	unsigned long m_runMode;/**< Run Mode */
 	unsigned long m_IterationsValue;/**< Iteration Value */
+	unsigned long m_logMode;/**< Log Mode */
+	unsigned long m_logToFile;/**< Log To File */
+	     wxString m_logFilePath;/**< Log File Path */
+	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
 
 	void Reset(void){
 		this->m_comportSetting.Reset();
@@ -53,6 +79,10 @@ typedef struct appSettings_t {
 		this->m_I2CSlaveAddress = DEFAULT_I2C_SLAVEADDRESS;
 		this->m_runMode = DEFAULT_RUN_MODE;
 		this->m_IterationsValue = DEFAULT_ITERATIONS_VALUE;
+		this->m_logMode = DEFAULT_LOG_MODE;/**< Log Mode */
+		this->m_logToFile = DEFAULT_LOG_TO_FILE;/**< Log To File */
+		this->m_logFilePath = wxString::Format("%s", DEFAULT_LOG_FILE_PATH);
+		this->m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
 	}
 
 } AppSettings_t;

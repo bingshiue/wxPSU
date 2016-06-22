@@ -20,7 +20,7 @@
 #include "TaskSystemEx.h"
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
-#include "PMBUSDataViewListModel.h"
+#include "PMBUSCMDListModel.h"
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSHelper.h"

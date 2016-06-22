@@ -13,40 +13,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "PMBUSLog.h"
+
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 
-#define PSU_PRINT(fmt, ...)  \
-		wxLogMessage(fmt,__VA_ARGS__);
-
-
-enum DEBUG_MSG_LEVEL {
-	MSG_FATAL = 0,
-	MSG_EMERGECY,
-	MSG_ALERT,
-	MSG_DEBUG,
-	MSG_DETAIL,
-};
-
-#define PSU_DEBUG_MSG /**< Print More Debug Messages */
-#define DEFAULT_DEBUG_MSG_LEVEL  MSG_ALERT /**< Default Debug Message Level */
-
-#ifdef PSU_DEBUG_MSG
-#ifdef _DEBUG
-#define PSU_DEBUG_PRINT(level,fmt, ...)  \
-		if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
-			wxLogMessage("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);
-#else
-#define PSU_DEBUG_PRINT(level,fmt, ...)  \
-		if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
-			wxLogMessage(fmt,__VA_ARGS__);
-#endif
-#else
-#define PSU_DEBUG_PRINT(fmt, ...)  \
-		while(0) ;
-#endif
-
+//#define DEFAULT_LOCK_UPDATE_FW
 #define ADMINISTRATOR_PASSWORD wxT("acbelacbel")
 
 #define IO_PORT_MAX_COUNT  255/**< Max Count of IO Device */     
