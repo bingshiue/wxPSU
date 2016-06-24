@@ -2,7 +2,6 @@
  * @file MainFrame.cpp
  */
 #include "MainFrame.h"
-#include "MyListStoreDerivedModel.h"
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
 #include "Acbel.xpm"
@@ -689,7 +688,7 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 #endif
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	}
 	
 	// Add page to NoteBook
@@ -828,7 +827,8 @@ void MainFrame::OnLogToFile(wxCommandEvent& event){
 		this->m_logToFileMenuItem->Check(true);
 		this->m_appSettings.m_logToFile = Generic_Enable;
 
-		wxDirDialog *dirDialog = new wxDirDialog(this, wxT("Please Select A Directory"), wxT("C:\\"));
+		//wxStandardPaths standardPath = wxStandardPaths::Get();
+		wxDirDialog *dirDialog = new wxDirDialog(this, wxT("Please Select A Directory"), wxT("C:\\"));// standardPath.GetDocumentsDir());
 		dirDialog->Centre(wxCENTER_ON_SCREEN);
 		dirDialog->ShowModal();
 

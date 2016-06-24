@@ -1,0 +1,2 @@
+ 14:41:03       main           Close Window
+ 14:41:03       main           Close Serial Port 000001F0

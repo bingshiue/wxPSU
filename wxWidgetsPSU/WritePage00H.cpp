@@ -89,7 +89,7 @@ void WritePage00H::OnButtonWrite(wxCommandEvent& event){
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
 	};
 
-	unsigned char separate_pec = 0;;
+	unsigned char separate_pec = 0;
 
 	separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, changePageSendBuffer + 2, 3);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);

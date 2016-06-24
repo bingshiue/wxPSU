@@ -36,6 +36,8 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 #define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
 
+#define IGNORE_ISP_RESPONSE_ERROR
+
 enum {
 	IOACCESS_SERIALPORT = 0,
 	IOACCESS_HID
@@ -49,6 +51,13 @@ enum {
 enum {
 	SUCCESS = EXIT_SUCCESS,    /**< SUCCESS */
 	FAILURE = EXIT_FAILURE,    /**< FAILURE */
+};
+
+enum {
+	ISP_Status_InProgress = 0,
+	ISP_Status_UserRequestCancel,
+	ISP_Status_ErrorOccurs,
+	ISP_Status_ALLDone
 };
 
 #endif

@@ -127,8 +127,8 @@ PMBUSCOMMAND_t g_PMBUSCommand[PMBUSCOMMAND_SIZE] = {
 	{ true, "DCH", 0xdc, "Read_BoxSTATUS", cmd_access_readwrite, 0, 0, { 0 }, 0x0C, { 0 }, { 0 }, { 0 } },
 // DDh         
 	{ true, "DDH", 0xdd, "Black_BOX_Index", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
-// F1h         
-	{ true, "F1H", 0xf1, "Firmware_Version_Command", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 } },
+// F5h         
+	{ true, "F5H", 0xf5, "Firmware_Version_Command", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 } },
 // FAh         
 	{ true, "FAH", 0xfa, "Firmware_Update_Command", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 } },
 // FCh         

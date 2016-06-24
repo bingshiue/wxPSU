@@ -20,6 +20,11 @@ public :
 		negative
 	};
 
+	enum {
+		response_ng = 0,
+		response_ok,
+	};
+
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
@@ -32,6 +37,9 @@ public :
 
 	static void GetNowDateTimeString(wxString& string);
 
+	static unsigned char IsResponseOK(unsigned char *buffer, unsigned int sizeOfBuffer);
+	static unsigned char ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex);
+
 protected :
 
 private :
@@ -39,6 +47,5 @@ private :
 
 	static PMBUSSTATUS_t m_pmbusStatus;
 };
-
 
 #endif

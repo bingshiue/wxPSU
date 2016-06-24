@@ -1,0 +1,2 @@
+ 14:53:05       main           Port Com3 Opened
+ 14:53:29       main           C:\Users\a105056\Documents

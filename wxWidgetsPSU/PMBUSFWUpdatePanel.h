@@ -9,8 +9,15 @@
 #include <wx/wx.h>
 #endif
 
+#include "wx/progdlg.h"
+
+#include "CommonDef.h"
+#include "PMBUSCommandType.h"
+#include "PMBUSHelper.h"
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
+
+#include "Task.h"
 
 enum {
 	ID_HEXMMAP_DVC = 8100,
@@ -22,13 +29,13 @@ enum {
 class PMBUSFWUpdatePanel : public wxPanel {
 public:
 	
-	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser& tiHexFileStat);
+	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO);
 
 	~PMBUSFWUpdatePanel();
 
 	void SetupHexMMAPDVL(void);
 
-	unsigned int& GetIndexOfNotebook(void) { return this->m_indexOfNotebook;  }
+	unsigned int& GetIndexOfNotebook(void) { return this->m_indexOfNotebook; }
 
 protected :
 
@@ -43,17 +50,29 @@ private:
 
 	TIHexFileParser m_tiHexFileStat;
 
+	IOACCESS *m_ioaccess;
+	
+	unsigned int *m_currentIO;
+
 	wxStaticText *m_fileNameST;
+	//wxTextCtrl *m_fileNameTC;
 
 	wxStaticText *m_startAddressST;
-	wxStaticText *m_endAddressST;
-	wxStaticText *m_addressRangeST;
-	wxStaticText *m_dataBytesST;
-    
+	wxTextCtrl *m_startAddressTC;
 
+	wxStaticText *m_endAddressST;
+	wxTextCtrl *m_endAddressTC;
+
+	wxStaticText *m_addressRangeST;
+	wxTextCtrl *m_addressRangeTC;
+
+	wxStaticText *m_dataBytesST;
+	wxTextCtrl *m_dataBytesTC;
+    
 	wxButton *m_writeButton;
 	wxButton *m_closeButton;
 
+	wxFlexGridSizer *m_fileStatFGS;
 	wxBoxSizer *m_buttonSizer;
 
 	wxStaticBoxSizer *m_statisticSBS;
@@ -67,6 +86,7 @@ private:
 	unsigned long m_addressRange;
 	unsigned long m_dataBytes;
 
+	unsigned int m_dvlRowCount;
 
 	unsigned int m_indexOfNotebook;
 

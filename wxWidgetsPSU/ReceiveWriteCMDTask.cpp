@@ -33,7 +33,7 @@ int ReceiveWriteCMDTask::Main(double elapsedTime){
 	if (this->m_recvBuff.m_length == 0){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 
-		new(TP_SendWriteCMDTask)SendWriteCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand);
+		//new(TP_SendWriteCMDTask) SendWriteCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand);
 
 		delete this;
 		return -1;

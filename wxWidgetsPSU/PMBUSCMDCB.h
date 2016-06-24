@@ -68,7 +68,7 @@ CMDQueryCBFunc CMDQueryCBFuncArray[PMBUSCOMMAND_SIZE] = {
 	Query_dbH,
 	Query_dcH,
 	Query_ddH,
-	Query_f1H,
+	Query_f5H,
 	Query_faH,
 	Query_fcH
 };
@@ -133,7 +133,7 @@ CMDCookCBFunc CMDCookCBFuncArray[PMBUSCOMMAND_SIZE] = {
 	Cook_dbH,
 	Cook_dcH,
 	Cook_ddH,
-	Cook_f1H,
+	Cook_f5H,
 	Cook_faH,
 	Cook_fcH
 };
@@ -198,7 +198,7 @@ CMDRawCBFunc CMDRawCBFuncArray[PMBUSCOMMAND_SIZE] = {
 	Raw_dbH,
 	Raw_dcH,
 	Raw_ddH,
-	Raw_f1H,
+	Raw_f5H,
 	Raw_faH,
 	Raw_fcH
 };

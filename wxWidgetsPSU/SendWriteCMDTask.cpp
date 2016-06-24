@@ -20,13 +20,12 @@ void SendWriteCMDTask::Draw(void){
 
 }
 
-
 int SendWriteCMDTask::Main(double elapsedTime){
 
 	int cnt = this->GetCount(task_ID_SendWriteCMDTask);
 	int ret;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%d", cnt);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Send Buffer Length = %d", this->m_pmbusSendCommand.m_sendDataLength);
 
@@ -71,7 +70,7 @@ int SendWriteCMDTask::Main(double elapsedTime){
 		return -1;
 	}
 
-	new(TP_ReceiveWriteCMDTask)ReceiveWriteCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand);
+	new(TP_ReceiveWriteCMDTask) ReceiveWriteCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand);
 
 	delete this;
 

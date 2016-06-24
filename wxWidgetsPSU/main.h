@@ -37,6 +37,7 @@
 #include "wx/config.h"
 #include "wx/fileconf.h"
 #include "wx/infobar.h"
+#include <wx/stdpaths.h>
 
 class WXPSU : public wxApp
 {

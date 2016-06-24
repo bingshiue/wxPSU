@@ -91,7 +91,6 @@
     <ClCompile Include="I2CInterfaceDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
-    <ClCompile Include="MyListStoreDerivedModel.cpp" />
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSCBCook.cpp" />
@@ -105,7 +104,13 @@
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="PMBUSVerificationPanel.cpp" />
+    <ClCompile Include="ReceiveISPEndCMDTask.cpp" />
+    <ClCompile Include="ReceiveISPStartCMDTask.cpp" />
+    <ClCompile Include="ReceiveISPWriteDataTask.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
+    <ClCompile Include="SendISPEndCMDTask.cpp" />
+    <ClCompile Include="SendISPStartCMDTask.cpp" />
+    <ClCompile Include="SendISPWriteDataTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />
@@ -148,7 +153,6 @@
     <ClInclude Include="IOAccess.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
-    <ClInclude Include="MyListStoreDerivedModel.h" />
     <ClInclude Include="PEC.h" />
     <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSCBCook.h" />

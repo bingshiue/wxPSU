@@ -66,7 +66,7 @@ int Query_d0H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int Query_dbH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int Query_dcH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int Query_ddH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
-int Query_f1H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+int Query_f5H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int Query_faH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int Query_fcH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 

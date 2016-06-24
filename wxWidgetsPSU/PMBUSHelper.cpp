@@ -20,7 +20,6 @@ PMBUSSTATUS_t* PMBUSHelper::GetPMBusStatus(void){
 	return &m_pmbusStatus;
 }
 
-
 #define N_VALUE_MASK  0xf800
 #define Y_VALUE_MASK  0x07ff
 
@@ -289,4 +288,42 @@ void PMBUSHelper::GetNowDateTimeString(wxString& string){
 	string += wxString::Format("%02d", datetime.GetHour());
 	string += "-";
 	string += wxString::Format("%02d", datetime.GetMinute());
+}
+
+unsigned char PMBUSHelper::IsResponseOK(unsigned char *buffer, unsigned int sizeOfBuffer){
+
+	unsigned char result = response_ok;
+
+#ifndef IGNORE_ISP_RESPONSE_ERROR
+	unsigned char ok_buffer[6] = { 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a };
+
+	if (sizeOfBuffer < sizeof(ok_buffer) / sizeof(ok_buffer[0])){
+		result = response_ng;
+		return result;
+	}
+
+	for (int idx = 0; idx < sizeof(ok_buffer) / sizeof(ok_buffer[0]); idx++){
+		if (buffer[idx] != ok_buffer[idx]){
+			result = response_ng;
+			break;
+		}
+	}
+#endif
+
+	return result;
+}
+
+unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex){
+	unsigned char CheckSum = 0x00;
+	unsigned char Sum = 0x00;
+
+	if (!buffer) { return CheckSum; }
+
+	for (unsigned int idx = dataStartIndex; idx <= dataEndIndex; idx++){
+		Sum += buffer[idx];
+	}
+
+	CheckSum = 0x0100 - Sum;
+
+	return CheckSum;
 }

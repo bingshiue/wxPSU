@@ -137,7 +137,7 @@ int Raw_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 int Raw_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_ddH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
-int Raw_f1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
+int Raw_f5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_faH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 int Raw_fcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return Raw_Common(pmbuscmd, string, dataBytesLength); }
 
