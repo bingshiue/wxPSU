@@ -45,49 +45,49 @@ void SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 	buffer[8] = data & 0x00ff;
 	buffer[9] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[10] = data & 0x00ff;
 	buffer[11] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[12] = data & 0x00ff;
 	buffer[13] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[14] = data & 0x00ff;
 	buffer[15] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[16] = data & 0x00ff;
 	buffer[17] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[18] = data & 0x00ff;
 	buffer[19] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[20] = data & 0x00ff;
 	buffer[21] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
 	buffer[22] = data & 0x00ff;
 	buffer[23] = (data & 0xff00) >> 8;
 
-	this->m_tiHexFileStat++;
+	(*this->m_tiHexFileStat)++;
 
 	// CheckSum Byte
 	buffer[24] = PMBUSHelper::ComputeISPDataCheckSum(buffer, 8, 23);
@@ -125,8 +125,8 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 
 	/*----------------------------------------------*/
 	// Product Send Buffer
-	//this->ProductSendBuffer(this->m_sendBuff);
-	++(*this->m_tiHexFileStat);
+	this->ProductSendBuffer(this->m_sendBuff);
+	//++(*this->m_tiHexFileStat);
 	/*----------------------------------------------*/
 
 	int sendResult;
@@ -163,7 +163,9 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 		return -1;
 	}
 
-	new(TP_ReceiveISPWriteDataTask) ReceiveISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+	if (*this->m_ispStatus == ISP_Status_InProgress){
+		new(TP_ReceiveISPWriteDataTask)ReceiveISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+	}
 
 	delete this;
 

@@ -158,8 +158,8 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		wxPD_APP_MODAL |
 		//wxPD_AUTO_HIDE | // -- try this as well
 		wxPD_ELAPSED_TIME |
-		wxPD_ESTIMATED_TIME |
-		wxPD_REMAINING_TIME |
+		//wxPD_ESTIMATED_TIME |
+		//wxPD_REMAINING_TIME |
 		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
 		);
 
@@ -187,13 +187,21 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus);
 
+
+	int not_cancel;
+
 	// Wait for ISP Sequence End
 	while (Task::GetCount() > 0){
 
 		information = wxString::Format("0x%08x",this->m_tiHexFileStat.currentAddress());
 
 		// Update Dialogs
-		dialog.Update(percentage, information);
+		not_cancel = dialog.Update(percentage, information);
+
+		if (not_cancel == false){
+			ispStatus = ISP_Status_UserRequestCancel;
+		}
+
 
 		// If Error Occurs
 		if (ispStatus == ISP_Status_ErrorOccurs){

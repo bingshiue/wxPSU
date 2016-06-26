@@ -75,7 +75,9 @@ int SendISPStartCMDTask::Main(double elapsedTime){
 		return -1;
 	}
 
-	new(TP_ReceiveISPStartCMDTask) ReceiveISPStartCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand, this->m_tiHexFileStat, this->m_ispStatus);
+	if (*this->m_ispStatus == ISP_Status_InProgress){
+		new(TP_ReceiveISPStartCMDTask)ReceiveISPStartCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand, this->m_tiHexFileStat, this->m_ispStatus);
+	}
 
 	delete this;
 
