@@ -4,7 +4,7 @@
 
 #include "PMBUSFWUpdatePanel.h"
 
-PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO) : wxPanel(parent) {
+PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning) : wxPanel(parent) {
 
 	this->m_parent = parent;
 
@@ -15,6 +15,8 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_ioaccess = ioaccess;
 
 	this->m_currentIO = currentIO;
+
+	this->m_isMonitorRunning = isMonitorRunning;
 
 	tiHexFileStat.begin();
     this->m_startAddress = tiHexFileStat.currentAddress();
@@ -146,6 +148,17 @@ void PMBUSFWUpdatePanel::SetupHexMMAPDVL(void){
 
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
+	
+	// Check if Monitor is Running
+	if (*this->m_isMonitorRunning == true){
+		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
+			wxT("Monitor is running !"),  // caption
+			wxOK | wxICON_INFORMATION);
+
+		return;
+	}
+
+	// Create Progress Dialog
 	wxProgressDialog dialog(wxT("ISP is in Progress"),
 		// "Reserve" enough space for the multiline
 		// messages below, we'll change it anyhow
@@ -182,21 +195,91 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	}
 
 	unsigned char ispStatus = ISP_Status_InProgress;
-	unsigned int percentage = 0;
+	double percentage = 0;
 	wxString information("");
 
 	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus);
 
 
 	int not_cancel;
+	bool inProcess = true;
+	unsigned char header_index = 0;
 
 	// Wait for ISP Sequence End
-	while (Task::GetCount() > 0){
+	while (inProcess){//Task::GetCount() > 0){
 
-		information = wxString::Format("0x%08x",this->m_tiHexFileStat.currentAddress());
+		if (ispStatus == ISP_Status_InProgress){
+
+			// Header
+			switch (header_index){
+
+			case 0:
+				information = wxString::Format("PC > - - - - - - - DSP");
+				break;
+
+			case 1:
+				information = wxString::Format("PC - > - - - - - - DSP");
+				break;
+
+			case 2:
+				information = wxString::Format("PC - - > - - - - - DSP");
+				break;
+
+			case 3:
+				information = wxString::Format("PC - - - > - - - - DSP");
+				break;
+
+			case 4:
+				information = wxString::Format("PC - - - - > - - - DSP");
+				break;
+
+			case 5:
+				information = wxString::Format("PC - - - - - > - - DSP");
+				break;
+
+			case 6:
+				information = wxString::Format("PC - - - - - - > - DSP");
+				break;
+
+			case 7:
+				information = wxString::Format("PC - - - - - - - > DSP");
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !")
+					break;
+			}
+			header_index++;
+			header_index %= 8;
+
+			information += wxT("\n");
+
+		}
+		else if (ispStatus == ISP_Status_ALLDone){
+
+			information = wxT("ISP Progress Complete");
+
+			information += wxT("\n");
+		}
+
+		// Show Current Address
+		unsigned long currentAddress = this->m_tiHexFileStat.currentAddress();
+		information += wxString::Format("Current Process Address : %08x", currentAddress);
+		information += wxT("\n");
+
+		// Show Processed Bytes
+		unsigned long processed_bytes = ((currentAddress - this->m_startAddress) + 1UL) * 2;
+		information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+
+		// Compute Percentage (Percentage = processed bytes / total bytes)
+		percentage = ((double)processed_bytes / this->m_dataBytes);
+		percentage *= 100;
+		if (percentage > 100) percentage = 100;
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
+
 
 		// Update Dialogs
-		not_cancel = dialog.Update(percentage, information);
+		not_cancel = dialog.Update((int)percentage, information);
 
 		if (not_cancel == false){
 			ispStatus = ISP_Status_UserRequestCancel;
@@ -205,11 +288,16 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 		// If Error Occurs
 		if (ispStatus == ISP_Status_ErrorOccurs){
-			//wxMessageBox(wxT("Error Occurs"),
-			             //wxT("Error Occurs In ISP Progress"),  // caption
-						 //wxOK | wxICON_ERROR);
+			wxMessageBox(wxT("Error occurs in ISP progress !"),
+			             wxT("Error !"),  // caption
+						 wxOK | wxICON_ERROR);
 
 			break;
+		}
+
+		// Check Still have Task
+		if (Task::GetCount()== 0){
+			inProcess = false;
 		}
 
 		wxMilliSleep(200);

@@ -671,24 +671,21 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	TIHexFileParser tiHexFileStat;
 	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
 
+	if (tiHexFileStat.getNoErrors() != 0){
+		wxMessageBox(wxT("Load TI Hex Format File Error"),
+		wxT("Error !"),
+		wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+
 	/* Fill Blank Address                                                     */
 	tiHexFileStat.fillBlankAddr(0xffff);
 
-#if 0
-	tiHexFileStat.begin();
-	unsigned long startAddress = tiHexFileStat.currentAddress();
-
-	tiHexFileStat.end();
-	unsigned long endAddress = tiHexFileStat.currentAddress();
-
-	PSU_DEBUG_PRINT(MSG_ALERT, "startAddress = 0x%08x", startAddress);
-	PSU_DEBUG_PRINT(MSG_ALERT, "EndAddress   = 0x%08x", endAddress);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Address Range= %d", endAddress - startAddress + 1UL);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data Bytes   = %d", tiHexFileStat.size());
-#endif
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running);
 	}
 	
 	// Add page to NoteBook
@@ -1083,10 +1080,10 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
-	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("&Update Primary Firmware...\tCtrl-P"), "Update Primary Firmware", wxITEM_NORMAL);
+	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware"), "Load Primary Firmware", wxITEM_NORMAL);
 	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
-	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("&Update Secondary Firmware...\tCtrl-U"), "Update Secnondary Firmware", wxITEM_NORMAL);
+	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware"), "Load Secnondary Firmware", wxITEM_NORMAL);
 	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
 	this->m_ispMenu = new wxMenu();

@@ -29,6 +29,7 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 	// Receive Data 
 	int ret;
 
+#ifndef ISP_DONT_WAIT_RESPONSE
 	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", this->m_pmbusSendCommand.m_bytesToRead);
 
 	// Read Data From IO
@@ -50,6 +51,7 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 	}
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+#endif
 
 	// If Response is OK
 	if (PMBUSHelper::IsResponseOK(this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){

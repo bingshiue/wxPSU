@@ -315,7 +315,7 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned char *buffer, unsigned int size
 
 unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex){
 	unsigned char CheckSum = 0x00;
-	unsigned char Sum = 0x00;
+	unsigned int Sum = 0x00;
 
 	if (!buffer) { return CheckSum; }
 
@@ -323,7 +323,7 @@ unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigne
 		Sum += buffer[idx];
 	}
 
-	CheckSum = 0x0100 - Sum;
+	CheckSum = 0x0100 - (Sum&0x000000ff);
 
 	return CheckSum;
 }

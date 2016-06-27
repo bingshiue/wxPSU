@@ -1,2 +1,0 @@
- 14:59:05       main           Port Com3 Opened
- 14:59:36       main           C:\

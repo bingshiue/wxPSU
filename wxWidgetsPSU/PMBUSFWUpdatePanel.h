@@ -29,7 +29,7 @@ enum {
 class PMBUSFWUpdatePanel : public wxPanel {
 public:
 	
-	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO);
+	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning);
 
 	~PMBUSFWUpdatePanel();
 
@@ -53,6 +53,8 @@ private:
 	IOACCESS *m_ioaccess;
 	
 	unsigned int *m_currentIO;
+
+	bool *m_isMonitorRunning;
 
 	wxStaticText *m_fileNameST;
 	//wxTextCtrl *m_fileNameTC;

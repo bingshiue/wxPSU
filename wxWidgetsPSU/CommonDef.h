@@ -36,7 +36,8 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 #define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
 
-#define IGNORE_ISP_RESPONSE_ERROR
+//#define ISP_DONT_WAIT_RESPONSE
+//#define IGNORE_ISP_RESPONSE_ERROR
 
 enum {
 	IOACCESS_SERIALPORT = 0,
