@@ -816,33 +816,55 @@ void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
 
 void MainFrame::OnLogToFile(wxCommandEvent& event){
 
+	wxConfigBase *pConfig = wxConfigBase::Get();
+	pConfig->SetPath(wxT("/LOG"));
+
 	if (this->m_appSettings.m_logToFile == Generic_Enable){
 		this->m_logToFileMenuItem->Check(false);
 		this->m_appSettings.m_logToFile = Generic_Disable;
+
+		// Log To File
+		pConfig->Write(wxT("LogToFile"), this->m_appSettings.m_logToFile);
+
+		pConfig->Flush();
 	}
 	else{
-		this->m_logToFileMenuItem->Check(true);
-		this->m_appSettings.m_logToFile = Generic_Enable;
-
+		
 		//wxStandardPaths standardPath = wxStandardPaths::Get();
 		wxDirDialog *dirDialog = new wxDirDialog(this, wxT("Please Select A Directory"), wxT("C:\\"));// standardPath.GetDocumentsDir());
 		dirDialog->Centre(wxCENTER_ON_SCREEN);
-		dirDialog->ShowModal();
+
+		if (dirDialog->ShowModal() == wxID_CANCEL){
+			return;
+		}
+
+		//
+		this->m_logToFileMenuItem->Check(true);
+		this->m_appSettings.m_logToFile = Generic_Enable;
 
 		// 
 		wxString logFileDirPath("");
 		logFileDirPath = dirDialog->GetPath();
+		logFileDirPath += wxT("\\");
 
-		PSU_DEBUG_PRINT(MSG_ALERT, "%s", dirDialog->GetPath());
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", logFileDirPath.c_str());
 
 		// Set Log File's Save Directory Path
-		this->m_appSettings.m_logFilePath = dirDialog->GetPath();
+		this->m_appSettings.m_logFilePath = logFileDirPath;
+
+		// Log To File
+		pConfig->Write(wxT("LogToFile"), this->m_appSettings.m_logToFile);
+
+		// Log File Path
+		pConfig->Write(wxT("LogFilePath"), this->m_appSettings.m_logFilePath);
+
+		pConfig->Flush();
 
 		// No more need
 		delete dirDialog;
 		
 		// Init Output Stream
-		this->ReInitLogFileOutputStream(logFileDirPath);
+		this->ReInitLogFileOutputStream(this->m_appSettings.m_logFilePath);
 
 	}
 }
@@ -2214,8 +2236,16 @@ void MainFrame::ReInitLogFileOutputStream(wxString dirPath){
 
 	//PSU_DEBUG_PRINT(MSG_ALERT, "logFilePath=%s", logFilePath.c_str());
 
-	if (this->m_logFileFFileOutputStream) delete this->m_logFileFFileOutputStream;
-	if (this->m_logFileTextOutputStream) delete this->m_logFileTextOutputStream;
+	if (this->m_logFileTextOutputStream) {
+		this->m_logFileTextOutputStream->Flush();
+		delete this->m_logFileTextOutputStream;
+		this->m_logFileTextOutputStream = NULL;
+	}
+
+	if (this->m_logFileFFileOutputStream) {
+		delete this->m_logFileFFileOutputStream;
+		this->m_logFileFFileOutputStream = NULL;
+	}
 
 	if (!this->m_logFileFFileOutputStream){
 		this->m_logFileFFileOutputStream = new wxFFileOutputStream(logFilePath);

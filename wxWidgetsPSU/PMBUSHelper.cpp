@@ -288,6 +288,8 @@ void PMBUSHelper::GetNowDateTimeString(wxString& string){
 	string += wxString::Format("%02d", datetime.GetHour());
 	string += "-";
 	string += wxString::Format("%02d", datetime.GetMinute());
+	string += "-";
+	string += wxString::Format("%02d", datetime.GetSecond());
 }
 
 unsigned char PMBUSHelper::IsResponseOK(unsigned char *buffer, unsigned int sizeOfBuffer){
