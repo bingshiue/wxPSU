@@ -624,27 +624,22 @@ void MainFrame::OnSecondaryFirmwarwe(wxCommandEvent& event)
 }
 
 void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
-}
 
-void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
-	
-	// 
-	if (this->PMBusSecondaryFWUpdatePanel) {
-		//
-		unsigned int deleteIndex = this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook();
+	// Delete previous primary panel instance
+	if (this->PMBusPrimaryFWUpdatePanel) {
+		// Get index of notebook
+		unsigned int deleteIndex = this->PMBusPrimaryFWUpdatePanel->GetIndexOfNotebook();
 
 		this->m_notebook->SetSelection(0);
 
 		this->m_notebook->RemovePage(deleteIndex);
 
-		wxDELETE(this->PMBusSecondaryFWUpdatePanel);
-
+		wxDELETE(this->PMBusPrimaryFWUpdatePanel);
 	}
-	//
 
+	// Load Hex File
 	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
-	
+
 	LoadHexFileDialog.Centre();
 
 	// If the user changed idea...
@@ -652,7 +647,6 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 		return;
 	}
 
-	// Load HEX File
 	wxString path = LoadHexFileDialog.GetPath();
 	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
 
@@ -672,7 +666,73 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
 
 	if (tiHexFileStat.getNoErrors() != 0){
-		wxMessageBox(wxT("Load TI Hex Format File Error"),
+		wxMessageBox(wxT("Load Hex File Error"),
+			wxT("Error !"),
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+
+	/* Fill Blank Address                                                     */
+	tiHexFileStat.fillBlankAddr(0xffff);
+
+
+	if (!this->PMBusPrimaryFWUpdatePanel){
+		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET);
+	}
+
+	// Add page to NoteBook
+	m_notebook->AddPage(this->PMBusPrimaryFWUpdatePanel, "Primary FW MMAP", true);
+	// Save Index Of Notebook
+	this->PMBusPrimaryFWUpdatePanel->GetIndexOfNotebook() = (m_notebook->GetPageCount() - 1);
+
+}
+
+void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
+	
+	// Delete previous secondary panel instance
+	if (this->PMBusSecondaryFWUpdatePanel) {
+		// Get index of notebook
+		unsigned int deleteIndex = this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook();
+
+		this->m_notebook->SetSelection(0);
+
+		this->m_notebook->RemovePage(deleteIndex);
+
+		wxDELETE(this->PMBusSecondaryFWUpdatePanel);
+	}
+	
+	// Load Hex File
+	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
+	
+	LoadHexFileDialog.Centre();
+
+	// If the user changed idea...
+	if (LoadHexFileDialog.ShowModal() == wxID_CANCEL){
+		return;
+	}
+
+	wxString path = LoadHexFileDialog.GetPath();
+	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
+
+	// Create an input stream
+	ifstream TIHexInput;
+
+	// Create a variable for the intel hex data
+	TIHexInput.open(path.c_str().AsChar(), ifstream::in);
+
+	if (!TIHexInput.good())
+	{
+		PSU_DEBUG_PRINT(MSG_ALERT, "Error: couldn't open file %s", path.c_str());
+	}
+
+	/* Decode file                                                            */
+	TIHexFileParser tiHexFileStat;
+	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
+
+	if (tiHexFileStat.getNoErrors() != 0){
+		wxMessageBox(wxT("Load Hex File Error"),
 		wxT("Error !"),
 		wxOK | wxICON_ERROR);
 
@@ -685,7 +745,7 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET);
 	}
 	
 	// Add page to NoteBook

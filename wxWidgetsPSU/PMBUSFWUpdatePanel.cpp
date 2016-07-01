@@ -4,7 +4,7 @@
 
 #include "PMBUSFWUpdatePanel.h"
 
-PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning) : wxPanel(parent) {
+PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target) : wxPanel(parent) {
 
 	this->m_parent = parent;
 
@@ -17,6 +17,8 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_currentIO = currentIO;
 
 	this->m_isMonitorRunning = isMonitorRunning;
+
+	this->m_target = target;
 
 	tiHexFileStat.begin();
     this->m_startAddress = tiHexFileStat.currentAddress();
@@ -178,7 +180,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 	// Prepare Send Buffer
 	unsigned char SendBuffer[8] = {
-		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, 0x60, 0x00, 0x0D, 0x0A
+		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
 	};
 
 	unsigned char pec = 0;

@@ -36,6 +36,9 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 #define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
 
+#define UPDATE_PRIMARY_FW_TARGET    0x60
+#define UPDATE_SECONDARY_FW_TARGET  0x60
+
 //#define ISP_DONT_WAIT_RESPONSE
 //#define IGNORE_ISP_RESPONSE_ERROR
 
