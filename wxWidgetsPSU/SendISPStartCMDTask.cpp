@@ -70,7 +70,7 @@ int SendISPStartCMDTask::Main(double elapsedTime){
 
 	if (sendRetryStillFailed == true){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Send Write CMD Retry Send Still Failed, Forgive to send !");
-		*this->m_ispStatus = ISP_Status_ErrorOccurs;
+		*this->m_ispStatus = ISP_Status_SendDataFailed;
 		delete this;
 		return -1;
 	}

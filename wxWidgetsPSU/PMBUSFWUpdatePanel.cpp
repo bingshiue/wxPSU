@@ -289,12 +289,35 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 
 		// If Error Occurs
-		if (ispStatus == ISP_Status_ErrorOccurs){
-			wxMessageBox(wxT("Error occurs in ISP progress !"),
-			             wxT("Error !"),  // caption
-						 wxOK | wxICON_ERROR);
+		if (ispStatus != ISP_Status_InProgress) {
 
-			break;
+			switch (ispStatus){
+
+			case ISP_Status_UserRequestCancel:
+				// User Cancel ISP
+				break;
+
+			case ISP_Status_SendDataFailed:
+				wxMessageBox(wxT("Send Data Failed !"),
+					wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
+
+				break;
+
+			case ISP_Status_ResponseDataError:
+				wxMessageBox(wxT("Response Data Error!"),
+					wxT("Error !"),  // caption
+					wxOK | wxICON_ERROR);
+
+				break;
+
+			default :
+				PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs, ispStatus = %02x", ispStatus);
+				break;
+
+			}
+
+			break;// while (inProcess)
 		}
 
 		// Check Still have Task

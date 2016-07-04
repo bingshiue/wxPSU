@@ -39,7 +39,7 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
-		*this->m_ispStatus = ISP_Status_ErrorOccurs;
+		*this->m_ispStatus = ISP_Status_ResponseDataError;
 		delete this;
 		return -1;
 #endif

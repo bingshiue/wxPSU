@@ -58,10 +58,12 @@ enum {
 };
 
 enum {
-	ISP_Status_InProgress = 0,
-	ISP_Status_UserRequestCancel,
-	ISP_Status_ErrorOccurs,
-	ISP_Status_ALLDone
+	ISP_Status_InProgress = 0x00,
+	ISP_Status_UserRequestCancel = 0x01,
+	ISP_Status_SendDataFailed = 0x02,
+	ISP_Status_ResponseDataError = 0x04,
+	ISP_Status_UnknownErrorOccurs = 0x08,
+	ISP_Status_ALLDone = 0x80
 };
 
 #endif
