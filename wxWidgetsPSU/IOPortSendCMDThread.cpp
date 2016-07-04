@@ -429,7 +429,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						}
 
 						// Create IOPortReadCMDThread
-						this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH);
+						unsigned int bytesToRead = this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+						this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){

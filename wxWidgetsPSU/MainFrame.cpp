@@ -118,7 +118,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		break;
 	}
 
-
 	// use fixed width font to align output in nice columns
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
 		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
@@ -266,7 +265,7 @@ EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmwarwe)
 EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
 EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
-EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
+//EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
 EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
 EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
@@ -315,6 +314,571 @@ MainFrame::~MainFrame()
 
 	// Save Config
 	this->SaveConfig();
+}
+
+void MainFrame::SetupMenuBar(void){
+	// Create Menu Bar and Its Components
+	// File Menu
+	/*
+	File
+	|- Hex To Bin -> Secondary Firmware
+	|------------------------------------
+	|- Exit
+	*/
+	this->m_fileMenu = new wxMenu();
+	this->m_hexToBinMenu = new wxMenu();
+	this->m_hexToBinMenu->Append(MENU_ID_Secondary_Firmware, "&Secondary Firmware...\tCtrl-S",
+		"Select Secondary Firmware");
+
+	this->m_fileMenu->AppendSubMenu(this->m_hexToBinMenu, wxT("Hex to Bin"), wxT("Transform Hex into Bin"));
+	this->m_fileMenu->AppendSeparator();
+
+	this->m_exitMenuItem = new wxMenuItem((wxMenu*)0, wxID_EXIT, wxT("Exit"),
+		wxT("Exit"), wxITEM_NORMAL);
+
+	this->m_exitMenuItem->SetBitmap(wxBITMAP_PNG(EXIT_16));
+
+	this->m_fileMenu->Append(m_exitMenuItem);
+
+
+	// Run Menu
+	/*
+	Run
+	|- Monitor
+	|- In System Programming -> |- Update Primary Firmware
+	|                           |- Update Secondary Firmware
+	### |- Stop Programming ###
+	|------------------------------------
+	|- I2C Fault Test
+	|- [V] Enable Checksum
+	|------------------------------------
+	|- Clear Error Log
+	|- Reset Max./Min. Value
+	|- Reset Run Time
+
+
+	*/
+	this->m_runMenu = new wxMenu();
+	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, "&Monitor...\tCtrl-M",
+		"Start Monitor", wxITEM_NORMAL);
+
+	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
+
+	this->m_runMenu->Append(this->m_monitorMenuItem);
+
+	this->m_inSystemProgrammingMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("In System Programming"), wxT("In System Programming"), wxITEM_NORMAL);
+
+	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+
+	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware"), "Load Primary Firmware", wxITEM_NORMAL);
+	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+
+	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware"), "Load Secnondary Firmware", wxITEM_NORMAL);
+	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+
+	this->m_ispMenu = new wxMenu();
+
+	this->m_ispMenu->Append(this->m_updatePrimaryFirmwareMenuItem);
+	this->m_ispMenu->Append(this->m_updateSecondaryFirmwareMenuItem);
+
+	this->m_inSystemProgrammingMenuItem->SetSubMenu(this->m_ispMenu);
+
+	this->m_runMenu->Append(this->m_inSystemProgrammingMenuItem);
+
+#ifdef DEFAULT_LOCK_UPDATE_FW
+	this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, false);
+	this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, false);
+#endif
+
+	//this->m_stopProgrammingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_Programming, wxT("Stop Programming"),
+		//"Stop Programming", wxITEM_NORMAL);
+
+	//this->m_runMenu->Append(m_stopProgrammingMenuItem);
+	this->m_runMenu->AppendSeparator();
+
+	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"),
+		wxT("I2C Fault Test"), wxITEM_NORMAL);
+
+	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"),
+		wxT("Enable Checksum"), wxITEM_CHECK);
+
+	if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
+		this->m_EnableChecksumMenuItem->Check(true);
+	}
+
+	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
+	this->m_runMenu->Append(m_EnableChecksumMenuItem);
+	this->m_runMenu->AppendSeparator();
+
+	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"),
+		wxT("Clear Error Log"), wxITEM_NORMAL);
+
+	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
+
+	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"),
+		wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
+
+	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP_PNG(REFRESH_16));
+
+	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"),
+		wxT("Reset Run Time"), wxITEM_NORMAL);
+
+	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP_PNG(TIMER_16));
+
+	this->m_runMenu->Append(this->m_ClearErrorLogMenuItem);
+	this->m_runMenu->Append(this->m_ResetMaxMinValueMenuItem);
+	this->m_runMenu->Append(this->m_ResetRunTimeMenuItem);
+
+	// PSU Menu
+	/*
+	PSU
+	|- Enable Calibration
+	|- Disable Calibration
+	|------------------------------------
+	|- Calibration
+	*/
+	this->m_psuMenu = new wxMenu();
+
+	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"),
+		wxT("Enable Calibration"), wxITEM_NORMAL);
+
+	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(ENABLE_16));
+
+	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"),
+		wxT("Disable Calibration"), wxITEM_NORMAL);
+
+	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(DISABLE_16));
+
+	this->m_psuMenu->Append(m_EnableCalibrationMenuItem);
+	this->m_psuMenu->Append(m_DisableCalibrationMenuItem);
+
+	this->m_psuMenu->AppendSeparator();
+
+	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"),
+		wxT("Calibration Setting"), wxITEM_NORMAL);
+
+	this->m_CalibrationMenuItem->SetBitmap(wxBITMAP_PNG(CALIBRATION_16));
+
+	this->m_psuMenu->Append(m_CalibrationMenuItem);
+
+
+	// Option Menu
+	/*
+	Option
+	|- Administrant...
+	|------------------------------------
+	|- I2C  Interface...
+	|------------------------------------
+	|- Disable All
+	|- Enable All
+	|------------------------------------
+	|- Run Mode          -> [V] Continually
+	|                       [V] Interations
+	|                       [V] Stop An Error
+	|
+	|- Error Log Mode    -> [V] All
+	|                       [V] Error Only
+	|                       ---------------
+	|                       Log To File
+	|
+	|- PMBus Read Method -> [V] PMBus1.1 (Single Mode)
+	|                       [V] PMBus1.2 (Page Plus Mode)
+	|
+
+
+	*/
+	this->m_optionMenu = new wxMenu();
+
+	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
+		wxT("Administrant"), wxITEM_NORMAL);
+
+	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
+
+	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
+		wxT("I2C Interface"), wxITEM_NORMAL);
+
+	this->m_I2CInterfaceMenuItem->SetBitmap(wxBITMAP_PNG(HWINFO_16));
+
+	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL...\tCtrl-D",
+		"Disable All Commands");
+
+	this->m_optionMenu->Append(MENU_ID_Enable_ALL, "&Enable  ALL...\tCtrl-E",
+		"Enable All Commands");
+
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_runModeMenu = new wxMenu();
+	this->m_errorLogMenu = new wxMenu();
+	this->m_pmbusReadMethodMenu = new wxMenu();
+
+	this->m_continuallyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Continually, wxT("Continually"),
+		wxT("Continually"), wxITEM_CHECK);
+
+	this->m_iterationsMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Iterations, wxT("Iterations"),
+		wxT("Iterations"), wxITEM_CHECK);
+
+	this->m_stopAnErrorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_An_Error, wxT("Stop An Error"),
+		wxT("Stop An Error"), wxITEM_CHECK);
+
+	this->m_runModeMenu->Append(this->m_continuallyMenuItem);
+	this->m_runModeMenu->Append(this->m_iterationsMenuItem);
+	this->m_runModeMenu->Append(this->m_stopAnErrorMenuItem);
+
+	switch (this->m_appSettings.m_runMode){
+
+	case RunMode_Iterations:
+		this->m_iterationsMenuItem->Check(true);
+		break;
+
+	case RunMode_Continually:
+		this->m_continuallyMenuItem->Check(true);
+		break;
+
+	case RunMode_StopAnError:
+		this->m_stopAnErrorMenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !");
+		break;
+	}
+
+	this->m_optionMenu->AppendSubMenu(this->m_runModeMenu, wxT("Run Mode"), wxT("Run Mode"));
+
+	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"),
+		wxT("All"), wxITEM_CHECK);
+
+	this->m_errorOnlyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ErrorOnly, wxT("Error Only"),
+		wxT("Error Only"), wxITEM_CHECK);
+
+	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"),
+		wxT("Log To File"), wxITEM_CHECK);
+
+	this->m_errorLogMenu->Append(this->m_allMenuItem);
+	this->m_errorLogMenu->Append(this->m_errorOnlyMenuItem);
+	this->m_errorLogMenu->AppendSeparator();
+	this->m_errorLogMenu->Append(this->m_logToFileMenuItem);
+
+	switch (this->m_appSettings.m_logMode){
+
+	case Log_Mode_Log_ALL:
+		this->m_allMenuItem->Check(true);
+		this->m_errorOnlyMenuItem->Check(false);
+		break;
+
+	case Log_Mode_Log_Error_Only:
+		this->m_allMenuItem->Check(false);
+		this->m_errorOnlyMenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+		break;
+	}
+
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		this->m_logToFileMenuItem->Check(true);
+	}
+	else{
+		this->m_logToFileMenuItem->Check(false);
+	}
+
+	this->m_optionMenu->AppendSubMenu(this->m_errorLogMenu, wxT("Error Log Mode"), wxT("Error Log Mode"));
+
+	this->m_pmBus11MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_1, wxT("PMBus1.1 (Single Mode)"),
+		wxT("PMBus1.1 (Single Mode)"), wxITEM_CHECK);
+
+	this->m_pmBus12MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_2, wxT("PMBus1.2 (Page Plus Mode)"),
+		wxT("PMBus1.2 (Page Plus Mode)"), wxITEM_CHECK);
+
+	this->m_pmbusReadMethodMenu->Append(this->m_pmBus11MenuItem);
+	this->m_pmbusReadMethodMenu->Append(this->m_pmBus12MenuItem);
+
+	switch (this->m_appSettings.m_pmbusReadMethod){
+
+	case PMBUS_ReadMethod_1_1:
+		this->m_pmBus11MenuItem->Check(true);
+		this->m_pmBus12MenuItem->Check(false);
+		break;
+
+	case PMBUS_ReadMethod_1_2:
+		this->m_pmBus11MenuItem->Check(false);
+		this->m_pmBus12MenuItem->Check(true);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+		break;
+	}
+
+	this->m_optionMenu->AppendSubMenu(this->m_pmbusReadMethodMenu, wxT("PMBus Read Method"), wxT("PMBus Read Method"));
+
+	// Help Menu
+	/*
+	Help
+	|- About
+	*/
+	this->m_helpMenu = new wxMenu();
+
+	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"),
+		wxT("About"), wxITEM_NORMAL);
+
+	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
+
+	this->m_helpMenu->Append(this->m_aboutMenuItem);
+
+	// Create MenuBar Instance
+	this->m_menuBar = new wxMenuBar();
+	this->m_menuBar->Append(this->m_fileMenu, wxT("File"));
+	this->m_menuBar->Append(this->m_runMenu, wxT("Run"));
+	this->m_menuBar->Append(this->m_psuMenu, wxT("PSU"));
+	this->m_menuBar->Append(this->m_optionMenu, wxT("Option"));
+	this->m_menuBar->Append(this->m_helpMenu, wxT("Help"));
+
+	SetMenuBar(this->m_menuBar);
+
+}
+
+void MainFrame::SetupToolBar(void){
+
+	// Setup Tool Bar
+	long style = TOOLBAR_STYLE;
+	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
+
+	// Create Tool Bar Instance
+	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
+
+	// Append Exit Button
+	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP_PNG(EXIT_32), wxT("Exit Program"), wxITEM_NORMAL);
+
+	// Append Monitor Button
+	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
+
+	// Append Enable Calibration Button
+	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP_PNG(ENABLE_32), wxT("Enable Calibration"), wxITEM_NORMAL);
+
+	// Append Reset Run Time Button
+	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, wxBITMAP_PNG(TIMER_32), wxT("Reset Run Time"), wxITEM_NORMAL);
+
+	// Append Refresh MAX/MIN Button
+	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, wxBITMAP_PNG(REFRESH_32), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
+
+	// Append Clear Error Log Button 
+	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, wxBITMAP_PNG(CLEAR_32), wxT("Clear Error Log"), wxITEM_NORMAL);
+
+	// Append Separator
+	m_toolbar->AddSeparator();
+
+	// Append Interation
+	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
+	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
+
+	wxString iterations_times = wxString::Format("%d", this->m_appSettings.m_IterationsValue);
+
+	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
+	m_iteration_input->SetValue(iterations_times);
+
+	wxTextValidator numberValidator;
+	numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	numberValidator.SetCharIncludes(wxT("0123456789"));
+
+	m_iteration_input->SetValidator(numberValidator);
+
+	if (this->m_iterationsMenuItem->IsChecked() == false){
+		m_iteration_input->Disable();
+	}
+
+	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
+
+	// Append Polling Time
+	m_polling_time_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Polling Time(ms)"));
+	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
+
+	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_polling_time_combobox->Append(wxT("0"));
+	m_polling_time_combobox->Append(wxT("10"));
+	m_polling_time_combobox->Append(wxT("20"));
+	m_polling_time_combobox->Append(wxT("50"));
+	m_polling_time_combobox->Append(wxT("100"));
+	m_polling_time_combobox->Append(wxT("200"));
+	m_polling_time_combobox->Append(wxT("300"));
+	m_polling_time_combobox->Append(wxT("500"));
+	m_polling_time_combobox->Append(wxT("1000"));
+	m_polling_time_combobox->Append(wxT("1500"));
+
+	m_polling_time_combobox->SetSelection(2);
+	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
+
+	// Append Separator
+	m_toolbar->AddSeparator();
+
+	// Append Address 
+	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("I2C Slave Address"));
+	m_toolbar->AddControl(m_address_text, wxEmptyString);
+
+	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
+
+	wxString SlaveAddressHex = (wxString::Format("%02lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
+	m_address_input->SetLabel(SlaveAddressHex);
+
+	wxTextValidator hexValidator;
+	hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	hexValidator.SetCharIncludes(wxT("0123456789abcdefABCDEF"));
+
+	m_address_input->SetValidator(hexValidator);
+
+	m_toolbar->AddControl(m_address_input, wxEmptyString);
+
+
+	// Append Address Set Button
+	m_addressSetButton = new wxButton(m_toolbar, CID_SLAVE_ADDRESS_SET_BUTTON, wxT("Set"));
+	m_toolbar->AddControl(m_addressSetButton, wxEmptyString);
+
+	// Append A2 A1 A0 Check Box
+	//m_a2_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A2, wxT("A2"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a2_chkbox, wxEmptyString);
+
+	//m_a1_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A1, wxT("A1"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a1_chkbox, wxEmptyString);
+
+	//m_a0_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A0, wxT("A0"), wxDefaultPosition, wxDefaultSize);
+	//m_toolbar->AddControl(m_a0_chkbox, wxEmptyString);
+
+	m_toolbar->Realize();
+}
+
+void MainFrame::SetupStatusBar(void){
+	this->m_status_bar = new PMBUSStatusBar(this);
+
+	SetStatusBar(this->m_status_bar);
+
+	PositionStatusBar();
+}
+
+void MainFrame::SetupCMDListDVL(wxPanel* parent){
+
+	wxASSERT(!this->m_cmdListDVC && !m_cmdListModel);
+	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
+		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
+
+	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData);
+	this->m_cmdListDVC->AssociateModel(m_cmdListModel.get());
+
+	// the various columns
+	this->m_cmdListDVC->AppendToggleColumn("",
+		PMBUSCMDListModel::Col_Toggle,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxDVC_TOGGLE_DEFAULT_WIDTH,
+		wxALIGN_CENTER_HORIZONTAL,
+		wxDATAVIEW_COL_REORDERABLE
+		);
+
+	this->m_cmdListDVC->AppendIconTextColumn("Register",
+		PMBUSCMDListModel::Col_RegisterIconText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
+
+	this->m_cmdListDVC->AppendTextColumn("Name",
+		PMBUSCMDListModel::Col_NameText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_NOT,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_cmdListDVC->AppendTextColumn("Access",
+		PMBUSCMDListModel::Col_AccessText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_CENTER_HORIZONTAL,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_cmdListDVC->AppendTextColumn("Query",
+		PMBUSCMDListModel::Col_QueryText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_CENTER_HORIZONTAL,
+		wxDATAVIEW_COL_SORTABLE);
+
+	this->m_cmdListDVC->AppendTextColumn("Cook",
+		PMBUSCMDListModel::Col_CookText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		350,
+		wxALIGN_CENTER_HORIZONTAL,
+		wxCOL_RESIZABLE);
+
+	this->m_cmdListDVC->AppendTextColumn("Raw",
+		PMBUSCMDListModel::Col_RawText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_LEFT,
+		wxCOL_RESIZABLE);
+
+#if 0
+	this->m_dataViewCtrl->AppendDateColumn("date",
+		PSUDataViewListModel::Col_Date);
+
+	m_attributes =
+		new wxDataViewColumn("attributes",
+		new wxDataViewTextRenderer,
+		PSUDataViewListModel::Col_TextWithAttr,
+		wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_RIGHT,
+		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
+	this->m_dataViewCtrl->AppendColumn(m_attributes);
+
+	this->m_dataViewCtrl->AppendColumn(
+		new wxDataViewColumn("custom renderer",
+		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
+		PSUDataViewListModel::Col_Custom)
+		);
+#endif
+
+	this->m_subNotebook->AddPage(this->m_stdPage, "STD");
+	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
+	//this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write"); // Don't show write page after APP initialized
+	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
+
+	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
+	this->m_cmdListDVC->SetMinSize(wxSize(-1, 200));
+
+	// Setup Sizer
+	GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
+	GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
+
+	// Setup CMDListPanel
+	CMDListSizer = new wxBoxSizer(wxHORIZONTAL);
+	CMDListSizer->Add(this->m_cmdListDVC, 1, wxEXPAND | wxALL);
+
+	this->CMDListPanel->SetSizerAndFit(CMDListSizer);
+
+	// Setup DebugLogPanel
+	m_debugLogStaticBoxSizer->Add(this->m_debugLogTC, 1, wxEXPAND | wxALL);
+
+	this->DebugLogPanel->SetSizerAndFit(this->m_debugLogStaticBoxSizer);
+
+	//
+	m_splitterWindow->SplitVertically(m_subNotebook, this->CMDListPanel, 0);// Add SubNoteBook & CMDListPanel to Splitter Window
+
+	m_splitterWindowTopLevel->SplitHorizontally(m_splitterWindow, this->DebugLogPanel, 0);
+
+	//GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
+	//GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
+	GeneralPanelSz->Add(m_splitterWindowTopLevel, 1, wxEXPAND);
+
+	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(1).Expand());
+	//GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
+	//GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
+
+	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
+
 }
 
 void MainFrame::SetupPMBusCommandData(void){
@@ -763,7 +1327,17 @@ void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
 }
 
 void MainFrame::OnEnableChecksum(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	
+	if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
+		this->m_appSettings.m_EnableChecksum = Generic_Disable;
+
+		this->m_EnableChecksumMenuItem->Check(false);
+	}
+	else if (this->m_appSettings.m_EnableChecksum == Generic_Disable){
+		this->m_appSettings.m_EnableChecksum = Generic_Enable;
+
+		this->m_EnableChecksumMenuItem->Check(true);
+	}
 }
 
 void MainFrame::OnClearErrorLog(wxCommandEvent& event){
@@ -1106,567 +1680,6 @@ void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
 	);
 
 	this->m_infoBarTimer->Start(3000, true);
-}
-
-void MainFrame::SetupMenuBar(void){
-	// Create Menu Bar and Its Components
-	// File Menu
-	/*
-	File
-	|- Hex To Bin -> Secondary Firmware
-	|------------------------------------
-	|- Exit
-	*/
-	this->m_fileMenu = new wxMenu();
-	this->m_hexToBinMenu = new wxMenu();
-	this->m_hexToBinMenu->Append(MENU_ID_Secondary_Firmware, "&Secondary Firmware...\tCtrl-S",
-		"Select Secondary Firmware");
-	
-	this->m_fileMenu->AppendSubMenu(this->m_hexToBinMenu,wxT("Hex to Bin"),wxT("Transform Hex into Bin"));
-	this->m_fileMenu->AppendSeparator();
-
-	this->m_exitMenuItem = new wxMenuItem((wxMenu*)0, wxID_EXIT, wxT("Exit"),
-		wxT("Exit"), wxITEM_NORMAL);
-
-	this->m_exitMenuItem->SetBitmap(wxBITMAP_PNG(EXIT_16));
-
-	this->m_fileMenu->Append(m_exitMenuItem);
-
-
-	// Run Menu
-	/*
-	Run
-	|- Monitor
-	|- In System Programming -> |- Update Primary Firmware
-	|                           |- Update Secondary Firmware 
-	|- Stop Programming
-	|------------------------------------
-	|- I2C Fault Test
-	|- [V] Enable Checksum
-	|------------------------------------
-	|- Clear Error Log
-	|- Reset Max./Min. Value
-	|- Reset Run Time
-
-
-	*/
-	this->m_runMenu = new wxMenu();
-	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, "&Monitor...\tCtrl-M",
-		"Start Monitor", wxITEM_NORMAL);
-
-	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
-
-	this->m_runMenu->Append(this->m_monitorMenuItem);
-
-	this->m_inSystemProgrammingMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("In System Programming"), wxT("In System Programming"), wxITEM_NORMAL);
-
-	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
-
-	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware"), "Load Primary Firmware", wxITEM_NORMAL);
-	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
-
-	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware"), "Load Secnondary Firmware", wxITEM_NORMAL);
-	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
-
-	this->m_ispMenu = new wxMenu();
-
-	this->m_ispMenu->Append(this->m_updatePrimaryFirmwareMenuItem);
-	this->m_ispMenu->Append(this->m_updateSecondaryFirmwareMenuItem);
-
-	this->m_inSystemProgrammingMenuItem->SetSubMenu(this->m_ispMenu);
-
-	this->m_runMenu->Append(this->m_inSystemProgrammingMenuItem);
-
-#ifdef DEFAULT_LOCK_UPDATE_FW
-	this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, false);
-	this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, false);
-#endif
-
-	this->m_stopProgrammingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_Programming, wxT("Stop Programming"),
-		"Stop Programming", wxITEM_NORMAL);
-
-	this->m_runMenu->Append(m_stopProgrammingMenuItem);
-	this->m_runMenu->AppendSeparator();
-
-	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"),
-		wxT("I2C Fault Test"), wxITEM_NORMAL);
-
-	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"),
-		wxT("Enable Checksum"), wxITEM_CHECK);
-
-	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
-	this->m_runMenu->Append(m_EnableChecksumMenuItem);
-	this->m_runMenu->AppendSeparator();
-
-	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"),
-		wxT("Clear Error Log"), wxITEM_NORMAL);
-
-	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
-
-	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"),
-		wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
-
-	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP_PNG(REFRESH_16));
-
-	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"),
-		wxT("Reset Run Time"), wxITEM_NORMAL);
-
-	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP_PNG(TIMER_16));
-
-	this->m_runMenu->Append(this->m_ClearErrorLogMenuItem);
-	this->m_runMenu->Append(this->m_ResetMaxMinValueMenuItem);
-	this->m_runMenu->Append(this->m_ResetRunTimeMenuItem);
-
-	// PSU Menu
-	/*
-	PSU
-	|- Enable Calibration
-	|- Disable Calibration
-	|------------------------------------
-	|- Calibration
-	*/
-	this->m_psuMenu = new wxMenu();
-
-	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"),
-		wxT("Enable Calibration"), wxITEM_NORMAL);
-
-	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(ENABLE_16));
-
-	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"),
-		wxT("Disable Calibration"), wxITEM_NORMAL);
-
-	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(DISABLE_16));
-
-	this->m_psuMenu->Append(m_EnableCalibrationMenuItem);
-	this->m_psuMenu->Append(m_DisableCalibrationMenuItem);
-
-	this->m_psuMenu->AppendSeparator();
-
-	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"),
-		wxT("Calibration Setting"), wxITEM_NORMAL);
-
-	this->m_CalibrationMenuItem->SetBitmap(wxBITMAP_PNG(CALIBRATION_16));
-
-	this->m_psuMenu->Append(m_CalibrationMenuItem);
-
-
-	// Option Menu
-	/*
-	Option
-	|- Administrant...
-	|------------------------------------
-	|- I2C  Interface...
-	|------------------------------------
-	|- Disable All
-	|- Enable All
-	|------------------------------------
-	|- Run Mode          -> [V] Continually
-	|                       [V] Interations
-	|                       [V] Stop An Error
-	|
-	|- Error Log Mode    -> [V] All
-	|                       [V] Error Only
-	|                       ---------------
-	|                       Log To File
-	|
-	|- PMBus Read Method -> [V] PMBus1.1 (Single Mode)
-	|                       [V] PMBus1.2 (Page Plus Mode)
-	|
-
-
-	*/
-	this->m_optionMenu = new wxMenu();
-
-	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
-		wxT("Administrant"), wxITEM_NORMAL);
-
-	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
-
-	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
-	this->m_optionMenu->AppendSeparator();
-
-	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
-		wxT("I2C Interface"), wxITEM_NORMAL);
-
-	this->m_I2CInterfaceMenuItem->SetBitmap(wxBITMAP_PNG(HWINFO_16));
-
-	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
-	this->m_optionMenu->AppendSeparator();
-
-	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL...\tCtrl-D",
-		"Disable All Commands");
-
-	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  "&Enable  ALL...\tCtrl-E",
-		"Enable All Commands");
-
-	this->m_optionMenu->AppendSeparator();
-
-	this->m_runModeMenu = new wxMenu();
-	this->m_errorLogMenu = new wxMenu();
-	this->m_pmbusReadMethodMenu = new wxMenu();
-
-	this->m_continuallyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Continually, wxT("Continually"),
-		wxT("Continually"), wxITEM_CHECK);
-
-	this->m_iterationsMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Iterations, wxT("Iterations"),
-		wxT("Iterations"), wxITEM_CHECK);
-
-	this->m_stopAnErrorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Stop_An_Error, wxT("Stop An Error"),
-		wxT("Stop An Error"), wxITEM_CHECK);
-
-	this->m_runModeMenu->Append(this->m_continuallyMenuItem);
-	this->m_runModeMenu->Append(this->m_iterationsMenuItem);
-	this->m_runModeMenu->Append(this->m_stopAnErrorMenuItem);
-
-	switch (this->m_appSettings.m_runMode){
-
-	case RunMode_Iterations:
-		this->m_iterationsMenuItem->Check(true);
-		break;
-
-	case RunMode_Continually:
-		this->m_continuallyMenuItem->Check(true);
-		break;
-
-	case RunMode_StopAnError:
-		this->m_stopAnErrorMenuItem->Check(true);
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !");
-		break;
-	}
-
-	this->m_optionMenu->AppendSubMenu(this->m_runModeMenu, wxT("Run Mode"), wxT("Run Mode"));
-	
-	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"),
-		wxT("All"), wxITEM_CHECK);
-
-	this->m_errorOnlyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ErrorOnly, wxT("Error Only"),
-		wxT("Error Only"), wxITEM_CHECK);
-
-	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"),
-		wxT("Log To File"), wxITEM_CHECK);
-
-	this->m_errorLogMenu->Append(this->m_allMenuItem);
-	this->m_errorLogMenu->Append(this->m_errorOnlyMenuItem);
-	this->m_errorLogMenu->AppendSeparator();
-	this->m_errorLogMenu->Append(this->m_logToFileMenuItem);
-
-	switch (this->m_appSettings.m_logMode){
-
-	case Log_Mode_Log_ALL:
-		this->m_allMenuItem->Check(true);
-		this->m_errorOnlyMenuItem->Check(false);
-		break;
-
-	case Log_Mode_Log_Error_Only:
-		this->m_allMenuItem->Check(false);
-		this->m_errorOnlyMenuItem->Check(true);
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
-		break;
-	}
-
-	if (this->m_appSettings.m_logToFile == Generic_Enable){
-		this->m_logToFileMenuItem->Check(true);
-	}
-	else{
-		this->m_logToFileMenuItem->Check(false);
-	}
-
-	this->m_optionMenu->AppendSubMenu(this->m_errorLogMenu, wxT("Error Log Mode"), wxT("Error Log Mode"));
-	
-	this->m_pmBus11MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_1, wxT("PMBus1.1 (Single Mode)"),
-		wxT("PMBus1.1 (Single Mode)"), wxITEM_CHECK);
-
-	this->m_pmBus12MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_2, wxT("PMBus1.2 (Page Plus Mode)"),
-		wxT("PMBus1.2 (Page Plus Mode)"), wxITEM_CHECK);
-
-	this->m_pmbusReadMethodMenu->Append(this->m_pmBus11MenuItem);
-	this->m_pmbusReadMethodMenu->Append(this->m_pmBus12MenuItem);
-
-	switch (this->m_appSettings.m_pmbusReadMethod){
-
-	case PMBUS_ReadMethod_1_1:
-		this->m_pmBus11MenuItem->Check(true);
-		this->m_pmBus12MenuItem->Check(false);
-		break;
-
-	case PMBUS_ReadMethod_1_2:
-		this->m_pmBus11MenuItem->Check(false);
-		this->m_pmBus12MenuItem->Check(true);
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
-		break;
-	}
-
-	this->m_optionMenu->AppendSubMenu(this->m_pmbusReadMethodMenu, wxT("PMBus Read Method"), wxT("PMBus Read Method"));
-
-	// Help Menu
-	/*
-	Help
-	|- About
-	*/
-	this->m_helpMenu = new wxMenu();
-
-	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"),
-		wxT("About"), wxITEM_NORMAL);
-
-	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
-
-	this->m_helpMenu->Append(this->m_aboutMenuItem);
-
-	// Create MenuBar Instance
-	this->m_menuBar = new wxMenuBar();
-	this->m_menuBar->Append(this->m_fileMenu,   wxT("File"));
-	this->m_menuBar->Append(this->m_runMenu,    wxT("Run"));
-	this->m_menuBar->Append(this->m_psuMenu,    wxT("PSU"));
-	this->m_menuBar->Append(this->m_optionMenu, wxT("Option"));
-	this->m_menuBar->Append(this->m_helpMenu,   wxT("Help"));
-
-	SetMenuBar(this->m_menuBar);
-
-}
-
-void MainFrame::SetupToolBar(void){
-	
-	// Setup Tool Bar
-	long style = TOOLBAR_STYLE;
-	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
-
-	// Create Tool Bar Instance
-	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
-
-	// Append Exit Button
-	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP_PNG(EXIT_32), wxT("Exit Program"), wxITEM_NORMAL);
-
-	// Append Monitor Button
-	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
-
-	// Append Enable Calibration Button
-	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP_PNG(ENABLE_32), wxT("Enable Calibration"), wxITEM_NORMAL);
-
-	// Append Reset Run Time Button
-	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, wxBITMAP_PNG(TIMER_32), wxT("Reset Run Time"), wxITEM_NORMAL);
-
-	// Append Refresh MAX/MIN Button
-	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, wxBITMAP_PNG(REFRESH_32), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
-
-	// Append Clear Error Log Button 
-	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, wxBITMAP_PNG(CLEAR_32), wxT("Clear Error Log"), wxITEM_NORMAL);
-
-	// Append Separator
-	m_toolbar->AddSeparator();
-
-	// Append Interation
-	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
-	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
-
-	wxString iterations_times = wxString::Format("%d",this->m_appSettings.m_IterationsValue);
-
-	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
-	m_iteration_input->SetValue(iterations_times);
-
-	wxTextValidator numberValidator;
-	numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
-	numberValidator.SetCharIncludes(wxT("0123456789"));
-
-	m_iteration_input->SetValidator(numberValidator);
-
-	if (this->m_iterationsMenuItem->IsChecked() == false){
-		m_iteration_input->Disable();
-	}
-
-	m_toolbar->AddControl(m_iteration_input, wxEmptyString);
-
-	// Append Polling Time
-	m_polling_time_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Polling Time(ms)"));
-	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
-
-	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
-	m_polling_time_combobox->Append(wxT("0"));
-	m_polling_time_combobox->Append(wxT("10"));
-	m_polling_time_combobox->Append(wxT("20"));
-	m_polling_time_combobox->Append(wxT("50"));
-	m_polling_time_combobox->Append(wxT("100"));
-	m_polling_time_combobox->Append(wxT("200"));
-	m_polling_time_combobox->Append(wxT("300"));
-	m_polling_time_combobox->Append(wxT("500"));
-	m_polling_time_combobox->Append(wxT("1000"));
-	m_polling_time_combobox->Append(wxT("1500"));
-
-	m_polling_time_combobox->SetSelection(2);
-	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
-
-	// Append Separator
-	m_toolbar->AddSeparator();
-
-	// Append Address 
-	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("I2C Slave Address"));
-	m_toolbar->AddControl(m_address_text, wxEmptyString);
-
-	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
-
-	wxString SlaveAddressHex = (wxString::Format("%02lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
-	m_address_input->SetLabel(SlaveAddressHex);
-
-	wxTextValidator hexValidator;
-	hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
-	hexValidator.SetCharIncludes(wxT("0123456789abcdefABCDEF"));
-
-	m_address_input->SetValidator(hexValidator);
-
-	m_toolbar->AddControl(m_address_input, wxEmptyString);
-
-
-	// Append Address Set Button
-	m_addressSetButton = new wxButton(m_toolbar, CID_SLAVE_ADDRESS_SET_BUTTON, wxT("Set"));
-	m_toolbar->AddControl(m_addressSetButton, wxEmptyString);
-
-	// Append A2 A1 A0 Check Box
-	//m_a2_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A2, wxT("A2"), wxDefaultPosition, wxDefaultSize);
-	//m_toolbar->AddControl(m_a2_chkbox, wxEmptyString);
-
-	//m_a1_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A1, wxT("A1"), wxDefaultPosition, wxDefaultSize);
-	//m_toolbar->AddControl(m_a1_chkbox, wxEmptyString);
-
-	//m_a0_chkbox = new wxCheckBox(m_toolbar, CID_CHECKBOX_A0, wxT("A0"), wxDefaultPosition, wxDefaultSize);
-	//m_toolbar->AddControl(m_a0_chkbox, wxEmptyString);
-
-	m_toolbar->Realize();
-}
-
-void MainFrame::SetupStatusBar(void){
-	this->m_status_bar = new PMBUSStatusBar(this);
-
-	SetStatusBar(this->m_status_bar);
-
-	PositionStatusBar();
-}
-
-void MainFrame::SetupCMDListDVL(wxPanel* parent){
-	
-	wxASSERT(!this->m_cmdListDVC && !m_cmdListModel);
-	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
-		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
-
-	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData);
-	this->m_cmdListDVC->AssociateModel(m_cmdListModel.get());
-
-	// the various columns
-	this->m_cmdListDVC->AppendToggleColumn("",
-		PMBUSCMDListModel::Col_Toggle,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxDVC_TOGGLE_DEFAULT_WIDTH,
-		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_REORDERABLE
-		);
-
-	this->m_cmdListDVC->AppendIconTextColumn("Register",
-		PMBUSCMDListModel::Col_RegisterIconText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
-
-	this->m_cmdListDVC->AppendTextColumn("Name",
-		PMBUSCMDListModel::Col_NameText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_SORTABLE);
-
-	this->m_cmdListDVC->AppendTextColumn("Access",
-		PMBUSCMDListModel::Col_AccessText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_SORTABLE);
-
-	this->m_cmdListDVC->AppendTextColumn("Query",
-		PMBUSCMDListModel::Col_QueryText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_SORTABLE);
-
-	this->m_cmdListDVC->AppendTextColumn("Cook",
-		PMBUSCMDListModel::Col_CookText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		350,
-		wxALIGN_CENTER_HORIZONTAL,
-		wxCOL_RESIZABLE);
-
-	this->m_cmdListDVC->AppendTextColumn("Raw",
-		PMBUSCMDListModel::Col_RawText,
-		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_LEFT,
-		wxCOL_RESIZABLE);
-
-#if 0
-	this->m_dataViewCtrl->AppendDateColumn("date",
-		PSUDataViewListModel::Col_Date);
-
-	m_attributes =
-		new wxDataViewColumn("attributes",
-		new wxDataViewTextRenderer,
-		PSUDataViewListModel::Col_TextWithAttr,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_RIGHT,
-		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
-	this->m_dataViewCtrl->AppendColumn(m_attributes);
-
-	this->m_dataViewCtrl->AppendColumn(
-		new wxDataViewColumn("custom renderer",
-		new MyCustomRenderer(wxDATAVIEW_CELL_EDITABLE),
-		PSUDataViewListModel::Col_Custom)
-		);
-#endif
-
-	this->m_subNotebook->AddPage(this->m_stdPage, "STD");
-	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
-	//this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write"); // Don't show write page after APP initialized
-	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
-
-	this->m_subNotebook->SetMinSize(wxSize(-1, 200));
-	this->m_cmdListDVC->SetMinSize(wxSize(-1, 200));
-
-	// Setup Sizer
-	GeneralPanelTopLevelSizer = new wxBoxSizer(wxVERTICAL);
-	GeneralPanelSz = new wxBoxSizer(wxHORIZONTAL);
-	
-	// Setup CMDListPanel
-	CMDListSizer = new wxBoxSizer(wxHORIZONTAL);
-	CMDListSizer->Add(this->m_cmdListDVC, 1, wxEXPAND | wxALL);
-
-	this->CMDListPanel->SetSizerAndFit(CMDListSizer);
-
-	// Setup DebugLogPanel
-	m_debugLogStaticBoxSizer->Add(this->m_debugLogTC, 1, wxEXPAND | wxALL);
-
-	this->DebugLogPanel->SetSizerAndFit(this->m_debugLogStaticBoxSizer);
-
-	//
-	m_splitterWindow->SplitVertically(m_subNotebook, this->CMDListPanel, 0);// Add SubNoteBook & CMDListPanel to Splitter Window
-
-	m_splitterWindowTopLevel->SplitHorizontally(m_splitterWindow, this->DebugLogPanel, 0);
-
-	//GeneralPanelSz->Add(m_subNotebook, wxSizerFlags(2).Expand());//2, wxGROW | wxALL, 0);
-	//GeneralPanelSz->Add(this->CMDListPanel, wxSizerFlags(8).Expand());//wxGROW | wxALL, 0);
-	GeneralPanelSz->Add(m_splitterWindowTopLevel, 1, wxEXPAND);
-
-	GeneralPanelTopLevelSizer->Add(GeneralPanelSz, wxSizerFlags(1).Expand());
-	//GeneralPanelTopLevelSizer->Add(m_header, wxSizerFlags(0).Expand());
-	//GeneralPanelTopLevelSizer->Add(this->DebugLogPanel, wxSizerFlags(2).Expand());//wxSizerFlags(1).Expand());
-	
-	parent->SetSizerAndFit(GeneralPanelTopLevelSizer);
-
 }
 
 void MainFrame::OnContextMenu(wxDataViewEvent &event){
@@ -2112,6 +2125,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_IterationsValue = iterationsValue;
 	}
 
+	// Enable Checksum
+	long enableChecksum;
+	if (pConfig->Read(wxT("EnableChecksum"), &enableChecksum) == false){
+		pConfig->Write(wxT("EnableChecksum"), DEFAULT_ENABLE_CHECKSUM);
+		this->m_appSettings.m_EnableChecksum = DEFAULT_ENABLE_CHECKSUM;
+	}
+	else{
+		this->m_appSettings.m_EnableChecksum = enableChecksum;
+	}
+
 	pConfig->SetPath(wxT("/LOG"));
 	
 	// Log Mode
@@ -2222,6 +2245,8 @@ void MainFrame::CheckAndLoadConfig(void){
 		wxICON_INFORMATION | wxOK);
 		#endif
 	}
+
+	PMBUSHelper::SetAppSettings(&this->m_appSettings);
 }
 
 void MainFrame::SaveConfig(void){
@@ -2240,6 +2265,9 @@ void MainFrame::SaveConfig(void){
 
 	// Iterations
 	pConfig->Write(wxT("Iterations"), this->m_appSettings.m_IterationsValue);
+
+	// Enable Checksum
+	pConfig->Write(wxT("EnableChecksum"), this->m_appSettings.m_EnableChecksum);
 
 	pConfig->SetPath(wxT("/LOG"));
 

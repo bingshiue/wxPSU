@@ -7,6 +7,7 @@
 
 unsigned char PMBUSHelper::m_slaveAddress;
 PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
+AppSettings_t* PMBUSHelper::m_appSettings;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -19,6 +20,15 @@ unsigned char& PMBUSHelper::GetSlaveAddress(void){
 PMBUSSTATUS_t* PMBUSHelper::GetPMBusStatus(void){
 	return &m_pmbusStatus;
 }
+
+void PMBUSHelper::SetAppSettings(AppSettings_t* appSettings){
+	m_appSettings = appSettings;
+}
+
+AppSettings_t* PMBUSHelper::GetAppSettings(void){
+	return m_appSettings;
+}
+
 
 #define N_VALUE_MASK  0xf800
 #define Y_VALUE_MASK  0x07ff

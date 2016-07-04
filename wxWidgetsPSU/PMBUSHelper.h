@@ -11,6 +11,7 @@
 
 #include "CommonDef.h"
 #include "PMBUSStatus.h"
+#include "AppSettings.h"
 
 class PMBUSHelper {
 public :
@@ -29,6 +30,9 @@ public :
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
 
+	static void SetAppSettings(AppSettings_t* appSettings);
+	static AppSettings_t* GetAppSettings(void);
+
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
 	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
@@ -46,6 +50,8 @@ private :
 	static unsigned char m_slaveAddress;
 
 	static PMBUSSTATUS_t m_pmbusStatus;
+
+	static AppSettings_t* m_appSettings;
 };
 
 #endif

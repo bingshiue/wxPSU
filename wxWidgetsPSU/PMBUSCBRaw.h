@@ -11,6 +11,7 @@
 
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
+#include "pec.h"
 
 // Declare Raw CB Functions
 int Raw_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
