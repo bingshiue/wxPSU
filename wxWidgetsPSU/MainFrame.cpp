@@ -23,10 +23,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup IO Structure
 	this->DoSetupIOAccess();
 
-	// Current Use IO
-	//this->m_CurrentUseIOInterface = IOACCESS_HID;
-	this->m_CurrentUseIOInterface = IOACCESS_SERIALPORT;
-
 	// Initializa Semaphore
 	this->m_rxTxSemaphore = new wxSemaphore(0,0);
 	
@@ -237,7 +233,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Set Art Provider
 	wxArtProvider::Push(new PMBUSArtProvider);
 
-#if 1
 	// Open IO Device
 	int retval;
 	retval = this->OpenIODevice();
@@ -250,7 +245,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			delete comportDialog;
 		}
 	}
-#endif
 	
 	// Put Window in Center
 	Centre();
@@ -1391,7 +1385,8 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CInterface(wxCommandEvent& event){
-	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
+	
+	I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar);
 	i2cIFDialog->Centre();
 	i2cIFDialog->ShowModal();
 
@@ -1820,6 +1815,28 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_HID].m_CloseDevice = CloseHIDDevice;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceSendData = HIDSendData;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceReadData = HIDReadData;
+
+	// Current Use IO
+	switch (this->m_appSettings.m_I2CAdaptorModuleBoard){
+
+	case I2C_AdaptorModuleBoard_API2CS12_000:
+	case I2C_AdaptorModuleBoard_R90000_95611:
+	case I2C_AdaptorModuleBoard_TOTALPHASE:
+
+		this->m_CurrentUseIOInterface = IOACCESS_SERIALPORT;
+		
+		break;
+
+	case I2C_AdaptorModuleBoard_R90000_9271_USB:
+		
+		this->m_CurrentUseIOInterface = IOACCESS_HID;
+		
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_FATAL, "I2C Adaptor Module Board Setting Error");
+		break;
+	}
 }
 
 void MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
@@ -1859,121 +1876,132 @@ int MainFrame::OpenIODevice(void){
 			else{
 				//this->m_ioDeviceOpen = true;
 
-				// Append Comport Number
-				wxString openDeviceName(this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetOpenDeviceName());
-				//openDeviceName += wxT("-9600-N81");
-				
-				// Append BuadRate
-				switch (this->m_appSettings.m_comportSetting.m_buadRate){
-	
-				case CBR_110:
-					openDeviceName += wxString::Format("-%d-", 110);
-					break;
+				if (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) {
 
-				case CBR_300:
-					openDeviceName += wxString::Format("-%d-", 300);
-					break;
+					// Append Comport Number
+					wxString openDeviceName(this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetOpenDeviceName());
+					//openDeviceName += wxT("-9600-N81");
 
-				case CBR_600:
-					openDeviceName += wxString::Format("-%d-", 600);
-					break;
+					// Append BuadRate
+					switch (this->m_appSettings.m_comportSetting.m_buadRate){
 
-				case CBR_1200:
-					openDeviceName += wxString::Format("-%d-", 1200);
-					break;
+					case CBR_110:
+						openDeviceName += wxString::Format("-%d-", 110);
+						break;
 
-				case CBR_2400:
-					openDeviceName += wxString::Format("-%d-", 2400);
-					break;
+					case CBR_300:
+						openDeviceName += wxString::Format("-%d-", 300);
+						break;
 
-				case CBR_4800:
-					openDeviceName += wxString::Format("-%d-", 4800);
-					break;
+					case CBR_600:
+						openDeviceName += wxString::Format("-%d-", 600);
+						break;
 
-				case CBR_9600:
-					openDeviceName += wxString::Format("-%d-", 9600);
-					break;
+					case CBR_1200:
+						openDeviceName += wxString::Format("-%d-", 1200);
+						break;
 
-				case CBR_14400:
-					openDeviceName += wxString::Format("-%d-", 14400);
-					break;
+					case CBR_2400:
+						openDeviceName += wxString::Format("-%d-", 2400);
+						break;
 
-				case CBR_19200:
-					openDeviceName += wxString::Format("-%d-", 19200);
-					break;
+					case CBR_4800:
+						openDeviceName += wxString::Format("-%d-", 4800);
+						break;
 
-				case CBR_38400:
-					openDeviceName += wxString::Format("-%d-", 38400);
-					break;
+					case CBR_9600:
+						openDeviceName += wxString::Format("-%d-", 9600);
+						break;
 
-				case CBR_56000:
-					openDeviceName += wxString::Format("-%d-", 56000);
-					break;
+					case CBR_14400:
+						openDeviceName += wxString::Format("-%d-", 14400);
+						break;
 
-				case CBR_57600:
-					openDeviceName += wxString::Format("-%d-", 57600);
-					break;
-	
-				case CBR_115200:
-					openDeviceName += wxString::Format("-%d-", 115200);
-					break;
+					case CBR_19200:
+						openDeviceName += wxString::Format("-%d-", 19200);
+						break;
 
-				default:
-					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
-					break;
+					case CBR_38400:
+						openDeviceName += wxString::Format("-%d-", 38400);
+						break;
+
+					case CBR_56000:
+						openDeviceName += wxString::Format("-%d-", 56000);
+						break;
+
+					case CBR_57600:
+						openDeviceName += wxString::Format("-%d-", 57600);
+						break;
+
+					case CBR_115200:
+						openDeviceName += wxString::Format("-%d-", 115200);
+						break;
+
+					default:
+						PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+						break;
+					}
+
+					// Append Parity Check
+					switch (this->m_appSettings.m_comportSetting.m_parityCheck){
+
+					case NOPARITY:
+						openDeviceName += wxString::Format("%s", "N");
+						break;
+
+					case ODDPARITY:
+						openDeviceName += wxString::Format("%s", "O");
+						break;
+
+					case EVENPARITY:
+						openDeviceName += wxString::Format("%s", "E");
+						break;
+
+					case MARKPARITY:
+						openDeviceName += wxString::Format("%s", "M");
+						break;
+					case SPACEPARITY:
+						openDeviceName += wxString::Format("%s", "S");
+						break;
+
+					default:
+						PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+						break;
+					}
+
+					// Append Byte Bits
+					openDeviceName += wxString::Format("%d", this->m_appSettings.m_comportSetting.m_byteSize);
+
+					// Append Stop Bits
+					switch (this->m_appSettings.m_comportSetting.m_stopBits){
+
+					case ONESTOPBIT:
+						openDeviceName += wxString::Format("%d", 1);
+						break;
+
+					case ONE5STOPBITS:
+						openDeviceName += wxString::Format("%f", 1.5);
+						break;
+
+					case TWOSTOPBITS:
+						openDeviceName += wxString::Format("%d", 2);
+						break;
+
+					default:
+						PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+						break;
+					}
+
+					this->UpdateStatusBarIOSettingFiled(openDeviceName);
 				}
+				else if (this->m_CurrentUseIOInterface == IOACCESS_HID){
 
-				// Append Parity Check
-				switch (this->m_appSettings.m_comportSetting.m_parityCheck){
+					wxString usbDeviceName(wxT("USB"));
 
-				case NOPARITY:
-					openDeviceName += wxString::Format("%s", "N");
-					break;
+					this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
-				case ODDPARITY:
-					openDeviceName += wxString::Format("%s", "O");
-					break;
-
-				case EVENPARITY:
-					openDeviceName += wxString::Format("%s", "E");
-					break;
-
-				case MARKPARITY:
-					openDeviceName += wxString::Format("%s", "M");
-					break;
-				case SPACEPARITY:
-					openDeviceName += wxString::Format("%s", "S");
-					break;
-
-				default:
-					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
-					break;
 				}
-				
-				// Append Byte Bits
-				openDeviceName += wxString::Format("%d", this->m_appSettings.m_comportSetting.m_byteSize);
-
-				// Append Stop Bits
-				switch (this->m_appSettings.m_comportSetting.m_stopBits){
-
-				case ONESTOPBIT:
-					openDeviceName += wxString::Format("%d", 1);
-					break;
-
-				case ONE5STOPBITS:
-					openDeviceName += wxString::Format("%f", 1.5);
-					break;
-
-				case TWOSTOPBITS:
-					openDeviceName += wxString::Format("%d", 2);
-					break;
-
-				default:
-					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
-					break;
-				}
-
-				this->UpdateStatusBarIOSettingFiled(openDeviceName);
+		
 			}
 		}
 	//}
@@ -2093,7 +2121,16 @@ void MainFrame::CheckAndLoadConfig(void){
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(wxT("/APP"));
-	
+	// I2C Adaptor Module Board
+	long i2cAdaptorModuleBoard;
+	if (pConfig->Read(wxT("I2CAdaptorModuleBoard"), &i2cAdaptorModuleBoard) == false){
+		pConfig->Write(wxT("I2CAdaptorModuleBoard"), DEFAULT_I2C_ADAPTOR_MODULE);
+		this->m_appSettings.m_I2CAdaptorModuleBoard = DEFAULT_I2C_ADAPTOR_MODULE;
+	}
+	else{
+		this->m_appSettings.m_I2CAdaptorModuleBoard = i2cAdaptorModuleBoard;
+	}
+
 	// I2C Slave Address
 	long i2cSlaveAddr;
 	if (pConfig->Read(wxT("I2CSlaveAddress"), &i2cSlaveAddr) == false){
@@ -2256,6 +2293,9 @@ void MainFrame::SaveConfig(void){
 	if (pConfig==NULL) return;
 
 	pConfig->SetPath(wxT("/APP"));
+
+	// I2C Adaptor Module Board
+	pConfig->Write(wxT("I2CAdaptorModuleBoard"), this->m_appSettings.m_I2CAdaptorModuleBoard);
 
 	// I2C Slave Address
 	pConfig->Write(wxT("I2CSlaveAddress"), this->m_appSettings.m_I2CSlaveAddress);

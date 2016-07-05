@@ -75,6 +75,7 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 	handle = hid_open(DEFAULT_VID, DEFAULT_PID, NULL);
 
 	if (handle == NULL){
+		PSU_DEBUG_PRINT(MSG_FATAL, "HID device can't be opend, handle=%p", handle);
 		return EXIT_FAILURE;
 	}
 	else{
@@ -120,7 +121,13 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 
 int HIDSendData(unsigned char* buff, unsigned int size){
 
-	return hid_write(handle, buff, size);
+	int bytes_write = 0;
+
+	if (handle == NULL) { return 0; }
+
+	bytes_write = hid_write(handle, buff, size);
+
+	return bytes_write;
 }
 
 #define RETRY_TIMES  3

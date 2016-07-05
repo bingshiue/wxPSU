@@ -85,6 +85,7 @@ void WritePage01H::OnButtonWrite(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", cmdOperationValue);
 	}
 
+#if 0
 	unsigned char SendBuffer[8] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x01, cmdOperationValue, 0x00, 0x0D, 0x0A
 	};
@@ -95,11 +96,22 @@ void WritePage01H::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 	SendBuffer[5] = separate_pec;
+#endif
+
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		m_currentIO,
+		SendBuffer,
+		sizeof(SendBuffer),
+		0x01, // CMD
+		&cmdOperationValue,
+		sizeof(cmdOperationValue)
+		);
 
 	PMBUSSendCOMMAND_t CMD01H;
 
-	CMD01H.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD01H.m_bytesToRead = CMD_01H_BYTES_TO_READ;
+	CMD01H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD01H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_01H_BYTES_TO_READ : CMD_01H_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD01H.m_sendData[idx] = SendBuffer[idx];
 	}
@@ -115,7 +127,7 @@ void WritePage01H::OnButtonWrite(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask)SendWriteCMDTask(m_ioaccess, m_currentIO, CMD01H);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD01H);
 	}
 
 }

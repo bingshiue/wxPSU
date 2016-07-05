@@ -113,6 +113,7 @@ void WritePage6BH::OnButtonWrite(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", pinOPWarnValue);
 	}
 
+#if 0
 	unsigned char SendBuffer[9] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x6B, 0x00, 0x00, 0x00, 0x0D, 0x0A
 	};
@@ -125,11 +126,25 @@ void WritePage6BH::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 	SendBuffer[6] = separate_pec;
+#endif
+
+	unsigned char pinOPWarnValueArray[2];
+	PMBUSHelper::ProductLinearData(pinOPWarnValueArray, (double)pinOPWarnValue, scale);
+
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		m_currentIO,
+		SendBuffer,
+		sizeof(SendBuffer),
+		0x6B, // CMD
+		pinOPWarnValueArray,
+		sizeof(pinOPWarnValueArray)
+		);
 
 	PMBUSSendCOMMAND_t CMD6BH;
 
-	CMD6BH.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD6BH.m_bytesToRead = CMD_6BH_BYTES_TO_READ;
+	CMD6BH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD6BH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_6BH_BYTES_TO_READ : CMD_6BH_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD6BH.m_sendData[idx] = SendBuffer[idx];
 	}

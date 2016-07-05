@@ -30,11 +30,14 @@ public:
 		CID_COMPORT_BUTTOUN,
 	};
 
-	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
+	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
 
 	~I2CInterfaceDialog();
 
 	IOACCESS *m_ioaccess;
+	unsigned int *m_currentUseIO;
+	PORT_SETTING_t m_portSetting;
+	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 	AppSettings_t *m_appSettings;
 	PMBUSStatusBar *m_pmbusStatusBar;
 
@@ -72,6 +75,12 @@ public:
 	wxButton *m_USBSettingButton;
 
 private:
+
+	void UpdateStatusBarIOSettingFiled(wxString io_string);
+	int SetIODeviceOption(void);
+
+	int OpenIODevice(void);
+	int CloseIODevice(void);
 
 	void OnOKButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);

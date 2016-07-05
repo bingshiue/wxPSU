@@ -116,6 +116,7 @@ void WritePage51H::OnButtonWrite(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", otWarnLimitValue);
 	}
 
+#if 0
 	unsigned char SendBuffer[9] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x51, 0x00, 0x00, 0x00, 0x0D, 0x0A
 	};
@@ -128,11 +129,25 @@ void WritePage51H::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 	SendBuffer[6] = separate_pec;
+#endif
 
+	unsigned char otWarnLimitValueArray[2];
+	PMBUSHelper::ProductLinearData(otWarnLimitValueArray, (double)otWarnLimitValue, scale);
+
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		m_currentIO,
+		SendBuffer,
+		sizeof(SendBuffer),
+		0x51, // CMD
+		otWarnLimitValueArray,
+		sizeof(otWarnLimitValueArray)
+		);
+	
 	PMBUSSendCOMMAND_t CMD51H;
 
-	CMD51H.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD51H.m_bytesToRead = CMD_51H_BYTES_TO_READ;
+	CMD51H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;// sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD51H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_51H_BYTES_TO_READ : CMD_51H_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD51H.m_sendData[idx] = SendBuffer[idx];
 	}

@@ -37,6 +37,8 @@ public :
 	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
+	static int ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+
 	static long HexToDecimal(wxString string);
 
 	static void GetNowDateTimeString(wxString& string);

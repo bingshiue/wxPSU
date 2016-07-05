@@ -28,14 +28,22 @@ enum {
 	PMBUS_ReadMethod_1_2
 };
 
-#define DEFAULT_I2C_SLAVEADDRESS  0xb6
-#define DEFAULT_RUN_MODE          (unsigned long)(RunMode_Continually)//0x01 //RunMode_Continually
-#define DEFAULT_ITERATIONS_VALUE  10000
-#define DEFAULT_ENABLE_CHECKSUM   (unsigned long)Generic_Enable
+enum {
+	I2C_AdaptorModuleBoard_API2CS12_000= 0,
+	I2C_AdaptorModuleBoard_R90000_95611,
+	I2C_AdaptorModuleBoard_R90000_9271_USB,
+	I2C_AdaptorModuleBoard_TOTALPHASE,
+};
 
-#define DEFAULT_LOG_MODE          (unsigned long)Log_Mode_Log_ALL
-#define DEFAULT_LOG_TO_FILE       (unsigned long)Generic_Disable
-#define DEFAULT_LOG_FILE_PATH     ""
+#define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_95611
+#define DEFAULT_I2C_SLAVEADDRESS    0xb6
+#define DEFAULT_RUN_MODE            (unsigned long)(RunMode_Continually)//0x01 //RunMode_Continually
+#define DEFAULT_ITERATIONS_VALUE    10000
+#define DEFAULT_ENABLE_CHECKSUM     (unsigned long)Generic_Enable
+
+#define DEFAULT_LOG_MODE            (unsigned long)Log_Mode_Log_ALL
+#define DEFAULT_LOG_TO_FILE         (unsigned long)Generic_Disable
+#define DEFAULT_LOG_FILE_PATH       ""
 
 #define DEFAULT_PMBUS_READ_METHOD     (unsigned long)PMBUS_ReadMethod_1_1
 
@@ -66,6 +74,7 @@ typedef struct comport_setting {
 typedef struct appSettings_t {
 	COMPORT_SETTING_t m_comportSetting;
 	
+	unsigned long m_I2CAdaptorModuleBoard;/**< I2C Adaptor Module Board */
 	unsigned long m_I2CSlaveAddress;/**< I2C Slave Address */
 	unsigned long m_runMode;/**< Run Mode */
 	unsigned long m_IterationsValue;/**< Iteration Value */
@@ -78,6 +87,7 @@ typedef struct appSettings_t {
 	void Reset(void){
 		this->m_comportSetting.Reset();
 
+		this->m_I2CAdaptorModuleBoard = DEFAULT_I2C_ADAPTOR_MODULE;
 		this->m_I2CSlaveAddress = DEFAULT_I2C_SLAVEADDRESS;
 		this->m_runMode = DEFAULT_RUN_MODE;
 		this->m_IterationsValue = DEFAULT_ITERATIONS_VALUE;

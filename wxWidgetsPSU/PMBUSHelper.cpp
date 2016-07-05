@@ -3,6 +3,7 @@
  */
 
 #include "math.h"
+#include "pec.h"
 #include "PMBUSHelper.h"
 
 unsigned char PMBUSHelper::m_slaveAddress;
@@ -119,7 +120,6 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 	return result;
 
 }
-
 
 int PMBUSHelper::ProductFakeLinearData(unsigned char *dest, double value, double scale){
 	short result = 0;
@@ -278,6 +278,84 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 	dest[1] = *(((char*)&result + 1));
 
 	return 0;
+}
+
+int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer){
+
+	unsigned int pec_start_index = 0;
+
+	if (buff == NULL || dataBuffer == NULL){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Buff or Data Buffer = NULL");
+		return 0;
+	}
+
+	if (sizeOfBuffer < 64){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Size of Buffer Less Than 64");
+		return 0;
+	}
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		buff[0] = 0x41;
+		buff[1] = 0x54;
+		buff[2] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		buff[3] = cmd; // CMD
+		// Data start from index 4
+		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
+			buff[4+idx] = dataBuffer[idx];
+			pec_start_index = (4 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 2, 2 + sizeOfDataBuffer);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+
+		// Fill Last 2 
+		pec_start_index++;
+		buff[pec_start_index++] = 0x0D;
+		buff[pec_start_index++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		buff[0] = 0x05;
+		
+		buff[2] = 0x41;
+		buff[3] = 0x54;
+		buff[4] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		buff[5] = cmd; // CMD
+		// Data start from index 6
+		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
+			buff[6 + idx] = dataBuffer[idx];
+			pec_start_index = (6 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 4, 2 + sizeOfDataBuffer);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+
+		// Fill Last 2 
+		pec_start_index++;
+		buff[pec_start_index++] = 0x0D;
+		buff[pec_start_index++] = 0x0A;
+
+		// Fill Length
+		buff[1] = pec_start_index - 2;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return pec_start_index;
 }
 
 long PMBUSHelper::HexToDecimal(wxString string){

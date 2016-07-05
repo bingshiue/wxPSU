@@ -76,7 +76,7 @@ int Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 	if (PMBUSHelper::GetAppSettings()->m_EnableChecksum == Generic_Enable){
 		verify_pec = PMBusSlave_Crc8MakeBitwise(0, 7, tmp_buffer + 0, ((dataBytesLength+5) - 1));
 
-		PSU_DEBUG_PRINT(MSG_ALERT, "verify_pec = %02x, pec = %02x", verify_pec, pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength-1]);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "verify_pec = %02x, pec = %02x", verify_pec, pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength-1]);
 
 		if (verify_pec != pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength - 1]){
 			wxstr += L" (Checksum Error)";
@@ -205,7 +205,7 @@ int Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLeng
 	if (PMBUSHelper::GetAppSettings()->m_EnableChecksum == Generic_Enable){
 		verify_pec = PMBusSlave_Crc8MakeBitwise(0, 7, tmp_buffer + 0, ((dataBytesLength+3) - 1));
 
-		PSU_DEBUG_PRINT(MSG_ALERT, "verify_pec = %02x, pec = %02x", verify_pec, pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength-1]);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "verify_pec = %02x, pec = %02x", verify_pec, pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength-1]);
 
 		if (verify_pec != pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength - 1]){
 			wxstr += L" (Checksum Error)";

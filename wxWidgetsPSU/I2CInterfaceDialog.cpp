@@ -4,7 +4,7 @@
 
 #include "I2CInterfaceDialog.h"
 
-I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
+I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
 	
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
@@ -13,6 +13,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, App
 	this->SetBackgroundColour(wxColour(255, 255, 255));
 
 	m_ioaccess = ioaccess;
+	m_currentUseIO = currentUseIO;
 	m_appSettings = appSettings;
 	m_pmbusStatusBar = pmbusStatusBar;
 
@@ -24,13 +25,29 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, App
 	m_generalFlexSizer = new wxFlexGridSizer(6,2,5,5);
 	m_ButtonSizer = new wxBoxSizer(wxVERTICAL);
 
+	// I2C Adaptor Module Board
+
 	m_moduleNameST = new wxStaticText(m_i2cIFModuleSBS->GetStaticBox(), wxID_ANY, wxT("Module Name"));
 	m_moduleNameCB = new wxComboBox(m_i2cIFModuleSBS->GetStaticBox(), wxID_ANY, wxT(""));
 	m_moduleNameCB->Append("API2CS12-000");
 	m_moduleNameCB->Append("R90000-95611");
 	m_moduleNameCB->Append("R90000-9271(USB)");
 	m_moduleNameCB->Append("TOTAL PHASE");
-	m_moduleNameCB->SetSelection(1);
+
+	unsigned long adaptorArray[4] = {
+		I2C_AdaptorModuleBoard_API2CS12_000,
+		I2C_AdaptorModuleBoard_R90000_95611,
+		I2C_AdaptorModuleBoard_R90000_9271_USB,
+		I2C_AdaptorModuleBoard_TOTALPHASE
+	};
+	unsigned int select = 0;
+	for (unsigned int idx = 0; idx < sizeof(adaptorArray) / sizeof(adaptorArray[0]); idx++){
+		if (this->m_appSettings->m_I2CAdaptorModuleBoard == adaptorArray[idx]){
+			select = idx;
+			break;
+		}
+	}
+	m_moduleNameCB->SetSelection(select);
 
 
 	m_i2cIFModuleSBS->Add(m_moduleNameST, wxSizerFlags().Align(wxCENTER).Border());
@@ -152,6 +169,61 @@ I2CInterfaceDialog::~I2CInterfaceDialog(){
 
 
 void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
+	int select = 0;
+
+	// Save Settings
+	// I2C Adaptor Module Board
+	select = this->m_moduleNameCB->GetSelection();
+
+	switch (select){
+
+	case I2C_AdaptorModuleBoard_API2CS12_000:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_API2CS12_000;
+		break;
+	
+	case I2C_AdaptorModuleBoard_R90000_95611:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_R90000_95611;
+		break;
+
+	case I2C_AdaptorModuleBoard_R90000_9271_USB:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_R90000_9271_USB;
+		break;
+
+	case I2C_AdaptorModuleBoard_TOTALPHASE:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_TOTALPHASE;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Save I2C Adaptor Module Board Error");
+		break;
+	}
+
+	// Current Use IO
+	switch (this->m_appSettings->m_I2CAdaptorModuleBoard){
+
+	case I2C_AdaptorModuleBoard_API2CS12_000:
+	case I2C_AdaptorModuleBoard_R90000_95611:
+	case I2C_AdaptorModuleBoard_TOTALPHASE:
+
+		*this->m_currentUseIO = IOACCESS_SERIALPORT;
+
+		break;
+
+	case I2C_AdaptorModuleBoard_R90000_9271_USB:
+
+		*this->m_currentUseIO = IOACCESS_HID;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_FATAL, "I2C Adaptor Module Board Setting Error");
+		break;
+	}
+
+	this->CloseIODevice();
+	wxMilliSleep(200);
+	this->OpenIODevice();
+
 	this->EndModal(0);
 }
 
@@ -165,6 +237,194 @@ void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
 	comportDialog->ShowModal();
 
 	delete comportDialog;
+}
+
+void I2CInterfaceDialog::UpdateStatusBarIOSettingFiled(wxString io_string){
+	this->m_pmbusStatusBar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
+}
+
+int I2CInterfaceDialog::SetIODeviceOption(void){
+	this->m_portSetting.m_comportNumber = this->m_appSettings->m_comportSetting.m_comportNumber;
+	this->m_portSetting.m_buadRate = this->m_appSettings->m_comportSetting.m_buadRate;
+	this->m_portSetting.m_byteSize = this->m_appSettings->m_comportSetting.m_byteSize;
+	this->m_portSetting.m_parityCheck = this->m_appSettings->m_comportSetting.m_parityCheck;
+	this->m_portSetting.m_stopBits = this->m_appSettings->m_comportSetting.m_stopBits;
+
+	return EXIT_SUCCESS;
+}
+
+int I2CInterfaceDialog::OpenIODevice(void){
+
+	int ret = EXIT_FAILURE;
+
+	// Open Device
+
+	if (this->m_ioaccess[*this->m_currentUseIO].m_GetDeviceStatus() == IODEVICE_CLOSE) {
+		this->m_ioaccess[*this->m_currentUseIO].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
+
+		this->SetIODeviceOption();
+		ret = this->m_ioaccess[*this->m_currentUseIO].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT, &this->m_portSetting);
+
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Open IO Device Failed !");
+		}
+		else{
+			//this->m_ioDeviceOpen = true;
+
+			if (*this->m_currentUseIO == IOACCESS_SERIALPORT) {
+
+				// Append Comport Number
+				wxString openDeviceName(this->m_ioaccess[*this->m_currentUseIO].m_GetOpenDeviceName());
+				//openDeviceName += wxT("-9600-N81");
+
+				// Append BuadRate
+				switch (this->m_appSettings->m_comportSetting.m_buadRate){
+
+				case CBR_110:
+					openDeviceName += wxString::Format("-%d-", 110);
+					break;
+
+				case CBR_300:
+					openDeviceName += wxString::Format("-%d-", 300);
+					break;
+
+				case CBR_600:
+					openDeviceName += wxString::Format("-%d-", 600);
+					break;
+
+				case CBR_1200:
+					openDeviceName += wxString::Format("-%d-", 1200);
+					break;
+
+				case CBR_2400:
+					openDeviceName += wxString::Format("-%d-", 2400);
+					break;
+
+				case CBR_4800:
+					openDeviceName += wxString::Format("-%d-", 4800);
+					break;
+
+				case CBR_9600:
+					openDeviceName += wxString::Format("-%d-", 9600);
+					break;
+
+				case CBR_14400:
+					openDeviceName += wxString::Format("-%d-", 14400);
+					break;
+
+				case CBR_19200:
+					openDeviceName += wxString::Format("-%d-", 19200);
+					break;
+
+				case CBR_38400:
+					openDeviceName += wxString::Format("-%d-", 38400);
+					break;
+
+				case CBR_56000:
+					openDeviceName += wxString::Format("-%d-", 56000);
+					break;
+
+				case CBR_57600:
+					openDeviceName += wxString::Format("-%d-", 57600);
+					break;
+
+				case CBR_115200:
+					openDeviceName += wxString::Format("-%d-", 115200);
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
+
+				// Append Parity Check
+				switch (this->m_appSettings->m_comportSetting.m_parityCheck){
+
+				case NOPARITY:
+					openDeviceName += wxString::Format("%s", "N");
+					break;
+
+				case ODDPARITY:
+					openDeviceName += wxString::Format("%s", "O");
+					break;
+
+				case EVENPARITY:
+					openDeviceName += wxString::Format("%s", "E");
+					break;
+
+				case MARKPARITY:
+					openDeviceName += wxString::Format("%s", "M");
+					break;
+				case SPACEPARITY:
+					openDeviceName += wxString::Format("%s", "S");
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
+
+				// Append Byte Bits
+				openDeviceName += wxString::Format("%d", this->m_appSettings->m_comportSetting.m_byteSize);
+
+				// Append Stop Bits
+				switch (this->m_appSettings->m_comportSetting.m_stopBits){
+
+				case ONESTOPBIT:
+					openDeviceName += wxString::Format("%d", 1);
+					break;
+
+				case ONE5STOPBITS:
+					openDeviceName += wxString::Format("%f", 1.5);
+					break;
+
+				case TWOSTOPBITS:
+					openDeviceName += wxString::Format("%d", 2);
+					break;
+
+				default:
+					PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs");
+					break;
+				}
+
+				this->UpdateStatusBarIOSettingFiled(openDeviceName);
+			}
+			else if (*this->m_currentUseIO == IOACCESS_HID){
+
+				wxString usbDeviceName(wxT("USB"));
+
+				this->UpdateStatusBarIOSettingFiled(usbDeviceName);
+
+			}
+
+		}
+	}
+	//}
+
+	return ret;
+
+}
+
+int I2CInterfaceDialog::CloseIODevice(void){
+	int ret = EXIT_FAILURE;
+
+	//if (this->m_ioDeviceOpen == true){
+	// Close IO Device
+	if (this->m_ioaccess[*this->m_currentUseIO].m_GetDeviceStatus() == IODEVICE_OPEN){
+		ret = this->m_ioaccess[*this->m_currentUseIO].m_CloseDevice();
+
+		if (ret != EXIT_SUCCESS){
+			PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
+		}
+		else{
+			//this->m_ioDeviceOpen = false;
+			this->UpdateStatusBarIOSettingFiled(wxString("Disconnect"));
+		}
+	}
+
+	//}
+
+	return ret;
 }
 
 wxBEGIN_EVENT_TABLE(I2CInterfaceDialog, wxDialog)

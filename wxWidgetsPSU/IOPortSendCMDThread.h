@@ -39,6 +39,7 @@ public:
 	bool          m_running;/**< Indicate thread is running */
 	unsigned int  m_register;/**< Register */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
+	unsigned char m_writePageSendBuff[SEND_BUFFER_MAX_SIZE];/**< Send  Buffer for Write Page */
 	unsigned int  *m_pollingTime;/**< polling time */
 	BOOL          m_enumIOPort[IO_PORT_MAX_COUNT];
 
@@ -77,6 +78,8 @@ public:
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
 	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
+	void productWritePageSendBuff(char cmdPageValue);
+
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);
 
 	void UpdateSTDPage(unsigned int index);

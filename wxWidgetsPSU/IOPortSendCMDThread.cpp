@@ -47,6 +47,53 @@ IOPortSendCMDThread::~IOPortSendCMDThread() {
 }
 
 
+void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
+
+	unsigned short pec;
+
+	switch (*this->m_CurrentIO){
+
+	case IOACCESS_SERIALPORT:
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		m_writePageSendBuff[0] = 0x41;
+		m_writePageSendBuff[1] = 0x54;
+		m_writePageSendBuff[2] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		m_writePageSendBuff[3] = 0x00;// CMD
+		m_writePageSendBuff[4] = cmdPageValue;
+		m_writePageSendBuff[5] = 0x00; // PEC
+		m_writePageSendBuff[6] = 0x0D;
+		m_writePageSendBuff[7] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+		m_writePageSendBuff[0] = 0x05;
+		m_writePageSendBuff[1] = 0x08;
+		m_writePageSendBuff[2] = 0x41;
+		m_writePageSendBuff[3] = 0x54;
+		m_writePageSendBuff[4] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		m_writePageSendBuff[5] = 0x00;// CMD
+		m_writePageSendBuff[6] = cmdPageValue;
+		
+		pec = PMBusSlave_Crc8MakeBitwise(0, 7, m_writePageSendBuff + 4, 3);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "pec = %02xh", pec);
+		
+		m_writePageSendBuff[7] = pec; // PEC
+		m_writePageSendBuff[8] = 0x0D;
+		m_writePageSendBuff[9] = 0x0A;
+
+
+
+		break;
+
+	default:
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		
+		break;
+	}
+}
+
 void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength){
 	
 	switch (*this->m_CurrentIO){
@@ -293,7 +340,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){
 							char cmdPageValue = this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage == 1 ? 0x01 : 0x00;
 							unsigned char pec = 0;;
-
+#if 0
 							unsigned char changePageSendBuffer[8] = {
 								0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
 							};
@@ -302,12 +349,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							PSU_DEBUG_PRINT(MSG_DEBUG, "pec = %02xh", pec);
 
 							changePageSendBuffer[5] = pec;
+#endif
+
+							this->productWritePageSendBuff(cmdPageValue);
 
 							PSU_DEBUG_PRINT(MSG_DEBUG, "CMD %s Need To Change Page, NeedChangeage=%d, CMDPage=%d", this->m_pmBusCommand[idx].m_label, this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
+							unsigned int writePageCMDWriteLength = (*this->m_CurrentIO) == IOACCESS_SERIALPORT ? 8 : HID_SEND_DATA_SIZE;
+
 							do {
 								// Send Data
-								sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(changePageSendBuffer, 8);
+								sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(m_writePageSendBuff, writePageCMDWriteLength);
 								if (sendResult <= 0){
 									PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write Page CMD Failed, sendResult=%d", sendResult);
 									// Retry 
