@@ -23,8 +23,201 @@ void SendISPWriteDataTask::Draw(void){
 
 }
 
-void SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
+unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
+	wxString output("");
+	unsigned int active_index = 0;
+	unsigned long start_address;
+	unsigned long address;
+	unsigned short data;
+
+	switch (*this->m_CurrentIO){
+	/* Serial Port */
+	case IOACCESS_SERIALPORT:
+
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
+		buffer[active_index++] = 0xf1; // Command
+		/* Address */
+		this->m_tiHexFileStat->startAddress(&start_address);
+		address = this->m_tiHexFileStat->currentAddress() - start_address;
+
+		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
+		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
+		buffer[active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
+		buffer[active_index++] = (unsigned char)(address & 0x000000ff);
+
+		/* Data  16 bytes (8 short datas) */
+		data = 0x0000;
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		if (!this->m_tiHexFileStat->endOfData()){
+			++(*this->m_tiHexFileStat);
+		}
+
+		// CheckSum Byte (PEC)
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 22);// PMBUSHelper::ComputeISPDataCheckSum(buffer, 8, 23);
+
+		// Last 2 Bytes
+		buffer[active_index++] = 0x0d;
+		buffer[active_index++] = 0x0a;
+
+
+		output += wxString::Format("length=%d,", active_index);
+		for (unsigned int idx = 0; idx < active_index; idx++){
+			output += wxString::Format(" %02x ", buffer[idx]);
+		}
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", output.c_str());
+
+		break;
+
+	/* HID */
+	case IOACCESS_HID:
+
+		buffer[0] = 0x05;
+		//buffer[1] = 27;
+		active_index = 2;
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
+		buffer[active_index++] = 0xf1; // Command
+		/* Address */
+		this->m_tiHexFileStat->startAddress(&start_address);
+		address = this->m_tiHexFileStat->currentAddress() - start_address;
+
+		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
+		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
+		buffer[active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
+		buffer[active_index++] = (unsigned char)(address & 0x000000ff);
+
+		/* Data  16 bytes (8 short datas) */
+		data = 0x0000;
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		++(*this->m_tiHexFileStat);
+
+		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		buffer[active_index++] = (data & 0xff00) >> 8;
+		buffer[active_index++] = data & 0x00ff;
+
+		if (!this->m_tiHexFileStat->endOfData()){
+			++(*this->m_tiHexFileStat);
+		}
+
+		// CheckSum Byte (PEC)
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 22);
+
+		// Last 2 Bytes
+		buffer[active_index++] = 0x0d;
+		buffer[active_index++] = 0x0a;
+
+		// Fill Length Fields
+		buffer[1] = active_index;
+
+
+		output += wxString::Format("length=%d,", active_index);
+		for (unsigned int idx = 0; idx < active_index; idx++){
+			output += wxString::Format(" %02x ", buffer[idx]);
+		}
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", output.c_str());
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return active_index;
+
+#if 0
 	buffer[0] = 0x41;
 	buffer[1] = 0x54;
 	buffer[2] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
@@ -106,7 +299,7 @@ void SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 	}
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", output.c_str());
-
+#endif
 }
 
 int SendISPWriteDataTask::Main(double elapsedTime){
@@ -128,7 +321,7 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 
 	/*----------------------------------------------*/
 	// Product Send Buffer
-	this->ProductSendBuffer(this->m_sendBuff);
+	unsigned int sendDataLength = this->ProductSendBuffer(this->m_sendBuff);
 	/*----------------------------------------------*/
 
 	int sendResult;
@@ -137,7 +330,7 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 
 	do {
 		// Send Data
-		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, 27);
+		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64);
 		if (sendResult <= 0){
 			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Failed, sendResult=%d", sendResult);
 			// Retry 

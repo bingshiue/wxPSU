@@ -148,6 +148,52 @@ void PMBUSFWUpdatePanel::SetupHexMMAPDVL(void){
 	this->m_tiHexMMAPDVC->AppendTextColumn("", TIHexMMAPModel::Col_ASCII, wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT);
 }
 
+unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
+	// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
+	unsigned int active_index = 0;
+
+	switch (*this->m_currentIO){
+
+	case IOACCESS_SERIALPORT:
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = this->m_target; // Target
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
+		
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+		buffer[active_index++] = 0x05;
+		buffer[active_index++] = 0x08;
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = this->m_target; // Target
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 3); // PEC
+
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return active_index;
+}
+
+
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	
@@ -178,6 +224,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
 		);
 
+#if 0
 	// Prepare Send Buffer
 	unsigned char SendBuffer[8] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
@@ -187,15 +234,21 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	pec = PMBusSlave_Crc8MakeBitwise(0, 7, SendBuffer + 2, 3);
 
 	SendBuffer[5] = pec;
+#endif
+
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = this->ProductSendBuffer(SendBuffer);
+
 
 	PMBUSSendCOMMAND_t CMDF0H;
 
-	CMDF0H.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMDF0H.m_bytesToRead = CMD_F0H_BYTES_TO_READ;
+	CMDF0H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMDF0H.m_sendData[idx] = SendBuffer[idx];
 	}
 
+	this->m_tiHexFileStat.begin();
 	unsigned char ispStatus = ISP_Status_InProgress;
 	double percentage = 0;
 	wxString information("");
@@ -206,9 +259,10 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	int not_cancel;
 	bool inProcess = true;
 	unsigned char header_index = 0;
+	unsigned int try_end = 0;
 
 	// Wait for ISP Sequence End
-	while (inProcess){//Task::GetCount() > 0){
+	while (inProcess) {//Task::GetCount() > 0){
 
 		if (ispStatus == ISP_Status_InProgress){
 
@@ -264,6 +318,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			information += wxT("\n");
 		}
 
+
 		// Show Current Address
 		unsigned long currentAddress = this->m_tiHexFileStat.currentAddress();
 		information += wxString::Format("Current Process Address : %08x", currentAddress);
@@ -276,9 +331,16 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		// Compute Percentage (Percentage = processed bytes / total bytes)
 		percentage = ((double)processed_bytes / this->m_dataBytes);
 		percentage *= 100;
-		if (percentage > 100) percentage = 100;
+		if (percentage >= 100) { 
+			percentage = 100; 
+			information = wxT("ISP Progress Complete");
+			information += wxT("\n");
+			information += wxString::Format("Current Process Address : %08x", currentAddress);
+			information += wxT("\n");
+			information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+		
+		}
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
-
 
 		// Update Dialogs
 		not_cancel = dialog.Update((int)percentage, information);
@@ -295,6 +357,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 			case ISP_Status_UserRequestCancel:
 				// User Cancel ISP
+
 				break;
 
 			case ISP_Status_SendDataFailed:
@@ -321,8 +384,15 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		}
 
 		// Check Still have Task
-		if (Task::GetCount()== 0){
-			inProcess = false;
+		if (Task::GetCount() == 0){
+			try_end++;
+			if (try_end >= 3){
+				inProcess = false;
+				try_end = 0;
+			}
+		}
+		else{
+			try_end = 0;
 		}
 
 		wxMilliSleep(200);

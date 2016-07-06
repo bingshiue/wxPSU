@@ -27,12 +27,13 @@ void ReceiveISPEndCMDTask::Draw(void){
 int ReceiveISPEndCMDTask::Main(double elapsedTime){
 	// Receive Data 
 	int ret;
+	unsigned int ispEndDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
 
 #ifndef ISP_DONT_WAIT_RESPONSE
-	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ISP_ENDDATA_BYTES_TO_READ);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ispEndDataBytesToRead);
 
 	// Read Data From IO
-	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ISP_ENDDATA_BYTES_TO_READ);
+	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispEndDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
@@ -53,11 +54,15 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 #endif
 
 	// If Response is OK
-	if (PMBUSHelper::IsResponseOK(this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
+	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 		
 		PSU_DEBUG_PRINT(MSG_ALERT, "Send ISP Data Sequence All Done Without Errors");
 		
 		*this->m_ispStatus = ISP_Status_ALLDone;
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 
 	delete this;

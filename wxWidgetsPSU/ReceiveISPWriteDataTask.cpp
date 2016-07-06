@@ -27,13 +27,16 @@ void ReceiveISPWriteDataTask::Draw(void){
 int ReceiveISPWriteDataTask::Main(double elapsedTime){
 	// Receive Data 
 	int ret;
+	unsigned int ispDataBytesToRead = 0;
+
+	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
-	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ISP_WRITEDATA_BYTES_TO_READ);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	// Read Data From IO
-	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ISP_WRITEDATA_BYTES_TO_READ);
+	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
@@ -55,7 +58,7 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 #endif
 
 	// If Response is OK
-	if (PMBUSHelper::IsResponseOK(this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
+	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 
 		if (this->m_tiHexFileStat->endOfData()){
 			PSU_DEBUG_PRINT(MSG_ALERT, "End of Data : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());

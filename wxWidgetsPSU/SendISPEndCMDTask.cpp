@@ -22,6 +22,52 @@ void SendISPEndCMDTask::Draw(void){
 
 }
 
+unsigned int SendISPEndCMDTask::ProductSendBuffer(unsigned char* buffer){
+
+	unsigned int active_index = 0;
+
+	switch (*this->m_CurrentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = 0x00; // End
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
+
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+
+		buffer[active_index++] = 0x05;
+		buffer[active_index++] = 0x08;
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = 0x00; // End
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 3); // PEC
+
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return active_index;
+}
 
 int SendISPEndCMDTask::Main(double elapsedTime){
 
@@ -30,6 +76,7 @@ int SendISPEndCMDTask::Main(double elapsedTime){
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
 
+#if 0
 	// Product End Command Buffer
 	m_sendBuff[0] = 0x41;
 	m_sendBuff[1] = 0x54;
@@ -46,6 +93,17 @@ int SendISPEndCMDTask::Main(double elapsedTime){
 		str += wxString::Format(" %02x ", m_sendBuff[idx]);
 	}
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+#endif
+
+	unsigned int sendDataLength = 0;
+	sendDataLength = this->ProductSendBuffer(this->m_sendBuff);
+
+
+	wxString str("Send Data : ");
+	for (unsigned int idx = 0; idx < sendDataLength; idx++){
+		str += wxString::Format(" %02x ", m_sendBuff[idx]);
+	}
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
 
 	/*----------------------------------------------*/
 
@@ -55,7 +113,7 @@ int SendISPEndCMDTask::Main(double elapsedTime){
 
 	do {
 		// Send Data
-		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(m_sendBuff, 8);
+		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64);
 		if (sendResult <= 0){
 			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Failed, sendResult=%d", sendResult);
 			// Retry 

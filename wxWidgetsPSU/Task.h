@@ -167,7 +167,7 @@ public:
 	/**
 	 * @brief Product Send Buffer.
 	 */
-	void ProductSendBuffer(unsigned char *buffer);
+	unsigned int ProductSendBuffer(unsigned char *buffer);
 };
 
 class ReceiveISPWriteDataTask : public TaskEx {
@@ -216,6 +216,8 @@ class SendISPEndCMDTask : public TaskEx {
 	unsigned char *m_ispStatus;
 
 	double m_elapsedTimer;/**< for compute elapsed time */
+
+	unsigned int ProductSendBuffer(unsigned char* buffer);
 
 public:
 	/**

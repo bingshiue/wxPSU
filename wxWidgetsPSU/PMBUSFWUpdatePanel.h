@@ -37,6 +37,8 @@ public:
 
 	unsigned int& GetIndexOfNotebook(void) { return this->m_indexOfNotebook; }
 
+	unsigned int ProductSendBuffer(unsigned char* buffer);
+
 protected :
 
 

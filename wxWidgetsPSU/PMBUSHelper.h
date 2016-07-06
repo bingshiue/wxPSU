@@ -43,7 +43,7 @@ public :
 
 	static void GetNowDateTimeString(wxString& string);
 
-	static unsigned char IsResponseOK(unsigned char *buffer, unsigned int sizeOfBuffer);
+	static unsigned char IsResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
 	static unsigned char ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex);
 
 protected :

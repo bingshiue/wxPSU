@@ -9,7 +9,7 @@ using namespace std;
 #include "PMBUSHelper.h"
 #include "HID.h"
 
-#define READ_OPERATION_BLOCKING
+//#define READ_OPERATION_BLOCKING
 
 #define DEFAULT_VID 0x4d8/**< Default VID */
 #define DEFAULT_PID 0x3f/**< Default PID */
@@ -140,11 +140,11 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 
 		readSize = hid_read(handle, buff, sizeOfBuff+2);// Read To [0x0d] [0x0a]
 		if (readSize != HID_EXPECT_DATA_LENGTH){
-			PSU_DEBUG_PRINT(MSG_ALERT, "readSize = %d", readSize);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "readSize = %d", readSize);
 		}
 
 		retry++;
-		Sleep(20);
+		wxMilliSleep(10);
 	}
 
 	if (retry >= RETRY_TIMES){

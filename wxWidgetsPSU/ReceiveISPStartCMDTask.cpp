@@ -54,11 +54,15 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 #endif
 
 	// If Response is OK
-	if (PMBUSHelper::IsResponseOK(this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
+	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 		// Start Send Data
 		this->m_tiHexFileStat->begin();
 		PSU_DEBUG_PRINT(MSG_ALERT, "Start Address = %08x", this->m_tiHexFileStat->currentAddress());
 		new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 
 	delete this;

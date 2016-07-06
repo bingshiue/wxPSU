@@ -380,24 +380,55 @@ void PMBUSHelper::GetNowDateTimeString(wxString& string){
 	string += wxString::Format("%02d", datetime.GetSecond());
 }
 
-unsigned char PMBUSHelper::IsResponseOK(unsigned char *buffer, unsigned int sizeOfBuffer){
-
+unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer){
+	// 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a
+	// 0x15  0x07  0x41  0x43  0x02  0x4f  0x4b  0x0d  0x0a <- If OK
+	// 0x15  0x07  0x41  0x43  0x02  0x4e  0x47  0x0d  0x0a <- If NG
+	unsigned char ok_buffer[6] = { 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a };
+	unsigned char ok_hid_buffer[9] = { 0x15, 0x07, 0x41, 0x43, 0x02, 0x4f, 0x4b, 0x0d, 0x0a };
 	unsigned char result = response_ok;
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
-	unsigned char ok_buffer[6] = { 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a };
 
-	if (sizeOfBuffer < sizeof(ok_buffer) / sizeof(ok_buffer[0])){
-		result = response_ng;
-		return result;
-	}
+	switch (*currentIO){
+	
+	case IOACCESS_SERIALPORT:
 
-	for (int idx = 0; idx < sizeof(ok_buffer) / sizeof(ok_buffer[0]); idx++){
-		if (buffer[idx] != ok_buffer[idx]){
+		if (sizeOfBuffer < sizeof(ok_buffer) / sizeof(ok_buffer[0])){
 			result = response_ng;
-			break;
+			return result;
 		}
+
+		for (int idx = 0; idx < sizeof(ok_buffer) / sizeof(ok_buffer[0]); idx++){
+			if (buffer[idx] != ok_buffer[idx]){
+				result = response_ng;
+				break;
+			}
+		}
+
+		break;
+
+	case IOACCESS_HID:
+
+		if (sizeOfBuffer < sizeof(ok_hid_buffer) / sizeof(ok_hid_buffer[0])){
+			result = response_ng;
+			return result;
+		}
+
+		for (int idx = 0; idx < sizeof(ok_hid_buffer) / sizeof(ok_hid_buffer[0]); idx++){
+			if (buffer[idx] != ok_hid_buffer[idx]){
+				result = response_ng;
+				break;
+			}
+		}
+
+		break;
+	
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
 	}
+
 #endif
 
 	return result;
