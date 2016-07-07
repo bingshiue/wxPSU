@@ -13,7 +13,7 @@ BOOL GetSerialPortName(wchar_t *buff, unsigned int sizeOfBuff, unsigned int num)
 	BOOL ret = TRUE;
 
 	if (sizeOfBuff < 16 || num < 0){
-		PSU_DEBUG_PRINT(MSG_FATAL, "%s: Error Occurs, sizeOfBuff=%d, num=%d", __FUNCTIONW__, sizeOfBuff, num);
+		PSU_DEBUG_PRINT(MSG_ERROR, "%s: Error Occurs, sizeOfBuff=%d, num=%d", __FUNCTIONW__, sizeOfBuff, num);
 		ret = FALSE;
 		return ret;
 	}
@@ -101,7 +101,7 @@ int SetSerialPortTimeouts(void){
 
 
 	if (SetCommTimeouts(hComm, &timeouts) == FALSE){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting Time Outs");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! in Setting Time Outs");
 		return EXIT_FAILURE;
 	}
 	else{
@@ -147,7 +147,7 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 		NULL);                             // Null for Comm Devices
 
 	if (hComm == INVALID_HANDLE_VALUE){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! Port %s can't be opened", ComPortName);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! Port %s can't be opened", ComPortName);
 		return EXIT_FAILURE;
 	}
 	else{
@@ -160,7 +160,7 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 	Status = GetCommState(hComm, &dcbSerialParams);     //retreives the current settings
 
 	if (Status == FALSE){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in GetCommState()");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! in GetCommState()");
 		return EXIT_FAILURE;
 	}
 
@@ -175,8 +175,8 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 
 	if (Status == FALSE)
 	{
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting DCB Structure");
-		PSU_DEBUG_PRINT(MSG_FATAL, "GetLastError() = %d", GetLastError());
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! in Setting DCB Structure");
+		PSU_DEBUG_PRINT(MSG_ERROR, "GetLastError() = %d", GetLastError());
 		return EXIT_FAILURE;
 	}
 	else
@@ -201,13 +201,13 @@ int DumpComStat(void){
 	DWORD dwErrors;
 	COMSTAT ComStat;
 
-	PSU_DEBUG_PRINT(MSG_FATAL, "DumpComStat");
+	PSU_DEBUG_PRINT(MSG_ERROR, "DumpComStat");
 
 	ClearCommError(hComm, &dwErrors, &ComStat);
 
-	PSU_DEBUG_PRINT(MSG_FATAL, "dwErrors=%ld", dwErrors);
-	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
-	PSU_DEBUG_PRINT(MSG_FATAL, "ComStat.cbInQue=%ld", ComStat.cbInQue);
+	PSU_DEBUG_PRINT(MSG_ERROR, "dwErrors=%ld", dwErrors);
+	PSU_DEBUG_PRINT(MSG_ERROR, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
+	PSU_DEBUG_PRINT(MSG_ERROR, "ComStat.cbInQue=%ld", ComStat.cbInQue);
 
 	return ComStat.cbInQue;// Return how many data bytes in In-Queue
 }
@@ -271,7 +271,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 #endif
 
 			if (dNoOfBytesWritten != send_size){
-				PSU_DEBUG_PRINT(MSG_FATAL, "Send Size Unexpected ! dNoOfBytesWritten=%d", dNoOfBytesWritten);
+				PSU_DEBUG_PRINT(MSG_ERROR, "Send Size Unexpected ! dNoOfBytesWritten=%d", dNoOfBytesWritten);
 				DumpComStat();
 
 				ResetEvent(ol_write.hEvent);
@@ -287,7 +287,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 		}
 		else
 		{
-			PSU_DEBUG_PRINT(MSG_FATAL, "ERROR in Send, Error = %d", send_err);
+			PSU_DEBUG_PRINT(MSG_ERROR, "ERROR in Send, Error = %d", send_err);
 			// Get Error Information
 			DumpComStat();
 			
@@ -350,7 +350,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	Status = SetCommMask(hComm, EV_RXCHAR); //Configure Windows to Monitor the serial device for Character Reception
 
 	if (Status == FALSE){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting CommMask");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! in Setting CommMask");
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Setting CommMask successfull");
@@ -368,7 +368,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 		Status = SetCommMask(hComm, EV_RXCHAR);
 
 		if (Status == FALSE){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Error! in Setting CommMask");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Error! in Setting CommMask");
 		}
 		else{
 			PSU_DEBUG_PRINT(MSG_DEBUG, "Setting CommMask successfull");
@@ -534,7 +534,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 #endif
 						}
 						else{// if (lastError == ERROR_IO_PENDING)
-							PSU_DEBUG_PRINT(MSG_FATAL, "ReadFile lastError=%d", lastError);
+							PSU_DEBUG_PRINT(MSG_ERROR, "ReadFile lastError=%d", lastError);
 							NoBytesRead = 0;
 							DumpComStat();
 							break; // break while (i < bytesToRead);

@@ -354,6 +354,8 @@ int Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 }
 
 int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -386,6 +388,7 @@ int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_byte.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_byte.Save(0xff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_BYTE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_byte.status);
 
@@ -407,10 +410,23 @@ int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned short previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -458,6 +474,7 @@ int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_word.Save(pmbuscmd->m_recvBuff.m_dataBuff[0] | (pmbuscmd->m_recvBuff.m_dataBuff[1] << 8));
+	//PMBUSHelper::GetPMBusStatus()->m_status_word.Save(0xffff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_WORD = %04x", PMBUSHelper::GetPMBusStatus()->m_status_word.status);
 
@@ -479,10 +496,23 @@ int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != 0x0000){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -514,6 +544,7 @@ int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_vout.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_vout.Save(0xff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_VOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_vout.status);
 
@@ -535,10 +566,23 @@ int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -572,6 +616,7 @@ int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 
 	PMBUSHelper::GetPMBusStatus()->m_status_iout.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_iout.Save(0xff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_IOUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_iout.status);
 
@@ -593,10 +638,23 @@ int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -629,6 +687,7 @@ int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_input.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_input.Save(0xff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_INPUT = %02x", PMBUSHelper::GetPMBusStatus()->m_status_input.status);
 
@@ -650,10 +709,23 @@ int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -685,6 +757,7 @@ int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_temperature.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_temperature.Save(0xff); // For Test Output
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_TEMPERATURE = %02x", PMBUSHelper::GetPMBusStatus()->m_status_temperature.status);
 
@@ -706,10 +779,23 @@ int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -741,6 +827,7 @@ int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_cml.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_cml.Save(0xff);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_CML = %02x", PMBUSHelper::GetPMBusStatus()->m_status_cml.status);
 
@@ -762,10 +849,23 @@ int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -798,6 +898,7 @@ int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Status: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_other.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_other.Save(0xff);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_OTHER = %02x", PMBUSHelper::GetPMBusStatus()->m_status_other.status);
 
@@ -819,10 +920,23 @@ int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
+		}
+	}
+
 	return EXIT_SUCCESS; 
 }
 
 int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
+	static unsigned char previous_status = 0x00;
+	
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -857,6 +971,7 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Fan 1: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
+	//PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(0xff); // For Test Output Meaasges
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_FAN_1_2 = %02x", PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status);
 
@@ -892,6 +1007,18 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	lstrcpyn(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != 0x00){
+		if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != previous_status){
+			// Output MSG to Log 
+			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output += wxstr;
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+
+			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
+		}
+	}
+
 
 	return EXIT_SUCCESS; 
 }

@@ -26,7 +26,6 @@ void ReceiveISPEndCMDTask::Draw(void){
 #define ISP_ENDDATA_BYTES_TO_READ  6
 int ReceiveISPEndCMDTask::Main(double elapsedTime){
 	// Receive Data 
-	int ret;
 	unsigned int ispEndDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
 
 #ifndef ISP_DONT_WAIT_RESPONSE

@@ -27,7 +27,6 @@ void ReceiveISPStartCMDTask::Draw(void){
 
 int ReceiveISPStartCMDTask::Main(double elapsedTime){
 	// Receive Data 
-	int ret;
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", this->m_pmbusSendCommand.m_bytesToRead);

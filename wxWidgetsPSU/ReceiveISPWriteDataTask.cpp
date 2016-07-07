@@ -26,7 +26,6 @@ void ReceiveISPWriteDataTask::Draw(void){
 #define ISP_WRITEDATA_BYTES_TO_READ  6
 int ReceiveISPWriteDataTask::Main(double elapsedTime){
 	// Receive Data 
-	int ret;
 	unsigned int ispDataBytesToRead = 0;
 
 	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
@@ -68,6 +67,10 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 			new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		}
 
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 
 	delete this;

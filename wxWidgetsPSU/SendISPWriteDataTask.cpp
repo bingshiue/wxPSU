@@ -305,7 +305,6 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 int SendISPWriteDataTask::Main(double elapsedTime){
 
 	int cnt = this->GetCount(task_ID_SendISPWriteDataTask);
-	int ret;
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
 

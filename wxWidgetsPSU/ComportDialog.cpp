@@ -232,7 +232,7 @@ int ComportDialog::OpenIODevice(void){
 		ret = this->m_ioaccess[0].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT, &this->m_portSetting);
 
 		if (ret != EXIT_SUCCESS){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed !");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Open IO Device Failed !");
 		}
 		else{
 			//this->m_ioDeviceOpen = true;
@@ -363,7 +363,7 @@ int ComportDialog::CloseIODevice(void){
 		ret = this->m_ioaccess[0].m_CloseDevice();
 	
 		if (ret != EXIT_SUCCESS){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Close IO Device Failed !");
 		}
 		else{
 			this->UpdateStatusBarIOSettingFiled(wxString("Disconnect"));

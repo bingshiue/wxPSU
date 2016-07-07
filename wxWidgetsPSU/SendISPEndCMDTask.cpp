@@ -72,7 +72,6 @@ unsigned int SendISPEndCMDTask::ProductSendBuffer(unsigned char* buffer){
 int SendISPEndCMDTask::Main(double elapsedTime){
 
 	int cnt = this->GetCount(task_ID_SendISPEndCMDTask);
-	int ret;
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
 

@@ -17,7 +17,7 @@ wxLogVerbose
 */
 enum DEBUG_MSG_LEVEL {
 	MSG_FATAL = 0,
-	MSG_EMERGECY,
+	MSG_ERROR,
 	MSG_ALERT,
 	MSG_DEBUG,
 	MSG_DETAIL,
@@ -30,32 +30,28 @@ enum DEBUG_MSG_LEVEL {
 #ifdef _DEBUG
 #define PSU_DEBUG_PRINT(level,fmt, ...)  \
 		if(level == MSG_FATAL) \
-			wxLogError("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);   \
-		else if(level == MSG_EMERGECY) \
-		    wxLogWarning("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__); \
-				else if(level == MSG_ALERT) \
+			wxLogFatalError("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);   \
+		else if(level == MSG_ERROR) \
+		    wxLogError("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__); \
+		else if(level == MSG_ALERT) \
 		    wxLogMessage("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__); \
-				else if(level == MSG_DEBUG) \
+		else if(level == MSG_DEBUG) \
 		    wxLogDebug("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);   \
-				else if(level == MSG_DETAIL) \
+		else if(level == MSG_DETAIL) \
 		    wxLogVerbose("%s():%d:"fmt,__FUNCTIONW__,__LINE__,## __VA_ARGS__);
 
 #else
 #define PSU_DEBUG_PRINT(level,fmt, ...)  \
 		if(level == MSG_FATAL) \
-			wxLogError(fmt,__VA_ARGS__);   \
-				else if(level == MSG_EMERGECY) \
-		    wxLogWarning(fmt,__VA_ARGS__); \
-								else if(level == MSG_ALERT) \
+			wxLogFatalError(fmt,__VA_ARGS__);   \
+		else if(level == MSG_ERROR) \
+		    wxLogError(fmt,__VA_ARGS__); \
+		else if(level == MSG_ALERT) \
 		    wxLogMessage(fmt,__VA_ARGS__); \
-								else if(level == MSG_DEBUG) \
+		else if(level == MSG_DEBUG) \
 		    wxLogDebug(fmt,__VA_ARGS__);   \
-								else if(level == MSG_DETAIL) \
+		else if(level == MSG_DETAIL) \
 		    wxLogVerbose(fmt,__VA_ARGS__);
-
-//#define PSU_DEBUG_PRINT(level,fmt, ...)  \
-		//if(level <= DEFAULT_DEBUG_MSG_LEVEL) \
-			//wxLogMessage(fmt,__VA_ARGS__);
 
 #endif
 #else

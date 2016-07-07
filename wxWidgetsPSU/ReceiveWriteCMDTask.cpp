@@ -23,7 +23,6 @@ void ReceiveWriteCMDTask::Draw(void){
 
 int ReceiveWriteCMDTask::Main(double elapsedTime){
 	// Receive Data 
-	int ret;
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", this->m_pmbusSendCommand.m_bytesToRead);
 

@@ -75,7 +75,7 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 	handle = hid_open(DEFAULT_VID, DEFAULT_PID, NULL);
 
 	if (handle == NULL){
-		PSU_DEBUG_PRINT(MSG_FATAL, "HID device can't be opend, handle=%p", handle);
+		PSU_DEBUG_PRINT(MSG_ERROR, "HID device can't be opend, handle=%p", handle);
 		return EXIT_FAILURE;
 	}
 	else{

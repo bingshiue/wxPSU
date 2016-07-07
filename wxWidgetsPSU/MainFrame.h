@@ -376,7 +376,9 @@ private:
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 
 	// logging helper
-	void DoLogLine(wxTextCtrl *text,
+	void DoLogLine(
+		wxLogLevel level,
+		wxTextCtrl *text,
 		const wxString& timestr,
 		const wxString& threadstr,
 		const wxString& msg);

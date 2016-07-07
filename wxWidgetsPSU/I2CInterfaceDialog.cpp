@@ -216,7 +216,7 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_FATAL, "I2C Adaptor Module Board Setting Error");
+		PSU_DEBUG_PRINT(MSG_ERROR, "I2C Adaptor Module Board Setting Error");
 		break;
 	}
 
@@ -414,7 +414,7 @@ int I2CInterfaceDialog::CloseIODevice(void){
 		ret = this->m_ioaccess[*this->m_currentUseIO].m_CloseDevice();
 
 		if (ret != EXIT_SUCCESS){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Close IO Device Failed !");
 		}
 		else{
 			//this->m_ioDeviceOpen = false;

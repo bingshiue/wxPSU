@@ -231,7 +231,7 @@ void PMBUSCMDListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsi
 
 
 			default:
-				PSU_DEBUG_PRINT(MSG_FATAL, "CMD Status Abnormal, Status=%d", this->m_pmBusCommand[row].m_cmdStatus.m_status);
+				PSU_DEBUG_PRINT(MSG_ERROR, "CMD Status Abnormal, Status=%d", this->m_pmBusCommand[row].m_cmdStatus.m_status);
 				break;
 			}
 		}

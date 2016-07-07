@@ -311,7 +311,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 		ret = this->m_IOAccess[*this->m_CurrentIO].m_OpenDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT);
 
 		if (ret != EXIT_SUCCESS){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Open IO Device Failed ! Need add error handle mechanism here");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Open IO Device Failed ! Need add error handle mechanism here");
 		}
 	}
 #endif
@@ -391,7 +391,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							// If Create Thread Success
 							if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-								PSU_DEBUG_PRINT(MSG_FATAL, "Can't create thread!");
+								PSU_DEBUG_PRINT(MSG_ERROR, "Can't create thread!");
 							}
 							else{
 								this->m_IOPortReadCMDThread->Run();
@@ -486,7 +486,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-							PSU_DEBUG_PRINT(MSG_FATAL, "Can't create thread!");
+							PSU_DEBUG_PRINT(MSG_ERROR, "Can't create thread!");
 						}
 						else{
 							this->m_IOPortReadCMDThread->Run();
@@ -651,7 +651,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-							PSU_DEBUG_PRINT(MSG_FATAL, "Can't create thread! (Separate)");
+							PSU_DEBUG_PRINT(MSG_ERROR, "Can't create thread! (Separate)");
 						}
 						else{
 							this->m_IOPortReadCMDThread->Run();

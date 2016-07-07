@@ -38,7 +38,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_pause16Bitmap = new wxBitmap(wxT("PAUSE_16"), wxBITMAP_TYPE_PNG_RESOURCE);
 
 	// Setup Icon
-	SetIcon(Acbel_xpm);
+	SetIcon(wxICON(APP_ICON));//Acbel_xpm);
 
 	// Setup PMNBusCommand Data
 	SetupPMBusCommandData();
@@ -93,7 +93,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//DoLogLine(m_header, "  Time", " Thread", "          Message");
 	this->m_debugLogTC = new wxTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), wxID_ANY, "",//this->DebugLogPanel, wxID_ANY, "",
 		wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY );
+		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 	
 	// Get old logger
 	m_oldLogger = wxLog::GetActiveTarget();
@@ -171,7 +171,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_TaskSystemThread = new TaskSystemThread();
 	// If Create Thread Success
 	if (this->m_TaskSystemThread->Create() != wxTHREAD_NO_ERROR){
-		PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Task System Thread");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Task System Thread");
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
@@ -1317,7 +1317,7 @@ void MainFrame::OnStopProgramming(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnI2CFaultTest");
 }
 
 void MainFrame::OnEnableChecksum(wxCommandEvent& event){
@@ -1434,6 +1434,8 @@ void MainFrame::OnErrorLogALL(wxCommandEvent& event){
 	this->m_appSettings.m_logMode = Log_Mode_Log_ALL;
 	this->m_allMenuItem->Check(true);
 	this->m_errorOnlyMenuItem->Check(false);
+
+	wxLog::SetLogLevel(wxLOG_Message);
 }
 
 void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
@@ -1441,6 +1443,8 @@ void MainFrame::OnErrorLogErrorOnly(wxCommandEvent& event){
 	this->m_appSettings.m_logMode = Log_Mode_Log_Error_Only;
 	this->m_allMenuItem->Check(false);
 	this->m_errorOnlyMenuItem->Check(true);
+
+	wxLog::SetLogLevel(wxLOG_Warning);
 }
 
 void MainFrame::OnLogToFile(wxCommandEvent& event){
@@ -1590,7 +1594,7 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 		// If Create Thread Success
 		if (this->m_IOPortSendCMDThread->Create() != wxTHREAD_NO_ERROR){
-			PSU_DEBUG_PRINT(MSG_FATAL, "Can't Create Send Command Thread");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Send Command Thread");
 		}
 		else{
 			this->m_IOPortSendCMDThread->Run();
@@ -1612,8 +1616,34 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 }
 
-void MainFrame::DoLogLine(wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
+void MainFrame::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
 {
+
+	switch (level) {
+
+	case wxLOG_FatalError:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+	case wxLOG_Error:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+	//case wxLOG_Warning:
+		//break;
+	//case wxLOG_Message:
+		//break;
+	//case wxLOG_Status:
+		//break;
+	//case wxLOG_Info:
+		//break;
+	//case wxLOG_Debug:
+		//break;
+
+	default:
+		text->SetDefaultStyle(wxTextAttr(*wxBLUE, *wxWHITE));
+		break;
+	}
+
+#ifdef _DEBUG
 	text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
 
 	// If enable output log to file
@@ -1623,6 +1653,17 @@ void MainFrame::DoLogLine(wxTextCtrl *text, const wxString& timestr, const wxStr
 			(*this->m_logFileTextOutputStream).Flush();
 		}
 	}
+#else
+	text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s           %s", timestr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
+#endif
 }
 
 void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info)
@@ -1639,6 +1680,7 @@ void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRe
 #endif
 
 	DoLogLine(
+		level,
 		this->m_debugLogTC,
 		wxDateTime(info.timestamp).FormatISOTime(),
 		info.threadId == wxThread::GetMainId()
@@ -1646,6 +1688,7 @@ void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRe
 		: wxString::Format("%lx", info.threadId),
 		msg + "\n"
 	);
+
 }
 
 void MainFrame::OnValueChanged(wxDataViewEvent &event)
@@ -1834,7 +1877,7 @@ void MainFrame::DoSetupIOAccess(void){
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_FATAL, "I2C Adaptor Module Board Setting Error");
+		PSU_DEBUG_PRINT(MSG_ERROR, "I2C Adaptor Module Board Setting Error");
 		break;
 	}
 }
@@ -2019,7 +2062,7 @@ int MainFrame::CloseIODevice(void){
 			ret = this->m_IOAccess[this->m_CurrentUseIOInterface].m_CloseDevice();
 
 			if (ret != EXIT_SUCCESS){
-				PSU_DEBUG_PRINT(MSG_FATAL, "Close IO Device Failed !");
+				PSU_DEBUG_PRINT(MSG_ERROR, "Close IO Device Failed !");
 			}
 			else{
 				//this->m_ioDeviceOpen = false;
