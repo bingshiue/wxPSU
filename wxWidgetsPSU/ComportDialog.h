@@ -41,6 +41,8 @@ public:
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 	PORT_SETTING_t m_portSetting;
 
+	BOOL enumArray[256];
+
 	wxBoxSizer *m_TopLevelSizer;
 
 	wxStaticBoxSizer *m_SettingSBS;

@@ -17,7 +17,10 @@ AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString
 	m_acbelLogoSB = new wxStaticBitmap(this, wxID_ANY, wxBitmap(Acbel_large_xpm));
 
 	m_line1ST = new wxStaticText(this, wxID_ANY, wxT("PSU Monitor"), wxDefaultPosition, wxDefaultSize);
-	m_line2ST = new wxStaticText(this, wxID_ANY, wxT("Version: 1.0.0.0"), wxDefaultPosition, wxDefaultSize);
+
+	wxString version(wxT("Version : ")); 
+	version += wxString::Format("%s", VERSION_STRING);
+	m_line2ST = new wxStaticText(this, wxID_ANY, version, wxDefaultPosition, wxDefaultSize);
 	
 	wxString buildDate = wxString::Format("%s", __DATE__);
 	m_buildDateST = new wxStaticText(this, wxID_ANY, buildDate, wxDefaultPosition, wxDefaultSize);

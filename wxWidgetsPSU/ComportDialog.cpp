@@ -32,23 +32,69 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 	m_DataBitsST = new wxStaticText(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT("Data Bits"));
 	m_StopBitsST = new wxStaticText(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT("Stop Bits"));
 
+	// 
+	this->CloseIODevice();
+	wxMilliSleep(200);
+
 	// Comport Number
 	m_ComportNumberCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1));
 
-	unsigned long comportNumberArray[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-	for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
-		m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray[idx]));
-	}
+	int comport_cnt = m_ioaccess->m_EnumerateAvailableDevice(this->enumArray, sizeof(this->enumArray) / sizeof(this->enumArray[0]));
 
-	unsigned int select = 0;
-	for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
-		if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray[idx]){
-			select = idx;
-			break;
+	if (comport_cnt == 0){
+		wxMessageBox(wxT("Can not find any Comport Interface !"),
+			wxT("Error !"),  // caption
+			wxOK | wxICON_ERROR);
+
+		// Can't find any comport interface, use default setting
+		unsigned long comportNumberArray_fixed[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+		for (unsigned int idx = 0; idx < sizeof(comportNumberArray_fixed) / sizeof(comportNumberArray_fixed[0]); idx++){
+			m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray_fixed[idx]));
 		}
+
+		unsigned int select_fixed = 0;
+		for (unsigned int idx = 0; idx < sizeof(comportNumberArray_fixed) / sizeof(comportNumberArray_fixed[0]); idx++){
+			if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray_fixed[idx]){
+				select_fixed = idx;
+				break;
+			}
+		}
+
+		m_ComportNumberCB->SetSelection(select_fixed);
+	}
+	else{
+		unsigned long* comportNumberArray = new unsigned long[comport_cnt];
+
+		// Get Comport Number
+		for (unsigned int idx = 0, cnt_idx =0; idx < sizeof(this->enumArray) / sizeof(this->enumArray[0]); idx++){
+			if (this->enumArray[idx] == TRUE){
+				comportNumberArray[cnt_idx++] = (idx + 1);
+			}
+		}
+
+		// Append Comport Number to Combo Box
+		for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+			m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray[idx]));
+		}
+
+		// Default Select Index
+		unsigned int select_dynamic = 0;
+		for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+			if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray[idx]){
+				select_dynamic = idx;
+				break;
+			}
+		}
+
+		m_ComportNumberCB->SetSelection(select_dynamic);
+		//
+
+		delete[] comportNumberArray;
 	}
 
-	m_ComportNumberCB->SetSelection(select);
+
+
+	unsigned int select;
 
 	// Buad Rate
 	m_BuadRateCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100, -1));

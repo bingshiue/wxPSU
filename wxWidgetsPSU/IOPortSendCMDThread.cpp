@@ -283,7 +283,8 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 #define BASE_RESPONSE_DATA_LENGTH  6
 #define STR_LENGTH  256
-//#define PRINT_RAW_IN_FEILD
+#define PRINT_RAW_IN_FEILD
+#define OUTPUT_SEND_DATA
 wxThread::ExitCode IOPortSendCMDThread::Entry()
 {
 	int ret;
@@ -375,6 +376,15 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 								}
 								else{
+#ifdef OUTPUT_SEND_DATA
+									wxString PageSentData(wxT("Sent Data : "));
+									for (unsigned idx = 0; idx < writePageCMDWriteLength; idx++){
+										PageSentData += wxString::Format(" %02x ", this->m_writePageSendBuff[idx]);
+									}
+									PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageSentData.c_str());
+#endif
+									
+									
 									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Write Page CMD Success");
 								}
 
@@ -469,6 +479,13 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							}
 							else{
+#ifdef OUTPUT_SEND_DATA
+								wxString sentData(wxT("Sent Data : "));
+								for (int idx = 0; idx < sendDataLength; idx++){
+									sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+								}
+								PSU_DEBUG_PRINT(MSG_ALERT, "%s", sentData.c_str());
+#endif
 								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
 							}
 

@@ -132,6 +132,8 @@ private:
 
 	void OnTCData1(wxCommandEvent& event);
 
+	int ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done = false);
+
 	wxDECLARE_EVENT_TABLE();
 };
 

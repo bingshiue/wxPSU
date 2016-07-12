@@ -91,7 +91,7 @@ enum
 	TOOLBAR_ID_RESET_RUN_TIME,
 	TOOLBAR_ID_REFRESH_MAXMIN,
 
-	ID_ATTR_CTRL = 51,
+	CID_CMDLIST_DVC = 51,
 
 	ID_TOOLBAR = 500,
 	CID_SLAVE_ADDRESS_SET_BUTTON,
@@ -398,6 +398,9 @@ private:
 	void SaveConfig(void);
 
 	void ReInitLogFileOutputStream(wxString dirPath);
+
+	void StartMonitor(void);
+	void StopMonitor(void);
 
 	wxDECLARE_EVENT_TABLE();
 

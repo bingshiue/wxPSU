@@ -4,6 +4,11 @@
 #ifndef _PMBUSFWUPDATEPANEL_H
 #define _PMBUSFWUPDATEPANEL_H
 
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <iomanip>
+
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -21,6 +26,8 @@
 
 enum {
 	ID_HEXMMAP_DVC = 8100,
+
+	MENU_ID_POPUP_SAVEHEX,
 
 	CID_WRITE_BUTTON,
 	CID_CLOSE_BUTTON,
@@ -60,6 +67,9 @@ private:
 
 	unsigned char m_target;
 
+	wxMenu* m_popupMenu;
+	wxMenuItem* m_saveHexMenuItem;
+
 	wxStaticText *m_fileNameST;
 	//wxTextCtrl *m_fileNameTC;
 
@@ -98,6 +108,9 @@ private:
 
 	void OnWriteButton(wxCommandEvent& event);
 	void OnCloseButton(wxCommandEvent& event);
+
+	void OnPopUpMenu(wxDataViewEvent &event);
+	void OnSaveHex(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };

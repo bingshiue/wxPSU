@@ -181,6 +181,7 @@
     <ClInclude Include="TaskSystemThread.h" />
     <ClInclude Include="TIHexFileParser.h" />
     <ClInclude Include="TIHexMMAPModel.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

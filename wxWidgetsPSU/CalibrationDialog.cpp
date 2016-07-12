@@ -237,11 +237,166 @@ wxEND_EVENT_TABLE()
 #define INDEX_DATA_2_START       8
 #define INDEX_PEC               10 
 
+#define INDEX_CALIBRATION_ITEM_HID   4+2
+#define INDEX_POINTER_HID            5+2
+#define INDEX_DATA_1_START_HID       6+2
+#define INDEX_DATA_2_START_HID       8+2
+#define INDEX_PEC_HID               10+2
+
+
+int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done){
+	
+	double value1 = 0;
+	double resolution1 = 0;
+	
+	double value2 = 0;
+	double resolution2 = 0;
+
+	unsigned char separate_pec = 0;
+
+	int active_index = 0;
+	
+	if (buffer == NULL){
+		PSU_DEBUG_PRINT(MSG_ERROR, "buffer = NULL");
+	}
+
+	if (SizeOfBuffer < 64){
+		PSU_DEBUG_PRINT(MSG_ERROR, "SizeOfBuffer < 64");
+	}
+
+	switch (*this->m_currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		buffer[0] = 0x41;
+		buffer[1] = 0x54;
+		buffer[2] = PMBUSHelper::GetSlaveAddress();
+		buffer[3] = 0xCB;
+
+		// Get Calibration Item Command
+		buffer[INDEX_CALIBRATION_ITEM] = calibrationItemCommand[this->m_calibrationItemCB->GetSelection()];
+
+		// Get Pointer
+		buffer[INDEX_POINTER] = 
+		(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+
+		// Data 1
+		value1 = 0;
+		this->m_data1TC->GetValue().ToDouble(&value1);
+
+		resolution1 = 0;
+		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START, value1, resolution1);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START, value1, resolution1);
+#endif
+
+		// Data 2
+		value2 = 0;
+		this->m_data2TC->GetValue().ToDouble(&value2);
+
+		resolution2 = 0;
+		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START, value2, resolution2);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START, value2, resolution2);
+#endif
+
+		separate_pec = 0;
+
+		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 8);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+		buffer[INDEX_PEC] = separate_pec;
+
+		active_index = INDEX_PEC + 1;
+
+		buffer[active_index++] = 0x0d;
+		buffer[active_index++] = 0x0a;
+
+		break;
+
+	case IOACCESS_HID:
+
+		buffer[0] = 0x05;
+
+		buffer[2] = 0x41;
+		buffer[3] = 0x54;
+		buffer[4] = PMBUSHelper::GetSlaveAddress();
+		buffer[5] = 0xCB;
+
+		// Get Calibration Item Command
+		buffer[INDEX_CALIBRATION_ITEM_HID] = calibrationItemCommand[this->m_calibrationItemCB->GetSelection()];
+
+		// Get Pointer
+		buffer[INDEX_POINTER_HID] =
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+
+		// Data 1
+		value1 = 0;
+		this->m_data1TC->GetValue().ToDouble(&value1);
+
+		resolution1 = 0;
+		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START, value1, resolution1);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START_HID, value1, resolution1);
+#endif
+
+		// Data 2
+		value2 = 0;
+		this->m_data2TC->GetValue().ToDouble(&value2);
+
+		resolution2 = 0;
+		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START, value2, resolution2);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START_HID, value2, resolution2);
+#endif
+
+		separate_pec = 0;
+
+		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 8);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+		buffer[INDEX_PEC_HID] = separate_pec;
+
+		active_index = INDEX_PEC_HID + 1;
+
+		buffer[active_index++] = 0x0d;
+		buffer[active_index++] = 0x0a;
+
+		buffer[1] = active_index - 2;
+
+		break;
+
+	default:
+
+		break;
+	}
+
+
+	return active_index;
+}
 
 //#define USE_LINEAR_DATA_FORMAT
 #define CALIBRATION_ITEM_BYTES_TO_READ  6
 void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	// Send Buffer
+	unsigned int SendLength = 0;
+	unsigned char SendBuffer[64] = { 0 };
+
+	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]));
+
+#if 0
 	unsigned char SendBuffer[13] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xCB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x0A
 	};
@@ -284,10 +439,10 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 	SendBuffer[INDEX_PEC] = separate_pec;
+#endif
 
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 	wxString debugStr("Send Buffer :");
-	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+	for (unsigned idx = 0; idx < SendLength; idx++){
 		debugStr += wxString::Format(" %02x ", SendBuffer[idx]);
 	}
 
@@ -295,9 +450,9 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
-	calibrationItem.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	calibrationItem.m_bytesToRead = CALIBRATION_ITEM_BYTES_TO_READ;
-	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	calibrationItem.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < SendLength; idx++){
 		calibrationItem.m_sendData[idx] = SendBuffer[idx];
 	}
 
@@ -319,6 +474,14 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 }
 
 void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
+	// Send Buffer
+	unsigned int SendLength = 0;
+	unsigned char SendBuffer[64] = { 0 };
+
+	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]), true);
+
+
+#if 0	
 	// Send Buffer
 	unsigned char SendBuffer[13] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xCB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x0A
@@ -362,10 +525,10 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 	SendBuffer[INDEX_PEC] = separate_pec;
+#endif
 
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
 	wxString debugStr("Send Buffer :");
-	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+	for (unsigned idx = 0; idx < SendLength; idx++){
 		debugStr += wxString::Format(" %02x ", SendBuffer[idx]);
 	}
 
@@ -373,9 +536,9 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
-	calibrationItem.m_sendDataLength = sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	calibrationItem.m_bytesToRead = CALIBRATION_ITEM_BYTES_TO_READ;
-	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	calibrationItem.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ+1;
+	for (unsigned idx = 0; idx < SendLength; idx++){
 		calibrationItem.m_sendData[idx] = SendBuffer[idx];
 	}
 
@@ -391,13 +554,13 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask)SendWriteCMDTask(m_ioaccess, m_currentIO, calibrationItem);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, calibrationItem);
 	}
 
 }
 
 void CalibrationDialog::OnBtnRead(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
 }
 
 void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
@@ -675,11 +838,11 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 }
 
 void CalibrationDialog::OnCBPointer(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
 }
 
 void CalibrationDialog::OnTCData1(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
 }
 
 

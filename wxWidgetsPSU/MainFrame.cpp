@@ -46,6 +46,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup Menu
 	SetupMenuBar();
 
+	// Setup CMDList Pop Up Menu
 	this->m_cmdListPopupMenu = new wxMenu();
 	this->m_popupFontMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_FONT, wxT("Font"), wxT("Font"), wxITEM_NORMAL);
 	this->m_popupPrintScreenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_PRINT_SCREEN, wxT("Print Screen"), wxT("Print Screen"), wxITEM_NORMAL);
@@ -285,9 +286,9 @@ EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
 EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
-EVT_DATAVIEW_SELECTION_CHANGED(ID_ATTR_CTRL, MainFrame::OnDVSelectionChanged)
-EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_ATTR_CTRL, MainFrame::OnContextMenu)
-//EVT_DATAVIEW_ITEM_VALUE_CHANGED(ID_ATTR_CTRL, MainFrame::OnValueChanged)
+EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
+EVT_DATAVIEW_ITEM_CONTEXT_MENU(CID_CMDLIST_DVC, MainFrame::OnContextMenu)
+//EVT_DATAVIEW_ITEM_VALUE_CHANGED(CID_CMDLIST_DVC, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
 
@@ -758,7 +759,7 @@ void MainFrame::SetupStatusBar(void){
 void MainFrame::SetupCMDListDVL(wxPanel* parent){
 
 	wxASSERT(!this->m_cmdListDVC && !m_cmdListModel);
-	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, ID_ATTR_CTRL, wxDefaultPosition,
+	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, CID_CMDLIST_DVC, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData);
@@ -1112,7 +1113,7 @@ void MainFrame::OnExit(wxCommandEvent& event)
 }
 
 void MainFrame::OnWindowClose(wxCloseEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "Close Window");
+	PSU_DEBUG_PRINT(MSG_ALERT, "Close Application");
 
 	if (m_destroying > 0) return;
 
@@ -1195,6 +1196,25 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 		wxDELETE(this->PMBusPrimaryFWUpdatePanel);
 	}
 
+	// If Monitor is Running
+	int confirm = 0;
+	if (this->m_monitor_running == true){
+		wxMessageDialog* confirmDialog = new wxMessageDialog(this, wxT("Monitor is Running, Do you want to stop monitor ?"), wxT("Confirm"), wxYES_NO | wxICON_INFORMATION);
+		confirmDialog->Centre();
+		confirm = confirmDialog->ShowModal();
+
+		delete confirmDialog;
+
+		if (confirm == wxID_NO){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel Load FW");
+			return;
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Stop Monitor");
+			this->StopMonitor();
+		}
+	}
+
 	// Load Hex File
 	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 
@@ -1223,12 +1243,39 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	TIHexFileParser tiHexFileStat;
 	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
 
+	// Check Errors
 	if (tiHexFileStat.getNoErrors() != 0){
-		wxMessageBox(wxT("Load Hex File Error"),
+		
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Errors :");
+
+		while (tiHexFileStat.getNoErrors() != 0){
+			string error_str;
+			tiHexFileStat.popNextError(error_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_str.c_str());
+		}
+		
+		
+		wxMessageBox(wxT("Load Hex File Has Error"),
 			wxT("Error !"),
 			wxOK | wxICON_ERROR);
 
 		return;
+	}
+
+	// Check Warnings
+	if (tiHexFileStat.getNoWarnings() != 0)
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Warnings :");
+
+		while (tiHexFileStat.getNoWarnings() != 0){
+			string warning_str;
+			tiHexFileStat.popNextWarning(warning_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warning_str.c_str());
+		}
+
+		wxMessageBox(wxT("Load Hex File Has Warning"),
+			wxT("Warning !"),
+			wxOK | wxICON_WARNING);
 	}
 
 
@@ -1261,6 +1308,25 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 		wxDELETE(this->PMBusSecondaryFWUpdatePanel);
 	}
 	
+	// If Monitor is Running
+	int confirm = 0;
+	if (this->m_monitor_running == true){
+		wxMessageDialog* confirmDialog = new wxMessageDialog(this, wxT("Monitor is Running, Do you want to stop monitor ?"), wxT("Confirm"), wxYES_NO | wxICON_INFORMATION);
+		confirmDialog->Centre();
+		confirm = confirmDialog->ShowModal();
+
+		delete confirmDialog;
+
+		if (confirm == wxID_NO){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel Load FW");
+			return;
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Stop Monitor");
+			this->StopMonitor();
+		}
+	}
+
 	// Load Hex File
 	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 	
@@ -1565,6 +1631,42 @@ void MainFrame::OnInfoBarTimer(wxTimerEvent& WXUNUSED(event)){
 	}
 }
 
+void MainFrame::StartMonitor(void){
+	this->m_monitor_running = true;
+
+	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
+	this->m_monitorMenuItem->SetBitmap(*m_pause16Bitmap);
+	this->m_toolbar->Realize();
+
+	(this->m_status_bar->getTimer())->Start();
+	this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
+
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
+	this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_cmdListModel, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
+	//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
+
+	// If Create Thread Success
+	if (this->m_IOPortSendCMDThread->Create() != wxTHREAD_NO_ERROR){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Send Command Thread");
+	}
+	else{
+		this->m_IOPortSendCMDThread->Run();
+		this->m_sendThreadStopFlag = false;
+	}
+}
+
+void MainFrame::StopMonitor(void){
+	this->m_monitor_running = false;
+
+	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
+	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
+	this->m_toolbar->Realize();
+
+	(this->m_status_bar->getTimer())->Stop();
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
+	this->m_IOPortSendCMDThread->m_running = false;
+}
+
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
@@ -1579,39 +1681,10 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 
 	// Start Send Data Thread
 	if (this->m_monitor_running == false){
-		this->m_monitor_running = true;
-
-		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
-		this->m_monitorMenuItem->SetBitmap(*m_pause16Bitmap);
-		this->m_toolbar->Realize();
-
-		(this->m_status_bar->getTimer())->Start();
-		this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
-
-		PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
-		this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_cmdListModel, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
-		//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
-
-		// If Create Thread Success
-		if (this->m_IOPortSendCMDThread->Create() != wxTHREAD_NO_ERROR){
-			PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Send Command Thread");
-		}
-		else{
-			this->m_IOPortSendCMDThread->Run();
-			this->m_sendThreadStopFlag = false;
-		}
-
+		this->StartMonitor();
 	}
 	else{ // One Send Command Thread is Running
-		this->m_monitor_running = false;
-
-		this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
-		this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
-		this->m_toolbar->Realize();
-
-		(this->m_status_bar->getTimer())->Stop();
-		PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
-		this->m_IOPortSendCMDThread->m_running = false;
+		this->StopMonitor();
 	}
 
 }

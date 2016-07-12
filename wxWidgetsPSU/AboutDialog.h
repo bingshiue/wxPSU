@@ -19,6 +19,7 @@
 
 #include "CommonDef.h"
 #include "PMBUSHelper.h"
+#include "version.h"
 
 class AboutDialog : public wxDialog
 {

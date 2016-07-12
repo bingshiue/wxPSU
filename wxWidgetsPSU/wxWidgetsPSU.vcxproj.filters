@@ -302,6 +302,9 @@
     <ClInclude Include="PMBUSFWUpdatePanel.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

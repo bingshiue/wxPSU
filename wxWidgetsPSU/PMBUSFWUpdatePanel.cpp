@@ -112,6 +112,14 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 
 	this->SetSizerAndFit(this->m_topLevelSizer);
+	
+	// Setup Pop Up Menu
+	this->m_popupMenu = new wxMenu();
+	this->m_saveHexMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_SAVEHEX, wxT("Save Hex"), wxT("Save Hex"), wxITEM_NORMAL);
+
+	this->m_saveHexMenuItem->SetBitmap(wxBITMAP_PNG(HEX_16));
+
+	this->m_popupMenu->Append(this->m_saveHexMenuItem);
 }
 
 PMBUSFWUpdatePanel::~PMBUSFWUpdatePanel(){
@@ -411,7 +419,80 @@ void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){
 	this->m_parent->RemovePage(selected_index);
 }
 
+void PMBUSFWUpdatePanel::OnPopUpMenu(wxDataViewEvent &event){
+	// Show Pop Up Menu
+	this->m_tiHexMMAPDVC->PopupMenu(this->m_popupMenu);
+}
+
+void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
+	// Save Current Hex Data As New File
+	wxString SaveName(this->m_hexFilePath);
+	SaveName.RemoveLast(4); // Remove ".hex"
+	SaveName += wxT("-Filled");
+
+	wxFileDialog SaveHexDialog(this, L"Save To", "", SaveName, "HEX files (*.hex)|*.hex", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	SaveHexDialog.Centre();
+
+	// If the user changed idea...
+	if (SaveHexDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	// Start Save Hex File
+	wxString SavePath = SaveHexDialog.GetPath();
+	PSU_DEBUG_PRINT(MSG_ALERT, "Save Hex To : %s", SavePath.c_str());
+
+	// Create an output stream
+	std::ofstream TIHexOutput;
+
+	TIHexOutput.open(SavePath.c_str().AsChar(), ofstream::out);
+
+	if (!TIHexOutput.good())
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Open %s", SavePath.c_str());
+	}
+
+	TIHexOutput << this->m_tiHexFileStat;
+
+	if (this->m_tiHexFileStat.getNoWarnings() > 0)
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Warnings generated during decoding:");
+		// Check Warnings
+		while (this->m_tiHexFileStat.getNoErrors() > 0)
+		{
+			string error_message;
+
+			this->m_tiHexFileStat.popNextError(error_message);
+
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_message.c_str());
+
+			wxMessageBox(wxT("Load Hex File Has Error"),
+				wxT("Error !"),
+				wxOK | wxICON_ERROR);
+
+		}
+		// Check Errors
+		while (this->m_tiHexFileStat.getNoWarnings() > 0)
+		{
+			string warn_message;
+
+			this->m_tiHexFileStat.popNextWarning(warn_message);
+
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warn_message.c_str());
+
+			wxMessageBox(wxT("Load Hex File Has Warning"),
+				wxT("Warning !"),
+				wxOK | wxICON_WARNING);
+		}
+	}
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "Create %s Successfully", SavePath.c_str());
+}
+
 wxBEGIN_EVENT_TABLE(PMBUSFWUpdatePanel, wxPanel)
 EVT_BUTTON(CID_WRITE_BUTTON, PMBUSFWUpdatePanel::OnWriteButton)
 EVT_BUTTON(CID_CLOSE_BUTTON, PMBUSFWUpdatePanel::OnCloseButton)
+EVT_MENU(MENU_ID_POPUP_SAVEHEX, PMBUSFWUpdatePanel::OnSaveHex)
+EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_HEXMMAP_DVC, PMBUSFWUpdatePanel::OnPopUpMenu)
 wxEND_EVENT_TABLE()
