@@ -119,11 +119,11 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 		break;
 
 	case Col_Max:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 
 	default:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 	}
 
@@ -161,11 +161,11 @@ bool TIHexMMAPModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataView
 		break;
 
 	case Col_Max:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 
 	default:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 	}
 
@@ -249,11 +249,11 @@ bool TIHexMMAPModel::SetValueByRow(const wxVariant &variant, unsigned int row, u
 		break;
 
 	case Col_Max:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 
 	default:
-		wxFAIL_MSG("invalid column");
+		PSU_DEBUG_PRINT(MSG_ERROR, "invalid column");
 		break;
 	}
 

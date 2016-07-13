@@ -283,8 +283,8 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 #define BASE_RESPONSE_DATA_LENGTH  6
 #define STR_LENGTH  256
-#define PRINT_RAW_IN_FEILD
-#define OUTPUT_SEND_DATA
+//#define PRINT_RAW_IN_FEILD
+//#define OUTPUT_SEND_DATA
 wxThread::ExitCode IOPortSendCMDThread::Entry()
 {
 	int ret;

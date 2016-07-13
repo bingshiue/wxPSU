@@ -50,7 +50,8 @@ enum {
 
 enum
 {
-	MENU_ID_Secondary_Firmware = 1,
+	MENU_ID_Primary_Firmware = 1,
+	MENU_ID_Secondary_Firmware,
 	MENU_ID_Monitor,
 
 	MENU_ID_Update_Primary_Firmware,
@@ -206,6 +207,10 @@ public:
 	wxMenu      *m_fileMenu;
 	
 	wxMenu      *m_hexToBinMenu;
+	wxMenuItem  *m_transFWMenuItem;
+	wxMenuItem  *m_transPrimaryFWMenuItem;
+	wxMenuItem  *m_transSecondaryFWMenuItem;
+
 	wxMenuItem  *m_exitMenuItem;
 
 	wxMenu      *m_runMenu;
@@ -322,7 +327,8 @@ private:
 	void SetupStatusBar(void);
 	void SetupCMDListDVL(wxPanel* parent);
 
-	void OnSecondaryFirmwarwe(wxCommandEvent& event);
+	void OnPrimaryFirmware(wxCommandEvent& event);
+	void OnSecondaryFirmware(wxCommandEvent& event);
 	void OnMonitor(wxCommandEvent& event);
 	void OnUpdatePrimaryFirmware(wxCommandEvent& event);
 	void OnUpdateSecondaryFirmware(wxCommandEvent& event);
@@ -401,6 +407,8 @@ private:
 
 	void StartMonitor(void);
 	void StopMonitor(void);
+
+	void HexToBin(void);
 
 	wxDECLARE_EVENT_TABLE();
 

@@ -256,7 +256,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmwarwe)
+EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
+EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmware)
 EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
 EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
@@ -316,16 +317,30 @@ void MainFrame::SetupMenuBar(void){
 	// File Menu
 	/*
 	File
-	|- Hex To Bin -> Secondary Firmware
+	|- Hex To Bin -> Transform Primary Firmware Hex To Binary
+	|             -> Transform Secondary Firmware Hex To Binary
 	|------------------------------------
 	|- Exit
 	*/
 	this->m_fileMenu = new wxMenu();
-	this->m_hexToBinMenu = new wxMenu();
-	this->m_hexToBinMenu->Append(MENU_ID_Secondary_Firmware, "&Secondary Firmware...\tCtrl-S",
-		"Select Secondary Firmware");
 
-	this->m_fileMenu->AppendSubMenu(this->m_hexToBinMenu, wxT("Hex to Bin"), wxT("Transform Hex into Bin"));
+	this->m_transFWMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("Transform Hex To Binary"), wxT("Transform Hex To Binary"), wxITEM_NORMAL);
+	this->m_transFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+
+	this->m_transPrimaryFWMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Primary_Firmware, wxT("Transform Primary Firmware Hex To Binary"), "Select Primary Firmware", wxITEM_NORMAL);
+	this->m_transPrimaryFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+
+	this->m_transSecondaryFWMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Secondary_Firmware, wxT("Transform Secondary Firmware Hex To Binary"), "Select Secondary Firmware", wxITEM_NORMAL);
+	this->m_transSecondaryFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+
+	this->m_hexToBinMenu = new wxMenu();
+
+	this->m_hexToBinMenu->Append(this->m_transPrimaryFWMenuItem);
+	this->m_hexToBinMenu->Append(this->m_transSecondaryFWMenuItem);
+
+	this->m_transFWMenuItem->SetSubMenu(this->m_hexToBinMenu);
+	this->m_fileMenu->Append(this->m_transFWMenuItem);
+
 	this->m_fileMenu->AppendSeparator();
 
 	this->m_exitMenuItem = new wxMenuItem((wxMenu*)0, wxID_EXIT, wxT("Exit"),
@@ -1177,9 +1192,13 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 	delete aboutDialog;
 }
 
-void MainFrame::OnSecondaryFirmwarwe(wxCommandEvent& event)
+void MainFrame::OnPrimaryFirmware(wxCommandEvent& event){
+	this->HexToBin();
+}
+
+void MainFrame::OnSecondaryFirmware(wxCommandEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_ALERT,"Not Implement");
+	this->HexToBin();
 }
 
 void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
@@ -1226,7 +1245,7 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	}
 
 	wxString path = LoadHexFileDialog.GetPath();
-	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "HEX File Path : %s", path.c_str());
 
 	// Create an input stream
 	ifstream TIHexInput;
@@ -1614,7 +1633,7 @@ void MainFrame::OnPopupPrintScreen(wxCommandEvent& event){
 	wxFFileOutputStream fileOutStream(SavePath);
 
 	if (!fileOutStream.IsOk()){
-		wxLogError("Can not Save List To %s", SavePath);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can not Save List To %s", SavePath);
 		return;
 	}
 
@@ -2509,4 +2528,118 @@ void MainFrame::ReInitLogFileOutputStream(wxString dirPath){
 
 }
 
+void MainFrame::HexToBin(void){
+	// Load Hex File
+	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 
+	LoadHexFileDialog.Centre();
+
+	// If the user changed idea...
+	if (LoadHexFileDialog.ShowModal() == wxID_CANCEL){
+		return;
+	}
+
+	wxString path = LoadHexFileDialog.GetPath();
+	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
+
+	// Create an input stream
+	ifstream TIHexInput;
+
+	// Create a variable for the intel hex data
+	TIHexInput.open(path.c_str().AsChar(), ifstream::in);
+
+	if (!TIHexInput.good())
+	{
+		PSU_DEBUG_PRINT(MSG_ALERT, "Error: couldn't open file %s", path.c_str());
+	}
+
+	/* Decode file                                                            */
+	TIHexFileParser tiHexFileStat;
+	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
+
+	// Check Errors
+	if (tiHexFileStat.getNoErrors() != 0){
+
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Errors :");
+
+		while (tiHexFileStat.getNoErrors() != 0){
+			string error_str;
+			tiHexFileStat.popNextError(error_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_str.c_str());
+		}
+
+
+		wxMessageBox(wxT("Load Hex File Has Error"),
+			wxT("Error !"),
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+	// Check Warnings
+	if (tiHexFileStat.getNoWarnings() != 0)
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Warnings :");
+
+		while (tiHexFileStat.getNoWarnings() != 0){
+			string warning_str;
+			tiHexFileStat.popNextWarning(warning_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warning_str.c_str());
+		}
+
+		wxMessageBox(wxT("Load Hex File Has Warning"),
+			wxT("Warning !"),
+			wxOK | wxICON_WARNING);
+	}
+
+
+	/* Fill Blank Address */
+	tiHexFileStat.fillBlankAddr(0xffff);
+
+	/* Compute Start & End Address */
+	tiHexFileStat.begin();
+	unsigned long StartAddress = tiHexFileStat.currentAddress();
+
+	tiHexFileStat.end();
+	unsigned long EndAddress = tiHexFileStat.currentAddress();
+
+	/* Get Binary File Save Name */
+	path.RemoveLast(4);
+	path += wxT(".bin");
+
+	// Start Save Binary File 
+	wxString SavePath = path;
+	PSU_DEBUG_PRINT(MSG_ALERT, "Save Binary File To : %s", SavePath.c_str());
+
+	wxFFileOutputStream fileOutStream(SavePath);
+
+	if (!fileOutStream.IsOk()){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can not Save Binary To %s", SavePath);
+		return;
+	}
+
+	wxDataOutputStream dataOutputStream(fileOutStream);
+
+
+	unsigned short data = 0x0000;
+	unsigned char tmp = 0x00;
+	for (unsigned long currentAddress = StartAddress; currentAddress <= EndAddress; currentAddress++){
+
+		tiHexFileStat.getData(&data, currentAddress);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "data=%04x", data);
+		tmp = *((unsigned char*)&data);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "tmp=%02x", tmp);
+		data >>= 8;
+		//PSU_DEBUG_PRINT(MSG_ALERT, "data=%04x", data);
+		*(((unsigned char*)&data) + 1) = tmp;
+		//data = (tmp << 8) | data;
+		//PSU_DEBUG_PRINT(MSG_ALERT, "data=%04x", data);
+
+		wxUint16 u16(data);
+
+		dataOutputStream.Write16(u16);
+	}
+
+
+	fileOutStream.Sync();
+}
