@@ -327,7 +327,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	case RunMode_Iterations:
 	case RunMode_Continually:
 		// RunMode is Continally 
-		while (m_running){
+		while (m_running && this->TestDestroy()==false){
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running == true; idx++){
 
@@ -737,7 +737,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				}
 
 			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
-		} //while(m_running)
+		} //while(m_running && this->TestDestroy()==false)
 
 		this->m_status_bar->getGauge()->SetValue(0);
 
@@ -760,7 +760,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_COMPLETED));
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
 
-	return NULL;
+	return (wxThread::ExitCode)1;
 }
 
 void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength){

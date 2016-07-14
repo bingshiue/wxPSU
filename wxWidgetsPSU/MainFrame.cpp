@@ -1108,7 +1108,8 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
-	
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "On Exit");
 #if 0
 	if (this->m_monitor_running == true){
 
@@ -1140,20 +1141,25 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		// IOPortSendCMDThread is Running
 		if (this->m_IOPortSendCMDThread->m_running == true && this->m_IOPortSendCMDThread->IsRunning() == true){
 			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running");
-			
+
+#if 0
 			this->m_IOPortSendCMDThread->m_running = false;
 
 			wxThread::Yield();
 
 			Sleep(2000);
+#endif 
 
-			//while (!this->m_sendThreadStopFlag) { PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running"); };
+			wxThread::ExitCode exitCode;
+			wxThreadError error = this->m_IOPortSendCMDThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
 
-			//wxThreadError error = this->m_IOPortSendCMDThread->Delete();
+			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread Exit Code = %d", (int)exitCode);
 
-			//if (error != wxTHREAD_NO_ERROR){
-				//PSU_DEBUG_PRINT(MSG_ALERT, "wxThreadError = %d", error);
-			//}
+			if (error != wxTHREAD_NO_ERROR){
+				PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
+			}
+
+			while (!this->m_sendThreadStopFlag) { PSU_DEBUG_PRINT(MSG_ALERT, "Wait IOPortSendCMDThread Finish"); };
 		}
 	}
 
@@ -1174,6 +1180,7 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	TaskEx::ReleaseTaskList();
 
 
+	PSU_DEBUG_PRINT(MSG_ALERT, "Close IO Device");
 	// Close IO Device
 	this->CloseIODevice();
 
@@ -1402,7 +1409,7 @@ void MainFrame::OnStopProgramming(wxCommandEvent& event){
 }
 
 void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "OnI2CFaultTest");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "OnI2CFaultTest");
 }
 
 void MainFrame::OnEnableChecksum(wxCommandEvent& event){
@@ -2187,7 +2194,7 @@ void MainFrame::TaskInit(void){
 
 void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	PSU_DEBUG_PRINT(MSG_ALERT, "Send Thread Completion");
 	this->m_sendThreadStopFlag = true;
 
 	// Reset Monitor Parameters
