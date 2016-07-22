@@ -148,7 +148,7 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	}
 
 	if (retry >= RETRY_TIMES){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Read Data Timeout Occurs, Retry = %d", retry);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read Data Timeout Occurs, Retry = %d", retry);
 		readSize = 0;
 	}
 
@@ -168,7 +168,7 @@ int CloseHIDDevice(void){
 	ret = hid_exit();
 
 	if (ret < 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Close HID Device Handle Failed");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Close HID Device Handle Failed");
 		return EXIT_FAILURE;
 	}
 	else{

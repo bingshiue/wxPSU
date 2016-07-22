@@ -257,11 +257,11 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	}
 
 	this->m_tiHexFileStat.begin();
-	unsigned char ispStatus = ISP_Status_InProgress;
+	unsigned char ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
 	double percentage = 0;
 	wxString information("");
 
-	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus);
+	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
 
 
 	int not_cancel;
@@ -272,7 +272,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	// Wait for ISP Sequence End
 	while (inProcess) {//Task::GetCount() > 0){
 
-		if (ispStatus == ISP_Status_InProgress){
+		if (ispStatus == ISP_Status_InProgress || ispStatus == ISP_Status_VerifyBeforeStart){
 
 			// Header
 			switch (header_index){
@@ -359,9 +359,14 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 
 		// If Error Occurs
-		if (ispStatus != ISP_Status_InProgress) {
+		if ((ispStatus & 0xff) > 0x02) {
 
 			switch (ispStatus){
+
+			case ISP_Status_VerifyBeforeStart:
+				// Verify Before Start
+
+				break;
 
 			case ISP_Status_UserRequestCancel:
 				// User Cancel ISP

@@ -104,12 +104,16 @@
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="PMBUSVerificationPanel.cpp" />
+    <ClCompile Include="ReceiveISPCheckStatusTask.cpp" />
     <ClCompile Include="ReceiveISPEndCMDTask.cpp" />
     <ClCompile Include="ReceiveISPStartCMDTask.cpp" />
+    <ClCompile Include="ReceiveISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="ReceiveISPWriteDataTask.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
+    <ClCompile Include="SendISPCheckStatusTask.cpp" />
     <ClCompile Include="SendISPEndCMDTask.cpp" />
     <ClCompile Include="SendISPStartCMDTask.cpp" />
+    <ClCompile Include="SendISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="SendISPWriteDataTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />

@@ -186,6 +186,18 @@
     <ClCompile Include="ReceiveISPEndCMDTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SendISPStartVerifyCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceiveISPStartVerifyCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="SendISPCheckStatusTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceiveISPCheckStatusTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">

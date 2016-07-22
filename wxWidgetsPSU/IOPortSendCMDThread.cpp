@@ -60,7 +60,11 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 		m_writePageSendBuff[2] = PMBUSHelper::GetSlaveAddress(); // Slave Address
 		m_writePageSendBuff[3] = 0x00;// CMD
 		m_writePageSendBuff[4] = cmdPageValue;
-		m_writePageSendBuff[5] = 0x00; // PEC
+
+		pec = PMBusSlave_Crc8MakeBitwise(0, 7, m_writePageSendBuff + 2, 3);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "pec = %02xh", pec);
+
+		m_writePageSendBuff[5] = pec; // PEC
 		m_writePageSendBuff[6] = 0x0D;
 		m_writePageSendBuff[7] = 0x0A;
 
@@ -337,7 +341,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 					if (this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
 
-						// Check If Need Chane Page
+						// Check If Need Change Page
 						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){
 							char cmdPageValue = this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage == 1 ? 0x01 : 0x00;
 							unsigned char pec = 0;;
@@ -366,7 +370,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									// Retry 
 									retry++;
 									if (retry >= 3){
-										PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Send Write Page CMD Failed, Retry Times = %d", retry);
+										PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Write Page CMD Failed, Retry Times = %d", retry);
 										sendRetryStillFailed = true;
 										break;
 									}

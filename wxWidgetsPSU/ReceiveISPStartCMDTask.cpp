@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-ReceiveISPStartCMDTask::ReceiveISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
+ReceiveISPStartCMDTask::ReceiveISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus, unsigned char target){
 	this->m_id = task_ID_ReceiveISPStartCMDTask;
 
 	this->m_IOAccess = ioaccess;
@@ -15,6 +15,8 @@ ReceiveISPStartCMDTask::ReceiveISPStartCMDTask(IOACCESS* ioaccess, unsigned int*
 	this->m_tiHexFileStat = tiHexFileStat;
 
 	this->m_ispStatus = ispStatus;
+
+	this->m_target = target;
 }
 
 ReceiveISPStartCMDTask::~ReceiveISPStartCMDTask(void){
@@ -54,10 +56,16 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 
 	// If Response is OK
 	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
+		
+		PSU_DEBUG_PRINT(MSG_ALERT, "Call SendISPStartVerifyCMDTask");
+		new(TP_SendISPStartVerifyCMDTask) SendISPStartVerifyCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
+
+#if 0
 		// Start Send Data
 		this->m_tiHexFileStat->begin();
 		PSU_DEBUG_PRINT(MSG_ALERT, "Start Address = %08x", this->m_tiHexFileStat->currentAddress());
 		new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+#endif
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");

@@ -40,7 +40,8 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 #define UPDATE_SECONDARY_FW_TARGET  0x60
 
 //#define ISP_DONT_WAIT_RESPONSE
-//#define IGNORE_ISP_RESPONSE_ERROR
+#define IGNORE_ISP_RESPONSE_ERROR
+
 
 enum {
 	IOACCESS_SERIALPORT = 0,
@@ -59,11 +60,12 @@ enum {
 
 enum {
 	ISP_Status_InProgress = 0x00,
-	ISP_Status_UserRequestCancel = 0x01,
-	ISP_Status_SendDataFailed = 0x02,
-	ISP_Status_ResponseDataError = 0x04,
-	ISP_Status_UnknownErrorOccurs = 0x08,
-	ISP_Status_ALLDone = 0x80
+	ISP_Status_VerifyBeforeStart = 0x01,
+	ISP_Status_ALLDone = 0x02,
+	ISP_Status_UserRequestCancel = 0x04,
+	ISP_Status_SendDataFailed = 0x08,
+	ISP_Status_ResponseDataError = 0x10,
+	ISP_Status_UnknownErrorOccurs = 0x80
 };
 
 #endif

@@ -26,6 +26,8 @@ public :
 		response_ok,
 	};
 
+	static unsigned int IspErrRetry;
+
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
@@ -44,7 +46,11 @@ public :
 	static void GetNowDateTimeString(wxString& string);
 
 	static unsigned char IsResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
+	static unsigned char IsISPStartVerifyResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer, unsigned char target);
+	static unsigned char IsISPCheckStatusResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
 	static unsigned char ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex);
+
+	static void PrintISPCheckStatusError(unsigned char error);
 
 protected :
 
@@ -54,6 +60,7 @@ private :
 	static PMBUSSTATUS_t m_pmbusStatus;
 
 	static AppSettings_t* m_appSettings;
+
 };
 
 #endif

@@ -9,6 +9,7 @@
 unsigned char PMBUSHelper::m_slaveAddress;
 PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
 AppSettings_t* PMBUSHelper::m_appSettings;
+unsigned int PMBUSHelper::IspErrRetry = 0;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -378,6 +379,141 @@ void PMBUSHelper::GetNowDateTimeString(wxString& string){
 	string += wxString::Format("%02d", datetime.GetMinute());
 	string += "-";
 	string += wxString::Format("%02d", datetime.GetSecond());
+}
+
+
+void PMBUSHelper::PrintISPCheckStatusError(unsigned char error){
+
+	switch (error){
+
+	case 0x51:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Not in Programming Mode");
+		break;
+
+	case 0x31:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP CheckSum Error");
+		break;
+
+	case 0x32:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Write to Flash Memory Error");
+		break;
+
+	case 0x33:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Incorrect Image (Incorrect SOH,EOF)");
+		break;
+
+	case 0x35:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Image Checksum Error");
+		break;
+
+	case 0x36:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Busy");
+		break;
+
+	case 0x37:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Timeout");
+		break;
+
+	case 0x38:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Timeout1");
+		break;
+
+	case 0x39:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Area Erase Failed");
+		break;
+
+	case 0x3A:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Pass-through received checksum error");
+		break;
+
+	case 0x3B:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Pass-through received command incorrect");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status (F3H) Something Error");
+		break;
+	}
+
+}
+
+unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer, unsigned char target){
+	
+	// 0x60 0xCB 0x0D 0x0A 0x4F 0x4B 0x0D 0x0A
+	// 15   08   41   54   02   00   ff   ff   0d   0a 
+
+	unsigned char result = response_ok;
+
+#ifndef IGNORE_ISP_RESPONSE_ERROR
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		if(buffer[0] != target){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch");
+		}
+
+		break;
+
+	case IOACCESS_HID:
+
+		//
+		if (buffer[6] != target){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch");
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Something Error");
+		break;
+	}
+
+#endif
+
+	return result;
+}
+
+unsigned char PMBUSHelper::IsISPCheckStatusResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer){
+	
+	// 0x30 0xC1 0x0D 0x0A 0x4F 0x4B 0x0D 0x0A
+	// 15   08   41   54   02   00   ff   ff   0d   0a
+
+	unsigned char result = response_ok;
+
+#ifndef IGNORE_ISP_RESPONSE_ERROR
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		if (buffer[0] != 0x30){
+			result = response_ng;
+			PrintISPCheckStatusError(buffer[0]);
+		}
+
+		break;
+
+	case IOACCESS_HID:
+
+		if (buffer[6] != 0x30){
+			result = response_ng;
+			PrintISPCheckStatusError(buffer[6]);
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+#endif
+
+	return result;
 }
 
 unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer){

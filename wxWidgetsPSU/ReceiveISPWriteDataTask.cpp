@@ -30,8 +30,8 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
-	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
+	PSU_DEBUG_PRINT(MSG_ALERT,  "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	// Read Data From IO
@@ -58,7 +58,10 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 	// If Response is OK
 	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
+        
+		new(TP_SendISPCheckStatusTask) SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 
+#if 0
 		if (this->m_tiHexFileStat->endOfData()){
 			PSU_DEBUG_PRINT(MSG_ALERT, "End of Data : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
 			new(TP_SendISPEndCMDTask) SendISPEndCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
@@ -66,6 +69,7 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 		else{
 			new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		}
+#endif
 
 	}
 	else{

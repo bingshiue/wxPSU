@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus){
+SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus, unsigned char target){
 	this->m_id = task_ID_SendISPStartCMDTask;
 
 	this->m_IOAccess = ioaccess;
@@ -13,6 +13,8 @@ SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* curre
 
 	this->m_tiHexFileStat = tiHexFileStat;
 	this->m_ispStatus = ispStatus;
+
+	this->m_target = target;
 }
 
 SendISPStartCMDTask::~SendISPStartCMDTask(void){
@@ -74,8 +76,8 @@ int SendISPStartCMDTask::Main(double elapsedTime){
 		return -1;
 	}
 
-	if (*this->m_ispStatus == ISP_Status_InProgress){
-		new(TP_ReceiveISPStartCMDTask) ReceiveISPStartCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand, this->m_tiHexFileStat, this->m_ispStatus);
+	if (*this->m_ispStatus == ISP_Status_VerifyBeforeStart){
+		new(TP_ReceiveISPStartCMDTask) ReceiveISPStartCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
 	}
 
 	delete this;
