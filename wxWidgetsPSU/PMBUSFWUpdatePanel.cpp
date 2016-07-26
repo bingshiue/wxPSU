@@ -194,7 +194,7 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");
 		break;
 	}
 
@@ -278,35 +278,43 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			switch (header_index){
 
 			case 0:
-				information = wxString::Format("PC > - - - - - - - DSP");
+				information = wxString::Format("PC > - - - - - - - - - DSP");
 				break;
 
 			case 1:
-				information = wxString::Format("PC - > - - - - - - DSP");
+				information = wxString::Format("PC - > - - - - - - - - DSP");
 				break;
 
 			case 2:
-				information = wxString::Format("PC - - > - - - - - DSP");
+				information = wxString::Format("PC - - > - - - - - - - DSP");
 				break;
 
 			case 3:
-				information = wxString::Format("PC - - - > - - - - DSP");
+				information = wxString::Format("PC - - - > - - - - - - DSP");
 				break;
 
 			case 4:
-				information = wxString::Format("PC - - - - > - - - DSP");
+				information = wxString::Format("PC - - - - > - - - - - DSP");
 				break;
 
 			case 5:
-				information = wxString::Format("PC - - - - - > - - DSP");
+				information = wxString::Format("PC - - - - - > - - - - DSP");
 				break;
 
 			case 6:
-				information = wxString::Format("PC - - - - - - > - DSP");
+				information = wxString::Format("PC - - - - - - > - - - DSP");
 				break;
 
 			case 7:
-				information = wxString::Format("PC - - - - - - - > DSP");
+				information = wxString::Format("PC - - - - - - - > - - DSP");
+				break;
+
+			case 8:
+				information = wxString::Format("PC - - - - - - - - > - DSP");
+				break;
+
+			case 9:
+				information = wxString::Format("PC - - - - - - - - - > DSP");
 				break;
 
 			default:
@@ -314,7 +322,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 					break;
 			}
 			header_index++;
-			header_index %= 8;
+			header_index %= 10;
 
 			information += wxT("\n");
 
@@ -339,14 +347,25 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		// Compute Percentage (Percentage = processed bytes / total bytes)
 		percentage = ((double)processed_bytes / this->m_dataBytes);
 		percentage *= 100;
-		if (percentage >= 100) { 
-			percentage = 100; 
-			information = wxT("ISP Progress Complete");
-			information += wxT("\n");
-			information += wxString::Format("Current Process Address : %08x", currentAddress);
-			information += wxT("\n");
-			information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
-		
+		if (percentage >= 100) {
+
+
+			while (Task::GetCount() != 0){
+				PSU_DEBUG_PRINT(MSG_ALERT, "Wait Until No Tasks");
+				wxMilliSleep(200);
+			}
+
+			if ((ispStatus & 0xff) <= 0x02){
+				percentage = 100;
+				information = wxT("ISP Progress Complete");
+				information += wxT("\n");
+				information += wxString::Format("Current Process Address : %08x", currentAddress);
+				information += wxT("\n");
+				information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+			}
+			else{
+				percentage = 99; // Error occurs, set percentage less than 100 
+			}
 		}
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
 
@@ -382,6 +401,14 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 			case ISP_Status_ResponseDataError:
 				wxMessageBox(wxT("Response Data Error!"),
+					wxT("Error !"),  // caption
+					wxOK | wxICON_ERROR);
+
+				break;
+
+
+			case ISP_Status_RebootCheckError:
+				wxMessageBox(wxT("DSP Reboot Check Error!"),
 					wxT("Error !"),  // caption
 					wxOK | wxICON_ERROR);
 

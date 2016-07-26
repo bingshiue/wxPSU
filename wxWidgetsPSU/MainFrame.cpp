@@ -395,7 +395,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_runMenu->Append(this->m_inSystemProgrammingMenuItem);
 
-#ifdef DEFAULT_LOCK_UPDATE_FW
+#ifdef LOCK_UPDATE_FW
 	this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, false);
 	this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, false);
 #endif

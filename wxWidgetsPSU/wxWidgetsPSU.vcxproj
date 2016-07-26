@@ -109,12 +109,14 @@
     <ClCompile Include="ReceiveISPStartCMDTask.cpp" />
     <ClCompile Include="ReceiveISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="ReceiveISPWriteDataTask.cpp" />
+    <ClCompile Include="ReceiveRebootCheckTask.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
     <ClCompile Include="SendISPCheckStatusTask.cpp" />
     <ClCompile Include="SendISPEndCMDTask.cpp" />
     <ClCompile Include="SendISPStartCMDTask.cpp" />
     <ClCompile Include="SendISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="SendISPWriteDataTask.cpp" />
+    <ClCompile Include="SendRebootCheckTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />

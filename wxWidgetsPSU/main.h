@@ -38,6 +38,7 @@
 #include "wx/fileconf.h"
 #include "wx/infobar.h"
 #include <wx/stdpaths.h>
+#include <wx/richtext/richtextctrl.h>
 
 class WXPSU : public wxApp
 {

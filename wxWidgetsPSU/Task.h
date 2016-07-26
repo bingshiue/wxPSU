@@ -42,6 +42,8 @@
 #define TP_ReceiveISPCheckStatusTask (0.5f)
 #define TP_SendISPEndCMDTask (0.5f)
 #define TP_ReceiveISPEndCMDTask (0.5f)
+#define TP_SendRebootCheckTask (0.5f)
+#define TP_ReceiveRebootCheckTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -55,7 +57,9 @@ enum {
 	task_ID_SendISPCheckStatusTask,
 	task_ID_ReceiveISPCheckStatusTask,
 	task_ID_SendISPEndCMDTask,
-	task_ID_ReceiveISPEndCMDTask
+	task_ID_ReceiveISPEndCMDTask,
+	task_ID_SendRebootCheckTask,
+	task_ID_ReceiveRebootCheckTask
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -444,6 +448,80 @@ public:
 	*/
 	int Main(double elapsedTime);
 
+};
+
+class SendRebootCheckTask : public TaskEx {
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
+
+	TIHexFileParser *m_tiHexFileStat;
+	unsigned char *m_ispStatus;
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	unsigned int ProductSendBuffer(unsigned char* buffer);
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	SendRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~SendRebootCheckTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+};
+
+class ReceiveRebootCheckTask : public TaskEx {
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
+
+	TIHexFileParser *m_tiHexFileStat;
+	unsigned char *m_ispStatus;
+
+	unsigned int m_bytesToRead;/**< Bytes To Read */
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~ReceiveRebootCheckTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
 };
 
 class SendWriteCMDTask : public TaskEx {

@@ -55,12 +55,16 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 	// If Response is OK
 	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 		
-		PSU_DEBUG_PRINT(MSG_ALERT, "Send ISP Data Sequence All Done Without Errors");
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP End Command Response OK");
+
+		new(TP_SendRebootCheckTask) SendRebootCheckTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		
-		*this->m_ispStatus = ISP_Status_ALLDone;
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Send ISP Data Sequence All Done Without Errors");
+		
+		//*this->m_ispStatus = ISP_Status_ALLDone;
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP End Command Response Failed");
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 

@@ -198,6 +198,12 @@
     <ClCompile Include="ReceiveISPCheckStatusTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SendRebootCheckTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceiveRebootCheckTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">

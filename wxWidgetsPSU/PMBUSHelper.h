@@ -48,6 +48,7 @@ public :
 	static unsigned char IsResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
 	static unsigned char IsISPStartVerifyResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer, unsigned char target);
 	static unsigned char IsISPCheckStatusResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
+	static unsigned char IsISPRebootCheckResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer);
 	static unsigned char ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex);
 
 	static void PrintISPCheckStatusError(unsigned char error);

@@ -437,6 +437,47 @@ void PMBUSHelper::PrintISPCheckStatusError(unsigned char error){
 
 }
 
+#define REBOOT_OK  0x00
+unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer){
+
+	// 0x00 0xEC 0x0D 0x0A 0x4F 0x4B 0x0D 0x0A
+	// 15  08  41  54  02  00  [00]  83  0d  0a
+
+	unsigned char result = response_ok;
+
+#ifndef IGNORE_ISP_RESPONSE_ERROR
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		if (buffer[0] != REBOOT_OK || buffer[4] != 0x4F || buffer[5] != 0x4B ){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch");
+		}
+
+		break;
+
+	case IOACCESS_HID:
+
+		//
+		if (buffer[6] != REBOOT_OK){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch");
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Something Error");
+		break;
+	}
+
+#endif
+
+	return result;
+}
+
 unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, unsigned char *buffer, unsigned int sizeOfBuffer, unsigned char target){
 	
 	// 0x60 0xCB 0x0D 0x0A 0x4F 0x4B 0x0D 0x0A
