@@ -21,6 +21,7 @@
 #include "PMBUSHelper.h"
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
+#include "PMBUSLogTextCtrl.h"
 
 #include "Task.h"
 
@@ -33,21 +34,24 @@ enum {
 	CID_CLOSE_BUTTON,
 };
 
-class PMBUSFWUpdatePanel : public wxPanel {
+class PMBUSFWUpdatePanel : public wxPanel, private wxLog {
 public:
 	
-	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target);
+	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode);
 
 	~PMBUSFWUpdatePanel();
 
 	void SetupHexMMAPDVL(void);
 
-	unsigned int& GetIndexOfNotebook(void) { return this->m_indexOfNotebook; }
+	unsigned int& GetIndexOfNotebook(void);
 
 	unsigned int ProductSendBuffer(unsigned char* buffer);
 
+	bool isCloseButtonPressed(void);
+
 protected :
 
+	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
 private:
 
@@ -67,8 +71,16 @@ private:
 
 	unsigned char m_target;
 
+	unsigned long m_developerMode;
+
+	bool m_pressedCloseButton;
+
 	wxMenu* m_popupMenu;
 	wxMenuItem* m_saveHexMenuItem;
+
+	wxStaticLine *m_st1;
+	wxStaticLine *m_st2;
+	//wxStaticLine *m_st3;
 
 	wxStaticText *m_fileNameST;
 	//wxTextCtrl *m_fileNameTC;
@@ -95,6 +107,8 @@ private:
 
 	wxBoxSizer *m_topLevelSizer;
 
+	PMBUSLogTextCtrl *m_logTC;
+
 	wxString m_hexFilePath;
 
 	unsigned long m_startAddress;
@@ -111,6 +125,13 @@ private:
 
 	void OnPopUpMenu(wxDataViewEvent &event);
 	void OnSaveHex(wxCommandEvent& event);
+
+	void DoLogLine(
+		wxLogLevel level,
+		wxTextCtrl *text,
+		const wxString& timestr,
+		const wxString& threadstr,
+		const wxString& msg);
 
 	wxDECLARE_EVENT_TABLE();
 };

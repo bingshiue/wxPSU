@@ -7,6 +7,7 @@
 
 #include "CommonDef.h"
 #include "main.h"
+#include "PMBUSHelper.h"
 
 class PMBUSStatusBar : public wxStatusBar
 {

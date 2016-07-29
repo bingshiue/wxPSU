@@ -204,6 +204,9 @@
     <ClCompile Include="ReceiveRebootCheckTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PMBUSLogTextCtrl.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -321,6 +324,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="version.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSLogTextCtrl.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

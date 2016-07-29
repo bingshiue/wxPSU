@@ -84,6 +84,9 @@ typedef struct appSettings_t {
 	     wxString m_logFilePath;/**< Log File Path */
 	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
 
+	/* ----- Developer Setting ----- */
+	unsigned long m_developerMode;/**< Developer Mode */
+
 	void Reset(void){
 		this->m_comportSetting.Reset();
 
@@ -96,6 +99,8 @@ typedef struct appSettings_t {
 		this->m_logToFile = DEFAULT_LOG_TO_FILE;/**< Log To File */
 		this->m_logFilePath = wxString::Format("%s", DEFAULT_LOG_FILE_PATH);
 		this->m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
+
+		this->m_developerMode = Generic_Disable;
 	}
 
 } AppSettings_t;

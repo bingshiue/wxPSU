@@ -31,6 +31,7 @@
 #include "PMBUSStatusPanel.h"
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSFWUpdatePanel.h"
+#include "PMBUSLogTextCtrl.h"
 #include "PMBUSHelper.h"
 #include "PMBUSArtProv.h"
 #include "CalibrationDialog.h"
@@ -105,6 +106,8 @@ enum
 	SplitterWindowID,
 	SplitterWindowTopLevelID,
 
+	ID_LOG_TEXTCTRL
+
 };
 
 class MainFrame : public wxFrame, private wxLog
@@ -174,7 +177,8 @@ public:
 	wxDataViewColumn* m_attributes;
 
 	// Error Log
-	wxTextCtrl *m_debugLogTC;
+	//wxTextCtrl *m_debugLogTC;
+	PMBUSLogTextCtrl* m_debugLogTC;
 
 	// Note Book
 	wxNotebook *m_notebook;

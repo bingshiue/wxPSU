@@ -67,7 +67,7 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");
 		break;
 	}
 
@@ -76,13 +76,9 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 
 int SendRebootCheckTask::Main(double elapsedTime){
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Wait DSP Reboot");
-	
-	wxMilliSleep(WAIT_DSP_REBOOT_TIME);
-
 	int cnt = this->GetCount(task_ID_SendISPStartVerifyCMDTask);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
 
 	unsigned int sendDataLength = 0;
 	sendDataLength = this->ProductSendBuffer(this->m_sendBuff);
@@ -92,7 +88,7 @@ int SendRebootCheckTask::Main(double elapsedTime){
 	for (unsigned int idx = 0; idx < sendDataLength; idx++){
 		str += wxString::Format(" %02x ", m_sendBuff[idx]);
 	}
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 
 	/*----------------------------------------------*/
 
@@ -104,27 +100,27 @@ int SendRebootCheckTask::Main(double elapsedTime){
 		// Send Data
 		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64);
 		if (sendResult <= 0){
-			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Failed, sendResult=%d", sendResult);
+			PSU_DEBUG_PRINT(MSG_ERROR, "IO Send Write CMD Failed, sendResult=%d", sendResult);
 			// Retry 
 			retry++;
 			if (retry >= 3){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Write CMD Failed, Retry Times = %d", retry);
+				PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Write CMD Failed, Retry Times = %d", retry);
 				sendRetryStillFailed = true;
 				break;
 			}
 			else{
-				PSU_DEBUG_PRINT(MSG_ALERT, "Send Write CMD Retry Times = %d", retry);
+				PSU_DEBUG_PRINT(MSG_ERROR, "Send Write CMD Retry Times = %d", retry);
 			}
 
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Success");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Write CMD Success");
 		}
 
 	} while (sendResult <= 0);
 
 	if (sendRetryStillFailed == true){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Send Write CMD Retry Send Still Failed, Forgive to send !");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Send Write CMD Retry Send Still Failed, Forgive to send !");
 		*this->m_ispStatus = ISP_Status_SendDataFailed;
 		delete this;
 		return -1;

@@ -4,7 +4,7 @@
 
 #include "PMBUSFWUpdatePanel.h"
 
-PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target) : wxPanel(parent) {
+PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
 
 	this->m_parent = parent;
 
@@ -20,6 +20,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_target = target;
 
+	this->m_developerMode = developerMode;
+
+	this->m_pressedCloseButton = false;
+
 	tiHexFileStat.begin();
     this->m_startAddress = tiHexFileStat.currentAddress();
 
@@ -32,18 +36,18 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_dvlRowCount = (this->m_addressRange % 16 == 0) ? this->m_addressRange / 16 : (this->m_addressRange / 16) + 1;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "startAddress = 0x%08x", this->m_startAddress);
-	PSU_DEBUG_PRINT(MSG_ALERT, "EndAddress   = 0x%08x", this->m_endAddress);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Address Range= %d", this->m_addressRange);
-	PSU_DEBUG_PRINT(MSG_ALERT, "Data Bytes   = %d", this->m_dataBytes);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "startAddress = 0x%08x", this->m_startAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "EndAddress   = 0x%08x", this->m_endAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range= %d", this->m_addressRange);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Data Bytes   = %d", this->m_dataBytes);
 
 	this->m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
-	this->m_statisticSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("MEMORY MAP"));
+	this->m_statisticSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("File Description"));
 	this->m_buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->m_fileStatFGS = new wxFlexGridSizer(2, 8, 5, 5);
 
 	// File Name
-	wxString fileName = wxT("File : ");
+	wxString fileName = wxT("File Path : ");
 	fileName += this->m_hexFilePath;
 	this->m_fileNameST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, fileName);
 	wxFont font = this->m_fileNameST->GetFont();
@@ -51,6 +55,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	font.SetWeight(wxFONTWEIGHT_BOLD);
 	this->m_fileNameST->SetFont(font);
 
+	// Static Line
+	this->m_st1 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
+	this->m_st2 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
+	//this->m_st3 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 
 	// Start Address
 	this->m_startAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("START Address : "));
@@ -87,10 +95,12 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_closeButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_CLOSE_BUTTON, wxT("CLOSE"));
 	this->m_closeButton->SetBitmap(wxBITMAP_PNG(CLOSE_32));
 
-	this->m_buttonSizer->Add(this->m_writeButton);
-	this->m_buttonSizer->Add(this->m_closeButton);
+	this->m_buttonSizer->Add(this->m_writeButton, wxSizerFlags(0).Border(wxALL));
+	this->m_buttonSizer->Add(this->m_closeButton, wxSizerFlags(0).Border(wxALL));
 
 	this->m_statisticSBS->Add(this->m_fileNameST, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
+
+	this->m_statisticSBS->Add(this->m_st1, wxSizerFlags(0).Expand().Border(wxALL));
 
 	this->m_fileStatFGS->Add(this->m_startAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
 	this->m_fileStatFGS->Add(this->m_startAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
@@ -102,24 +112,35 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_fileStatFGS->Add(this->m_dataBytesTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
 
 	this->m_statisticSBS->Add(this->m_fileStatFGS, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
+
+	this->m_statisticSBS->Add(this->m_st2, wxSizerFlags(0).Expand().Border(wxALL));
 	
 	this->m_statisticSBS->Add(this->m_buttonSizer, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
 	this->m_topLevelSizer->Add(this->m_statisticSBS, wxSizerFlags(0).Expand());
 
-	this->SetupHexMMAPDVL();
+	if (this->m_developerMode == Generic_Enable){
 
-	this->m_topLevelSizer->Add(this->m_tiHexMMAPDVC, wxSizerFlags(1).Expand());
+		this->SetupHexMMAPDVL();
 
+		this->m_topLevelSizer->Add(this->m_tiHexMMAPDVC, wxSizerFlags(1).Expand());
+
+
+		// Setup Pop Up Menu
+		this->m_popupMenu = new wxMenu();
+		this->m_saveHexMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_SAVEHEX, wxT("Save Hex"), wxT("Save Hex"), wxITEM_NORMAL);
+
+		this->m_saveHexMenuItem->SetBitmap(wxBITMAP_PNG(HEX_16));
+
+		this->m_popupMenu->Append(this->m_saveHexMenuItem);
+	}
+	else{
+
+		this->m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
+
+		this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Expand());
+	}
 
 	this->SetSizerAndFit(this->m_topLevelSizer);
-	
-	// Setup Pop Up Menu
-	this->m_popupMenu = new wxMenu();
-	this->m_saveHexMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_SAVEHEX, wxT("Save Hex"), wxT("Save Hex"), wxITEM_NORMAL);
-
-	this->m_saveHexMenuItem->SetBitmap(wxBITMAP_PNG(HEX_16));
-
-	this->m_popupMenu->Append(this->m_saveHexMenuItem);
 }
 
 PMBUSFWUpdatePanel::~PMBUSFWUpdatePanel(){
@@ -205,6 +226,8 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	
+	wxLog* oldLogger = wxLog::GetActiveTarget();
+
 	// Check if Monitor is Running
 	if (*this->m_isMonitorRunning == true){
 		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
@@ -212,6 +235,11 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			wxOK | wxICON_INFORMATION);
 
 		return;
+	}
+
+	if (this->m_developerMode == Generic_Disable){
+		// Change Logger Target
+		wxLog::SetActiveTarget(this);
 	}
 
 	// Create Progress Dialog
@@ -318,7 +346,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 				break;
 
 			default:
-				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !")
+				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error")
 					break;
 			}
 			header_index++;
@@ -351,7 +379,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 
 			while (Task::GetCount() != 0){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Wait Until No Tasks");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "Wait Until No Tasks");
 				wxMilliSleep(200);
 			}
 
@@ -435,7 +463,17 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			try_end = 0;
 		}
 
+		// Flush Log
+		if (this->m_developerMode == Generic_Disable){
+			wxLog::FlushActive();
+		}
+		
 		wxMilliSleep(200);
+	}
+
+	if (this->m_developerMode == Generic_Disable){
+		// Restore Logger Target
+		wxLog::SetActiveTarget(oldLogger);
 	}
 
 }
@@ -446,9 +484,12 @@ void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){
 
 	selected_index = this->m_parent->GetSelection();
 
+	this->m_pressedCloseButton = true;
+
 	this->m_parent->SetSelection(0);
 
 	this->m_parent->RemovePage(selected_index);
+
 }
 
 void PMBUSFWUpdatePanel::OnPopUpMenu(wxDataViewEvent &event){
@@ -473,7 +514,7 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 
 	// Start Save Hex File
 	wxString SavePath = SaveHexDialog.GetPath();
-	PSU_DEBUG_PRINT(MSG_ALERT, "Save Hex To : %s", SavePath.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Save Hex To : %s", SavePath.c_str());
 
 	// Create an output stream
 	std::ofstream TIHexOutput;
@@ -487,9 +528,9 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 
 	TIHexOutput << this->m_tiHexFileStat;
 
-	if (this->m_tiHexFileStat.getNoWarnings() > 0)
+	if (this->m_tiHexFileStat.getNoWarnings() > 0 || this->m_tiHexFileStat.getNoErrors() > 0)
 	{
-		PSU_DEBUG_PRINT(MSG_ERROR, "Warnings generated during decoding:");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error or Warnings generated during decoding:");
 		// Check Warnings
 		while (this->m_tiHexFileStat.getNoErrors() > 0)
 		{
@@ -519,8 +560,99 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 		}
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Create %s Successfully", SavePath.c_str());
+	PSU_DEBUG_PRINT(MSG_ALERT, "Save Hex File : %s Successfully", SavePath.c_str());
 }
+
+
+unsigned int& PMBUSFWUpdatePanel::GetIndexOfNotebook(void) {
+	return this->m_indexOfNotebook; 
+}
+
+bool PMBUSFWUpdatePanel::isCloseButtonPressed(void){
+	return this->m_pressedCloseButton;
+}
+
+void PMBUSFWUpdatePanel::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
+{
+
+	switch (level) {
+
+	case wxLOG_FatalError:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+	case wxLOG_Error:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+		//case wxLOG_Warning:
+		//break;
+		//case wxLOG_Message:
+		//break;
+		//case wxLOG_Status:
+		//break;
+		//case wxLOG_Info:
+		//break;
+		//case wxLOG_Debug:
+		//break;
+
+	default:
+		text->SetDefaultStyle(wxTextAttr(*wxBLUE, *wxWHITE));
+		break;
+	}
+
+#ifdef _DEBUG
+	text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+
+#if 0
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s %10s           %s", timestr, threadstr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
+#endif
+
+#else
+	text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+
+#if 0
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s           %s", timestr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
+#endif
+
+#endif
+}
+
+void PMBUSFWUpdatePanel::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info)
+{
+	// let the default GUI logger treat warnings and errors as they should be
+	// more noticeable than just another line in the log window and also trace
+	// messages as there may be too many of them
+#if 0
+	if (level <= wxLOG_Warning || level == wxLOG_Trace)
+	{
+		m_oldLogger->LogRecord(level, msg, info);
+		return;
+	}
+#endif
+
+	DoLogLine(
+		level,
+		this->m_logTC,
+		wxDateTime(info.timestamp).FormatISOTime(),
+		info.threadId == wxThread::GetMainId()
+		? wxString("main")
+		: wxString::Format("%lx", info.threadId),
+		msg + "\n"
+		);
+
+}
+
 
 wxBEGIN_EVENT_TABLE(PMBUSFWUpdatePanel, wxPanel)
 EVT_BUTTON(CID_WRITE_BUTTON, PMBUSFWUpdatePanel::OnWriteButton)

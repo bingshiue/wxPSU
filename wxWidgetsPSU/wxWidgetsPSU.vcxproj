@@ -99,6 +99,7 @@
     <ClCompile Include="PMBUSCMDListModel.cpp" />
     <ClCompile Include="PMBUSFWUpdatePanel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
+    <ClCompile Include="PMBUSLogTextCtrl.cpp" />
     <ClCompile Include="PMBUSMFRPanel.cpp" />
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="PMBUSFWUpdatePanel.h" />
     <ClInclude Include="PMBUSHelper.h" />
     <ClInclude Include="PMBUSLog.h" />
+    <ClInclude Include="PMBUSLogTextCtrl.h" />
     <ClInclude Include="PMBUSMFRPanel.h" />
     <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PMBUSStatusDCHPanel.h" />

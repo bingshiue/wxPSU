@@ -74,20 +74,16 @@ unsigned int SendISPCheckStatusTask::ProductSendBuffer(unsigned char* buffer){
 	return active_index;
 }
 
-#define ISP_SLEEP
-#ifdef ISP_SLEEP
-#define ISP_SLEEP_TIME 10
-#endif
 int SendISPCheckStatusTask::Main(double elapsedTime){
 
-	// Sleep 100 ms
+	// Sleep
 #ifdef ISP_SLEEP
 	wxMilliSleep(ISP_SLEEP_TIME);
 #endif
 
 	int cnt = this->GetCount(task_ID_SendISPCheckStatusTask);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Count of Task = %d", cnt);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
 
 	unsigned int sendDataLength = 0;
 	sendDataLength = this->ProductSendBuffer(this->m_sendBuff);
@@ -97,7 +93,7 @@ int SendISPCheckStatusTask::Main(double elapsedTime){
 	for (unsigned int idx = 0; idx < sendDataLength; idx++){
 		str += wxString::Format(" %02x ", m_sendBuff[idx]);
 	}
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 
 	/*----------------------------------------------*/
 
@@ -109,27 +105,27 @@ int SendISPCheckStatusTask::Main(double elapsedTime){
 		// Send Data
 		sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(m_sendBuff, (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64);
 		if (sendResult <= 0){
-			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Failed, sendResult=%d", sendResult);
+			PSU_DEBUG_PRINT(MSG_ERROR, "IO Send Write CMD Failed, sendResult=%d", sendResult);
 			// Retry 
 			retry++;
 			if (retry >= 3){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Write CMD Failed, Retry Times = %d", retry);
+				PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Write CMD Failed, Retry Times = %d", retry);
 				sendRetryStillFailed = true;
 				break;
 			}
 			else{
-				PSU_DEBUG_PRINT(MSG_ALERT, "Send Write CMD Retry Times = %d", retry);
+				PSU_DEBUG_PRINT(MSG_ERROR, "Send Write CMD Retry Times = %d", retry);
 			}
 
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Write CMD Success");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Write CMD Success");
 		}
 
 	} while (sendResult <= 0);
 
 	if (sendRetryStillFailed == true){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Retry Send ISP Check Status CMD Still Failed, Forgive to send !");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send ISP Check Status CMD Still Failed, Forgive to send !");
 		*this->m_ispStatus = ISP_Status_SendDataFailed;
 		delete this;
 		return -1;

@@ -12,10 +12,10 @@
 
 PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(parent, wxID_ANY, style, "PSUStatusBar")
 #if wxUSE_TIMER
-	, m_timer(this)
+, m_timer(this)
 #endif
 #if wxUSE_CHECKBOX
-	//, m_checkbox(NULL)
+//, m_checkbox(NULL)
 #endif
 {
 	int widths[Field_Max];
@@ -41,8 +41,28 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 
 	this->SetStatusText(wxT("Disconnect"), Field_IO_Setting);//Com3-9600-N81
 	this->SetStatusText(wxT("100kHz"), Field_I2C_Clock);
-	this->SetStatusText(wxT("Continually"), Field_Run_Mode);
 
+	unsigned long runMode = PMBUSHelper::GetAppSettings()->m_runMode;
+
+	switch (runMode){
+
+	case RunMode_Iterations:
+		this->SetStatusText(wxT("Iterations"), Field_Run_Mode);
+		break;
+
+	case RunMode_Continually:
+		this->SetStatusText(wxT("Continually"), Field_Run_Mode);
+		break;
+
+	case RunMode_StopAnError:
+		this->SetStatusText(wxT("Stop An Error"), Field_Run_Mode);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error")
+		break;
+
+	}
 
 #if wxUSE_TIMER
 	//m_timer.Start(1000);

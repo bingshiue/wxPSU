@@ -25,17 +25,21 @@ void ReceiveISPEndCMDTask::Draw(void){
 
 #define ISP_ENDDATA_BYTES_TO_READ  6
 int ReceiveISPEndCMDTask::Main(double elapsedTime){
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DSP Reboot, Wait %d Milliseconds", WAIT_DSP_REBOOT_TIME);
+	wxMilliSleep(WAIT_DSP_REBOOT_TIME);
+
 	// Receive Data 
 	unsigned int ispEndDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
 
 #ifndef ISP_DONT_WAIT_RESPONSE
-	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", ispEndDataBytesToRead);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data From I/O, Bytes To Read = %d", ispEndDataBytesToRead);
 
 	// Read Data From IO
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispEndDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
@@ -49,7 +53,7 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 		str += wxString::Format(" %02x ", this->m_recvBuff.m_recvBuff[idx]);
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 #endif
 
 	// If Response is OK
@@ -64,7 +68,7 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 		//*this->m_ispStatus = ISP_Status_ALLDone;
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "ISP End Command Response Failed");
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP End Command Response Failed");
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 

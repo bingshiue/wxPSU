@@ -31,13 +31,13 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 	// Receive Data 
 
 #ifndef ISP_DONT_WAIT_RESPONSE
-	PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From I/O, Bytes To Read = %d", this->m_pmbusSendCommand.m_bytesToRead);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data From I/O, Bytes To Read = %d", this->m_pmbusSendCommand.m_bytesToRead);
 
 	// Read Data From IO
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, this->m_pmbusSendCommand.m_bytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
@@ -51,13 +51,13 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 		str += wxString::Format(" %02x ", this->m_recvBuff.m_recvBuff[idx]);
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 #endif
 
 	// If Response is OK
 	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 		
-		PSU_DEBUG_PRINT(MSG_ALERT, "Call SendISPStartVerifyCMDTask");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Call SendISPStartVerifyCMDTask");
 		new(TP_SendISPStartVerifyCMDTask) SendISPStartVerifyCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
 
 #if 0
@@ -68,7 +68,7 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 #endif
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Response Data Not OK");
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 

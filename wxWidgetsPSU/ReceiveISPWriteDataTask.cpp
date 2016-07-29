@@ -31,14 +31,14 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
-	PSU_DEBUG_PRINT(MSG_ALERT,  "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	// Read Data From IO
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
@@ -53,7 +53,7 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 		str += wxString::Format(" %02x ", this->m_recvBuff.m_recvBuff[idx]);
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 #endif
 
 	// If Response is OK
@@ -73,7 +73,7 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Response Data Not OK");
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Response Data Not OK");
 		*this->m_ispStatus = ISP_Status_ResponseDataError;
 	}
 

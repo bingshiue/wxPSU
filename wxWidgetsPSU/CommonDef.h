@@ -23,6 +23,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent); /**< Declare Th
 
 #define LOCK_UPDATE_FW /**< Lock Update FW MenuItem Default */
 #define ADMINISTRATOR_PASSWORD wxT("acbelacbel") /**< Default Administrator Password */
+#define DEVELOPER_PASSWORD wxT("0226217672") /**< Default Developer Password */
 
 #define IO_PORT_MAX_COUNT  255/**< Max Count of IO Device */     
 
@@ -40,7 +41,14 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent); /**< Declare Th
 
 #define ISP_HANDLE_OD /**< Handle '0x0d' as special character in ISP */
 
-#define WAIT_DSP_REBOOT_TIME  3000 /**< Wait for DSP Reboot Time (MilliSecond) */
+#define DELAY_READ_ISP_START_VERIFY_RESPONSE  30 /**< Delay Read ISP Start Verify Response */
+
+//#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
+#ifdef ISP_SLEEP
+#define ISP_SLEEP_TIME  10  /**< Sleep Time Between F3(F1) Command  */
+#endif
+
+#define WAIT_DSP_REBOOT_TIME  5000 /**< Wait for DSP Reboot Time (MilliSecond) */
 
 /* ----- Below is for debug only ------ */
 

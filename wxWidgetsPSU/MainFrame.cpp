@@ -92,9 +92,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		//wxDefaultPosition, wxDefaultSize,
 		//wxTE_READONLY);
 	//DoLogLine(m_header, "  Time", " Thread", "          Message");
-	this->m_debugLogTC = new wxTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), wxID_ANY, "",//this->DebugLogPanel, wxID_ANY, "",
-		wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
+	this->m_debugLogTC = new PMBUSLogTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), ID_LOG_TEXTCTRL);//new wxTextCtrl(this->m_debugLogStaticBoxSizer->GetStaticBox(), wxID_ANY, "",//this->DebugLogPanel, wxID_ANY, "",
+		//wxDefaultPosition, wxDefaultSize,
+		//wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH);
 	
 	// Get old logger
 	m_oldLogger = wxLog::GetActiveTarget();
@@ -103,7 +103,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	switch (this->m_appSettings.m_logMode){
 
 	case Log_Mode_Log_ALL:
-		wxLog::SetLogLevel(wxLOG_Message);
+		wxLog::SetLogLevel(wxLOG_Debug);
 		break;
 
 	case Log_Mode_Log_Error_Only:
@@ -1214,10 +1214,20 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	if (this->PMBusPrimaryFWUpdatePanel) {
 		// Get index of notebook
 		unsigned int deleteIndex = this->PMBusPrimaryFWUpdatePanel->GetIndexOfNotebook();
+		unsigned int currentPageCount = m_notebook->GetPageCount();
+		PSU_DEBUG_PRINT(MSG_DEBUG, "currentPageCount=%d, deleteIndex=%d", currentPageCount, deleteIndex);
 
-		this->m_notebook->SetSelection(0);
+		if (deleteIndex > (currentPageCount - 1)){
+			deleteIndex = (currentPageCount - 1);
+		}
 
-		this->m_notebook->RemovePage(deleteIndex);
+		if (deleteIndex == this->m_notebook->GetSelection()){
+			this->m_notebook->SetSelection(0);
+		}
+
+		if (this->PMBusPrimaryFWUpdatePanel->isCloseButtonPressed() == false){
+			this->m_notebook->RemovePage(deleteIndex);
+		}
 
 		wxDELETE(this->PMBusPrimaryFWUpdatePanel);
 	}
@@ -1252,7 +1262,7 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	}
 
 	wxString path = LoadHexFileDialog.GetPath();
-	PSU_DEBUG_PRINT(MSG_DEBUG, "HEX File Path : %s", path.c_str());
+	PSU_DEBUG_PRINT(MSG_ALERT, "HEX File Path : %s", path.c_str());
 
 	// Create an input stream
 	ifstream TIHexInput;
@@ -1310,11 +1320,11 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
 
 	if (!this->PMBusPrimaryFWUpdatePanel){
-		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET);
+		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET, this->m_appSettings.m_developerMode);
 	}
 
 	// Add page to NoteBook
-	m_notebook->AddPage(this->PMBusPrimaryFWUpdatePanel, "Primary FW MMAP", true);
+	m_notebook->AddPage(this->PMBusPrimaryFWUpdatePanel, "Primary FW Update", true);
 	// Save Index Of Notebook
 	this->PMBusPrimaryFWUpdatePanel->GetIndexOfNotebook() = (m_notebook->GetPageCount() - 1);
 
@@ -1326,10 +1336,20 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	if (this->PMBusSecondaryFWUpdatePanel) {
 		// Get index of notebook
 		unsigned int deleteIndex = this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook();
+		unsigned int currentPageCount = m_notebook->GetPageCount();
+		PSU_DEBUG_PRINT(MSG_DEBUG, "currentPageCount=%d, deleteIndex=%d", currentPageCount, deleteIndex);
 
-		this->m_notebook->SetSelection(0);
+		if (deleteIndex > (currentPageCount-1)){
+			deleteIndex = (currentPageCount-1);
+		}
 
-		this->m_notebook->RemovePage(deleteIndex);
+		if (deleteIndex == this->m_notebook->GetSelection()){
+			this->m_notebook->SetSelection(0);
+		}
+
+		if (this->PMBusSecondaryFWUpdatePanel->isCloseButtonPressed() == false){
+			this->m_notebook->RemovePage(deleteIndex);
+		}
 
 		wxDELETE(this->PMBusSecondaryFWUpdatePanel);
 	}
@@ -1395,11 +1415,11 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET, this->m_appSettings.m_developerMode);
 	}
 	
 	// Add page to NoteBook
-	m_notebook->AddPage(this->PMBusSecondaryFWUpdatePanel, "Secondary FW MMAP", true);
+	m_notebook->AddPage(this->PMBusSecondaryFWUpdatePanel, "Secondary FW Update", true);
 	// Save Index Of Notebook
 	this->PMBusSecondaryFWUpdatePanel->GetIndexOfNotebook() = (m_notebook->GetPageCount() - 1);
 }
@@ -1463,14 +1483,25 @@ void MainFrame::OnAdministrant(wxCommandEvent& event){
 	password = passwordEntryDialog->GetValue();
 
 	if (password.compare(ADMINISTRATOR_PASSWORD) == 0){
-		PSU_DEBUG_PRINT(MSG_DETAIL, "Password = %s", password.c_str());
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "Password = %s", password.c_str());
+		// Enable Update Firmware
+		this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, true);
+		this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, true);
+	}
+	else if (password.compare(DEVELOPER_PASSWORD) == 0){
 		// Enable Update Firmware
 		this->m_runMenu->Enable(MENU_ID_Update_Primary_Firmware, true);
 		this->m_runMenu->Enable(MENU_ID_Update_Secondary_Firmware, true);
 
+		// Enable Developer Mode
+		this->m_appSettings.m_developerMode = Generic_Enable;
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Password Not Match");
+
+		wxMessageBox(wxT("Password Not Match !"),
+			wxT("Password Not Match"),
+			wxOK | wxICON_ERROR);
 	}
 
 	delete passwordEntryDialog;
