@@ -102,7 +102,11 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 
 		if (PMBUSHelper::IspErrRetry < ISP_CHECK_STATUS_RETRY){
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status Retry : %d", PMBUSHelper::IspErrRetry);
-			new(TP_SendISPCheckStatusTask) SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+
+#ifdef	ISP_F3_CMD_FAILED_RETRY_SLEEP
+			wxMilliSleep(ISP_F3_CMD_FAILED_RETRY_SLEEP_TIME);
+#endif
+			new(TP_SendISPCheckStatusTask)SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		}
 		else{
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status Failed");

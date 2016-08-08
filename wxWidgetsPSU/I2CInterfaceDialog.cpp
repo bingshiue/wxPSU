@@ -28,7 +28,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	// I2C Adaptor Module Board
 
 	m_moduleNameST = new wxStaticText(m_i2cIFModuleSBS->GetStaticBox(), wxID_ANY, wxT("Module Name"));
-	m_moduleNameCB = new wxComboBox(m_i2cIFModuleSBS->GetStaticBox(), wxID_ANY, wxT(""));
+	m_moduleNameCB = new wxComboBox(m_i2cIFModuleSBS->GetStaticBox(), CID_MODULE_BOARD_COMBO, wxT(""));
 	m_moduleNameCB->Append("API2CS12-000");
 	m_moduleNameCB->Append("R90000-95611");
 	m_moduleNameCB->Append("R90000-9271(USB)");
@@ -40,14 +40,14 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 		I2C_AdaptorModuleBoard_R90000_9271_USB,
 		I2C_AdaptorModuleBoard_TOTALPHASE
 	};
-	unsigned int select = 0;
+	unsigned int module_select = 0;
 	for (unsigned int idx = 0; idx < sizeof(adaptorArray) / sizeof(adaptorArray[0]); idx++){
 		if (this->m_appSettings->m_I2CAdaptorModuleBoard == adaptorArray[idx]){
-			select = idx;
+			module_select = idx;
 			break;
 		}
 	}
-	m_moduleNameCB->SetSelection(select);
+	m_moduleNameCB->SetSelection(module_select);
 
 
 	m_i2cIFModuleSBS->Add(m_moduleNameST, wxSizerFlags().Align(wxCENTER).Border());
@@ -143,8 +143,12 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	m_ComportButton = new wxButton(this, CID_COMPORT_BUTTOUN, wxT("Comport"), wxDefaultPosition, wxSize(80, -1));
 	m_ComportButton->SetBitmap(wxBITMAP_PNG(COMPLUG_16));
 
-	m_USBSettingButton = new wxButton(this, wxID_ANY, wxT("Setting"), wxDefaultPosition, wxSize(80, -1));
+	m_USBSettingButton = new wxButton(this, CID_USB_SETTINGS_BUTTON, wxT("Setting"), wxDefaultPosition, wxSize(80, -1));
 	m_USBSettingButton->SetBitmap(wxBITMAP_PNG(USB_16));
+
+	if (module_select != I2C_AdaptorModuleBoard_R90000_9271_USB){
+		m_USBSettingButton->Enable(false);
+	}
 
 	m_ButtonSizer->Add(m_OkButton, wxSizerFlags().Align(wxCENTER).Border());
 	m_ButtonSizer->Add(m_CancelButton, wxSizerFlags().Align(wxCENTER).Border());
@@ -167,6 +171,17 @@ I2CInterfaceDialog::~I2CInterfaceDialog(){
 
 }
 
+
+void I2CInterfaceDialog::OnModuleBoardCombo(wxCommandEvent& event){
+	//PSU_DEBUG_PRINT(MSG_ALERT, "OnModuleBoardCombo");
+
+	if (this->m_moduleNameCB->GetSelection() == I2C_AdaptorModuleBoard_R90000_9271_USB){
+		this->m_USBSettingButton->Enable(true);
+	}
+	else{
+		this->m_USBSettingButton->Enable(false);
+	}
+}
 
 void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	int select = 0;
@@ -237,6 +252,14 @@ void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
 	comportDialog->ShowModal();
 
 	delete comportDialog;
+}
+
+void I2CInterfaceDialog::OnUSBSettingsButton(wxCommandEvent& event){
+	USBSettingsDialog* usbSettingsDialog = new USBSettingsDialog(this, this->m_ioaccess, this->m_appSettings, this->m_pmbusStatusBar);
+	usbSettingsDialog->Centre();
+	usbSettingsDialog->ShowModal();
+
+	delete usbSettingsDialog;
 }
 
 void I2CInterfaceDialog::UpdateStatusBarIOSettingFiled(wxString io_string){
@@ -428,7 +451,9 @@ int I2CInterfaceDialog::CloseIODevice(void){
 }
 
 wxBEGIN_EVENT_TABLE(I2CInterfaceDialog, wxDialog)
+EVT_COMBOBOX(CID_MODULE_BOARD_COMBO, I2CInterfaceDialog::OnModuleBoardCombo)
 EVT_BUTTON(CID_OK_BUTTOUN, I2CInterfaceDialog::OnOKButton)
 EVT_BUTTON(CID_CANCEL_BUTTON, I2CInterfaceDialog::OnCancelButton)
 EVT_BUTTON(CID_COMPORT_BUTTOUN, I2CInterfaceDialog::OnComportButton)
+EVT_BUTTON(CID_USB_SETTINGS_BUTTON, I2CInterfaceDialog::OnUSBSettingsButton)
 wxEND_EVENT_TABLE()

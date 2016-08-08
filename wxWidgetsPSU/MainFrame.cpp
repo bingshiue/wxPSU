@@ -7,6 +7,14 @@
 #include "Acbel.xpm"
 #include "sample.xpm"
 
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
+
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -252,66 +260,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 }
 
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
-
-wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
-EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
-EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmware)
-EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
-EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
-EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
-//EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
-EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
-EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
-EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
-EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
-EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)
-EVT_MENU(MENU_ID_EnableCalibration, MainFrame::OnEnableCalibration)
-EVT_MENU(MENU_ID_DisableCalibration, MainFrame::OnDisableCalibration)
-EVT_MENU(MENU_ID_Calibration, MainFrame::OnCalibration)
-EVT_MENU(MENU_ID_Administrant, MainFrame::OnAdministrant)
-EVT_MENU(MENU_ID_I2C_Interface, MainFrame::OnI2CInterface)
-EVT_MENU(MENU_ID_Enable_ALL, MainFrame::OnEnableAll)
-EVT_MENU(MENU_ID_Disable_ALL, MainFrame::OnDisableAll)
-EVT_MENU(MENU_ID_Continually, MainFrame::OnContinually)
-EVT_MENU(MENU_ID_Iterations, MainFrame::OnIterations)
-EVT_MENU(MENU_ID_Stop_An_Error, MainFrame::OnStopAnError)
-EVT_MENU(MENU_ID_ErrorLog_ALL, MainFrame::OnErrorLogALL)
-EVT_MENU(MENU_ID_ErrorLog_ErrorOnly, MainFrame::OnErrorLogErrorOnly)
-EVT_MENU(MENU_ID_Log_To_File, MainFrame::OnLogToFile)
-EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
-EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
-EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
-EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
-EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
-
-EVT_MENU(wxID_EXIT, MainFrame::OnExit)
-EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
-EVT_DATAVIEW_ITEM_CONTEXT_MENU(CID_CMDLIST_DVC, MainFrame::OnContextMenu)
-//EVT_DATAVIEW_ITEM_VALUE_CHANGED(CID_CMDLIST_DVC, MainFrame::OnValueChanged)
-EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
-EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
-
-EVT_TIMER(wxID_ANY, MainFrame::OnInfoBarTimer)
-
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_START, MainFrame::OnSendThreadStart)
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, MainFrame::OnSendThreadUpdateRaw)
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, MainFrame::OnSendThreadUpdateCook)
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
-
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
-EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
-
-EVT_CLOSE(MainFrame::OnWindowClose)
-wxEND_EVENT_TABLE()
-
 MainFrame::~MainFrame()
 {		
 	wxLog::SetActiveTarget(m_oldLogger);
@@ -514,6 +462,10 @@ void MainFrame::SetupMenuBar(void){
 		wxT("Administrant"), wxITEM_NORMAL);
 
 	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
+
+#ifdef DONT_SUPPORT_ISP
+	this->m_AdministrantMenuItem->Enable(false);
+#endif
 
 	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
 	this->m_optionMenu->AppendSeparator();
@@ -2735,3 +2687,56 @@ void MainFrame::HexToBin(void){
 
 	fileOutStream.Sync();
 }
+
+wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
+EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
+EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmware)
+EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
+EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
+EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
+//EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
+EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
+EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
+EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
+EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
+EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)
+EVT_MENU(MENU_ID_EnableCalibration, MainFrame::OnEnableCalibration)
+EVT_MENU(MENU_ID_DisableCalibration, MainFrame::OnDisableCalibration)
+EVT_MENU(MENU_ID_Calibration, MainFrame::OnCalibration)
+EVT_MENU(MENU_ID_Administrant, MainFrame::OnAdministrant)
+EVT_MENU(MENU_ID_I2C_Interface, MainFrame::OnI2CInterface)
+EVT_MENU(MENU_ID_Enable_ALL, MainFrame::OnEnableAll)
+EVT_MENU(MENU_ID_Disable_ALL, MainFrame::OnDisableAll)
+EVT_MENU(MENU_ID_Continually, MainFrame::OnContinually)
+EVT_MENU(MENU_ID_Iterations, MainFrame::OnIterations)
+EVT_MENU(MENU_ID_Stop_An_Error, MainFrame::OnStopAnError)
+EVT_MENU(MENU_ID_ErrorLog_ALL, MainFrame::OnErrorLogALL)
+EVT_MENU(MENU_ID_ErrorLog_ErrorOnly, MainFrame::OnErrorLogErrorOnly)
+EVT_MENU(MENU_ID_Log_To_File, MainFrame::OnLogToFile)
+EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
+EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
+EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
+EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
+EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
+
+EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
+EVT_DATAVIEW_ITEM_CONTEXT_MENU(CID_CMDLIST_DVC, MainFrame::OnContextMenu)
+//EVT_DATAVIEW_ITEM_VALUE_CHANGED(CID_CMDLIST_DVC, MainFrame::OnValueChanged)
+EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
+EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
+
+EVT_TIMER(wxID_ANY, MainFrame::OnInfoBarTimer)
+
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_START, MainFrame::OnSendThreadStart)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, MainFrame::OnSendThreadUpdateRaw)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, MainFrame::OnSendThreadUpdateCook)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
+
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
+
+EVT_CLOSE(MainFrame::OnWindowClose)
+wxEND_EVENT_TABLE()
+

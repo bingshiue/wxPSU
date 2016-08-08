@@ -30,8 +30,20 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
-	PSU_DEBUG_PRINT(MSG_DEBUG,  "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
+	unsigned long hexStartAddr = 0;
+	this->m_tiHexFileStat->startAddress(&hexStartAddr);
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "Hex Start Address = %08x", hexStartAddr);
+
+	if (hexStartAddr == (this->m_tiHexFileStat->currentAddress() - 8)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Delay 200 ms after sent data of the start address");
+		// Need To Delay 200 ms after sent data of the start address
+		wxMilliSleep(200);
+	}
+
+
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data From I/O, Bytes To Read = %d", ispDataBytesToRead);
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	// Read Data From IO

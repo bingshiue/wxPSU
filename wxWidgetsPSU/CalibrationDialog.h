@@ -123,6 +123,9 @@ private:
 
 	wxBoxSizer *m_sizerTop;
 
+	wxString DecimalCharIncludes;
+	wxTextValidator m_numberValidator;
+
 	void OnBtnApply(wxCommandEvent& event);
 	void OnBtnDone(wxCommandEvent& event);
 	void OnBtnRead(wxCommandEvent& event);
@@ -133,6 +136,8 @@ private:
 	void OnTCData1(wxCommandEvent& event);
 
 	int ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done = false);
+
+	bool ValidateInputData(void);
 
 	wxDECLARE_EVENT_TABLE();
 };

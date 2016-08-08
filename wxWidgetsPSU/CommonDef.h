@@ -27,6 +27,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< De
 #define DEFAULT_WINDOW_WIDTH   864 /**< Default Window Width */
 #define DEFAULT_WINDOW_HEIGHT  660 /**< Default Window Height */
 
+//#define DONT_SUPPORT_ISP /**< Don't Support ISP (Disable Administratot Menu Item) */
 #define LOCK_UPDATE_FW /**< Lock Update FW MenuItem Default */
 #define ADMINISTRATOR_PASSWORD wxT("acbelacbel") /**< Default Administrator Password */
 #define DEVELOPER_PASSWORD wxT("0226217672") /**< Default Developer Password */
@@ -51,7 +52,12 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< De
 
 //#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
 #ifdef ISP_SLEEP
-#define ISP_SLEEP_TIME  10  /**< Sleep Time Between F3(F1) Command  */
+#define ISP_SLEEP_TIME  10  /**< Sleep Time Between F3(F1) Command (MilliSecond) */
+#endif
+
+#define ISP_F3_CMD_FAILED_RETRY_SLEEP /**< Sleep before F3 Command Check Failed Retry */
+#ifdef ISP_F3_CMD_FAILED_RETRY_SLEEP 
+#define ISP_F3_CMD_FAILED_RETRY_SLEEP_TIME 50 /**< Sleep Time before F3 Command Check Failed Retry (MilliSecond) */
 #endif
 
 #define WAIT_DSP_REBOOT_TIME  5000 /**< Wait for DSP Reboot Time (MilliSecond) */

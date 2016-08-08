@@ -112,7 +112,7 @@ int SetSerialPortTimeouts(void){
 }
 
 int GetSerialPortStatus(void){
-	PSU_DEBUG_PRINT(MSG_DEBUG, "hComm = %d", hComm);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "hComm = %p", hComm);
 	if (hComm == INVALID_HANDLE_VALUE){
 		return IODEVICE_CLOSE;
 	}

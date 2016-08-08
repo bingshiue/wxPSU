@@ -20,14 +20,17 @@
 #include "CommonDef.h"
 #include "PMBUSStatusBar.h"
 #include "ComportDialog.h"
+#include "USBSettingsDialog.h"
 
 class I2CInterfaceDialog : public wxDialog
 {
 public:
 	enum {
-		CID_OK_BUTTOUN      = 7001,
+		CID_MODULE_BOARD_COMBO = 7001,
+		CID_OK_BUTTOUN,
 		CID_CANCEL_BUTTON,
 		CID_COMPORT_BUTTOUN,
+		CID_USB_SETTINGS_BUTTON
 	};
 
 	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
@@ -82,9 +85,12 @@ private:
 	int OpenIODevice(void);
 	int CloseIODevice(void);
 
+	void OnModuleBoardCombo(wxCommandEvent& event);
+
 	void OnOKButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
 	void OnComportButton(wxCommandEvent& event);
+	void OnUSBSettingsButton(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

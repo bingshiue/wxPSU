@@ -127,6 +127,11 @@
     <ClCompile Include="TaskSystemThread.cpp" />
     <ClCompile Include="TIHexFileParser.cpp" />
     <ClCompile Include="TIHexMMAPModel.cpp" />
+    <ClCompile Include="USBGPIOPanel.cpp" />
+    <ClCompile Include="USBI2CRS232Panel.cpp" />
+    <ClCompile Include="USBInfoPanel.cpp" />
+    <ClCompile Include="USBSettingsDialog.cpp" />
+    <ClCompile Include="USBSPICANPanel.cpp" />
     <ClCompile Include="WritePage00H.cpp" />
     <ClCompile Include="WritePage01H.cpp" />
     <ClCompile Include="WritePage02H.cpp" />
@@ -189,6 +194,11 @@
     <ClInclude Include="TaskSystemThread.h" />
     <ClInclude Include="TIHexFileParser.h" />
     <ClInclude Include="TIHexMMAPModel.h" />
+    <ClInclude Include="USBGPIOPanel.h" />
+    <ClInclude Include="USBI2CRS232Panel.h" />
+    <ClInclude Include="USBInfoPanel.h" />
+    <ClInclude Include="USBSettingsDialog.h" />
+    <ClInclude Include="USBSPICANPanel.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>

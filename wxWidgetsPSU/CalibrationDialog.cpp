@@ -142,6 +142,12 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	wxString data1DefaultText("0.0000");
 	m_data1TC->SetValue(data1DefaultText);
 
+	DecimalCharIncludes = wxT("0123456789.");
+	m_numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	m_numberValidator.SetCharIncludes(DecimalCharIncludes);
+
+	this->m_data1TC->SetValidator(this->m_numberValidator);
+
 	m_resolution1ST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT("Resolution 1"), wxDefaultPosition, wxDefaultSize);
 	m_resolution1TC = new wxTextCtrl(m_settingControlSBS->GetStaticBox(), wxID_ANY);
 
@@ -226,6 +232,7 @@ wxBEGIN_EVENT_TABLE(CalibrationDialog, wxDialog)
 	EVT_BUTTON(CID_BTN_READ, CalibrationDialog::OnBtnRead)
 	EVT_COMBOBOX(CID_CB_CALIBRATION_ITEM, CalibrationDialog::OnCBCalibrationItem)
 	EVT_COMBOBOX(CID_CB_POINTER, CalibrationDialog::OnCBPointer)
+	//EVT_TEXT(CID_TC_DATA_1, CalibrationDialog::OnTCData1)
 	//EVT_TEXT_ENTER(CID_TC_DATA_1, CalibrationDialog::OnTCData1)
 wxEND_EVENT_TABLE()
 
@@ -390,6 +397,11 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 //#define USE_LINEAR_DATA_FORMAT
 #define CALIBRATION_ITEM_BYTES_TO_READ  6
 void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
+	
+	// Validate Input Data
+	bool result = ValidateInputData();
+	if (result == false) return;
+	
 	// Send Buffer
 	unsigned int SendLength = 0;
 	unsigned char SendBuffer[64] = { 0 };
@@ -474,6 +486,11 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 }
 
 void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
+	
+	// Validate Input Data
+	bool result = ValidateInputData();
+	if (result == false) return;
+
 	// Send Buffer
 	unsigned int SendLength = 0;
 	unsigned char SendBuffer[64] = { 0 };
@@ -804,7 +821,7 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 
 		break;
 
-	case ACS_SETPOINT:
+	case ACS_SETPOINT: /* By Default the input parameter of this item must be shown as Integer */
 		// Set Pinter CB Field
 		this->m_pointerCB->Clear();
 
@@ -816,13 +833,13 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 		this->m_pointerCB->SetSelection(0);
 
 		// Set Data & Resolution
-		tmp = wxString::Format("%5.4f", m_dataResolution[ACS_SETPOINT].m_data1);
+		tmp = wxString::Format("%.0f", m_dataResolution[ACS_SETPOINT].m_data1);
 		this->m_data1TC->SetValue(tmp);
 
 		tmp = wxString::Format("%5.8f", m_dataResolution[ACS_SETPOINT].m_Resolution1);
 		this->m_resolution1TC->SetValue(tmp);
 
-		tmp = wxString::Format("%5.4f", m_dataResolution[ACS_SETPOINT].m_data2);
+		tmp = wxString::Format("%.0f", m_dataResolution[ACS_SETPOINT].m_data2);
 		this->m_data2TC->SetValue(tmp);
 
 		tmp = wxString::Format("%5.8f", m_dataResolution[ACS_SETPOINT].m_Resolution2);
@@ -837,12 +854,71 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 
 }
 
+#define ACS_SETPOINT_INPUT_MAX  2300
+#define ACS_SETPOINT_INPUT_MIN  1900
+bool CalibrationDialog::ValidateInputData(void){
+	bool ret = true;
+
+	double value1 = 0;
+	int InputValue = 0;
+	bool result = false;
+
+	if (this->m_calibrationItemCB->GetSelection() == ACS_SETPOINT){
+		value1 = 0;
+		result = this->m_data1TC->GetValue().ToDouble(&value1);
+
+		if (result == true){
+
+			InputValue = (int)value1;
+
+			if (InputValue > ACS_SETPOINT_INPUT_MAX || InputValue < ACS_SETPOINT_INPUT_MIN){
+				wxMessageDialog *dial = new wxMessageDialog(NULL, L" Input Value Range : 1900(12.0V) ~ 2300(12.33V) \n Please Input Again !", L"Input Data Error", wxOK | wxICON_ERROR);
+				dial->ShowModal();
+
+				delete dial;
+				ret = false;
+			}
+
+		}
+
+	}
+
+	return ret;
+}
+
+
 void CalibrationDialog::OnCBPointer(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
 }
 
 void CalibrationDialog::OnTCData1(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
+#if 0
+	double value1 = 0;
+	int InputValue = 0;
+	bool result = false;
+	
+	if (this->m_calibrationItemCB->GetSelection() == ACS_SETPOINT){
+		//PSU_DEBUG_PRINT(MSG_ALERT, "OnTCData1");
+		value1 = 0;
+		result = this->m_data1TC->GetValue().ToDouble(&value1);
+
+		if (result == true){
+
+			InputValue = (int)value1;
+
+			if (InputValue > ACS_SETPOINT_INPUT_MAX || InputValue < ACS_SETPOINT_INPUT_MIN){
+				wxMessageDialog *dial = new wxMessageDialog(NULL, L"Input Value Range : 1900 ~ 2300", L"Error", wxOK | wxICON_ERROR);
+				dial->ShowModal();
+
+				delete dial;
+			}
+			else{
+				//
+			}
+		}
+	
+	}
+#endif
 }
 
 
