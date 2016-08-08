@@ -23,7 +23,8 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 
 		Task::RunTask(dummy);
 
-		Sleep(1);
+		//Sleep(1);
+		wxMilliSleep(1);
 	}
 
 	return NULL;

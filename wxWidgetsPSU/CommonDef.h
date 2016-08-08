@@ -52,7 +52,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Decla
 
 #define ISP_HANDLE_OD /**< Handle '0x0d' as special character in ISP */
 
-#define DELAY_READ_ISP_START_VERIFY_RESPONSE  30 /**< Delay Read ISP Start Verify Response */
+#define DELAY_READ_ISP_START_VERIFY_RESPONSE  500 /**< Delay Read ISP Start Verify Response */
 
 //#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
 #ifdef ISP_SLEEP
