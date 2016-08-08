@@ -15,6 +15,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
 
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
+
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -2249,6 +2251,60 @@ void MainFrame::OnSendThreadUpdateSummary(wxThreadEvent& event){
 
 }
 
+void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
+	
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceInterrupt");
+
+	int ispStatus = event.GetInt();
+
+	// If Error Occurs
+	if ((ispStatus & 0xff) > 0x02) {
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ispStatus = 0x%xH", ispStatus);
+
+		switch (ispStatus){
+
+		case ISP_Status_VerifyBeforeStart:
+			// Verify Before Start
+
+			break;
+
+		case ISP_Status_UserRequestCancel:
+			// User Cancel ISP
+
+			break;
+
+		case ISP_Status_SendDataFailed:
+			wxMessageBox(wxT("Send Data Failed ! \n\n IO Port Send Data Failed"),
+						 wxT("Error !"),  // caption
+						 wxOK | wxICON_ERROR);
+
+			break;
+
+		case ISP_Status_ResponseDataError:
+			wxMessageBox(wxT("Response Data Error ! \n\n This may caused by Unstable IO or Incorrect Image"),
+						 wxT("Error !"),  // caption
+						 wxOK | wxICON_ERROR);
+
+			break;
+
+
+		case ISP_Status_RebootCheckError:
+			wxMessageBox(wxT("DSP Reboot Check Error ! \n\n DSP Reboot Failed"),
+						 wxT("Error !"),  // caption
+						 wxOK | wxICON_ERROR);
+
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs, ispStatus = %02x", ispStatus);
+			break;
+
+		}
+	}
+
+}
+
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	wxVariant Value;
 	wxString registerValue("");
@@ -2736,6 +2792,8 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion
 
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
+
+EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()

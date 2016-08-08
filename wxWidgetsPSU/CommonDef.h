@@ -24,11 +24,15 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent); /**< Decla
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent); /**< Declare Thread Update CMD Name Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< Declare Thread Update Summary Event */
 
+wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Declare ISP SEQUENCE Interrupt Event */
+
 #define DEFAULT_WINDOW_WIDTH   864 /**< Default Window Width */
 #define DEFAULT_WINDOW_HEIGHT  660 /**< Default Window Height */
 
 //#define DONT_SUPPORT_ISP /**< Don't Support ISP (Disable Administratot Menu Item) */
+#ifndef _DEBUG
 #define LOCK_UPDATE_FW /**< Lock Update FW MenuItem Default */
+#endif
 #define ADMINISTRATOR_PASSWORD wxT("acbelacbel") /**< Default Administrator Password */
 #define DEVELOPER_PASSWORD wxT("0226217672") /**< Default Developer Password */
 

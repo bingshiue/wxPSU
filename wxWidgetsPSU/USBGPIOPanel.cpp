@@ -26,6 +26,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 
 	/* Top Left Section */
 	m_autoReportCheckBox = new wxCheckBox(this, wxID_ANY, wxT("Auto Report"));
+	m_autoReportCheckBox->SetValue(true);
 
 	m_digitalOutputSB = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Digital Output"));
 
@@ -43,7 +44,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 	m_digitalOutputSB->Add(m_digiOutputLight4);
 	m_digitalOutputSB->Add(m_digiOutputLight5);
 	m_digitalOutputSB->Add(m_digiOutputLight6);
-	m_digitalOutputSB->Add(m_digiOutputTC);
+	m_digitalOutputSB->Add(m_digiOutputTC, wxSizerFlags().Border());
 
 	m_digitalInputSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Digital Input"));
 
@@ -77,7 +78,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 	m_digiInputUpSizer->Add(m_digiInputLight8);
 
 	m_digitalInputSB->Add(m_digiInputUpSizer, wxSizerFlags(1).Expand());
-	m_digitalInputSB->Add(m_digiInputSL, wxSizerFlags(0).Expand());
+	m_digitalInputSB->Add(m_digiInputSL, wxSizerFlags(0).Expand().Border());
 
 	m_digiInputDownSizer->Add(m_digiInputLight9);
 	m_digiInputDownSizer->Add(m_digiInputLight10);

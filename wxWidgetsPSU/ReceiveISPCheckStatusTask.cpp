@@ -70,7 +70,7 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 			// Start Send Data
 			*this->m_ispStatus = ISP_Status_InProgress;
 			this->m_tiHexFileStat->begin();
-			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Start Send HEX Data, Start Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Start Send HEX Data, Start Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
 			new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 
 			break;
@@ -78,19 +78,23 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 		case ISP_Status_InProgress: // In Progress
 
 			if (this->m_tiHexFileStat->endOfData()){
-				PSU_DEBUG_PRINT(MSG_ALERT, "ISP Latest HEX Data Has Been Sent : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Latest HEX Data Has Been Sent : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
 				new(TP_SendISPEndCMDTask) SendISPEndCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 			}
 			else{
-				PSU_DEBUG_PRINT(MSG_ALERT, "ISP Sending HEX Data : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Sending HEX Data : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
 				new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 			}
 
 			break;
 
+		case ISP_Status_UserRequestCancel:// User Request Cancel
+			PSU_DEBUG_PRINT(MSG_ERROR, "User Request Cancel");
+			break;
+
 
 		default:
-			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error, ISP Status = %x", *this->m_ispStatus);
 			break;
 		}
 
@@ -100,13 +104,13 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 
 		PMBUSHelper::IspErrRetry++;
 
-		if (PMBUSHelper::IspErrRetry < ISP_CHECK_STATUS_RETRY){
+		if (PMBUSHelper::IspErrRetry <= ISP_CHECK_STATUS_RETRY){
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status Retry : %d", PMBUSHelper::IspErrRetry);
 
 #ifdef	ISP_F3_CMD_FAILED_RETRY_SLEEP
 			wxMilliSleep(ISP_F3_CMD_FAILED_RETRY_SLEEP_TIME);
 #endif
-			new(TP_SendISPCheckStatusTask)SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
+			new(TP_SendISPCheckStatusTask) SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		}
 		else{
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status Failed");

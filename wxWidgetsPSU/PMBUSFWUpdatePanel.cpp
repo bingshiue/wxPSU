@@ -60,27 +60,31 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_st2 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 	//this->m_st3 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 
-	// Start Address
-	this->m_startAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("START Address : "));
-	this->m_startAddressST->SetFont(font);
-	wxString StartAddress = wxString::Format("0x%08x", this->m_startAddress);
-	this->m_startAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, StartAddress);
+	if (this->m_developerMode == Generic_Enable){
 
-	this->m_startAddressTC->SetEditable(false);
+		// Start Address
+		this->m_startAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("START Address : "));
+		this->m_startAddressST->SetFont(font);
+		wxString StartAddress = wxString::Format("0x%08x", this->m_startAddress);
+		this->m_startAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, StartAddress);
 
-	this->m_endAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("End Address : "));
-	this->m_endAddressST->SetFont(font);
-	wxString EndAddress = wxString::Format("0x%08x", this->m_endAddress);
-	this->m_endAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, EndAddress);
+		this->m_startAddressTC->SetEditable(false);
 
-	this->m_endAddressTC->SetEditable(false);
+		this->m_endAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("End Address : "));
+		this->m_endAddressST->SetFont(font);
+		wxString EndAddress = wxString::Format("0x%08x", this->m_endAddress);
+		this->m_endAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, EndAddress);
 
-	this->m_addressRangeST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Address Range : "));
-	this->m_addressRangeST->SetFont(font);
-	wxString AddressRange = wxString::Format("%d", this->m_addressRange);
-	this->m_addressRangeTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, AddressRange);
+		this->m_endAddressTC->SetEditable(false);
 
-	this->m_addressRangeTC->SetEditable(false);
+		this->m_addressRangeST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Address Range : "));
+		this->m_addressRangeST->SetFont(font);
+		wxString AddressRange = wxString::Format("%d", this->m_addressRange);
+		this->m_addressRangeTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, AddressRange);
+
+		this->m_addressRangeTC->SetEditable(false);
+
+	}
 
 	this->m_dataBytesST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Data Bytes : "));
 	this->m_dataBytesST->SetFont(font);
@@ -102,12 +106,17 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_statisticSBS->Add(this->m_st1, wxSizerFlags(0).Expand().Border(wxALL));
 
-	this->m_fileStatFGS->Add(this->m_startAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_fileStatFGS->Add(this->m_startAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_fileStatFGS->Add(this->m_endAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_fileStatFGS->Add(this->m_endAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_fileStatFGS->Add(this->m_addressRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_fileStatFGS->Add(this->m_addressRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+	if (this->m_developerMode == Generic_Enable){
+
+		this->m_fileStatFGS->Add(this->m_startAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_fileStatFGS->Add(this->m_startAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_fileStatFGS->Add(this->m_endAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_fileStatFGS->Add(this->m_endAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_fileStatFGS->Add(this->m_addressRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_fileStatFGS->Add(this->m_addressRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
+
+	}
+
 	this->m_fileStatFGS->Add(this->m_dataBytesST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
 	this->m_fileStatFGS->Add(this->m_dataBytesTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL));
 
@@ -225,7 +234,7 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
-	
+
 	wxLog* oldLogger = wxLog::GetActiveTarget();
 
 	// Check if Monitor is Running
@@ -279,7 +288,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	PMBUSSendCOMMAND_t CMDF0H;
 
 	CMDF0H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ+1;
+	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMDF0H.m_sendData[idx] = SendBuffer[idx];
 	}
@@ -289,8 +298,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	double percentage = 0;
 	wxString information("");
 
-	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
-
+	new(TP_SendISPStartCMDTask)SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
 
 	int not_cancel;
 	bool inProcess = true;
@@ -365,8 +373,11 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 		// Show Current Address
 		unsigned long currentAddress = this->m_tiHexFileStat.currentAddress();
-		information += wxString::Format("Current Process Address : %08x", currentAddress);
-		information += wxT("\n");
+
+		if (this->m_developerMode == Generic_Enable){
+			information += wxString::Format("Current Process Address : %08x", currentAddress);
+			information += wxT("\n");
+		}
 
 		// Show Processed Bytes
 		unsigned long processed_bytes = ((currentAddress - this->m_startAddress) + 1UL) * 2;
@@ -395,7 +406,10 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 				percentage = 99; // Error occurs, set percentage less than 100 
 			}
 		}
-		PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
+		
+		//PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %f%%", percentage);
+
 
 		// Update Dialogs
 		not_cancel = dialog.Update((int)percentage, information);
@@ -404,48 +418,12 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			ispStatus = ISP_Status_UserRequestCancel;
 		}
 
-
 		// If Error Occurs
 		if ((ispStatus & 0xff) > 0x02) {
 
-			switch (ispStatus){
-
-			case ISP_Status_VerifyBeforeStart:
-				// Verify Before Start
-
-				break;
-
-			case ISP_Status_UserRequestCancel:
-				// User Cancel ISP
-
-				break;
-
-			case ISP_Status_SendDataFailed:
-				wxMessageBox(wxT("Send Data Failed !"),
-					wxT("Error !"),  // caption
-				wxOK | wxICON_ERROR);
-
-				break;
-
-			case ISP_Status_ResponseDataError:
-				wxMessageBox(wxT("Response Data Error!"),
-					wxT("Error !"),  // caption
-					wxOK | wxICON_ERROR);
-
-				break;
-
-
-			case ISP_Status_RebootCheckError:
-				wxMessageBox(wxT("DSP Reboot Check Error!"),
-					wxT("Error !"),  // caption
-					wxOK | wxICON_ERROR);
-
-				break;
-
-			default :
-				PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs, ispStatus = %02x", ispStatus);
-				break;
-
+			// Flush Log
+			if (this->m_developerMode == Generic_Disable){
+				wxLog::FlushActive();
 			}
 
 			break;// while (inProcess)
@@ -467,13 +445,45 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		if (this->m_developerMode == Generic_Disable){
 			wxLog::FlushActive();
 		}
-		
+
 		wxMilliSleep(200);
-	}
+	} // while (inProcess) 
 
 	if (this->m_developerMode == Generic_Disable){
 		// Restore Logger Target
 		wxLog::SetActiveTarget(oldLogger);
+	}
+
+	// Send ISP Interrupt Event To Main Thread
+	wxThreadEvent* threadISPInterrupt_evt;
+	if ((ispStatus & 0xff) > 0x02) {
+		switch (ispStatus){
+
+		case ISP_Status_VerifyBeforeStart:
+			// Verify Before Start
+
+			break;
+
+		case ISP_Status_UserRequestCancel:
+			// User Cancel ISP
+
+			break;
+
+		case ISP_Status_SendDataFailed:
+		case ISP_Status_ResponseDataError:
+		case ISP_Status_RebootCheckError:
+
+			threadISPInterrupt_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT);
+			threadISPInterrupt_evt->SetInt((int)ispStatus);
+			wxQueueEvent(this->m_parent->GetParent()->GetEventHandler(), threadISPInterrupt_evt);
+
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs, ispStatus = %02x", ispStatus);
+			break;
+
+		}
 	}
 
 }

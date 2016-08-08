@@ -194,6 +194,9 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 	SetSerialPortTimeouts();
 #endif
 
+	// Purge CommPort ( For Prevent error received data from first read/write operation )
+	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_RXABORT);
+
 	return ret;
 }
 
@@ -548,14 +551,14 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 
 					}
 					else{// if (ReadFileStatus == 0)
-						PSU_DEBUG_PRINT(MSG_DEBUG, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
+						PSU_DEBUG_PRINT(MSG_DETAIL, "Return of ReadFile = %d, NoBytesRead = %d", ReadFileStatus, NoBytesRead);
 						if (NoBytesRead == 0){
-							PSU_DEBUG_PRINT(MSG_ALERT, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
+							PSU_DEBUG_PRINT(MSG_ERROR, "ReadFile Return Success ! But NoBytesRead = %d", NoBytesRead);
 							break; // break while (i < bytesToRead);
 						}
 					}
 
-					PSU_DEBUG_PRINT(MSG_DEBUG, "NoBytesRead = %d", NoBytesRead);
+					PSU_DEBUG_PRINT(MSG_DETAIL, "NoBytesRead = %d", NoBytesRead);
 
 					if (NoBytesRead < bytesToRead){
 						;
@@ -567,7 +570,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 					//}
 
 					if (NoBytesRead > 0) {
-						PSU_DEBUG_PRINT(MSG_DEBUG, "NoBytesRead = %d", NoBytesRead);
+						PSU_DEBUG_PRINT(MSG_DETAIL, "NoBytesRead = %d", NoBytesRead);
 						i += NoBytesRead;
 					}
 

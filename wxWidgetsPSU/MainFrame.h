@@ -389,6 +389,8 @@ private:
 	void OnSendThreadUpdateCMDName(wxThreadEvent& event);
 	void OnSendThreadUpdateSummary(wxThreadEvent& event);
 
+	void OnISPSequenceInterrupt(wxThreadEvent& event);
+
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 
 	// logging helper

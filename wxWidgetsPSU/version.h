@@ -11,10 +11,10 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.2        |     Support ISP Sequence                  |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
-/* |                    |                                           |*/
+/* |     1.0.0.3        |     Fix Some Warning Messages in ISP      |*/
 /* |                    |                                           |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.2" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.3" /**< Program Version, Shown in About Dialog */
 
 #endif
