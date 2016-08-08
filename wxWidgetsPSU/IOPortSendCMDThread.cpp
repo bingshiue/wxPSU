@@ -323,7 +323,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 	m_running = true;
 
-	this->m_status_bar->getGauge()->Pulse();
+	//this->m_status_bar->getGauge()->Pulse();
+	wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_START));
 
 	switch (this->m_appSettings->m_runMode){
 
@@ -335,7 +336,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running == true; idx++){
 
+#if 1
+				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
+				thread_evt->SetInt(idx);
+				wxQueueEvent(m_pHandler->GetEventHandler(), thread_evt);
+#else
 				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE));
+#endif
+
 
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
@@ -415,19 +423,27 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
 							ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 							if (ret != wxSEMA_NO_ERROR){
-								PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
-							}
-							else{
-								PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
-								wxString writePageRes("");
-								for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
-									writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
-								}
-								PSU_DEBUG_PRINT(MSG_DEBUG, "Send Write Page CMD Response : %s", writePageRes.c_str());
+								PSU_DEBUG_PRINT(MSG_ERROR, "Semaphore wait timout occurs : error = %d", ret);
 
+								// If Run Mode Setting is "Stop An Error"
 								if (this->m_appSettings->m_runMode == RunMode_StopAnError){
 									m_running = false;
 									break;
+								}
+
+							}
+							else{
+								// If Receive Data Length is 0
+								if (this->m_recvBuff->m_length == 0){
+									PSU_DEBUG_PRINT(MSG_ERROR, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
+								}
+								else{
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
+									wxString writePageRes("");
+									for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
+										writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
+									}
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Send Write Page CMD Response : %s", writePageRes.c_str());
 								}
 							}
 
@@ -439,7 +455,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// Update DataView Register Field Icon
 						this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_running;
-						this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RegisterIconText);
+						//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RegisterIconText);
 
 						// Prepare Send Buffer
 						this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
@@ -524,7 +540,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						else{
 
 							if (this->m_recvBuff->m_length == 0){
-								PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %d", this->m_recvBuff->m_length, this->m_pmBusCommand[idx].m_register);
+								PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[idx].m_register);
 								this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
 								timeout++;
 							}
@@ -564,15 +580,21 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 #endif
 
 									// Update Data View Model Raw Field
-									wxVariant variantRaw;
-									variantRaw = RawMsg;
+									//wxVariant variantRaw;
+									//variantRaw = RawMsg;
 
 									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status != cmd_status_checksum_error){
 										this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
 									}
 									PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
-									this->m_dataViewListCtrl->get()->SetValueByRow(variantRaw, idx, PMBUSCMDListModel::Col_RawText);
-									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
+
+									wxThreadEvent* threadraw_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW);
+									threadraw_evt->SetInt(idx);
+									threadraw_evt->SetString(RawMsg);
+									wxQueueEvent(m_pHandler->GetEventHandler(), threadraw_evt);
+
+									//this->m_dataViewListCtrl->get()->SetValueByRow(variantRaw, idx, PMBUSCMDListModel::Col_RawText);
+									//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
 
@@ -582,11 +604,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 									// Update Data View Model Cook Field
 									wxString CookMsg(CookStr);
-									wxVariant variantCook;
-									variantCook = CookMsg;
 
-									this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PMBUSCMDListModel::Col_CookText);
-									this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
+									//wxVariant variantCook;
+									//variantCook = CookMsg;
+
+									wxThreadEvent* threadcook_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK);
+									threadcook_evt->SetInt(idx);
+									threadcook_evt->SetString(CookMsg);
+									wxQueueEvent(m_pHandler->GetEventHandler(), threadcook_evt);
+
+									//this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PMBUSCMDListModel::Col_CookText);
+									//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
 
@@ -606,10 +634,15 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 									if (this->m_recvBuff->m_recvBuff[2] == 0x4e && this->m_recvBuff->m_recvBuff[3] == 0x47) {
 										wxString NotFoundMsg(wxT("(I2C Interface Not Found)"));
-										wxVariant variantNotFound = NotFoundMsg;
+										//wxVariant variantNotFound = NotFoundMsg;
 
-										this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PMBUSCMDListModel::Col_RawText);
-										this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
+										wxThreadEvent* threadcook_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK);
+										threadcook_evt->SetInt(idx);
+										threadcook_evt->SetString(NotFoundMsg);
+										wxQueueEvent(m_pHandler->GetEventHandler(), threadcook_evt);
+
+										//this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PMBUSCMDListModel::Col_RawText);
+										//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
 									}
 
 									if (this->m_appSettings->m_runMode == RunMode_StopAnError){
@@ -710,10 +743,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxString monitor("Monitoring...[");
 				wxString cmd(wxString::Format("%02x", this->m_pmBusCommand[idx].m_register).Upper());
 				wxString hex("h]");
-				this->m_status_bar->setMonitoringCMDName(monitor + cmd + hex);
+				//this->m_status_bar->setMonitoringCMDName(monitor + cmd + hex);
+
+				wxThreadEvent* threadCMDName_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME);
+				threadCMDName_evt->SetString(monitor + cmd + hex);
+				wxQueueEvent(m_pHandler->GetEventHandler(), threadCMDName_evt);
 
 				wxString summary(wxString::Format("Iteration:%ld,Success:%ld,Timeout:%ld", iteration, success, timeout));
-				this->m_status_bar->setMonitoringSummary(summary);
+				//this->m_status_bar->setMonitoringSummary(summary);
+				wxThreadEvent* threadSummary_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY);
+				threadSummary_evt->SetString(summary);
+				wxQueueEvent(m_pHandler->GetEventHandler(), threadSummary_evt);
 
 #if 0
 				if (idx == (PMBUSCOMMAND_SIZE - 1)){
@@ -743,7 +783,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
 		} //while(m_running && this->TestDestroy()==false)
 
-		this->m_status_bar->getGauge()->SetValue(0);
+		//this->m_status_bar->getGauge()->SetValue(0);
 
 		break;
 

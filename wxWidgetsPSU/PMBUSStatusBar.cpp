@@ -10,6 +10,16 @@
 #pragma warning(disable: 4355)
 #endif
 
+#define FILED_IO_SETTING_WIDTH             150
+#define FILED_I2C_CLOCK_WIDTH               50
+#define FILED_RUN_MODE_WIDTH                75
+#define FILED_MONITORING_COMMAND_WIDTH     150
+#define FILED_GAUGE_WIDTH                  100
+#define FILED_MONITOR_TIME                 100
+#define FILED_MONITOR_SUMMARY              (DEFAULT_WINDOW_WIDTH - (FILED_IO_SETTING_WIDTH + FILED_I2C_CLOCK_WIDTH + FILED_RUN_MODE_WIDTH \
+ + FILED_MONITORING_COMMAND_WIDTH + FILED_GAUGE_WIDTH + FILED_MONITOR_TIME))
+
+
 PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(parent, wxID_ANY, style, "PSUStatusBar")
 #if wxUSE_TIMER
 , m_timer(this)
@@ -19,13 +29,13 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 #endif
 {
 	int widths[Field_Max];
-	widths[Field_IO_Setting] = 130;
-	widths[Field_I2C_Clock] = 50;
-	widths[Field_Run_Mode] = 100;
-	widths[Field_Monitoring_Command] = 150;
-	widths[Field_Gauge] = 100;
-	widths[Field_Monitoring_Time] = 50; // growable
-	widths[Field_Monitoring_Summary] = -1;
+	widths[Field_IO_Setting] = FILED_IO_SETTING_WIDTH;
+	widths[Field_I2C_Clock] = FILED_I2C_CLOCK_WIDTH;
+	widths[Field_Run_Mode] = FILED_RUN_MODE_WIDTH;
+	widths[Field_Monitoring_Command] = FILED_MONITORING_COMMAND_WIDTH;
+	widths[Field_Gauge] = FILED_GAUGE_WIDTH;
+	widths[Field_Monitoring_Time] = FILED_MONITOR_TIME; 
+	widths[Field_Monitoring_Summary] = -1;//FILED_MONITOR_SUMMARY;// -1; // growable
 
 	SetFieldsCount(Field_Max);
 	SetStatusWidths(Field_Max, widths);

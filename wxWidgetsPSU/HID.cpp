@@ -150,6 +150,7 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	if (retry >= RETRY_TIMES){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Read Data Timeout Occurs, Retry = %d", retry);
 		readSize = 0;
+		return readSize;
 	}
 
 	return sizeOfBuff + 2;//readSize;

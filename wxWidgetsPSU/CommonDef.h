@@ -15,8 +15,14 @@
 
 #include "PMBUSLog.h"
 
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent); /**< Declare Thread Start Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent); /**< Declare Thread Compelete Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent); /**< Declare Thread Update Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent); /**< Declare Thread Update Raw Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent); /**< Declare Thread Update Cook Event */
+
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent); /**< Declare Thread Update CMD Name Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< Declare Thread Update Summary Event */
 
 #define DEFAULT_WINDOW_WIDTH   864 /**< Default Window Width */
 #define DEFAULT_WINDOW_HEIGHT  660 /**< Default Window Height */

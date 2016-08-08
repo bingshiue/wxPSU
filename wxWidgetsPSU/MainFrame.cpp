@@ -252,8 +252,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 }
 
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
@@ -295,8 +300,14 @@ EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
 
 EVT_TIMER(wxID_ANY, MainFrame::OnInfoBarTimer)
 
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_START, MainFrame::OnSendThreadStart)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, MainFrame::OnSendThreadUpdateRaw)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, MainFrame::OnSendThreadUpdateCook)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
+
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()
@@ -2223,9 +2234,14 @@ void MainFrame::TaskInit(void){
 	// Task Init 
 }
 
+void MainFrame::OnSendThreadStart(wxThreadEvent& event){
+	// Thread Start
+	this->m_status_bar->getGauge()->Pulse();
+}
+
 void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 {
-	PSU_DEBUG_PRINT(MSG_ALERT, "Send Thread Completion");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Send Thread Completion");
 	this->m_sendThreadStopFlag = true;
 
 	// Reset Monitor Parameters
@@ -2235,12 +2251,50 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 	this->m_toolbar->Realize();
 
+	this->m_status_bar->getGauge()->SetValue(0);
 	(this->m_status_bar->getTimer())->Stop();
 }
 
 void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 {
-	//PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update!");
+	//PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update! Int = %d", event.GetInt());
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
+	
+}
+
+void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DETAIL, "SendThreadUpdateRaw Thread Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+	wxVariant variantRaw;
+	variantRaw = event.GetString();
+
+	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_RawText);
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RawText);
+}
+
+void MainFrame::OnSendThreadUpdateCook(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DETAIL, "SendThreadUpdateCook Thread Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+
+	wxVariant variantCook;
+	variantCook = event.GetString();
+
+	this->m_cmdListModel.get()->SetValueByRow(variantCook, event.GetInt(), PMBUSCMDListModel::Col_CookText);
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_CookText);
+
+}
+
+void MainFrame::OnSendThreadUpdateCMDName(wxThreadEvent& event){
+
+	wxString CMDName = event.GetString();
+
+	this->m_status_bar->setMonitoringCMDName(CMDName);
+}
+
+void MainFrame::OnSendThreadUpdateSummary(wxThreadEvent& event){
+
+	wxString summary = event.GetString();
+
+	this->m_status_bar->setMonitoringSummary(summary); 
+
 }
 
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){

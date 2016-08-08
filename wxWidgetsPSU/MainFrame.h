@@ -379,9 +379,15 @@ private:
 
 	void OnContextMenu(wxDataViewEvent &event);
 
+	void OnSendThreadStart(wxThreadEvent& event);
 	void OnSendThreadCompletion(wxThreadEvent& event);
 
 	void OnSendThreadUpdate(wxThreadEvent& event);
+	void OnSendThreadUpdateRaw(wxThreadEvent& event);
+	void OnSendThreadUpdateCook(wxThreadEvent& event);
+
+	void OnSendThreadUpdateCMDName(wxThreadEvent& event);
+	void OnSendThreadUpdateSummary(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 
