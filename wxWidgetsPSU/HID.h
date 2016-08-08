@@ -17,6 +17,8 @@
 #include <wx/wx.h>
 #endif
 
+#include "USBInfoType.h"
+
 void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsigned int command, unsigned int responseLength);
 
 /**

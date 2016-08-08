@@ -45,6 +45,31 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 	}
 	hid_free_enumeration(devs);
 
+	/* Enumerate VID : 0x4d8 PID : 0x3f */
+	devs = hid_enumerate(DEFAULT_VID, DEFAULT_PID);
+	cur_dev = devs;
+	while (cur_dev) {
+		PSU_DEBUG_PRINT(MSG_ALERT, "Device Found ->");
+		PSU_DEBUG_PRINT(MSG_ALERT, "Type: %04hx %04hx", cur_dev->vendor_id, cur_dev->product_id);
+		
+		PMBUSHelper::GetUSBInfo()->m_vid = cur_dev->vendor_id;
+		PMBUSHelper::GetUSBInfo()->m_pid = cur_dev->product_id;
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "Path: %s", cur_dev->path);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "serial_number: %ls", cur_dev->serial_number);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer: %ls", cur_dev->manufacturer_string);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Product:      %ls", cur_dev->product_string);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Release:      %hx", cur_dev->release_number);
+		
+		PMBUSHelper::GetUSBInfo()->m_release = cur_dev->release_number;
+		
+		PSU_DEBUG_PRINT(MSG_ALERT, "Interface:    %d", cur_dev->interface_number);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Usage Page:   0x%02x", cur_dev->usage_page);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Usage:        0x%02x", cur_dev->usage);
+		cur_dev = cur_dev->next;
+	}
+	hid_free_enumeration(devs);
+
 	return EXIT_SUCCESS;
 }
 
@@ -86,12 +111,16 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read manufacturer string");
 		PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer String: %ls", wstr);
 
+		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_vendor_name, wstr, 255);
+
 		// Read the Product String
 		wstr[0] = 0x0000;
 		res = hid_get_product_string(handle, wstr, MAX_STR);
 		if (res < 0)
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read product string");
 		PSU_DEBUG_PRINT(MSG_ALERT, "Product String: %ls", wstr);
+
+		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_product_name, wstr, 255);
 
 		// Read the Serial Number String
 		wstr[0] = 0x0000;

@@ -12,6 +12,7 @@
 #include "CommonDef.h"
 #include "PMBUSStatus.h"
 #include "AppSettings.h"
+#include "USBInfoType.h"
 
 class PMBUSHelper {
 public :
@@ -31,6 +32,7 @@ public :
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);
+	static USBINFO* GetUSBInfo(void);
 
 	static void SetAppSettings(AppSettings_t* appSettings);
 	static AppSettings_t* GetAppSettings(void);
@@ -61,6 +63,8 @@ private :
 	static PMBUSSTATUS_t m_pmbusStatus;
 
 	static AppSettings_t* m_appSettings;
+
+	static USBINFO m_USBInfo;
 
 };
 

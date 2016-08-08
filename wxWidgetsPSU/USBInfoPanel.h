@@ -17,6 +17,8 @@
 #include <wx/animate.h>
 #include <wx/statline.h>
 
+#include "PMBUSHelper.h"
+
 class USBInfoPanel : public wxPanel {
 public:
 	/**

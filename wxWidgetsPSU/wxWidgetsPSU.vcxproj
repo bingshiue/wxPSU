@@ -197,6 +197,7 @@
     <ClInclude Include="USBGPIOPanel.h" />
     <ClInclude Include="USBI2CRS232Panel.h" />
     <ClInclude Include="USBInfoPanel.h" />
+    <ClInclude Include="USBInfoType.h" />
     <ClInclude Include="USBSettingsDialog.h" />
     <ClInclude Include="USBSPICANPanel.h" />
     <ClInclude Include="version.h" />

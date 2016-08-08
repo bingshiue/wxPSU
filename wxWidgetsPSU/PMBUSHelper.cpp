@@ -9,6 +9,7 @@
 unsigned char PMBUSHelper::m_slaveAddress;
 PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
 AppSettings_t* PMBUSHelper::m_appSettings;
+USBINFO PMBUSHelper::m_USBInfo;
 unsigned int PMBUSHelper::IspErrRetry = 0;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
@@ -21,6 +22,10 @@ unsigned char& PMBUSHelper::GetSlaveAddress(void){
 
 PMBUSSTATUS_t* PMBUSHelper::GetPMBusStatus(void){
 	return &m_pmbusStatus;
+}
+
+USBINFO* PMBUSHelper::GetUSBInfo(void){
+	return &m_USBInfo;
 }
 
 void PMBUSHelper::SetAppSettings(AppSettings_t* appSettings){
