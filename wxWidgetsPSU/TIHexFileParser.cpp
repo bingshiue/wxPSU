@@ -1173,6 +1173,8 @@ ostream& operator<<(ostream& dataOut, TIHexFileParser& ihLocal)
 	return (dataOut);
 }
 
+#define FORCE_ADDRESS_START_FROM_003F4000
+#define FIXED_START_ADDRESS 0x003f4000
 #define ADDR_ALIGN_XXXF
 /*******************************************************************************
 * Fill Blank Address with value
@@ -1184,6 +1186,17 @@ void TIHexFileParser::fillBlankAddr(unsigned short value){
 	unsigned long emptyRegionEnd = 0;
 	unsigned long previousAddress = 0;
 	unsigned long lcurrentAddress = 0;
+
+#ifdef FORCE_ADDRESS_START_FROM_003F4000
+	// Force Address Start form 0x003f4000
+	unsigned long start_Address;
+	startAddress(&start_Address);
+
+	if (start_Address != 0x003f4000){
+		ihReturn = ihContent.insert(pair<int, unsigned short>(FIXED_START_ADDRESS, 0xffff));
+	}
+
+#endif
 
 #ifdef ADDR_ALIGN_XXXF
 	// Fill Address To Align XXXF

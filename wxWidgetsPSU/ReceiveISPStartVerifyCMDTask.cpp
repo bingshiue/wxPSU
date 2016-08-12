@@ -27,11 +27,7 @@ void ReceiveISPStartVerifyCMDTask::Draw(void){
 
 #define ISP_ENDDATA_BYTES_TO_READ  8
 int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
-	
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d Milliseconds", DELAY_READ_ISP_START_VERIFY_RESPONSE);
-
-	wxMilliSleep(DELAY_READ_ISP_START_VERIFY_RESPONSE);
-	
+		
 	// Receive Data 
 	unsigned int ispEndDataBytesToRead = ISP_ENDDATA_BYTES_TO_READ;//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 2;
 

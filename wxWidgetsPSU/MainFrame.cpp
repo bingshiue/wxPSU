@@ -1217,7 +1217,7 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	}
 
 	// Load Hex File
-	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
+	wxFileDialog LoadHexFileDialog(this, L"Load Primary Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 
 	LoadHexFileDialog.Centre();
 
@@ -1339,7 +1339,7 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	}
 
 	// Load Hex File
-	wxFileDialog LoadHexFileDialog(this, L"Load Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
+	wxFileDialog LoadHexFileDialog(this, L"Load Secondary Firmware File", "", "", "HEX Files (*.hex)|*.hex", wxFD_OPEN);
 	
 	LoadHexFileDialog.Centre();
 
@@ -1553,9 +1553,11 @@ void MainFrame::OnLogToFile(wxCommandEvent& event){
 		
 		//wxStandardPaths standardPath = wxStandardPaths::Get();
 		wxDirDialog *dirDialog = new wxDirDialog(this, wxT("Please Select A Directory"), wxT("C:\\"));// standardPath.GetDocumentsDir());
-		dirDialog->Centre(wxCENTER_ON_SCREEN);
+		//dirDialog->Centre(wxCENTER_ON_SCREEN);
 
 		if (dirDialog->ShowModal() == wxID_CANCEL){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Select Dir Cancel");
+			this->m_logToFileMenuItem->Check(false);
 			return;
 		}
 
@@ -1739,22 +1741,25 @@ void MainFrame::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& ti
 	}
 
 #ifdef _DEBUG
-	text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+
+	//text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+	text->AppendText(wxString::Format("%-8s   %s", threadstr, msg));
 
 	// If enable output log to file
 	if (this->m_appSettings.m_logToFile == Generic_Enable){
 		if (this->m_logFileTextOutputStream){
-			*this->m_logFileTextOutputStream << wxString::Format("%9s %10s           %s", timestr, threadstr, msg);// << endl;
+			*this->m_logFileTextOutputStream << wxString::Format("%-8s   %s", threadstr, msg);//wxString::Format("%9s %10s           %s", timestr, threadstr, msg);// << endl;
 			(*this->m_logFileTextOutputStream).Flush();
 		}
 	}
 #else
-	text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+	//text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+	text->AppendText(wxString::Format("%-s", msg));
 
 	// If enable output log to file
 	if (this->m_appSettings.m_logToFile == Generic_Enable){
 		if (this->m_logFileTextOutputStream){
-			*this->m_logFileTextOutputStream << wxString::Format("%9s           %s", timestr, msg);// << endl;
+			*this->m_logFileTextOutputStream << wxString::Format("%-s", msg);//wxString::Format("%9s           %s", timestr, msg);// << endl;
 			(*this->m_logFileTextOutputStream).Flush();
 		}
 	}

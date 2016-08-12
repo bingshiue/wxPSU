@@ -11,6 +11,7 @@ PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
 AppSettings_t* PMBUSHelper::m_appSettings;
 USBINFO PMBUSHelper::m_USBInfo;
 unsigned int PMBUSHelper::IspErrRetry = 0;
+wxString PMBUSHelper::m_timeString;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -135,7 +136,7 @@ int PMBUSHelper::ProductFakeLinearData(unsigned char *dest, double value, double
 	dest[0] = *((char*)&result);
 	dest[1] = *((char*)&result+1);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "dest[0]=%02x, dest[1]=%02x", dest[0], dest[1]);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "dest[0]=%02x, dest[1]=%02x", dest[0], dest[1]);
 
 	return 0;
 }
@@ -386,7 +387,6 @@ void PMBUSHelper::GetNowDateTimeString(wxString& string){
 	string += wxString::Format("%02d", datetime.GetSecond());
 }
 
-
 void PMBUSHelper::PrintISPCheckStatusError(unsigned char error){
 
 	switch (error){
@@ -458,7 +458,7 @@ unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, u
 
 		if (buffer[0] != REBOOT_OK || buffer[4] != 0x4F || buffer[5] != 0x4B ){
 			result = response_ng;
-			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch");
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch, Return Code = %02xh", buffer[0]);
 		}
 
 		break;
@@ -468,7 +468,7 @@ unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, u
 		//
 		if (buffer[6] != REBOOT_OK){
 			result = response_ng;
-			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch");
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch, Return Code = %02xh", buffer[6]);
 		}
 
 		break;
@@ -498,7 +498,7 @@ unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, u
 
 		if(buffer[0] != target){
 			result = response_ng;
-			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch");
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[0]);
 		}
 
 		break;
@@ -508,7 +508,7 @@ unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, u
 		//
 		if (buffer[6] != target){
 			result = response_ng;
-			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch");
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[6]);
 		}
 
 		break;
@@ -629,4 +629,17 @@ unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigne
 	CheckSum = 0x0100 - (Sum&0x000000ff);
 
 	return CheckSum;
+}
+
+wxString& PMBUSHelper::GetNowTimeString(void){
+	// Get Now Time
+	wxDateTime dateTime = wxDateTime::UNow();
+	_SYSTEMTIME systemTime;
+	dateTime.GetAsMSWSysTime(&systemTime);
+
+	// Make Time String
+	//timeString = wxString::Format("%d-%d %d:%d.%d", systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wMilliseconds);
+	m_timeString = wxString::Format("%02d:%02d:%02d.%03d", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
+
+	return m_timeString;
 }

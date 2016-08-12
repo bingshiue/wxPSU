@@ -9,6 +9,7 @@
 
 #include "wx/config.h"
 
+#include "version.h"
 #include "main.h"
 #include "MainFrame.h"
 
@@ -22,7 +23,11 @@ bool WXPSU::OnInit()
 	wxSize size = wxGetDisplaySize();
 	size.Scale(0.75, 0.75);
 
-	MainFrame *mainFrame = new MainFrame("PSU Tool", wxPoint(50, 50), size);//wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
+	/* Window Title */
+	wxString winTitle(wxT("PSU Tool "));
+	winTitle += wxT(VERSION_STRING);
+
+	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size);//wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 	mainFrame->Show(true);
 
 	return true;

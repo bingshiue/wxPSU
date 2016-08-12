@@ -26,9 +26,6 @@ void ReceiveISPEndCMDTask::Draw(void){
 #define ISP_ENDDATA_BYTES_TO_READ  6
 int ReceiveISPEndCMDTask::Main(double elapsedTime){
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DSP Reboot, Wait %d Milliseconds", WAIT_DSP_REBOOT_TIME);
-	wxMilliSleep(WAIT_DSP_REBOOT_TIME);
-
 	// Receive Data 
 	unsigned int ispEndDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
 
@@ -60,6 +57,9 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 	if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0])) == PMBUSHelper::response_ok){
 		
 		PSU_DEBUG_PRINT(MSG_ALERT, "ISP End Command Response OK");
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DSP Reboot, Wait %d Milliseconds", WAIT_DSP_REBOOT_TIME);
+		wxMilliSleep(WAIT_DSP_REBOOT_TIME);
 
 		new(TP_SendRebootCheckTask) SendRebootCheckTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		

@@ -24,6 +24,8 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_pressedCloseButton = false;
 
+	this->m_writeCount = 0;
+
 	tiHexFileStat.begin();
     this->m_startAddress = tiHexFileStat.currentAddress();
 
@@ -146,6 +148,12 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 		this->m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
 
+		// use fixed width font to align output in nice columns
+		wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
+			wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+
+		this->m_logTC->SetFont(font);
+
 		this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Expand());
 	}
 
@@ -235,6 +243,8 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
+	this->m_writeCount++;
+
 	wxLog* oldLogger = wxLog::GetActiveTarget();
 
 	// Check if Monitor is Running
@@ -251,8 +261,18 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		wxLog::SetActiveTarget(this);
 	}
 
+	wxString dialogTitle;
+	if (this->m_target == UPDATE_PRIMARY_FW_TARGET){
+		dialogTitle = wxString("Primary FW");
+	}
+	else if (this->m_target == UPDATE_SECONDARY_FW_TARGET){
+		dialogTitle = wxString("Secondary FW");
+	}
+
+	dialogTitle += wxT(" ISP Progress");
+
 	// Create Progress Dialog
-	wxProgressDialog dialog(wxT("ISP is in Progress"),
+	wxProgressDialog dialog(dialogTitle,
 		// "Reserve" enough space for the multiline
 		// messages below, we'll change it anyhow
 		// immediately in the loop below
@@ -298,7 +318,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	double percentage = 0;
 	wxString information("");
 
-	new(TP_SendISPStartCMDTask)SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
+	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
 
 	int not_cancel;
 	bool inProcess = true;
@@ -398,8 +418,12 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 				percentage = 100;
 				information = wxT("ISP Progress Complete");
 				information += wxT("\n");
-				information += wxString::Format("Current Process Address : %08x", currentAddress);
-				information += wxT("\n");
+
+				if (this->m_developerMode == Generic_Enable){
+					information += wxString::Format("Current Process Address : %08x", currentAddress);
+					information += wxT("\n");
+				}
+
 				information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
 			}
 			else{
@@ -408,7 +432,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		}
 		
 		//PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %f%%", percentage);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %.2f%%", percentage);
 
 
 		// Update Dialogs
@@ -486,6 +510,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		}
 	}
 
+	PSU_DEBUG_PRINT(MSG_ALERT, "Write Count = %d", this->m_writeCount);
 }
 
 void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){
@@ -610,7 +635,9 @@ void PMBUSFWUpdatePanel::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxS
 	}
 
 #ifdef _DEBUG
-	text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+
+	//text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+	text->AppendText(wxString::Format("%-8s   %s", threadstr, msg));
 
 #if 0
 	// If enable output log to file
@@ -623,7 +650,8 @@ void PMBUSFWUpdatePanel::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxS
 #endif
 
 #else
-	text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+	//text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+	text->AppendText(wxString::Format("%-s", msg));
 
 #if 0
 	// If enable output log to file

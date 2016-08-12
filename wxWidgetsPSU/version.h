@@ -12,9 +12,10 @@
 /* |     1.0.0.2        |     Support ISP Sequence                  |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.3        |     Fix Some Warning Messages in ISP      |*/
-/* |                    |                                           |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.4        |     Add Millisecond in Log Time Stamp     |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.3" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.4" /**< Program Version, Shown in About Dialog */
 
 #endif

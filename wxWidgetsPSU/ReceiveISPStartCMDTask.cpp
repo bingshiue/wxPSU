@@ -28,6 +28,11 @@ void ReceiveISPStartCMDTask::Draw(void){
 }
 
 int ReceiveISPStartCMDTask::Main(double elapsedTime){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d Milliseconds", DELAY_READ_ISP_START_VERIFY_RESPONSE);
+
+	wxMilliSleep(DELAY_READ_ISP_START_VERIFY_RESPONSE);
+
 	// Receive Data 
 
 #ifndef ISP_DONT_WAIT_RESPONSE

@@ -74,12 +74,15 @@ DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 };
 
-CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration dialog")))
+CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration dialog")), wxDefaultPosition, wxSize(600, 400))
 {
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(CALIBRATION_16));
 
 	this->SetIcon(icon);
+
+	m_oldLog = wxLog::GetActiveTarget();
+	wxLog::SetActiveTarget(this);
 	
 	this->m_ioaccess = ioaccess;
 	this->m_currentIO = currentIO;
@@ -101,15 +104,35 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_calibrationItemCB = new wxComboBox(m_settingControlSBS->GetStaticBox(), CID_CB_CALIBRATION_ITEM, wxEmptyString, wxDefaultPosition, wxDefaultSize);
 
 	m_calibrationItemCB->Append(wxT("Output Current Main"));
+	m_calibrationItemString[0] = wxString(wxT("Output Current Main"));
+
 	m_calibrationItemCB->Append(wxT("Output Current SB"));
+	m_calibrationItemString[1] = wxString(wxT("Output Current SB"));
+
 	m_calibrationItemCB->Append(wxT("Output Voltage Main(PWM)"));
+	m_calibrationItemString[2] = wxString(wxT("Output Voltage Main(PWM)"));
+
 	m_calibrationItemCB->Append(wxT("Output Voltage SB(PWM)"));
+	m_calibrationItemString[3] = wxString(wxT("Output Voltage SB(PWM)"));
+
 	m_calibrationItemCB->Append(wxT("Output Voltage LS(PWM)"));
+	m_calibrationItemString[4] = wxString(wxT("Output Voltage LS(PWM)"));
+
 	m_calibrationItemCB->Append(wxT("AC Vin Current 110V AC"));
+	m_calibrationItemString[5] = wxString(wxT("AC Vin Current 110V AC"));
+
 	m_calibrationItemCB->Append(wxT("AC Vin Current 220V AC"));
+	m_calibrationItemString[6] = wxString(wxT("AC Vin Current 220V AC"));
+
 	m_calibrationItemCB->Append(wxT("AC Vin Power 110V AC"));
+	m_calibrationItemString[7] = wxString(wxT("AC Vin Power 110V AC"));
+
 	m_calibrationItemCB->Append(wxT("AC Vin Power 220V AC"));
+	m_calibrationItemString[8] = wxString(wxT("AC Vin Power 220V AC"));
+	
 	m_calibrationItemCB->Append(wxT("ACS SET Pointer"));
+	m_calibrationItemString[9] = wxString(wxT("ACS SET Pointer"));
+	
 	m_calibrationItemCB->SetSelection(0);
 
 	m_calibrationItemSizer->Add(m_calibrationItemST, wxSizerFlags().Border(wxALL, 5));
@@ -186,15 +209,23 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 
 	m_settingControlSBS->Add(m_calibrationItemGridSizer, wxSizerFlags(0).Align(wxALIGN_CENTER));
 
+	m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
+
 	m_sizerTop->Add(m_bottonSizer, wxSizerFlags(0).Expand());
 	m_sizerTop->Add(m_settingControlSBS, wxSizerFlags(0).Expand());
+	m_sizerTop->Add(m_logTC, wxSizerFlags(1).Expand());
 
-	SetSizerAndFit(m_sizerTop);
+	//SetSizerAndFit(m_sizerTop);
+	SetSizer(m_sizerTop);
 
 	SetEscapeId(wxID_CLOSE);
 
 	m_btnApply->SetFocus();
 	m_btnApply->SetDefault();
+}
+
+CalibrationDialog::~CalibrationDialog(){
+	wxLog::SetActiveTarget(m_oldLog);
 }
 
 void CalibrationDialog::OnButton(wxCommandEvent& event)
@@ -408,6 +439,38 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]));
 
+	// Show MSG
+	double value1 = 0;
+	this->m_data1TC->GetValue().ToDouble(&value1);
+
+	double value2 = 0;
+	this->m_data2TC->GetValue().ToDouble(&value2);
+	
+	wxString msg(wxT(""));
+
+	switch(*this->m_currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[SendBuffer[INDEX_CALIBRATION_ITEM]].c_str(), 
+			SendBuffer[INDEX_POINTER],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
+	case IOACCESS_HID:
+
+		break;
+
+	default:
+
+		break;
+	}
+
 #if 0
 	unsigned char SendBuffer[13] = {
 		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xCB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x0A
@@ -458,7 +521,7 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 		debugStr += wxString::Format(" %02x ", SendBuffer[idx]);
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", debugStr.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr.c_str());
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
@@ -472,7 +535,7 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(calibrationItem);
-			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
 		}
 	}
 	else{
@@ -497,6 +560,37 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]), true);
 
+	// Show MSG
+	double value1 = 0;
+	this->m_data1TC->GetValue().ToDouble(&value1);
+
+	double value2 = 0;
+	this->m_data2TC->GetValue().ToDouble(&value2);
+
+	wxString msg(wxT(""));
+
+	switch(*this->m_currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[SendBuffer[INDEX_CALIBRATION_ITEM]].c_str(),
+			SendBuffer[INDEX_POINTER],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
+	case IOACCESS_HID:
+
+		break;
+
+	default:
+
+		break;
+}
 
 #if 0	
 	// Send Buffer
@@ -549,7 +643,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 		debugStr += wxString::Format(" %02x ", SendBuffer[idx]);
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", debugStr.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr.c_str());
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
@@ -563,7 +657,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(calibrationItem);
-			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
 		}
 	}
 	else{
@@ -890,6 +984,91 @@ bool CalibrationDialog::ValidateInputData(void){
 void CalibrationDialog::OnCBPointer(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
 }
+
+void CalibrationDialog::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
+{
+
+	switch (level) {
+
+	case wxLOG_FatalError:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+	case wxLOG_Error:
+		text->SetDefaultStyle(wxTextAttr(*wxRED, *wxWHITE));
+		break;
+		//case wxLOG_Warning:
+		//break;
+		//case wxLOG_Message:
+		//break;
+		//case wxLOG_Status:
+		//break;
+		//case wxLOG_Info:
+		//break;
+		//case wxLOG_Debug:
+		//break;
+
+	default:
+		text->SetDefaultStyle(wxTextAttr(*wxBLUE, *wxWHITE));
+		break;
+	}
+
+#ifdef _DEBUG
+
+	//text->AppendText(wxString::Format("%9s %10s           %s", timestr, threadstr, msg));
+	text->AppendText(wxString::Format("%-8s   %s", threadstr, msg));
+
+#if 0
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s %10s           %s", timestr, threadstr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
+#endif
+
+#else
+	//text->AppendText(wxString::Format("%9s           %s", timestr, msg));
+	text->AppendText(wxString::Format("%-s", msg));
+
+#if 0
+	// If enable output log to file
+	if (this->m_appSettings.m_logToFile == Generic_Enable){
+		if (this->m_logFileTextOutputStream){
+			*this->m_logFileTextOutputStream << wxString::Format("%9s           %s", timestr, msg);// << endl;
+			(*this->m_logFileTextOutputStream).Flush();
+		}
+	}
+#endif
+
+#endif
+}
+
+void CalibrationDialog::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info)
+{
+	// let the default GUI logger treat warnings and errors as they should be
+	// more noticeable than just another line in the log window and also trace
+	// messages as there may be too many of them
+#if 0
+	if (level <= wxLOG_Warning || level == wxLOG_Trace)
+	{
+		m_oldLogger->LogRecord(level, msg, info);
+		return;
+	}
+#endif
+
+	DoLogLine(
+		level,
+		this->m_logTC,
+		wxDateTime(info.timestamp).FormatISOTime(),
+		info.threadId == wxThread::GetMainId()
+		? wxString("main")
+		: wxString::Format("%lx", info.threadId),
+		msg + "\n"
+		);
+
+}
+
 
 void CalibrationDialog::OnTCData1(wxCommandEvent& event){
 #if 0

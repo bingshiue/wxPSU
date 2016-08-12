@@ -64,7 +64,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Decla
 #define ISP_F3_CMD_FAILED_RETRY_SLEEP_TIME 50 /**< Sleep Time before F3 Command Check Failed Retry (MilliSecond) */
 #endif
 
-#define WAIT_DSP_REBOOT_TIME  5000 /**< Wait for DSP Reboot Time (MilliSecond) */
+#define WAIT_DSP_REBOOT_TIME  7000 /**< Wait for DSP Reboot Time (MilliSecond) */
 
 /* ----- Below is for debug only ------ */
 

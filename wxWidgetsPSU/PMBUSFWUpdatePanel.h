@@ -120,6 +120,8 @@ private:
 
 	unsigned int m_indexOfNotebook;
 
+	unsigned int m_writeCount;
+
 	void OnWriteButton(wxCommandEvent& event);
 	void OnCloseButton(wxCommandEvent& event);
 

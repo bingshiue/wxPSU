@@ -55,6 +55,8 @@ public :
 
 	static void PrintISPCheckStatusError(unsigned char error);
 
+	static wxString& GetNowTimeString(void);
+
 protected :
 
 private :
@@ -65,6 +67,8 @@ private :
 	static AppSettings_t* m_appSettings;
 
 	static USBINFO m_USBInfo;
+
+	static wxString m_timeString;
 
 };
 

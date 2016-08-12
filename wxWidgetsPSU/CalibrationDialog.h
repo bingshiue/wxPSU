@@ -19,6 +19,7 @@
 
 #include "CommonDef.h"
 #include "PMBUSHelper.h"
+#include "PMBUSLogTextCtrl.h"
 #include "Task.h"
 
 typedef struct data_resolution_t {
@@ -30,11 +31,14 @@ typedef struct data_resolution_t {
 
 } DATA_RESOLUTION_t;
 
+#define CALIBRARTION_ITEM_SIZE  10 /**< Size Of Calibration Items */
 
-class CalibrationDialog : public wxDialog
+class CalibrationDialog : public wxDialog, private wxLog
 {
 public:
 	CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector);
+
+	~CalibrationDialog();
 
 	void OnButton(wxCommandEvent& event);
 
@@ -83,6 +87,10 @@ public:
 	static double defSelectablePointerCount[CALIBRATION_ITEM_SIZE];/**< Default Selectable Pointer Count */
 	static DATA_RESOLUTION_t m_dataResolution[CALIBRATION_ITEM_SIZE];/**< Data & Resolution */
 
+protected:
+
+	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
+
 private:
 	IOACCESS *m_ioaccess;
 	unsigned int *m_currentIO;
@@ -126,6 +134,12 @@ private:
 	wxString DecimalCharIncludes;
 	wxTextValidator m_numberValidator;
 
+	PMBUSLogTextCtrl *m_logTC;
+
+	wxLog* m_oldLog;
+
+	wxString m_calibrationItemString[CALIBRARTION_ITEM_SIZE];
+
 	void OnBtnApply(wxCommandEvent& event);
 	void OnBtnDone(wxCommandEvent& event);
 	void OnBtnRead(wxCommandEvent& event);
@@ -138,6 +152,13 @@ private:
 	int ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done = false);
 
 	bool ValidateInputData(void);
+
+	void DoLogLine(
+		wxLogLevel level,
+		wxTextCtrl *text,
+		const wxString& timestr,
+		const wxString& threadstr,
+		const wxString& msg);
 
 	wxDECLARE_EVENT_TABLE();
 };
