@@ -1442,9 +1442,18 @@ void MainFrame::OnCalibration(wxCommandEvent& event){
 
 void MainFrame::OnAdministrant(wxCommandEvent& event){
 	wxString password;
+	int dialog_ret = 0;
+
 	
 	wxPasswordEntryDialog *passwordEntryDialog = new wxPasswordEntryDialog(this, wxT("Please Input Administrator Password"));
-	passwordEntryDialog->ShowModal();
+	dialog_ret = passwordEntryDialog->ShowModal();
+
+	// If user press cancel
+	if (dialog_ret == wxID_CANCEL){
+		delete passwordEntryDialog;
+		return;
+	}
+
 	password = passwordEntryDialog->GetValue();
 
 	if (password.compare(ADMINISTRATOR_PASSWORD) == 0){
