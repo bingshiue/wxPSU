@@ -300,7 +300,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	DWORD iteration = 0;
 	DWORD success = 0;
 	DWORD timeout = 0;
-	wchar_t QueryStr[STR_LENGTH];
+	//wchar_t QueryStr[STR_LENGTH];
 	wchar_t CookStr[STR_LENGTH];
 	wchar_t RawStr[STR_LENGTH];
 
@@ -485,16 +485,16 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// Send Data
 							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
 							if (sendResult <= 0){
-								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
+								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
 								// Retry 
 								retry++;
 								if (retry >= 3){
-									PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Failed, Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
 									sendRetryStillFailed = true;
 									break;
 								}
 								else{
-									PSU_DEBUG_PRINT(MSG_ALERT, "Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
 								}
 
 							}
@@ -512,7 +512,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						} while (sendResult <= 0);
 
 						if (sendRetryStillFailed == true){
-							PSU_DEBUG_PRINT(MSG_ALERT, "Retry Send Still Failed, Exit Send Thread");
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
 							m_running = false;
 							break;
 						}
@@ -523,7 +523,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-							PSU_DEBUG_PRINT(MSG_ERROR, "Can't create thread!");
+							PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
 						}
 						else{
 							this->m_IOPortReadCMDThread->Run();
@@ -674,7 +674,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// Send Data
 							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(sendCMDVector_Iterator->m_sendData, sendCMDVector_Iterator->m_sendDataLength);
 							if (sendResult <= 0){
-								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Separate Write CMD Failed, sendResult=%d", sendResult);
+								PSU_DEBUG_PRINT(MSG_ERROR, "IO Send Separate Write CMD Failed, sendResult=%d", sendResult);
 								// Retry 
 								retry++;
 								if (retry >= 3){

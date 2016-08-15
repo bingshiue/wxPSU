@@ -856,7 +856,7 @@ istream& operator>>(istream& dataIn, TIHexFileParser& ihLocal)
 					"; calculated 0x" +
 					ihLocal.ucToHexString(intelHexChecksum - byteRead) +
 					" expected 0x" +
-					ihLocal.ucToHexString(byteRead);
+					ihLocal.ucToHexString((unsigned char)byteRead);
 
 				ihLocal.addError(message);
 			}
@@ -1064,15 +1064,15 @@ ostream& operator<<(ostream& dataOut, TIHexFileParser& ihLocal)
 
 				/* Start with the RECLEN record length                        */
 				dataByte = static_cast<unsigned char>(recordData.size() * 2);
-				thisRecord += ihLocal.ucToHexString(dataByte);
+				thisRecord += ihLocal.ucToHexString((unsigned char)dataByte);
 				checksum += dataByte;
 
 				/* Then the LOAD OFFSET                                       */
 				dataByte = static_cast<unsigned char>((loadOffset >> 8) & 0xFF);
-				thisRecord += ihLocal.ucToHexString(dataByte);
+				thisRecord += ihLocal.ucToHexString((unsigned char)dataByte);
 				checksum += dataByte;
 				dataByte = static_cast<unsigned char>(loadOffset & 0xFF);
-				thisRecord += ihLocal.ucToHexString(dataByte);
+				thisRecord += ihLocal.ucToHexString((unsigned char)dataByte);
 				checksum += dataByte;
 
 				/* Then the RECTYP record type (no need to add to checksum -  */

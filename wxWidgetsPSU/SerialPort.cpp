@@ -147,11 +147,11 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 		NULL);                             // Null for Comm Devices
 
 	if (hComm == INVALID_HANDLE_VALUE){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Error! Port %s can't be opened", ComPortName);
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error! Serial Port %s can't be opened", ComPortName);
 		return EXIT_FAILURE;
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ALERT, "Port %s Opened", ComPortName);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Serial Port %s Opened", ComPortName);
 	}
 
 	/*------------------------------- Setting the Parameters for the SerialPort ------------------------------*/
@@ -204,13 +204,13 @@ int DumpComStat(void){
 	DWORD dwErrors;
 	COMSTAT ComStat;
 
-	PSU_DEBUG_PRINT(MSG_ERROR, "DumpComStat");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "DumpComStat");
 
 	ClearCommError(hComm, &dwErrors, &ComStat);
 
-	PSU_DEBUG_PRINT(MSG_ERROR, "dwErrors=%ld", dwErrors);
-	PSU_DEBUG_PRINT(MSG_ERROR, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
-	PSU_DEBUG_PRINT(MSG_ERROR, "ComStat.cbInQue=%ld", ComStat.cbInQue);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "dwErrors=%ld", dwErrors);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "ComStat.cbOutQue=%ld", ComStat.cbOutQue);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "ComStat.cbInQue=%ld", ComStat.cbInQue);
 
 	return ComStat.cbInQue;// Return how many data bytes in In-Queue
 }
@@ -290,7 +290,7 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 		}
 		else
 		{
-			PSU_DEBUG_PRINT(MSG_ERROR, "ERROR in Send, Error = %d", send_err);
+			PSU_DEBUG_PRINT(MSG_ERROR, "Send Data Failed, Error = %d", send_err);
 			// Get Error Information
 			DumpComStat();
 			
@@ -315,15 +315,15 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	BOOL  Status;                          // Status of the various operations
 	int ReadFileStatus;                    //
 	DWORD dwEventMask;                     // Event mask to trigger
-	unsigned char TempChar;                // Temperory Character
-	unsigned char RcvBuf[1024];            //
+	//unsigned char TempChar;                // Temperory Character
+	//unsigned char RcvBuf[1024];            //
 	//char  SerialBuffer[256];             // Buffer Containing Rxed Data
 	DWORD endtime;                         // For Compute Timeout
 	DWORD NoBytesRead;                     // Bytes read by ReadFile()
 	//OVERLAPPED g_ol;                       // Overlapped Sructure */
 	//OVERLAPPED g_ol2;                      // Overlapped Sructure */
-	DWORD dwErrors;
-	COMSTAT ComStat;
+	//DWORD dwErrors;
+	//COMSTAT ComStat;
 	BOOL bWaitForSingle;                   //
 	BOOL bWaitRxCharEvent;                 //
 	DWORD lastError;                       // Last Error
@@ -781,7 +781,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 int CloseSerialPort(void){
 	int ret = SUCCESS;
 
-	PSU_DEBUG_PRINT(MSG_ALERT ,"Close Serial Port %p", hComm);
+	PSU_DEBUG_PRINT(MSG_DEBUG ,"Close Serial Port %p", hComm);
 	CloseHandle(hComm);//Closing the Serial Port
 
 	hComm = INVALID_HANDLE_VALUE;
