@@ -331,6 +331,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	unsigned int i = 0;
 	BOOL WaitCommEventTimeOutFlag = FALSE;
 	BOOL ReadFileOverlappedTimeOutFlag = FALSE;
+	BOOL DataHaveInQueue = FALSE;
 	int InQueue;
 
 
@@ -418,6 +419,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 				}
 				else{
 					WaitCommEventTimeOutFlag = TRUE;
+					DataHaveInQueue = TRUE;
 					PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT InQueue = bytesToRead");
 				}
 				break;
@@ -439,21 +441,24 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEvent : LastError = %d", lastError);
 		}
 
-		if (WaitCommEventTimeOutFlag==TRUE){
+		if (WaitCommEventTimeOutFlag == TRUE && DataHaveInQueue == FALSE){
 
 			break;// while (bWaitRxCharEvent == false)
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEventTimeOutFlag = False");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEventTimeOutFlag = %d", (char)WaitCommEventTimeOutFlag);
 		}
 
 		/*-------------------------- Program will Wait here till a Character is received ------------------------*/
 
-		if (dwEventMask != 0)
+		if (dwEventMask != 0 || DataHaveInQueue == TRUE)
 		{
 			if ((dwEventMask & EV_RXCHAR) != EV_RXCHAR){
-				PSU_DEBUG_PRINT(MSG_ALERT, "dwEventMask != EV_RXCHAR");
-				continue;
+				
+				if (DataHaveInQueue == FALSE){
+					PSU_DEBUG_PRINT(MSG_ALERT, "dwEventMask != EV_RXCHAR");
+					continue;
+				}
 			}
 			else{
 				PSU_DEBUG_PRINT(MSG_DETAIL, "dwEventMask=%d", dwEventMask);
