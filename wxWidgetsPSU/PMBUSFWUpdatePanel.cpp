@@ -38,10 +38,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_dvlRowCount = (this->m_addressRange % 16 == 0) ? this->m_addressRange / 16 : (this->m_addressRange / 16) + 1;
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "startAddress = 0x%08x", this->m_startAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "StartAddress = 0x%08x", this->m_startAddress);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "EndAddress   = 0x%08x", this->m_endAddress);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range= %d", this->m_addressRange);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Data Bytes   = %d", this->m_dataBytes);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Total Data Bytes   = %d", this->m_dataBytes);
 
 	this->m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_statisticSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("File Description"));
@@ -88,7 +88,7 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	}
 
-	this->m_dataBytesST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Data Bytes : "));
+	this->m_dataBytesST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Total Data Bytes : "));
 	this->m_dataBytesST->SetFont(font);
 	wxString DataBytes = wxString::Format("%d", this->m_dataBytes);
 	this->m_dataBytesTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, DataBytes);
