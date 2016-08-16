@@ -39,6 +39,7 @@
 #include "wx/infobar.h"
 #include <wx/stdpaths.h>
 #include <wx/richtext/richtextctrl.h>
+#include <wx/busyinfo.h>
 
 class WXPSU : public wxApp
 {

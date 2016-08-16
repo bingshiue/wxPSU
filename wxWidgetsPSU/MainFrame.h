@@ -429,7 +429,7 @@ private:
 	void HexToBin(void);
 
 	void RegisterDeviceChangeNotify(void);
-	void DeviceChangeHandler(unsigned int Event, unsigned Type);
+	void DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned int pid, unsigned int vid);
 
 	wxDECLARE_EVENT_TABLE();
 

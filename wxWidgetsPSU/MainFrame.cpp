@@ -2150,7 +2150,7 @@ int MainFrame::OpenIODevice(void){
 				}
 				else if (this->m_CurrentUseIOInterface == IOACCESS_HID){
 
-					wxString usbDeviceName(wxT("USB"));
+					wxString usbDeviceName(wxT("R90000-9271(USB)"));
 
 					this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
@@ -2764,11 +2764,17 @@ void MainFrame::RegisterDeviceChangeNotify(void){
 	
 	const GUID GuidInterfaceList[] =
 	{
+		// USB Raw Device Interface Class GUID
 		{ 0xa5dcbf10,  0x6530, 0x11d2, { 0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed } },
+		// Disk Device Interface Class GUID
 		{ 0x53f56307,  0xb6bf, 0x11d0, { 0x94, 0xf2, 0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b } },
+		// Human Interface Device Class GUID
 		{ 0x4d1e55b2,  0xf16f, 0x11Cf, { 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30 } },
+		// COMPORT Device ???
 		{ 0xad498944,  0x762f, 0x11d0, { 0x8d, 0xcb, 0x00, 0xc0, 0x4f, 0xc3, 0x35, 0x8c } },
+		// FTDI_D2XX_Device Class GUID
 		{ 0x219d0508,  0x57a8, 0x4ff5, { 0x97, 0xa1, 0xbd, 0x86, 0x58, 0x7c, 0x6c, 0x7e } },
+		// FTDI_VCP_Device Class GUID
 		{ 0x86e0d1e0L, 0x8089, 0x11d0, { 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 } },
 	};
 
@@ -2785,7 +2791,9 @@ void MainFrame::RegisterDeviceChangeNotify(void){
 
 }
 
-void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type){
+void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned int pid, unsigned int vid){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "PID=%d, VID=%d", pid, vid);
 
 	switch (Event) {
 
@@ -2793,7 +2801,25 @@ void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
 		/* Device Arrival */
 		// If I/O is Close
+		if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_CLOSE){
 
+			wxBusyInfo info
+			(
+				wxBusyInfoFlags()
+				.Parent(this)
+				.Icon(wxArtProvider::GetIcon(wxART_FIND,
+				wxART_OTHER, wxSize(64, 64)))
+				.Title("<b>Find I/O Device</b>")
+				.Text("Please  wait  ...")
+				.Foreground(*wxBLACK)
+				.Background(*wxLIGHT_GREY)
+				.Transparency(wxALPHA_OPAQUE)// 4 * wxALPHA_OPAQUE / 5)
+		    );
+
+			this->CloseIODevice();
+			wxMilliSleep(200);
+			this->OpenIODevice();
+		}
 
 		break;
 
@@ -2801,6 +2827,15 @@ void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
 		/* Device Remove */
 		// If I/O is Open
+		if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
+			this->CloseIODevice();
+			//
+			wxMessageBox(wxT("Please Check I/O Device Connection !"),
+				wxT("Lost I/O Device ! !"),  // caption
+				wxOK | wxICON_ERROR);
+
+			wxMilliSleep(200);
+		}
 
 		break;
 
@@ -2819,40 +2854,49 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 	{
 		PDEV_BROADCAST_HDR pHdr = (PDEV_BROADCAST_HDR)lParam;
 
+		wxString devName;
+		unsigned int pid, vid;
+
 		PDEV_BROADCAST_DEVICEINTERFACE  pDevInf;
 		// PDEV_BROADCAST_HANDLE    pDevHnd; 
 		// PDEV_BROADCAST_OEM       pDevOem; 
-		PDEV_BROADCAST_PORT      pDevPort; 
+		// PDEV_BROADCAST_PORT      pDevPort; 
 		// PDEV_BROADCAST_VOLUME    pDevVolume; 
 		// PDEV_BROADCAST_DEVNODE   pDevNode;
 
 		switch (pHdr->dbch_devicetype)
 		{
 		case DBT_DEVTYP_DEVICEINTERFACE:
-			pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
-			
-			//DeviceUpdate(pDevInf, wParam);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVICEINTERFACE");
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Device Name = %s", pDevInf->dbcc_name);
 
-			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype);
-#if 0
+			pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
+		
+			//DeviceUpdate(pDevInf, wParam);
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_DEVICEINTERFACE");
+			PSU_DEBUG_PRINT(MSG_DETAIL, "Device Name = %s", pDevInf->dbcc_name);
+
+			devName = wxString::Format("%s", pDevInf->dbcc_name);
+			PMBUSHelper::GetPIDAndVIDFromString(devName, &pid, &vid);
+
+			PSU_DEBUG_PRINT(MSG_DETAIL, "PID=%d, VID=%d", pid, vid);
+
+			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+#if 0	
 			switch (wParam){
 
 			case DBT_DEVICEARRIVAL:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
+				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEARRIVAL");
 				// Device Arrival
 
 				break;
 
 			case DBT_DEVICEREMOVECOMPLETE:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
+				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEREMOVECOMPLETE");
 				// Device Remove
 				
 				break;
 
 			default:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "EVENT = %xH", wParam);
+				PSU_DEBUG_PRINT(MSG_DETAIL, "EVENT = %xH", wParam);
 				break;
 			}
 #endif
@@ -2862,29 +2906,34 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 
 		case DBT_DEVTYP_HANDLE:
 			// pDevHnd = (PDEV_BROADCAST_HANDLE)pHdr;
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_HANDLE");
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_HANDLE");
 			break;
 
 		case DBT_DEVTYP_OEM:
 			// pDevOem = (PDEV_BROADCAST_OEM)pHdr;
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_OEM");
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_OEM");
 			break;
 
 		case DBT_DEVTYP_PORT:
 			// pDevPort = (PDEV_BROADCAST_PORT)pHdr;
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_PORT");
-
-			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype);
-
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_PORT");
 #if 0
+			devName = wxString::Format("%s", pDevInf->dbcc_name);
+			PMBUSHelper::GetPIDAndVIDFromString(devName, &pid, &vid);
+
+			PSU_DEBUG_PRINT(MSG_DETAIL, "PID=%d, VID=%d", pid, vid);
+
+			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+
+
 			switch (wParam){
 
 			case DBT_DEVICEARRIVAL:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
+				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEARRIVAL");
 				break;
 
 			case DBT_DEVICEREMOVECOMPLETE:
-				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
+				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEREMOVECOMPLETE");
 				break;
 
 			default:
@@ -2897,22 +2946,20 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 
 		case DBT_DEVTYP_VOLUME:
 			// pDevVolume = (PDEV_BROADCAST_VOLUME)pHdr;
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_VOLUME");
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_VOLUME");
 			break;
 
 		case DBT_DEVTYP_DEVNODE:
 			// pDevNode = (PDEV_BROADCAST_DEVNODE)pHdr;
-			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVNODE");
+			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_DEVNODE");
 			break;
 		}
 	}
 
-	if (true == processed)
-	{
+	if (true == processed){
 		return((WXLRESULT)0);
 	}
-	else
-	{
+	else{
 		// If message was not device insert / remove, call standard handler
 		return wxFrame::MSWWindowProc(nMsg, wParam, lParam);
 	}

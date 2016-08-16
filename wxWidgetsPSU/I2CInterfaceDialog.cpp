@@ -414,7 +414,7 @@ int I2CInterfaceDialog::OpenIODevice(void){
 			}
 			else if (*this->m_currentUseIO == IOACCESS_HID){
 
-				wxString usbDeviceName(wxT("USB"));
+				wxString usbDeviceName(wxT("R90000-9271(USB)"));
 
 				this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 

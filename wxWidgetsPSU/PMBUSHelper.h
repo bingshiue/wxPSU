@@ -57,6 +57,8 @@ public :
 
 	static wxString& GetNowTimeString(void);
 
+	static void GetPIDAndVIDFromString(wxString string, unsigned int* pid, unsigned int* vid);
+
 protected :
 
 private :

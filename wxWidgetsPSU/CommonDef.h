@@ -66,6 +66,9 @@ wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Decla
 
 #define WAIT_DSP_REBOOT_TIME  7000 /**< Wait for DSP Reboot Time (MilliSecond) */
 
+#define I2C_AdaptorModuleBoard_R90000_9271_USB_PID  0x003F
+#define I2C_AdaptorModuleBoard_R90000_9271_USB_VID  0x04D8
+
 /* ----- Below is for debug only ------ */
 
 //#define ISP_DONT_WAIT_RESPONSE /**< For debug, Do ISP Sequence without waiting DSP's response */

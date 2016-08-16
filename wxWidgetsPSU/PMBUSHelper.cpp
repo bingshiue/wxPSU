@@ -643,3 +643,23 @@ wxString& PMBUSHelper::GetNowTimeString(void){
 
 	return m_timeString;
 }
+
+void PMBUSHelper::GetPIDAndVIDFromString(wxString string, unsigned int* pid, unsigned int* vid){
+
+	int pid_start_index = string.Find(wxString("PID_"));
+
+	int vid_start_index = string.Find(wxString("VID_"));
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "pid_start_index=%d, vid_start_index=%d", pid_start_index, vid_start_index);
+
+	wxString sPID = string.SubString(pid_start_index + 4, pid_start_index + 4 + 3);
+
+	wxString sVID = string.SubString(vid_start_index + 4, vid_start_index + 4 + 3);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "pid_string=%s, vid_string=%s", sPID.c_str(), sVID.c_str());
+
+	*pid = PMBUSHelper::HexToDecimal(sPID);
+
+	*vid = PMBUSHelper::HexToDecimal(sVID);
+
+}
