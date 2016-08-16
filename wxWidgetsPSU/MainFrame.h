@@ -4,6 +4,8 @@
 #ifndef _MAINFRAME_H_
 #define _MAINFRAME_H_
 
+#include <windows.h>
+#include <dbt.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -303,6 +305,8 @@ public:
 	*/
 	wxSemaphore *m_rxTxSemaphore;
 
+	HDEVNOTIFY NotificationHandle;
+
 	unsigned int getCurrentUseIOInterface(void);
 	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
 
@@ -311,6 +315,8 @@ public:
 
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
+
+	WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) wxOVERRIDE;
 
 	//TIHexFileParser m_SecondaryTIHexFileStat;
 
@@ -421,6 +427,9 @@ private:
 	void StopMonitor(void);
 
 	void HexToBin(void);
+
+	void RegisterDeviceChangeNotify(void);
+	void DeviceChangeHandler(unsigned int Event, unsigned Type);
 
 	wxDECLARE_EVENT_TABLE();
 

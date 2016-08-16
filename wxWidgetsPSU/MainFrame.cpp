@@ -21,6 +21,8 @@ static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
+	RegisterDeviceChangeNotify();
+	
 	wxInitAllImageHandlers();
 
 	CheckAndLoadConfig();
@@ -2756,6 +2758,164 @@ void MainFrame::HexToBin(void){
 
 
 	fileOutStream.Sync();
+}
+
+void MainFrame::RegisterDeviceChangeNotify(void){
+	
+	const GUID GuidInterfaceList[] =
+	{
+		{ 0xa5dcbf10,  0x6530, 0x11d2, { 0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed } },
+		{ 0x53f56307,  0xb6bf, 0x11d0, { 0x94, 0xf2, 0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b } },
+		{ 0x4d1e55b2,  0xf16f, 0x11Cf, { 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30 } },
+		{ 0xad498944,  0x762f, 0x11d0, { 0x8d, 0xcb, 0x00, 0xc0, 0x4f, 0xc3, 0x35, 0x8c } },
+		{ 0x219d0508,  0x57a8, 0x4ff5, { 0x97, 0xa1, 0xbd, 0x86, 0x58, 0x7c, 0x6c, 0x7e } },
+		{ 0x86e0d1e0L, 0x8089, 0x11d0, { 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 } },
+	};
+
+	DEV_BROADCAST_DEVICEINTERFACE dbch;
+	dbch.dbcc_size = sizeof(dbch);
+	dbch.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+	for (int i = 0; i < sizeof(GuidInterfaceList); i++)
+	{
+		//dbch.dbcc_classguid = FTDI_D2XX_GUID;//FTDI_VCP_GUID;
+		dbch.dbcc_classguid = GuidInterfaceList[i];
+		dbch.dbcc_name[0] = '\0';
+		NotificationHandle = RegisterDeviceNotification(this->GetHWND(), &dbch, DEVICE_NOTIFY_WINDOW_HANDLE);
+	}
+
+}
+
+void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type){
+
+	switch (Event) {
+
+	case DBT_DEVICEARRIVAL:
+		PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
+		/* Device Arrival */
+		// If I/O is Close
+
+
+		break;
+
+	case DBT_DEVICEREMOVECOMPLETE:
+		PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
+		/* Device Remove */
+		// If I/O is Open
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_DEBUG, "EVENT = %xH", Event);
+		break;
+	}
+
+}
+
+WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam){
+	
+	bool processed = false;
+
+	if ((DBT_DEVICEARRIVAL == wParam) || (DBT_DEVICEREMOVECOMPLETE == wParam))
+	{
+		PDEV_BROADCAST_HDR pHdr = (PDEV_BROADCAST_HDR)lParam;
+
+		PDEV_BROADCAST_DEVICEINTERFACE  pDevInf;
+		// PDEV_BROADCAST_HANDLE    pDevHnd; 
+		// PDEV_BROADCAST_OEM       pDevOem; 
+		PDEV_BROADCAST_PORT      pDevPort; 
+		// PDEV_BROADCAST_VOLUME    pDevVolume; 
+		// PDEV_BROADCAST_DEVNODE   pDevNode;
+
+		switch (pHdr->dbch_devicetype)
+		{
+		case DBT_DEVTYP_DEVICEINTERFACE:
+			pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
+			
+			//DeviceUpdate(pDevInf, wParam);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVICEINTERFACE");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Device Name = %s", pDevInf->dbcc_name);
+
+			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype);
+#if 0
+			switch (wParam){
+
+			case DBT_DEVICEARRIVAL:
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
+				// Device Arrival
+
+				break;
+
+			case DBT_DEVICEREMOVECOMPLETE:
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
+				// Device Remove
+				
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_DEBUG, "EVENT = %xH", wParam);
+				break;
+			}
+#endif
+
+			processed = true;
+			break;
+
+		case DBT_DEVTYP_HANDLE:
+			// pDevHnd = (PDEV_BROADCAST_HANDLE)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_HANDLE");
+			break;
+
+		case DBT_DEVTYP_OEM:
+			// pDevOem = (PDEV_BROADCAST_OEM)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_OEM");
+			break;
+
+		case DBT_DEVTYP_PORT:
+			// pDevPort = (PDEV_BROADCAST_PORT)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_PORT");
+
+			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype);
+
+#if 0
+			switch (wParam){
+
+			case DBT_DEVICEARRIVAL:
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
+				break;
+
+			case DBT_DEVICEREMOVECOMPLETE:
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
+				break;
+
+			default:
+
+				break;
+			}
+#endif
+
+			break;
+
+		case DBT_DEVTYP_VOLUME:
+			// pDevVolume = (PDEV_BROADCAST_VOLUME)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_VOLUME");
+			break;
+
+		case DBT_DEVTYP_DEVNODE:
+			// pDevNode = (PDEV_BROADCAST_DEVNODE)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVNODE");
+			break;
+		}
+	}
+
+	if (true == processed)
+	{
+		return((WXLRESULT)0);
+	}
+	else
+	{
+		// If message was not device insert / remove, call standard handler
+		return wxFrame::MSWWindowProc(nMsg, wParam, lParam);
+	}
 }
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
