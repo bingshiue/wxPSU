@@ -284,6 +284,11 @@ wxEND_EVENT_TABLE()
 
 int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done){
 	
+#ifdef CALIBRARTION_HANDLE_0D
+	unsigned char buffer_0D[64*2];
+    int index_0D = 0;
+#endif
+
 	double value1 = 0;
 	double resolution1 = 0;
 	
@@ -356,6 +361,30 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		buffer[active_index++] = 0x0d;
 		buffer[active_index++] = 0x0a;
 
+#ifdef CALIBRARTION_HANDLE_0D
+		index_0D = 0;
+		// Check 0x0d
+		for (int idx = 0; idx < active_index;idx++){ 
+			if (buffer[idx] == 0x0d && idx < active_index - 2){// "active_index-2" means don't handle last 2 bytes (0x0d 0x0a)
+				
+				buffer_0D[index_0D++] = buffer[idx];
+				buffer_0D[index_0D++] = 0x0D;
+			}
+			else{
+				
+				buffer_0D[index_0D++] = buffer[idx];
+			}
+		}
+
+		// Set New Length
+		active_index = index_0D;
+		// Copy New Conten To Original Buffer
+		for (int idx = 0; idx < active_index; idx++){
+			buffer[idx] = buffer_0D[idx];
+		}
+
+#endif
+
 		break;
 
 	case IOACCESS_HID:
@@ -413,6 +442,33 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		buffer[active_index++] = 0x0a;
 
 		buffer[1] = active_index - 2;
+
+#ifdef CALIBRARTION_HANDLE_0D
+
+		index_0D = 0;
+		// Check 0x0d
+		for (int idx = 0; idx < active_index; idx++){
+			if (buffer[idx] == 0x0d && ((idx >= 2) && (idx < active_index - 2))){// "active_index-2" means don't handle last 2 bytes (0x0d 0x0a)
+
+				buffer_0D[index_0D++] = buffer[idx];
+				buffer_0D[index_0D++] = 0x0D;
+			}
+			else{
+
+				buffer_0D[index_0D++] = buffer[idx];
+			}
+		}
+
+		// Set New Length
+		active_index = index_0D;
+		// Copy New Conten To Original Buffer
+		for (int idx = 0; idx < active_index; idx++){
+			buffer[idx] = buffer_0D[idx];
+		}
+
+		buffer[1] = active_index - 2;
+
+#endif
 
 		break;
 

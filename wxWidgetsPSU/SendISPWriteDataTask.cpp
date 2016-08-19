@@ -55,7 +55,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -64,7 +64,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -73,7 +73,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -82,7 +82,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)(address & 0x000000ff);
 		pec_buffer[pec_active_index++] = (unsigned char)(address & 0x000000ff);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -95,7 +95,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -104,7 +104,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -116,7 +116,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -125,7 +125,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -137,7 +137,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -146,7 +146,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -158,7 +158,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -166,7 +166,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -178,7 +178,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -186,7 +186,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -198,7 +198,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -206,7 +206,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -218,7 +218,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -226,7 +226,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -238,7 +238,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -246,7 +246,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -264,7 +264,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		pec_buffer[pec_active_index] = PMBusSlave_Crc8MakeBitwise(0, 7, pec_buffer + 2, 22);
 		pec_active_index++;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -321,7 +321,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -330,7 +330,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -339,7 +339,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0x0000ff00) >> 8);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -348,7 +348,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (unsigned char)(address & 0x000000ff);
 		pec_buffer[pec_active_index++] = (unsigned char)(address & 0x000000ff);
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -361,7 +361,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -370,7 +370,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -382,7 +382,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -391,7 +391,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -403,7 +403,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -412,7 +412,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -424,7 +424,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -433,7 +433,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -445,7 +445,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -454,7 +454,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -466,7 +466,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -475,7 +475,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -487,7 +487,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -496,7 +496,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -508,7 +508,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -517,7 +517,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = data & 0x00ff;
 		pec_buffer[pec_active_index++] = data & 0x00ff;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}
@@ -534,7 +534,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		pec_buffer[pec_active_index] = PMBusSlave_Crc8MakeBitwise(0, 7, pec_buffer + 4, 22);// +((active_index - 1) - 25));
 		pec_active_index++;
 
-#ifdef ISP_HANDLE_OD
+#ifdef ISP_HANDLE_0D
 		if (buffer[active_index - 1] == 0x0d){
 			buffer[active_index++] = 0x0d;
 		}

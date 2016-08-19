@@ -44,7 +44,7 @@ int ReceiveWriteCMDTask::Main(double elapsedTime){
 			PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
 		}
 		else {
-			PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response NG");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
 		}
 
 	}

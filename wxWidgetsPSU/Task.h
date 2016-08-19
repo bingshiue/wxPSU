@@ -44,6 +44,7 @@
 #define TP_ReceiveISPEndCMDTask (0.5f)
 #define TP_SendRebootCheckTask (0.5f)
 #define TP_ReceiveRebootCheckTask (0.5f)
+#define TP_UserCancelISPPostDelay (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -59,7 +60,8 @@ enum {
 	task_ID_SendISPEndCMDTask,
 	task_ID_ReceiveISPEndCMDTask,
 	task_ID_SendRebootCheckTask,
-	task_ID_ReceiveRebootCheckTask
+	task_ID_ReceiveRebootCheckTask,
+	task_ID_UserCancelISPPostDelay
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -594,6 +596,36 @@ public :
 	 * @param elapsedTime elapsed time
 	 * @retval success or failure
 	 */
+	int Main(double elapsedTime);
+
+};
+
+class UserCancelISPPostDelay : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	UserCancelISPPostDelay();
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~UserCancelISPPostDelay(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
 	int Main(double elapsedTime);
 
 };

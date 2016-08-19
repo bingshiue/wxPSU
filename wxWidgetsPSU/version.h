@@ -15,7 +15,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.4        |     Add Millisecond in Log Time Stamp     |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.5        |     Implement Auto Open / Close I/O       |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.4" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.5" /**< Program Version, Shown in About Dialog */
 
 #endif

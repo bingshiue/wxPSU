@@ -13,18 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "CustomEvent.h"
 #include "PMBUSLog.h"
-
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent); /**< Declare Thread Start Event */
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent); /**< Declare Thread Compelete Event */
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent); /**< Declare Thread Update Event */
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent); /**< Declare Thread Update Raw Event */
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent); /**< Declare Thread Update Cook Event */
-
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent); /**< Declare Thread Update CMD Name Event */
-wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< Declare Thread Update Summary Event */
-
-wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Declare ISP SEQUENCE Interrupt Event */
 
 #define DEFAULT_WINDOW_WIDTH   864 /**< Default Window Width */
 #define DEFAULT_WINDOW_HEIGHT  660 /**< Default Window Height */
@@ -50,7 +40,8 @@ wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Decla
 #define UPDATE_PRIMARY_FW_TARGET    0x61 /**< Primary FW Update Target code */
 #define UPDATE_SECONDARY_FW_TARGET  0x60 /**< Secondary FW Update Target code */
 
-#define ISP_HANDLE_OD /**< Handle '0x0d' as special character in ISP */
+#define CALIBRARTION_HANDLE_0D /**< Handle '0x0d' as special character in Calibration */
+#define ISP_HANDLE_0D /**< Handle '0x0d' as special character in ISP */
 
 #define DELAY_READ_ISP_START_VERIFY_RESPONSE  500 /**< Delay Read ISP Start Verify Response */
 
@@ -66,8 +57,10 @@ wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Decla
 
 #define WAIT_DSP_REBOOT_TIME  7000 /**< Wait for DSP Reboot Time (MilliSecond) */
 
-#define I2C_AdaptorModuleBoard_R90000_9271_USB_PID  0x003F
-#define I2C_AdaptorModuleBoard_R90000_9271_USB_VID  0x04D8
+#define UserCancelISP_POST_DELAY_TIME 7000 /**< User Cancel ISP Post Delay Time */
+
+#define I2C_AdaptorModuleBoard_R90000_9271_USB_PID  0x003F /**< R90000 9271 USB PID */
+#define I2C_AdaptorModuleBoard_R90000_9271_USB_VID  0x04D8 /**< R90000 9271 USB VID */
 
 /* ----- Below is for debug only ------ */
 

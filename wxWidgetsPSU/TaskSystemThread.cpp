@@ -18,12 +18,19 @@ TaskSystemThread::~TaskSystemThread(){ }
 wxThread::ExitCode TaskSystemThread::Entry() {
 	// Run Task
 	double dummy = 0;
+	double delta;
+	// Tick Parameter
+	DWORD nowTick, previousTick;
+	nowTick = previousTick = GetTickCount();
 
 	while (this->m_running == true){
 
-		Task::RunTask(dummy);
+		nowTick = GetTickCount();
 
-		//Sleep(1);
+		delta = nowTick - previousTick;
+		previousTick = nowTick;
+		Task::RunTask(delta);
+
 		wxMilliSleep(1);
 	}
 

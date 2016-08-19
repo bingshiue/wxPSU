@@ -222,6 +222,12 @@
     <ClCompile Include="USBGPIOPanel.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="UserCancelISPPostDelay.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSFWProgressDialog.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -360,6 +366,12 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="USBInfoType.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomEvent.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSFWProgressDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

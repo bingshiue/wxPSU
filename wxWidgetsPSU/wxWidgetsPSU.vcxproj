@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -54,6 +54,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;__WXMSW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(WXWIDGETS_HOME)\include;$(WXWIDGETS_HOME)\lib\vc_lib\mswud;$(SolutionDir)\TaskSystem\;$(SolutionDir)\hidapi-0.7.0\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -97,6 +98,7 @@
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
     <ClCompile Include="PMBUSCMDListModel.cpp" />
+    <ClCompile Include="PMBUSFWProgressDialog.cpp" />
     <ClCompile Include="PMBUSFWUpdatePanel.cpp" />
     <ClCompile Include="PMBUSHelper.cpp" />
     <ClCompile Include="PMBUSLogTextCtrl.cpp" />
@@ -132,6 +134,7 @@
     <ClCompile Include="USBInfoPanel.cpp" />
     <ClCompile Include="USBSettingsDialog.cpp" />
     <ClCompile Include="USBSPICANPanel.cpp" />
+    <ClCompile Include="UserCancelISPPostDelay.cpp" />
     <ClCompile Include="WritePage00H.cpp" />
     <ClCompile Include="WritePage01H.cpp" />
     <ClCompile Include="WritePage02H.cpp" />
@@ -160,6 +163,7 @@
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="ComportDialog.h" />
+    <ClInclude Include="CustomEvent.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="IOAccess.h" />
@@ -175,6 +179,7 @@
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />
     <ClInclude Include="PMBUSCMDListModel.h" />
+    <ClInclude Include="PMBUSFWProgressDialog.h" />
     <ClInclude Include="PMBUSFWUpdatePanel.h" />
     <ClInclude Include="PMBUSHelper.h" />
     <ClInclude Include="PMBUSLog.h" />

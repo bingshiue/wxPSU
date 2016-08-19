@@ -22,6 +22,7 @@
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
 #include "PMBUSLogTextCtrl.h"
+#include "PMBUSFWProgressDialog.h"
 
 #include "Task.h"
 
@@ -111,6 +112,8 @@ private:
 
 	wxString m_hexFilePath;
 
+	PMBUSFWProgressDialog *m_progressDialog;
+
 	unsigned long m_startAddress;
 	unsigned long m_endAddress;
 	unsigned long m_addressRange;
@@ -127,6 +130,8 @@ private:
 
 	void OnPopUpMenu(wxDataViewEvent &event);
 	void OnSaveHex(wxCommandEvent& event);
+
+	void OnProgressUpdate(wxThreadEvent& event);
 
 	void DoLogLine(
 		wxLogLevel level,

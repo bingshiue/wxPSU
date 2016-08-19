@@ -1667,6 +1667,10 @@ void MainFrame::OnInfoBarTimer(wxTimerEvent& WXUNUSED(event)){
 }
 
 void MainFrame::StartMonitor(void){
+	
+	// Select Notebook Page 0
+	this->m_notebook->SetSelection(0);
+	
 	this->m_monitor_running = true;
 
 	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
@@ -2287,6 +2291,9 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 
 		case ISP_Status_UserRequestCancel:
 			// User Cancel ISP
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel ISP Sequence !");
+
+			new(TP_UserCancelISPPostDelay) UserCancelISPPostDelay();
 
 			break;
 

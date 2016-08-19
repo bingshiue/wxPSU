@@ -4,6 +4,8 @@
 
 #include "PMBUSFWUpdatePanel.h"
 
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, wxThreadEvent);
+
 PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
 
 	this->m_parent = parent;
@@ -243,6 +245,15 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
+#if 0
+	//m_progressDialog = new PMBUSFWProgressDialog(this, wxT("Test Dialog"), 100);
+	//m_progressDialog->Show();
+	//m_progressDialog->Centre(wxCENTER_ON_SCREEN);
+
+	//m_progressDialog->Destroy();
+	//return;
+#endif
+
 	this->m_writeCount++;
 
 	wxLog* oldLogger = wxLog::GetActiveTarget();
@@ -252,6 +263,18 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
 			wxT("Monitor is running !"),  // caption
 			wxOK | wxICON_INFORMATION);
+
+		return;
+	}
+
+	// If User Cancel ISP Sequence Previous
+	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelay) > 0){
+		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"
+			                                "Due to Previous ISP Sequence Has been Canceled !", UserCancelISP_POST_DELAY_TIME/1000);
+
+		wxMessageBox(content,
+			wxT("Please Wait !"),  // caption
+			wxOK | wxICON_WARNING);
 
 		return;
 	}
@@ -327,6 +350,8 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 	// Wait for ISP Sequence End
 	while (inProcess) {//Task::GetCount() > 0){
+
+		information = wxString(wxT(""));
 
 		if (ispStatus == ISP_Status_InProgress || ispStatus == ISP_Status_VerifyBeforeStart){
 
@@ -432,8 +457,12 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		}
 		
 		//PSU_DEBUG_PRINT(MSG_DETAIL, "Percentage = %f, Processed bytes = %d, data bytes = %d, Current Address = %08x", percentage, processed_bytes, this->m_dataBytes, currentAddress);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %.2f%%", percentage);
-
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %.2f%%", percentage);
+		
+		//wxThreadEvent* threadISPProgressUpdateEvt;
+		//threadISPProgressUpdateEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_PROGRESS_UPDATE);
+		//threadISPProgressUpdateEvt->SetString(wxString::Format("Percentage = %.2f%%", percentage));
+		//wxQueueEvent(this->GetEventHandler(), threadISPProgressUpdateEvt);
 
 		// Update Dialogs
 		not_cancel = dialog.Update((int)percentage, information);
@@ -470,7 +499,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			wxLog::FlushActive();
 		}
 
-		wxMilliSleep(200);
+		//wxMilliSleep(200);
 	} // while (inProcess) 
 
 	if (this->m_developerMode == Generic_Disable){
@@ -488,11 +517,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 			break;
 
-		case ISP_Status_UserRequestCancel:
-			// User Cancel ISP
-
-			break;
-
+		case ISP_Status_UserRequestCancel:// User Cancel ISP
 		case ISP_Status_SendDataFailed:
 		case ISP_Status_ResponseDataError:
 		case ISP_Status_RebootCheckError:
@@ -692,9 +717,21 @@ void PMBUSFWUpdatePanel::DoLogRecord(wxLogLevel level, const wxString& msg, cons
 }
 
 
+void PMBUSFWUpdatePanel::OnProgressUpdate(wxThreadEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s", event.GetString());
+
+	// Flush Log
+	//if (this->m_developerMode == Generic_Disable){
+		//wxLog::FlushActive();
+	//}
+
+}
+
 wxBEGIN_EVENT_TABLE(PMBUSFWUpdatePanel, wxPanel)
 EVT_BUTTON(CID_WRITE_BUTTON, PMBUSFWUpdatePanel::OnWriteButton)
 EVT_BUTTON(CID_CLOSE_BUTTON, PMBUSFWUpdatePanel::OnCloseButton)
 EVT_MENU(MENU_ID_POPUP_SAVEHEX, PMBUSFWUpdatePanel::OnSaveHex)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_HEXMMAP_DVC, PMBUSFWUpdatePanel::OnPopUpMenu)
+EVT_THREAD(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, PMBUSFWUpdatePanel::OnProgressUpdate)
 wxEND_EVENT_TABLE()
