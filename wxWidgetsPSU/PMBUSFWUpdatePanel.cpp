@@ -147,7 +147,8 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		this->m_popupMenu->Append(this->m_saveHexMenuItem);
 	}
 	else{
-
+#if 0
+		// Initialize & Add log TextCtrl into Sizer
 		this->m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
 
 		// use fixed width font to align output in nice columns
@@ -157,6 +158,7 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		this->m_logTC->SetFont(font);
 
 		this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Expand());
+#endif
 	}
 
 	this->SetSizerAndFit(this->m_topLevelSizer);
@@ -245,20 +247,7 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
-#if 0
-	//m_progressDialog = new PMBUSFWProgressDialog(this, wxT("Test Dialog"), 100);
-	//m_progressDialog->Show();
-	//m_progressDialog->Centre(wxCENTER_ON_SCREEN);
-
-	//m_progressDialog->Destroy();
-	//return;
-#endif
-
-	this->m_writeCount++;
-
-	wxLog* oldLogger = wxLog::GetActiveTarget();
-
-	// Check if Monitor is Running
+	/*** Check if Monitor is Running ***/
 	if (*this->m_isMonitorRunning == true){
 		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
 			wxT("Monitor is running !"),  // caption
@@ -267,8 +256,8 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		return;
 	}
 
-	// If User Cancel ISP Sequence Previous
-	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelay) > 0){
+	/*** If User Cancel ISP Sequence Previous ***/
+	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){
 		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"
 			                                "Due to Previous ISP Sequence Has been Canceled !", UserCancelISP_POST_DELAY_TIME/1000);
 
@@ -279,11 +268,58 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		return;
 	}
 
+	/*** Write Count For Debug Perpose ***/
+	this->m_writeCount++;
+	PSU_DEBUG_PRINT(MSG_ALERT, "Write Count = %d", this->m_writeCount);
+
+	/*** Save Old Log Active Target ***/
+	//wxLog* oldLogger = wxLog::GetActiveTarget();
+
+#if 0
+	/*** Setup New Log Active Target ***/
 	if (this->m_developerMode == Generic_Disable){
 		// Change Logger Target
 		wxLog::SetActiveTarget(this);
 	}
+#endif
 
+#if 0
+	// Prepare Send Buffer
+	unsigned char SendBuffer[8] = {
+		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
+	};
+
+	unsigned char pec = 0;
+	pec = PMBusSlave_Crc8MakeBitwise(0, 7, SendBuffer + 2, 3);
+
+	SendBuffer[5] = pec;
+
+	/*** Prpare Send Data Buffer ***/
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = this->ProductSendBuffer(SendBuffer);
+
+	PMBUSSendCOMMAND_t CMDF0H;
+
+	CMDF0H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+		CMDF0H.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	/*** Jump To Start Address of Hex File ***/
+	this->m_tiHexFileStat.begin();
+
+	/*** Initialize ISP related Parameters ***/
+	unsigned char ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
+	double percentage = 0;
+	wxString information("");
+	int not_cancel;
+	bool inProcess = true;
+	unsigned char header_index = 0;
+	unsigned int try_end = 0;
+#endif
+
+	/*** Decide Dialog Title String ***/
 	wxString dialogTitle;
 	if (this->m_target == UPDATE_PRIMARY_FW_TARGET){
 		dialogTitle = wxString("Primary FW");
@@ -294,8 +330,9 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 	dialogTitle += wxT(" ISP Progress");
 
-	// Create Progress Dialog
-	wxProgressDialog dialog(dialogTitle,
+#if 0
+	/*** Create Progress Dialog ***/
+	m_progressDialog = new wxProgressDialog(dialogTitle,
 		// "Reserve" enough space for the multiline
 		// messages below, we'll change it anyhow
 		// immediately in the loop below
@@ -311,43 +348,37 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		//wxPD_REMAINING_TIME |
 		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
 		);
-
-#if 0
-	// Prepare Send Buffer
-	unsigned char SendBuffer[8] = {
-		0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
-	};
-
-	unsigned char pec = 0;
-	pec = PMBusSlave_Crc8MakeBitwise(0, 7, SendBuffer + 2, 3);
-
-	SendBuffer[5] = pec;
 #endif
 
-	unsigned char SendBuffer[64];
-	unsigned int sendDataLength = this->ProductSendBuffer(SendBuffer);
-
-
-	PMBUSSendCOMMAND_t CMDF0H;
-
-	CMDF0H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
-	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
-		CMDF0H.m_sendData[idx] = SendBuffer[idx];
-	}
-
-	this->m_tiHexFileStat.begin();
-	unsigned char ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
-	double percentage = 0;
-	wxString information("");
-
+#if 0
+	/*** Create SendISPStartCMD Task ***/
 	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, &this->m_tiHexFileStat, &ispStatus, this->m_target);
+#endif
+	
+	/*** Send ISP Start Event To Main Thread ***/
+	wxThreadEvent *threadISPStart_evt;
 
-	int not_cancel;
-	bool inProcess = true;
-	unsigned char header_index = 0;
-	unsigned int try_end = 0;
+	threadISPStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_SEQUENCE_START);
+	threadISPStart_evt->SetString(dialogTitle);
+	threadISPStart_evt->SetInt(m_target);
+	wxQueueEvent(this->m_parent->GetParent()->GetEventHandler(), threadISPStart_evt);
 
+#if 0
+	m_ispSequenceThread = new ISPSequenceThread(m_hexFilePath, &m_tiHexFileStat, m_ioaccess, m_currentIO, m_target, m_developerMode, this->m_parent->GetParent()->GetEventHandler(), m_progressDialog);
+	// If Create Thread Success
+	if (this->m_ispSequenceThread->Create() != wxTHREAD_NO_ERROR){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create ISP Sequence Thread");
+	}
+	else{
+		this->m_ispSequenceThread->Run();
+	}
+#endif
+
+	//m_progressDialog->ShowModal();
+	
+	//m_progressDialog->Destroy();
+
+#if 0
 	// Wait for ISP Sequence End
 	while (inProcess) {//Task::GetCount() > 0){
 
@@ -507,6 +538,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		wxLog::SetActiveTarget(oldLogger);
 	}
 
+
 	// Send ISP Interrupt Event To Main Thread
 	wxThreadEvent* threadISPInterrupt_evt;
 	if ((ispStatus & 0xff) > 0x02) {
@@ -534,8 +566,8 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 		}
 	}
+#endif
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Write Count = %d", this->m_writeCount);
 }
 
 void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){

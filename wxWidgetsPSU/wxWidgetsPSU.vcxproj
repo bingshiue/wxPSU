@@ -90,6 +90,7 @@
     <ClCompile Include="ComportDialog.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="I2CInterfaceDialog.cpp" />
+    <ClCompile Include="ISPSequenceThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="PEC.cpp" />
@@ -134,7 +135,8 @@
     <ClCompile Include="USBInfoPanel.cpp" />
     <ClCompile Include="USBSettingsDialog.cpp" />
     <ClCompile Include="USBSPICANPanel.cpp" />
-    <ClCompile Include="UserCancelISPPostDelay.cpp" />
+    <ClCompile Include="UserCancelISPPostDelayTask.cpp" />
+    <ClCompile Include="UserCancelISPTask.cpp" />
     <ClCompile Include="WritePage00H.cpp" />
     <ClCompile Include="WritePage01H.cpp" />
     <ClCompile Include="WritePage02H.cpp" />
@@ -167,6 +169,7 @@
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="IOAccess.h" />
+    <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="PEC.h" />

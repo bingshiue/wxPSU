@@ -44,7 +44,8 @@
 #define TP_ReceiveISPEndCMDTask (0.5f)
 #define TP_SendRebootCheckTask (0.5f)
 #define TP_ReceiveRebootCheckTask (0.5f)
-#define TP_UserCancelISPPostDelay (0.5f)
+#define TP_UserCancelISPPostDelayTask (0.5f)
+#define TP_UserCancelISPTask (0.9f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -61,7 +62,8 @@ enum {
 	task_ID_ReceiveISPEndCMDTask,
 	task_ID_SendRebootCheckTask,
 	task_ID_ReceiveRebootCheckTask,
-	task_ID_UserCancelISPPostDelay
+	task_ID_UserCancelISPPostDelayTask,
+	task_ID_UserCancelISPTask
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -224,6 +226,11 @@ public:
 	* @retval success or failure
 	*/
 	int Main(double elapsedTime);
+
+	/**
+	 * @brief Product ISP Start CMD Send Buffer.
+	 */
+	unsigned int ProductISPStartCMDSendBuffer(unsigned char* buffer);
 };
 
 class SendISPWriteDataTask : public TaskEx {
@@ -600,7 +607,7 @@ public :
 
 };
 
-class UserCancelISPPostDelay : public TaskEx {
+class UserCancelISPPostDelayTask : public TaskEx {
 
 	double m_elapsedTimer;/**< for compute elapsed time */
 
@@ -608,12 +615,12 @@ public:
 	/**
 	 * @brief Constructor.
 	 */
-	UserCancelISPPostDelay();
+	UserCancelISPPostDelayTask();
 
 	/**
 	 * @brief Deconstructor.
 	 */
-	~UserCancelISPPostDelay(void);
+	~UserCancelISPPostDelayTask(void);
 
 	/**
 	* @brief Draw function.
@@ -628,6 +635,37 @@ public:
 	*/
 	int Main(double elapsedTime);
 
+};
+
+class UserCancelISPTask : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	unsigned char* m_ispStatus;
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	UserCancelISPTask(unsigned char* ispStatus);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~UserCancelISPTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
 };
 
 #endif

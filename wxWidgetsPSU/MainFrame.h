@@ -41,6 +41,7 @@
 #include "AboutDialog.h"
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
+#include "ISPSequenceThread.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -132,11 +133,15 @@ public:
 	IOPortReadCMDThread *m_IOPortReadCMDThread;/**< Handle of IO Port Read Command Thread */
 	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle of IO Port Send Command Thread */
 
+	ISPSequenceThread* m_ispSequenceThread;
+
 	TaskSystemThread *m_TaskSystemThread;/**< Handle of Task System Thread */
 
 	bool m_sendThreadStopFlag;
 
 	unsigned char m_destroying;
+
+	unsigned char m_ispStatus;
 
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
@@ -318,7 +323,11 @@ protected:
 
 	WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) wxOVERRIDE;
 
-	//TIHexFileParser m_SecondaryTIHexFileStat;
+	TIHexFileParser m_PrimaryTIHexFileStat;
+	TIHexFileParser m_SecondaryTIHexFileStat;
+
+	//wxProgressDialog *m_progressDialog;
+	PMBUSFWProgressDialog *m_pmbusProgressDialog;
 
 private:
 
@@ -395,6 +404,7 @@ private:
 	void OnSendThreadUpdateCMDName(wxThreadEvent& event);
 	void OnSendThreadUpdateSummary(wxThreadEvent& event);
 
+	void OnISPSequenceStart(wxThreadEvent& event);
 	void OnISPSequenceInterrupt(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));

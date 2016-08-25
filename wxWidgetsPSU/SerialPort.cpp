@@ -411,16 +411,16 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 			switch (dwRes){
 
 			case WAIT_TIMEOUT:
-				PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject WAIT_TIMEOUT");
 				InQueue = DumpComStat();
 				if (InQueue != bytesToRead){
 					WaitCommEventTimeOutFlag = TRUE;
-					PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT InQueue != bytesToRead");
+					PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject WAIT_TIMEOUT InQueue != bytesToRead");
 				}
 				else{
 					WaitCommEventTimeOutFlag = TRUE;
 					DataHaveInQueue = TRUE;
-					PSU_DEBUG_PRINT(MSG_ALERT, "WaitForSingleObject WAIT_TIMEOUT InQueue = bytesToRead");
+					PSU_DEBUG_PRINT(MSG_DEBUG, "WaitForSingleObject WAIT_TIMEOUT InQueue = bytesToRead");
 				}
 				break;
 
@@ -439,6 +439,7 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 		}
 		else{
 			PSU_DEBUG_PRINT(MSG_DEBUG, "WaitCommEvent : LastError = %d", lastError);
+			break;// while (bWaitRxCharEvent == false)
 		}
 
 		if (WaitCommEventTimeOutFlag == TRUE && DataHaveInQueue == FALSE){

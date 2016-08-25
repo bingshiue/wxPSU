@@ -508,8 +508,10 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	case IOACCESS_SERIALPORT:
 
+		//PSU_DEBUG_PRINT(MSG_ALERT, "%d", this->m_calibrationItemCB->GetSelection());
+
 		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
-			m_calibrationItemString[SendBuffer[INDEX_CALIBRATION_ITEM]].c_str(), 
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
 			SendBuffer[INDEX_POINTER],
 			value1,
 			value2);
@@ -630,7 +632,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	case IOACCESS_SERIALPORT:
 
 		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
-			m_calibrationItemString[SendBuffer[INDEX_CALIBRATION_ITEM]].c_str(),
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
 			SendBuffer[INDEX_POINTER],
 			value1,
 			value2);

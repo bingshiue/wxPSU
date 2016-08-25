@@ -15,7 +15,12 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
 
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
+
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
@@ -1243,17 +1248,19 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	}
 
 	/* Decode file                                                            */
-	TIHexFileParser tiHexFileStat;
-	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
+	//TIHexFileParser tiHexFileStat;
+	//TIHexInput >> tiHexFileStat;
+	m_PrimaryTIHexFileStat.ClearALL();
+	TIHexInput >> m_PrimaryTIHexFileStat; //
 
 	// Check Errors
-	if (tiHexFileStat.getNoErrors() != 0){
+	if (m_PrimaryTIHexFileStat.getNoErrors() != 0){
 		
 		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Errors :");
 
-		while (tiHexFileStat.getNoErrors() != 0){
+		while (m_PrimaryTIHexFileStat.getNoErrors() != 0){
 			string error_str;
-			tiHexFileStat.popNextError(error_str);
+			m_PrimaryTIHexFileStat.popNextError(error_str);
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_str.c_str());
 		}
 		
@@ -1266,13 +1273,13 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 	}
 
 	// Check Warnings
-	if (tiHexFileStat.getNoWarnings() != 0)
+	if (m_PrimaryTIHexFileStat.getNoWarnings() != 0)
 	{
 		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Warnings :");
 
-		while (tiHexFileStat.getNoWarnings() != 0){
+		while (m_PrimaryTIHexFileStat.getNoWarnings() != 0){
 			string warning_str;
-			tiHexFileStat.popNextWarning(warning_str);
+			m_PrimaryTIHexFileStat.popNextWarning(warning_str);
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warning_str.c_str());
 		}
 
@@ -1283,11 +1290,12 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
 
 	/* Fill Blank Address                                                     */
-	tiHexFileStat.fillBlankAddr(0xffff);
+	//tiHexFileStat.fillBlankAddr(0xffff);
+	m_PrimaryTIHexFileStat.fillBlankAddr(0xffff);
 
 
 	if (!this->PMBusPrimaryFWUpdatePanel){
-		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET, this->m_appSettings.m_developerMode);
+		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, m_PrimaryTIHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET, this->m_appSettings.m_developerMode);
 	}
 
 	// Add page to NoteBook
@@ -1365,24 +1373,54 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	}
 
 	/* Decode file                                                            */
-	TIHexFileParser tiHexFileStat;
-	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
+	//TIHexFileParser tiHexFileStat;
+	//TIHexInput >> tiHexFileStat;
+	m_SecondaryTIHexFileStat.ClearALL();
+	TIHexInput >> m_SecondaryTIHexFileStat; //
 
-	if (tiHexFileStat.getNoErrors() != 0){
-		wxMessageBox(wxT("Load Hex File Error"),
-		wxT("Error !"),
-		wxOK | wxICON_ERROR);
+	// Check Errors
+	if (m_SecondaryTIHexFileStat.getNoErrors() != 0){
+
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Errors :");
+
+		while (m_SecondaryTIHexFileStat.getNoErrors() != 0){
+			string error_str;
+			m_SecondaryTIHexFileStat.popNextError(error_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_str.c_str());
+		}
+
+
+		wxMessageBox(wxT("Load Hex File Has Error"),
+			wxT("Error !"),
+			wxOK | wxICON_ERROR);
 
 		return;
 	}
 
+	// Check Warnings
+	if (m_SecondaryTIHexFileStat.getNoWarnings() != 0)
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Warnings :");
+
+		while (m_SecondaryTIHexFileStat.getNoWarnings() != 0){
+			string warning_str;
+			m_SecondaryTIHexFileStat.popNextWarning(warning_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warning_str.c_str());
+		}
+
+		wxMessageBox(wxT("Load Hex File Has Warning"),
+			wxT("Warning !"),
+			wxOK | wxICON_WARNING);
+	}
+
 
 	/* Fill Blank Address                                                     */
-	tiHexFileStat.fillBlankAddr(0xffff);
+	//tiHexFileStat.fillBlankAddr(0xffff);
+	m_SecondaryTIHexFileStat.fillBlankAddr(0xffff);
 
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, tiHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET, this->m_appSettings.m_developerMode);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, m_SecondaryTIHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET, this->m_appSettings.m_developerMode);
 	}
 	
 	// Add page to NoteBook
@@ -2216,6 +2254,14 @@ void MainFrame::OnSendThreadStart(wxThreadEvent& event){
 void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 {
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Send Thread Completion");
+	
+	int HasSendFail = event.GetInt();
+
+	// Close I/O Device
+	if (HasSendFail == TRUE){
+		this->CloseIODevice();
+	}
+	
 	this->m_sendThreadStopFlag = true;
 
 	// Reset Monitor Parameters
@@ -2271,8 +2317,98 @@ void MainFrame::OnSendThreadUpdateSummary(wxThreadEvent& event){
 
 }
 
-void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
+void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceStart");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Target = %d", event.GetInt());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Title  = %s", event.GetString().c_str());
+
+	TIHexFileParser *hexFileParser = NULL;
+
+	int target = event.GetInt();
+	wxString dialogTitle = event.GetString();
+
+#if 0
+	/*** Create Progress Dialog ***/
+	m_progressDialog = new wxProgressDialog(dialogTitle,
+		// "Reserve" enough space for the multiline
+		// messages below, we'll change it anyhow
+		// immediately in the loop below
+		wxString(' ', 100) + "\n\n\n\n",
+		100,    // range
+		this->m_notebook,  // parent
+		wxPD_CAN_ABORT |
+		//wxPD_CAN_SKIP |
+		wxPD_APP_MODAL |
+		//wxPD_AUTO_HIDE | // -- try this as well
+		wxPD_ELAPSED_TIME |
+		//wxPD_ESTIMATED_TIME |
+		//wxPD_REMAINING_TIME |
+		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
+		);
+#endif
+
+#if 0
+	/*** Create Progress Dialog ***/
+	wxProgressDialog progressDialog(dialogTitle,
+		// "Reserve" enough space for the multiline
+		// messages below, we'll change it anyhow
+		// immediately in the loop below
+		wxString(' ', 100) + "\n\n\n\n",
+		100,    // range
+		this->m_notebook,  // parent
+		wxPD_CAN_ABORT |
+		//wxPD_CAN_SKIP |
+		wxPD_APP_MODAL |
+		//wxPD_AUTO_HIDE | // -- try this as well
+		wxPD_ELAPSED_TIME |
+		//wxPD_ESTIMATED_TIME |
+		//wxPD_REMAINING_TIME |
+		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
+		);
+#endif
+
+	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus);
+
+	switch (target){
 	
+	case UPDATE_PRIMARY_FW_TARGET:
+		hexFileParser = &this->m_PrimaryTIHexFileStat;
+		break;
+
+	case UPDATE_SECONDARY_FW_TARGET:
+		hexFileParser = &this->m_SecondaryTIHexFileStat;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Target Code Error !");
+		break;
+	}
+
+	/*** Start ISP Sequence Thread ***/
+	m_ispSequenceThread = new ISPSequenceThread(wxString(wxT("FilePath")), hexFileParser, this->m_IOAccess, &this->m_CurrentUseIOInterface, target, this->m_appSettings.m_developerMode, this->GetEventHandler(), m_pmbusProgressDialog->GetEventHandler(), &this->m_ispStatus, NULL);
+	// If Create Thread Success
+	if (this->m_ispSequenceThread->Create() != wxTHREAD_NO_ERROR){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create ISP Sequence Thread");
+	}
+	else{
+		this->m_ispSequenceThread->Run();
+	}
+
+	m_pmbusProgressDialog->Centre();
+	int retCode = m_pmbusProgressDialog->ShowModal();
+	if (retCode == wxID_CANCEL){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel ISP Sequence");
+		this->m_ispStatus = ISP_Status_UserRequestCancel;
+	}
+
+
+	m_pmbusProgressDialog->Destroy();
+
+}
+
+void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceInterrupt");
 
 	int ispStatus = event.GetInt();
@@ -2293,29 +2429,29 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 			// User Cancel ISP
 			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel ISP Sequence !");
 
-			new(TP_UserCancelISPPostDelay) UserCancelISPPostDelay();
+			new(TP_UserCancelISPPostDelayTask) UserCancelISPPostDelayTask();
 
 			break;
 
 		case ISP_Status_SendDataFailed:
 			wxMessageBox(wxT("Send Data Failed ! \n\n IO Port Send Data Failed"),
-						 wxT("Error !"),  // caption
-						 wxOK | wxICON_ERROR);
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
 
 			break;
 
 		case ISP_Status_ResponseDataError:
 			wxMessageBox(wxT("Response Data Error ! \n\n This may caused by Unstable IO or Incorrect Image"),
-						 wxT("Error !"),  // caption
-						 wxOK | wxICON_ERROR);
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
 
 			break;
 
 
 		case ISP_Status_RebootCheckError:
 			wxMessageBox(wxT("DSP Reboot Check Error ! \n\n DSP Reboot Failed"),
-						 wxT("Error !"),  // caption
-						 wxOK | wxICON_ERROR);
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
 
 			break;
 
@@ -2325,6 +2461,12 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 
 		}
 	}
+
+	//m_progressDialog->Resume();
+
+	//if (m_progressDialog){
+	//m_progressDialog->Destroy();
+	//}
 
 }
 
@@ -2835,6 +2977,13 @@ void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned
 		/* Device Remove */
 		// If I/O is Open
 		if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
+			
+			// If Monitor is running
+			if (this->m_monitor_running == true){
+				StopMonitor();
+				wxMilliSleep(100);
+			}
+			
 			this->CloseIODevice();
 			//
 			wxMessageBox(wxT("Please Check I/O Device Connection !"),
@@ -2867,7 +3016,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 		PDEV_BROADCAST_DEVICEINTERFACE  pDevInf;
 		// PDEV_BROADCAST_HANDLE    pDevHnd; 
 		// PDEV_BROADCAST_OEM       pDevOem; 
-		// PDEV_BROADCAST_PORT      pDevPort; 
+		PDEV_BROADCAST_PORT      pDevPort; 
 		// PDEV_BROADCAST_VOLUME    pDevVolume; 
 		// PDEV_BROADCAST_DEVNODE   pDevNode;
 
@@ -2878,32 +3027,36 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 			pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
 		
 			//DeviceUpdate(pDevInf, wParam);
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_DEVICEINTERFACE");
-			PSU_DEBUG_PRINT(MSG_DETAIL, "Device Name = %s", pDevInf->dbcc_name);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVICEINTERFACE");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Device Name = %s", pDevInf->dbcc_name);
 
 			devName = wxString::Format("%s", pDevInf->dbcc_name);
 			PMBUSHelper::GetPIDAndVIDFromString(devName, &pid, &vid);
 
-			PSU_DEBUG_PRINT(MSG_DETAIL, "PID=%d, VID=%d", pid, vid);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "PID=%d, VID=%d", pid, vid);
 
-			this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+			if (this->m_CurrentUseIOInterface == IOACCESS_HID){
+				if(pid == I2C_AdaptorModuleBoard_R90000_9271_USB_PID && vid == I2C_AdaptorModuleBoard_R90000_9271_USB_VID){
+					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+				}
+			}
 #if 0	
 			switch (wParam){
 
 			case DBT_DEVICEARRIVAL:
-				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEARRIVAL");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEARRIVAL");
 				// Device Arrival
 
 				break;
 
 			case DBT_DEVICEREMOVECOMPLETE:
-				PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVICEREMOVECOMPLETE");
+				PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVICEREMOVECOMPLETE");
 				// Device Remove
 				
 				break;
 
 			default:
-				PSU_DEBUG_PRINT(MSG_DETAIL, "EVENT = %xH", wParam);
+				PSU_DEBUG_PRINT(MSG_DEBUG, "EVENT = %xH", wParam);
 				break;
 			}
 #endif
@@ -2913,17 +3066,28 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 
 		case DBT_DEVTYP_HANDLE:
 			// pDevHnd = (PDEV_BROADCAST_HANDLE)pHdr;
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_HANDLE");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_HANDLE");
 			break;
 
 		case DBT_DEVTYP_OEM:
 			// pDevOem = (PDEV_BROADCAST_OEM)pHdr;
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_OEM");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_OEM");
 			break;
 
 		case DBT_DEVTYP_PORT:
-			// pDevPort = (PDEV_BROADCAST_PORT)pHdr;
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_PORT");
+			pDevPort = (PDEV_BROADCAST_PORT)pHdr;
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_PORT");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Device Name = %s", pDevPort->dbcp_name);
+
+			devName = wxString::Format("%s", pDevPort->dbcp_name);
+			PMBUSHelper::GetPIDAndVIDFromString(devName, &pid, &vid);
+
+			PSU_DEBUG_PRINT(MSG_DEBUG, "PID=%d, VID=%d", pid, vid);
+
+			if(this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT){
+				this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+			}
+
 #if 0
 			devName = wxString::Format("%s", pDevInf->dbcc_name);
 			PMBUSHelper::GetPIDAndVIDFromString(devName, &pid, &vid);
@@ -2953,12 +3117,12 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 
 		case DBT_DEVTYP_VOLUME:
 			// pDevVolume = (PDEV_BROADCAST_VOLUME)pHdr;
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_VOLUME");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_VOLUME");
 			break;
 
 		case DBT_DEVTYP_DEVNODE:
 			// pDevNode = (PDEV_BROADCAST_DEVNODE)pHdr;
-			PSU_DEBUG_PRINT(MSG_DETAIL, "DBT_DEVTYP_DEVNODE");
+			PSU_DEBUG_PRINT(MSG_DEBUG, "DBT_DEVTYP_DEVNODE");
 			break;
 		}
 	}
@@ -3021,6 +3185,7 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
 
+EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_CLOSE(MainFrame::OnWindowClose)

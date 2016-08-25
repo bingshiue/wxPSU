@@ -24,7 +24,12 @@
 class PMBUSFWProgressDialog : public wxDialog, private wxLog
 {
 public:
-	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range);
+
+	enum {
+		CID_BTN_CANCELOK = 6060,
+	};
+
+	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus);
 
 	~PMBUSFWProgressDialog();
 
@@ -36,7 +41,9 @@ protected:
 
 
 private:
-	
+
+	wxStaticText *m_infoST;
+
 	wxLog *m_oldLog;
 
 	wxBoxSizer *m_topLevelSizer;
@@ -47,12 +54,27 @@ private:
 
 	PMBUSLogTextCtrl *m_logTC;
 
+	unsigned char* m_ispStatus;
+
+#if wxUSE_TIMER
+	wxTimer m_timer;
+#endif
+
+	wxDateTime m_beginTime;
+
 	void DoLogLine(
 		wxLogLevel level,
 		wxTextCtrl *text,
 		const wxString& timestr,
 		const wxString& threadstr,
 		const wxString& msg);
+
+	void OnISPSequenceUpdate(wxThreadEvent& event);
+	void OnISPSequenceEnd(wxThreadEvent& event);
+
+	void OnBtnCancelOK(wxCommandEvent& event);
+
+	void OnDialogClose(wxCloseEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

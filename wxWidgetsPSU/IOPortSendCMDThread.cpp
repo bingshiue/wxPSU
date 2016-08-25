@@ -792,7 +792,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 		break;
 	}
 
-#if 1
+#if 0
+	// If Send Failed, Close I/O Port
 	if(sendRetryStillFailed==true){
 		// Close Device
 		if (this->m_IOAccess[*this->m_CurrentIO].m_GetDeviceStatus() == IODEVICE_OPEN){
@@ -801,7 +802,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	}
 #endif
 
-	wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_COMPLETED));
+	wxThreadEvent* threadFinish_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_COMPLETED);
+	threadFinish_evt->SetInt(sendRetryStillFailed == true ? TRUE : FALSE);
+	wxQueueEvent(m_pHandler->GetEventHandler(), threadFinish_evt);
+	
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Thread finished.");
 
 	return (wxThread::ExitCode)1;

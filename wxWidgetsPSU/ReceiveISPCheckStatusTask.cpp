@@ -23,7 +23,6 @@ void ReceiveISPCheckStatusTask::Draw(void){
 
 }
 
-#define ISP_CHECK_STATUS_RETRY  5
 #define ISP_ENDDATA_BYTES_TO_READ  8
 int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 	
@@ -115,6 +114,7 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 		else{
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status Failed");
 			*this->m_ispStatus = ISP_Status_ResponseDataError;
+			PMBUSHelper::IspErrRetry = 0;
 		}
 	}
 

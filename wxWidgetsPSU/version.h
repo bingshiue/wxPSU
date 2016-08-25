@@ -17,7 +17,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.5        |     Implement Auto Open / Close I/O       |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.6        |     Use Customized FW Update Dialog       |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.5" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.6" /**< Program Version, Shown in About Dialog */
 
 #endif

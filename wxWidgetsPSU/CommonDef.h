@@ -43,12 +43,27 @@
 #define CALIBRARTION_HANDLE_0D /**< Handle '0x0d' as special character in Calibration */
 #define ISP_HANDLE_0D /**< Handle '0x0d' as special character in ISP */
 
-#define DELAY_READ_ISP_START_VERIFY_RESPONSE  500 /**< Delay Read ISP Start Verify Response */
+#define DELAY_READ_ISP_START_VERIFY_RESPONSE  100 /**< Delay Read ISP Start Verify Response */
 
 //#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
 #ifdef ISP_SLEEP
 #define ISP_SLEEP_TIME  10  /**< Sleep Time Between F3(F1) Command (MilliSecond) */
 #endif
+
+#define ISP_START_VERIFY_RETRY  5 /**< ISP Start Verify(F0) Command Fail Retry Times */
+
+#define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP /**< Sleep before Start Verify Command Failed Retry */
+#ifdef ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP 
+#define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP_TIME 200 /**< Sleep Time before Start Verify Command Failed Retry (MilliSecond) */
+#endif
+
+
+#define ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY /**< Delay After Primary Firmware Receive Start Verify CMD Success */
+#ifdef ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY
+#define ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME  2500 /**< Delay Time After Primary Firmware Receive Start Verify CMD Success */
+#endif
+
+#define ISP_CHECK_STATUS_RETRY  5 /**< ISP Check Status(F3) Command Fail Retry Times */
 
 #define ISP_F3_CMD_FAILED_RETRY_SLEEP /**< Sleep before F3 Command Check Failed Retry */
 #ifdef ISP_F3_CMD_FAILED_RETRY_SLEEP 

@@ -347,6 +347,7 @@ void TIHexFileParser::decodeDataRecord(unsigned char recordLength,//(Byte Count)
 	}
 }
 
+#define TI_HEX_FORMAT_SEGMENT_BASE_START_ADDRESS  0x3f0000
 /*******************************************************************************
 * Input Stream for Intel HEX File Decoding (friend function)
 *******************************************************************************/
@@ -370,6 +371,8 @@ istream& operator>>(istream& dataIn, TIHexFileParser& ihLocal)
 	unsigned long loadOffset;
 	// Variables to hold the record type
 	TIhexRecordType recordType;
+	// Variables to check TI HEX format segment base address
+	bool bHasTIHEXFormatSegmentBaseAddress = false;
 
 	do
 	{
@@ -716,6 +719,11 @@ istream& operator>>(istream& dataIn, TIHexFileParser& ihLocal)
 
 						/* Update the SBA                                 */
 						ihLocal.segmentBaseAddress = extLinAddress;
+
+						if (ihLocal.segmentBaseAddress == TI_HEX_FORMAT_SEGMENT_BASE_START_ADDRESS){
+							bHasTIHEXFormatSegmentBaseAddress = true;
+						}
+
 					}
 					else
 					{
@@ -862,6 +870,14 @@ istream& operator>>(istream& dataIn, TIHexFileParser& ihLocal)
 			}
 		}
 	} while (ihLine.length() > 0);
+
+
+	if (bHasTIHEXFormatSegmentBaseAddress == false){
+		string message;
+
+		message = "No Segment Base Address Start From " + ihLocal.ulToHexString(TI_HEX_FORMAT_SEGMENT_BASE_START_ADDRESS);
+		ihLocal.addError(message);
+	}
 
 	if (ihLocal.verbose == true)
 	{

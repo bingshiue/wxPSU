@@ -222,10 +222,16 @@
     <ClCompile Include="USBGPIOPanel.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="UserCancelISPPostDelay.cpp">
+    <ClCompile Include="PMBUSFWProgressDialog.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="PMBUSFWProgressDialog.cpp">
+    <ClCompile Include="ISPSequenceThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCancelISPPostDelayTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCancelISPTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
@@ -372,6 +378,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="PMBUSFWProgressDialog.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ISPSequenceThread.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

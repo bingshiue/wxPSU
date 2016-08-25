@@ -4,7 +4,13 @@
 
 #include "PMBUSFWProgressDialog.h"
 
-PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400) )
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
+
+PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
+#if wxUSE_TIMER
+, m_timer(this)
+#endif
 {
 	// Setup Icon
 	wxIcon icon;
@@ -12,12 +18,22 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	this->SetIcon(icon);
 
+	m_ispStatus = ispStatus;
+
+	// Information Static Text
+	m_infoST = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(200,60));
+
 	// Set Log Target
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);
 
 	m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
-	//m_logTC->SetSize(600, 300);
+	
+	// use fixed width font to align output in nice columns
+	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
+		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+
+	this->m_logTC->SetFont(font);
 
 	// Initialize Sizer
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -26,15 +42,17 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	m_gauge = new wxGauge(this, wxID_ANY, range, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL | wxGA_SMOOTH | wxGA_PROGRESS);
 
-	m_okCancelButton = new wxButton(this, wxID_ANY, wxT("Cancel"));
+	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"));
 
 
 	// Add GUI Component To Sizer
+	this->m_topLevelSizer->Add(this->m_infoST, wxSizerFlags(0).Border());
+
 	this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
 
-	this->m_topLevelSizer->Add(this->m_gauge, wxSizerFlags().Align(wxALIGN_CENTRE).Border().Expand());
+	this->m_topLevelSizer->Add(this->m_gauge, wxSizerFlags().Border().Expand());
 
-	this->m_topLevelSizer->Add(this->m_okCancelButton, wxSizerFlags().Align(wxALIGN_CENTRE).Border().Expand());
+	this->m_topLevelSizer->Add(this->m_okCancelButton, wxSizerFlags().Border().Expand());
 
 	// Set Sizer
 	//SetSizerAndFit(m_topLevelSizer);
@@ -42,15 +60,31 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	SetEscapeId(wxID_CLOSE);
 
+    // Start Timer
+	this->m_timer.Start();
+
+	// Save Begin Time
+	this->m_beginTime = wxDateTime::Now();
 }
 
 PMBUSFWProgressDialog::~PMBUSFWProgressDialog(){
 	wxLog::SetActiveTarget(m_oldLog);
+
+#if wxUSE_TIMER
+	if (m_timer.IsRunning())
+	{
+		m_timer.Stop();
+	}
+#endif
+
 }
 
 bool PMBUSFWProgressDialog::Update(int value, const wxString& newmsg, bool *skip){
 	bool result = false;
 
+	this->m_infoST->SetLabelText(newmsg);
+
+	this->m_gauge->SetValue(value);
 
 	return result;
 }
@@ -139,12 +173,88 @@ void PMBUSFWProgressDialog::DoLogRecord(wxLogLevel level, const wxString& msg, c
 
 }
 
+void PMBUSFWProgressDialog::OnISPSequenceUpdate(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceUpdate");
+
+	static int previous_percentage = 0;
+	int percentage = event.GetInt();
+	wxString information = event.GetString();
+
+#ifndef _DEBUG
+	if (previous_percentage != percentage){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %d%%", percentage);
+		previous_percentage = percentage;
+	}
+#endif
+
+	wxTimeSpan Elapsed = wxDateTime::Now() - m_beginTime;
+	information += wxT("\n");
+	information += wxT("Elapsed Time : ");
+	information += Elapsed.Format();
+
+	this->Update(percentage, information);
+
+	/*
+	// Update Dialogs
+	//not_cancel = dialog.Update((int)percentage, information);
+	int not_cancel = m_progressDialog->Update((int)percentage, information);
+
+	if (not_cancel == false){
+	m_ispStatus = ISP_Status_UserRequestCancel;
+	}
+	*/
+}
+
+void PMBUSFWProgressDialog::OnISPSequenceEnd(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceEnd");
+
+	this->m_okCancelButton->SetLabel("Close");
+
+	wxMessageBox(wxT("ISP Sequence ALL Complete, Please Press Close Button To Exit"), wxT("ISP Complete"), wxOK | wxICON_INFORMATION, this);
+
+	//this->Resume();
+}
+
+
+void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnDialogClose");
+	
+	*this->m_ispStatus = ISP_Status_UserRequestCancel;
+
+	//new(TP_UserCancelISPTask) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
+
+	while (Task::GetCount() > 0){
+		// If Task Count > 0, Wait
+		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
+
+		wxMilliSleep(50);
+	};
+
+	this->EndModal(wxID_CANCEL);
+}
+
+void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
+
+	int tmp = 0;
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnCancelOK");
+
+	*this->m_ispStatus = ISP_Status_UserRequestCancel;
+
+	while (Task::GetCount() > 0){
+		// If Task Count > 0, Wait
+		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
+
+		wxMilliSleep(50);
+	};
+
+	this->EndModal(wxID_CANCEL);
+}
+
 wxBEGIN_EVENT_TABLE(PMBUSFWProgressDialog, wxDialog)
-//EVT_BUTTON(CID_BTN_APPLY, CalibrationDialog::OnBtnApply)
-//EVT_BUTTON(CID_BTN_DONE, CalibrationDialog::OnBtnDone)
-//EVT_BUTTON(CID_BTN_READ, CalibrationDialog::OnBtnRead)
-//EVT_COMBOBOX(CID_CB_CALIBRATION_ITEM, CalibrationDialog::OnCBCalibrationItem)
-//EVT_COMBOBOX(CID_CB_POINTER, CalibrationDialog::OnCBPointer)
-//EVT_TEXT(CID_TC_DATA_1, CalibrationDialog::OnTCData1)
-//EVT_TEXT_ENTER(CID_TC_DATA_1, CalibrationDialog::OnTCData1)
+EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, PMBUSFWProgressDialog::OnISPSequenceUpdate)
+EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_END, PMBUSFWProgressDialog::OnISPSequenceEnd)
+EVT_BUTTON(CID_BTN_CANCELOK, PMBUSFWProgressDialog::OnBtnCancelOK)
+EVT_CLOSE(PMBUSFWProgressDialog::OnDialogClose)
 wxEND_EVENT_TABLE()

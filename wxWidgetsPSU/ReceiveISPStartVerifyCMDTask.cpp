@@ -25,7 +25,53 @@ void ReceiveISPStartVerifyCMDTask::Draw(void){
 
 }
 
+unsigned int ReceiveISPStartVerifyCMDTask::ProductISPStartCMDSendBuffer(unsigned char* buffer){
+	// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0xF0, this->m_target, 0x00, 0x0D, 0x0A
+	unsigned int active_index = 0;
+
+	switch (*this->m_CurrentIO){
+
+	case IOACCESS_SERIALPORT:
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = this->m_target; // Target
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
+
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+		buffer[active_index++] = 0x05;
+		buffer[active_index++] = 0x08;
+		buffer[active_index++] = 0x41;
+		buffer[active_index++] = 0x54;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = this->m_target; // Target
+
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 3); // PEC
+
+		buffer[active_index++] = 0x0D;
+		buffer[active_index++] = 0x0A;
+
+		break;
+
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");
+		break;
+	}
+
+	return active_index;
+}
+
 #define ISP_ENDDATA_BYTES_TO_READ  8
+#define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 		
 	// Receive Data 
@@ -58,14 +104,61 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 	// If Response is OK
 	if (PMBUSHelper::IsISPStartVerifyResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, sizeof(this->m_recvBuff.m_recvBuff) / sizeof(this->m_recvBuff.m_recvBuff[0]),this->m_target) == PMBUSHelper::response_ok){
 
+		PMBUSHelper::IspStartVerifyRetry = 0;
+		
 		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Verify Start CMD Success");
+
+#ifdef ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY
+		if (this->m_target == UPDATE_PRIMARY_FW_TARGET){
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait %.1f Sec For Start Update Primary FW", (double)ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME/1000);
+			wxMilliSleep(ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME);
+		}
+#endif
 
 		new(TP_SendISPCheckStatusTask) SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 
 	}
 	else{
-		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start CMD Verify Failed");
-		*this->m_ispStatus = ISP_Status_ResponseDataError;
+		
+		PMBUSHelper::IspStartVerifyRetry++;
+
+		// Retry 
+		if (PMBUSHelper::IspStartVerifyRetry <= ISP_START_VERIFY_RETRY){
+			
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Retry : %d", PMBUSHelper::IspStartVerifyRetry);
+
+#ifdef	ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP
+			wxMilliSleep(ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP_TIME);
+#endif
+	
+			// Solution 1 : Re-call SendISPStartVerifyCMDTask
+
+			//new(TP_SendISPStartVerifyCMDTask) SendISPStartVerifyCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
+
+
+			// Solution 2: Re-call SendISPStartCMDTask
+			/*** Prpare Send Data Buffer ***/
+			unsigned char SendBuffer[64];
+			unsigned int sendDataLength = this->ProductISPStartCMDSendBuffer(SendBuffer);
+
+			PMBUSSendCOMMAND_t CMDF0H;
+
+			CMDF0H.m_sendDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+			CMDF0H.m_bytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
+			for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+				CMDF0H.m_sendData[idx] = SendBuffer[idx];
+			}
+
+			new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_IOAccess, m_CurrentIO, CMDF0H, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
+
+		}
+		else{
+			
+			PMBUSHelper::IspStartVerifyRetry=0;
+			
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start CMD Verify Failed");
+			*this->m_ispStatus = ISP_Status_ResponseDataError;
+		}
 	}
 
 	delete this;

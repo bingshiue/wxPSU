@@ -23,6 +23,7 @@
 #include "TIHexMMAPModel.h"
 #include "PMBUSLogTextCtrl.h"
 #include "PMBUSFWProgressDialog.h"
+#include "ISPSequenceThread.h"
 
 #include "Task.h"
 
@@ -74,6 +75,9 @@ private:
 
 	unsigned long m_developerMode;
 
+	ISPSequenceThread* m_ispSequenceThread;
+	wxProgressDialog *m_progressDialog;
+
 	bool m_pressedCloseButton;
 
 	wxMenu* m_popupMenu;
@@ -112,7 +116,7 @@ private:
 
 	wxString m_hexFilePath;
 
-	PMBUSFWProgressDialog *m_progressDialog;
+	//PMBUSFWProgressDialog *m_progressDialog;
 
 	unsigned long m_startAddress;
 	unsigned long m_endAddress;

@@ -76,7 +76,7 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 
 int SendRebootCheckTask::Main(double elapsedTime){
 
-	int cnt = this->GetCount(task_ID_SendISPStartVerifyCMDTask);
+	int cnt = this->GetCount(task_ID_SendRebootCheckTask);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
 

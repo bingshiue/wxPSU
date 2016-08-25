@@ -28,6 +28,7 @@ public :
 	};
 
 	static unsigned int IspErrRetry;
+	static unsigned int IspStartVerifyRetry;
 
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);

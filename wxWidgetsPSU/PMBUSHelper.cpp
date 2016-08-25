@@ -11,6 +11,7 @@ PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
 AppSettings_t* PMBUSHelper::m_appSettings;
 USBINFO PMBUSHelper::m_USBInfo;
 unsigned int PMBUSHelper::IspErrRetry = 0;
+unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
 wxString PMBUSHelper::m_timeString;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
