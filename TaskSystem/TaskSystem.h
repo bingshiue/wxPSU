@@ -9,6 +9,11 @@
 #include<malloc.h>		        // for malloc, free
 #include<string.h>		        // for memset, memmove
 
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
 typedef unsigned char BYTE;
 typedef unsigned long DWORD;
 
@@ -36,6 +41,8 @@ protected:
 	Task* m_next;/**< Pointer to next task */
 
 public:
+	static wxCriticalSection m_critsect; /**< wxCriticalSection Object */
+
 	/**
 	 * @brief virtual deconstructor.
 	 */

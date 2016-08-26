@@ -34,5 +34,7 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 		wxMilliSleep(1);
 	}
 
+	PSU_DEBUG_PRINT(MSG_DEBUG, "TaskSystem Thread Finish");
+
 	return NULL;
 }

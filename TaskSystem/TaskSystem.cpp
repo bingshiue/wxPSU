@@ -11,6 +11,9 @@ BYTE* Task::m_free = NULL;	/**< 指向未使用記憶體開頭的指標(從這�
 static DWORD g_size = 0;		/**< 表示目前所有TASK所使用的記憶體總數 */
 static DWORD g_count = 0;		/**< 表示目前所有執行中的TASK數目 */
 
+wxCriticalSection Task::m_critsect;
+
+
 // 初始化TASK LIST(雙向LIST,LIST中的每一個元素為一個TASK)
 void Task::InitTaskList(void)
 {
@@ -54,6 +57,8 @@ void Task::Delete(void)
 // 執行所有的TASK中的Main函式,傳入每一畫格的時間差
 void Task::RunTask(double elapsedTime)
 {
+	wxCriticalSectionLocker locker(m_critsect);
+
 	if (g_buf == NULL) return;	// 若還未執行過初始化動作,別做以下的動作
 
 	Task *task, *next;
@@ -126,9 +131,11 @@ void Task::Defrag(void)
 
 // TASK生成,超載 delete 運算子
 void Task::operator delete(void *pTask)
-{
+{	
 	if (pTask == NULL) return;// 檢查是否為空指標
 	Task *task = (Task*)pTask;// 取得位址
+
+	wxCriticalSectionLocker locker(m_critsect);
 
 	if (task->m_use == FALSE) return;// 防止重複刪除
 	task->m_use = FALSE;// 設定為非使用
@@ -155,6 +162,8 @@ void Task::operator delete(void *pTask)
 // 優先權越小會放在越前面,會先被執行
 void* Task::operator new(size_t size, float priority)
 {
+	wxCriticalSectionLocker locker(m_critsect);
+	
 	if (g_buf == NULL) return NULL;// 若還未執行過初始化動作,別做以下的動作
 	if (m_free + size >= g_buf + MEM_SIZE) return NULL;// 記憶體容量不足
 

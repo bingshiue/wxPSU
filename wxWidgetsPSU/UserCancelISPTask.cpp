@@ -22,9 +22,9 @@ void UserCancelISPTask::Draw(void){
 
 int UserCancelISPTask::Main(double elapsedTime){
 
-	//this->m_elapsedTimer += elapsedTime;
+	this->m_elapsedTimer += elapsedTime;
 
-	//PSU_DEBUG_PRINT(MSG_DEBUG ,"m_elapsedTimer = %.0f", this->m_elapsedTimer);
+	PSU_DEBUG_PRINT(MSG_DEBUG ,"m_elapsedTimer = %.0f", this->m_elapsedTimer);
 
 	*this->m_ispStatus = ISP_Status_UserRequestCancel;
 

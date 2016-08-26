@@ -1138,6 +1138,19 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	//
 	this->m_sendCMDVector.clear();
 
+	// Stop Task System Thread
+	if (this->m_TaskSystemThread->m_running == true){
+		this->m_TaskSystemThread->m_running = false;
+	}
+
+	// Check TaskSystem Have Task or Not
+	int cnt = Task::GetCount();
+
+	if(cnt != 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
+	}
+
+#if 0
 	// Check TaskSystem Have Task or Not
 	int cnt = Task::GetCount();
 
@@ -1145,8 +1158,9 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
 		cnt = Task::GetCount();
 
-		Sleep(1000);
+		wxMilliSleep(200);
 	}
+#endif
 
 	// Release Task List
 	TaskEx::ReleaseTaskList();
