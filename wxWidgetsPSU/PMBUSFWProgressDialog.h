@@ -48,6 +48,9 @@ private:
 
 	wxBoxSizer *m_topLevelSizer;
 
+	wxStaticBoxSizer *m_statisticsSB;
+	wxStaticBoxSizer *m_logSB;
+
 	wxGauge *m_gauge;
 
 	wxButton *m_okCancelButton;

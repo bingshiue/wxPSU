@@ -20,14 +20,21 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	m_ispStatus = ispStatus;
 
+	// Initialize Sizer
+	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
+
+	// Initialize Static Box Sizer
+	m_statisticsSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Statistics"));
+	m_logSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Log"));
+
 	// Information Static Text
-	m_infoST = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(200,60));
+	m_infoST = new wxStaticText(this->m_statisticsSB->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(250, 60));// 200, 60));
 
 	// Set Log Target
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);
 
-	m_logTC = new PMBUSLogTextCtrl(this, wxID_ANY);
+	m_logTC = new PMBUSLogTextCtrl(m_logSB->GetStaticBox(), wxID_ANY);
 	
 	// use fixed width font to align output in nice columns
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
@@ -35,24 +42,27 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	this->m_logTC->SetFont(font);
 
-	// Initialize Sizer
-	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
-
 	// Initialize GUI Component
 
 	m_gauge = new wxGauge(this, wxID_ANY, range, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL | wxGA_SMOOTH | wxGA_PROGRESS);
 
-	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"));
+	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"), wxDefaultPosition, wxSize(250, -1));
 
+	// Add GUI Component To Static Box
+	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(1).Border());// .Align(wxALIGN_CENTER_HORIZONTAL));
 
-	// Add GUI Component To Sizer
-	this->m_topLevelSizer->Add(this->m_infoST, wxSizerFlags(0).Border());
+	m_logSB->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
 
-	this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
+	// Add Component To Sizer
+	//this->m_topLevelSizer->Add(this->m_infoST, wxSizerFlags(0).Border());
+	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(0).Border().Expand().Align(wxALIGN_CENTER_HORIZONTAL));
+
+	//this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
+	this->m_topLevelSizer->Add(m_logSB, wxSizerFlags(1).Border().Expand());
 
 	this->m_topLevelSizer->Add(this->m_gauge, wxSizerFlags().Border().Expand());
 
-	this->m_topLevelSizer->Add(this->m_okCancelButton, wxSizerFlags().Border().Expand());
+	this->m_topLevelSizer->Add(this->m_okCancelButton, wxSizerFlags().Border().Align(wxALIGN_CENTER_HORIZONTAL));
 
 	// Set Sizer
 	//SetSizerAndFit(m_topLevelSizer);
@@ -189,6 +199,7 @@ void PMBUSFWProgressDialog::OnISPSequenceUpdate(wxThreadEvent& event){
 
 	wxTimeSpan Elapsed = wxDateTime::Now() - m_beginTime;
 	information += wxT("\n");
+	information += wxT("\n");
 	information += wxT("Elapsed Time : ");
 	information += Elapsed.Format();
 
@@ -220,9 +231,9 @@ void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnDialogClose");
 	
-	*this->m_ispStatus = ISP_Status_UserRequestCancel;
+	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
-	//new(TP_UserCancelISPTask) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
+	new(0.1f) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
 
 	while (Task::GetCount() > 0){
 		// If Task Count > 0, Wait
@@ -240,7 +251,9 @@ void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnCancelOK");
 
-	*this->m_ispStatus = ISP_Status_UserRequestCancel;
+	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
+
+	new(0.1f) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
 
 	while (Task::GetCount() > 0){
 		// If Task Count > 0, Wait
