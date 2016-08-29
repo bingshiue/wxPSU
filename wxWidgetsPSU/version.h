@@ -22,6 +22,6 @@
 /* |     1.0.0.7        |     Add Critical Section in Task Syatem   |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.6" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.7" /**< Program Version, Shown in About Dialog */
 
 #endif
