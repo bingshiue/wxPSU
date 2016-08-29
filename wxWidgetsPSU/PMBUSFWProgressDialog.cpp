@@ -28,7 +28,7 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 	m_logSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Log"));
 
 	// Information Static Text
-	m_infoST = new wxStaticText(this->m_statisticsSB->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(250, 60));// 200, 60));
+	m_infoST = new wxStaticText(this->m_statisticsSB->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(250, 80));// 200, 60));
 
 	// Set Log Target
 	m_oldLog = wxLog::GetActiveTarget();
@@ -49,7 +49,7 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"), wxDefaultPosition, wxSize(250, -1));
 
 	// Add GUI Component To Static Box
-	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(1).Border());// .Align(wxALIGN_CENTER_HORIZONTAL));
+	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(0).Border());// .Align(wxALIGN_CENTER_HORIZONTAL));
 
 	m_logSB->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
 

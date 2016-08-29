@@ -40,6 +40,7 @@
 #include <wx/stdpaths.h>
 #include <wx/richtext/richtextctrl.h>
 #include <wx/busyinfo.h>
+#include <wx/snglinst.h>
 
 class WXPSU : public wxApp
 {
@@ -53,6 +54,10 @@ public:
 	 * @brief OnExit.
 	 */
 	virtual int OnExit() wxOVERRIDE;
+
+private:
+
+	wxSingleInstanceChecker *m_singleInstanceChecker;
 };
 
 

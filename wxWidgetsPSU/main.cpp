@@ -17,6 +17,22 @@ wxIMPLEMENT_APP(WXPSU);
 
 bool WXPSU::OnInit()
 {
+	/* Single Instance Check */
+	this->m_singleInstanceChecker = new wxSingleInstanceChecker;
+
+	if (this->m_singleInstanceChecker->IsAnotherRunning() == true){
+		//wxLogError(_("Another program instance is already running, aborting."));
+
+		wxMessageBox(wxT("Another program instance is already running, aborting."),
+			wxT("Error !"),  // caption
+			wxOK | wxICON_ERROR);
+
+		delete this->m_singleInstanceChecker;
+		this->m_singleInstanceChecker = NULL;
+
+		return false;
+	}
+	
 	if (!wxApp::OnInit())
 		return false;
 
@@ -34,6 +50,8 @@ bool WXPSU::OnInit()
 }
 
 int WXPSU::OnExit(){
+
+	delete this->m_singleInstanceChecker;
 
 	return 0;
 
