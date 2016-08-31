@@ -37,7 +37,7 @@
 
 #define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
 
-#define UPDATE_PRIMARY_FW_TARGET    0x61 /**< Primary FW Update Target code */
+#define UPDATE_PRIMARY_FW_TARGET    0x50 /**< Primary FW Update Target code */
 #define UPDATE_SECONDARY_FW_TARGET  0x60 /**< Secondary FW Update Target code */
 
 #define CALIBRARTION_HANDLE_0D /**< Handle '0x0d' as special character in Calibration */
