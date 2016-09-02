@@ -121,6 +121,7 @@
     <ClCompile Include="SendISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="SendISPWriteDataTask.cpp" />
     <ClCompile Include="SendRebootCheckTask.cpp" />
+    <ClCompile Include="SendUSBAdaptorBitRateTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="TaskSystemThread.h" />
     <ClInclude Include="TIHexFileParser.h" />
     <ClInclude Include="TIHexMMAPModel.h" />
+    <ClInclude Include="USBAdaptorSetting.h" />
     <ClInclude Include="USBGPIOPanel.h" />
     <ClInclude Include="USBI2CRS232Panel.h" />
     <ClInclude Include="USBInfoPanel.h" />

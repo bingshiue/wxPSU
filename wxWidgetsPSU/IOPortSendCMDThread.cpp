@@ -288,7 +288,8 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 #define BASE_RESPONSE_DATA_LENGTH  6
 #define STR_LENGTH  256
 //#define PRINT_RAW_IN_FEILD
-//#define OUTPUT_SEND_DATA
+#define OUTPUT_SEND_DATA
+#define OUTPUT_RECEIVE_DATA
 wxThread::ExitCode IOPortSendCMDThread::Entry()
 {
 	int ret;
@@ -393,7 +394,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									for (unsigned idx = 0; idx < writePageCMDWriteLength; idx++){
 										PageSentData += wxString::Format(" %02x ", this->m_writePageSendBuff[idx]);
 									}
-									PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageSentData.c_str());
+									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", PageSentData.c_str());
 #endif
 									
 									
@@ -504,7 +505,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								for (int idx = 0; idx < sendDataLength; idx++){
 									sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
 								}
-								PSU_DEBUG_PRINT(MSG_ALERT, "%s", sentData.c_str());
+								PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
 #endif
 								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
 							}
@@ -569,6 +570,16 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 									// Call Raw Data CB Function
 									this->m_pmBusCommand[idx].m_cmdCBFunc.m_rawCBFunc(&(this->m_pmBusCommand[idx]), RawStr, this->m_pmBusCommand[idx].m_responseDataLength);
+
+#ifdef OUTPUT_RECEIVE_DATA
+									wxString recvBytes("");
+									for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+										recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+									}
+
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
+
+#endif
 
 #ifdef PRINT_RAW_IN_FEILD
 									wxString RawMsg("");

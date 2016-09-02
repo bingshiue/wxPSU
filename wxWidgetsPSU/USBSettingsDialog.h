@@ -19,6 +19,7 @@
 
 #include "CommonDef.h"
 #include "IOAccess.h"
+#include "Task.h"
 #include "AppSettings.h"
 #include "PMBUSStatusBar.h"
 
@@ -91,6 +92,8 @@ private:
 	int SetIODeviceOption(void);
 	int OpenIODevice(void);
 	int CloseIODevice(void);
+
+	void SaveConfig(void);
 
 	void OnOKButton(wxCommandEvent& event);
 

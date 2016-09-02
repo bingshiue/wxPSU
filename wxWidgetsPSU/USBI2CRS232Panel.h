@@ -16,6 +16,9 @@
 #include <wx/animate.h>
 #include <wx/statline.h>
 
+#include "PMBUSHelper.h"
+#include "USBAdaptorSetting.h"
+
 class USBI2CRS232Panel : public wxPanel {
 public:
 	/**
@@ -33,14 +36,16 @@ public:
 	wxStaticBoxSizer *m_i2cportSB;
 	wxStaticBoxSizer *m_rs232portSB;
 
+	wxTextValidator m_decimalValidator;
+
 	/* I2C Port */
 	wxStaticText *m_i2cBitRateST;
 	wxComboBox *m_i2cBitRateCB;
 	wxCheckBox *m_smbusCheckBox;
 
 	wxStaticText *m_commBusTimeoutST;
-	wxTextCtrl *m_commBusTimeoutTC1;
-	wxTextCtrl *m_commBusTimeoutTC2;
+	wxTextCtrl *m_commTC;
+	wxTextCtrl *m_BusTimeoutTC;
 
 	wxStaticText *m_i2cRecvBuffSizeST;
 	wxTextCtrl *m_i2cRecvBuffSizeTC;
@@ -63,6 +68,8 @@ public:
 
 	wxStaticText *m_rs232RecvBuffSizeST;
 	wxTextCtrl *m_rs232RecvBuffSizeTC;
+
+	unsigned long i2cBitRateSpeedItemArray[I2C_BIT_RATE_SPEED_ITEM_SIZE];
 
 private:
 

@@ -234,6 +234,9 @@
     <ClCompile Include="UserCancelISPTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SendUSBAdaptorBitRateTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -381,6 +384,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="ISPSequenceThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="USBAdaptorSetting.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

@@ -47,6 +47,8 @@
 #define TP_UserCancelISPPostDelayTask (0.5f)
 #define TP_UserCancelISPTask (0.9f)
 
+#define TP_SendUSBAdaptorBitRateTask (0.5f)
+
 enum {
 	task_ID_SendWriteCMDTask = 0,
 	task_ID_ReceiveWriteCMDTask,
@@ -63,7 +65,9 @@ enum {
 	task_ID_SendRebootCheckTask,
 	task_ID_ReceiveRebootCheckTask,
 	task_ID_UserCancelISPPostDelayTask,
-	task_ID_UserCancelISPTask
+	task_ID_UserCancelISPTask,
+
+	task_ID_SendUSBAdaptorBitRateTask
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -645,14 +649,53 @@ class UserCancelISPTask : public TaskEx {
 
 public:
 	/**
+	 * @brief Constructor.
+	 */
+	UserCancelISPTask(unsigned char* ispStatus);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~UserCancelISPTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+};
+
+class SendUSBAdaptorBitRateTask : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS* m_IOAccess;
+
+	unsigned short m_i2cBitRate;
+	unsigned short m_spiBitRate;
+	unsigned short m_canBitRate;
+
+	unsigned short m_i2cBusTimeOut;
+
+	unsigned int ProductSendBuffer(unsigned char *buffer);
+
+public:
+	/**
 	* @brief Constructor.
 	*/
-	UserCancelISPTask(unsigned char* ispStatus);
+	SendUSBAdaptorBitRateTask(IOACCESS* ioaccess, unsigned short i2cBitRate, unsigned short spiBitRate, unsigned short canBitRate, unsigned short m_i2cBusTimeOut);
 
 	/**
 	* @brief Deconstructor.
 	*/
-	~UserCancelISPTask(void);
+	~SendUSBAdaptorBitRateTask(void);
 
 	/**
 	* @brief Draw function.

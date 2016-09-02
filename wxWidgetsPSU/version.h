@@ -21,7 +21,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.7        |     Add Critical Section in Task Syatem   |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.8        |     Support Set USB Adaptor I2C BitRate   |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.7" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.8" /**< Program Version, Shown in About Dialog */
 
 #endif

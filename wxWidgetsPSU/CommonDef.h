@@ -43,7 +43,7 @@
 #define CALIBRARTION_HANDLE_0D /**< Handle '0x0d' as special character in Calibration */
 #define ISP_HANDLE_0D /**< Handle '0x0d' as special character in ISP */
 
-#define DELAY_READ_ISP_START_VERIFY_RESPONSE  100 /**< Delay Read ISP Start Verify Response */
+#define DELAY_READ_ISP_START_VERIFY_RESPONSE  50 /**< Delay Read ISP Start Verify Response */
 
 //#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
 #ifdef ISP_SLEEP
@@ -54,7 +54,7 @@
 
 #define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP /**< Sleep before Start Verify Command Failed Retry */
 #ifdef ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP 
-#define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP_TIME 200 /**< Sleep Time before Start Verify Command Failed Retry (MilliSecond) */
+#define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP_TIME 50 /**< Sleep Time before Start Verify Command Failed Retry (MilliSecond) */
 #endif
 
 
@@ -76,6 +76,8 @@
 
 #define I2C_AdaptorModuleBoard_R90000_9271_USB_PID  0x003F /**< R90000 9271 USB PID */
 #define I2C_AdaptorModuleBoard_R90000_9271_USB_VID  0x04D8 /**< R90000 9271 USB VID */
+
+#define RELOAD_USB_ADAPTOR_SETTINGS_APP_RESTART  /**< Reload USB Adaptor's Setting when APP restart */
 
 /* ----- Below is for debug only ------ */
 

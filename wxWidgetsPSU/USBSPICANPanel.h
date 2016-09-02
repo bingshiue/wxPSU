@@ -16,6 +16,9 @@
 #include <wx/animate.h>
 #include <wx/statline.h>
 
+#include "PMBUSHelper.h"
+#include "USBAdaptorSetting.h"
+
 class USBSPICANPanel : public wxPanel {
 public:
 	/**
@@ -32,6 +35,8 @@ public:
 	wxFlexGridSizer* m_fgSizer2;
 	wxStaticBoxSizer *m_spiPortSB;
 	wxStaticBoxSizer *m_canPortSB;
+
+	wxTextValidator m_decimalValidator;
 
 	wxStaticText *m_spiRecvBuffSizeST;
 	wxTextCtrl *m_spiRecvBuffSizeTC;
@@ -54,6 +59,10 @@ public:
 
 	wxStaticText *m_canBitRateSpeedST;
 	wxComboBox *m_canBitRateSpeedCB;
+
+	unsigned long spiBitRateSpeedItemArray[SPI_BIT_RATE_SPEED_ITEM_SIZE];
+
+	unsigned long canBitRateSpeedItemArray[CAN_BIT_RATE_SPEED_ITEM_SIZE];
 
 private:
 

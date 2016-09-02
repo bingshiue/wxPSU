@@ -24,6 +24,11 @@ enum {
 };
 
 enum {
+	Generic_Unchecked = 0,
+	Generic_Checked
+};
+
+enum {
 	PMBUS_ReadMethod_1_1 = 0,
 	PMBUS_ReadMethod_1_2
 };
@@ -53,12 +58,39 @@ enum {
 #define DEFAULT_COMPORT_STOPBITS      ONESTOPBIT
 #define DEFAULT_COMPORT_PARITYCHECK   NOPARITY
 
+/* --- USB ADAPTOR Setting ---- */
+#define DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED            100
+#define DEFAULT_USB_ADAPTOR_I2C_SMBUS                     (unsigned long)Generic_Checked
+#define DEFAULT_USB_ADAPTOR_I2C_COMM                      200
+#define DEFAULT_USB_ADAPTOR_I2C_BUS_TIMEOUT               20
+#define DEFAULT_USB_ADAPTOR_I2C_RECEIVE_BUFFER_SIZE       512
+
+#define DEFAULT_USB_ADAPTOR_SPI_BIT_RATE_SPEED            1000
+#define DEFAULT_USB_ADAPTOR_SPI_RECEIVED_TIMEOUT          40
+#define DEFAULT_USB_ADAPTOR_SPI_RECEIVE_BUFFER_SIZE       512
+
+#define DEFAULT_USB_ADAPTOR_CAN_BIT_RATE_SPEED            500
+#define DEFAULT_USB_ADAPTOR_CAN_RECEIVED_MSGSIZE          20
+#define DEFAULT_USB_ADAPTOR_CAN_RECEIVED_TIMEOUT          2
+#define DEFAULT_USB_ADAPTOR_CAN_RECEIVE_BUFFER_SIZE       256
+
+
+#define USB_ADAPTOR_UART_SIZE                             4
+
+#define DEFAULT_USB_ADAPTOR_UART_NUM                      0x00
+#define DEFAULT_USB_ADAPTOR_UART_BUADRATE                 CBR_9600
+#define DEFAULT_USB_ADAPTOR_UART_BYTESIZE                 8
+#define DEFAULT_USB_ADAPTOR_UART_STOPBITS                 ONESTOPBIT
+#define DEFAULT_USB_ADAPTOR_UART_PARITYCHECK              NOPARITY
+#define DEFAULT_USB_ADAPTOR_UART_RECEIVE_BUFFER_SIZE      1024
+
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
 	unsigned long m_buadRate;
 	unsigned long m_byteSize;
 	unsigned long m_stopBits;
 	unsigned long m_parityCheck;
+
 
 	void Reset(void){
 		m_comportNumber = DEFAULT_COMPORT_NUM;
@@ -70,6 +102,109 @@ typedef struct comport_setting {
 
 
 } COMPORT_SETTING_t;
+
+typedef struct usb_adaptor_i2c_setting {
+	unsigned long m_bitRateSpeed;
+	unsigned long m_smBus;
+	unsigned long m_comm;
+	unsigned long m_busTimeout;
+	unsigned long m_receiveBufferSize;
+
+	unsigned long m_previous_bitRateSpeed;
+	unsigned long m_previous_smBus;
+	unsigned long m_previous_comm;
+	unsigned long m_previous_busTimeout;
+	unsigned long m_previous_receiveBufferSize;
+
+	usb_adaptor_i2c_setting(){
+		Reset();
+	}
+
+	void Reset(void){
+		m_previous_bitRateSpeed = m_bitRateSpeed = DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED;
+		m_previous_smBus = m_smBus = DEFAULT_USB_ADAPTOR_I2C_SMBUS;
+		m_previous_comm = m_comm = DEFAULT_USB_ADAPTOR_I2C_COMM;
+		m_previous_busTimeout = m_busTimeout = DEFAULT_USB_ADAPTOR_I2C_BUS_TIMEOUT;
+		m_previous_receiveBufferSize = m_receiveBufferSize = DEFAULT_USB_ADAPTOR_I2C_RECEIVE_BUFFER_SIZE;
+	}
+
+
+} USB_ADAPTOR_I2C_SETTING_t;
+
+typedef struct usb_adaptor_spi_setting {
+	unsigned long m_bitRateSpeed;
+	unsigned long m_receivedTimeout;
+	unsigned long m_receiveBufferSize;
+
+	unsigned long m_previous_bitRateSpeed;
+	unsigned long m_previous_receivedTimeout;
+	unsigned long m_previous_receiveBufferSize;
+
+	usb_adaptor_spi_setting(){
+		Reset();
+	}
+
+	void Reset(void){
+		m_previous_bitRateSpeed = m_bitRateSpeed = DEFAULT_USB_ADAPTOR_SPI_BIT_RATE_SPEED;
+		m_previous_receivedTimeout = m_receivedTimeout = DEFAULT_USB_ADAPTOR_SPI_RECEIVED_TIMEOUT;
+		m_previous_receiveBufferSize = m_receiveBufferSize = DEFAULT_USB_ADAPTOR_SPI_RECEIVE_BUFFER_SIZE;
+	}
+
+} USB_ADAPTOR_SPI_SETTING_t;
+
+typedef struct usb_adaptor_can_setting {
+	unsigned long m_bitRateSpeed;
+	unsigned long m_receivedMSGSize;
+	unsigned long m_receivedTimeout;
+	unsigned long m_receiveBufferSize;
+
+	unsigned long m_previous_bitRateSpeed;
+	unsigned long m_previous_receivedMSGSize;
+	unsigned long m_previous_receivedTimeout;
+	unsigned long m_previous_receiveBufferSize;
+
+	usb_adaptor_can_setting(){
+		Reset();
+	}
+
+	void Reset(void){
+		m_previous_bitRateSpeed = m_bitRateSpeed = DEFAULT_USB_ADAPTOR_CAN_BIT_RATE_SPEED;
+		m_previous_receivedMSGSize = m_receivedMSGSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_MSGSIZE;
+		m_previous_receivedTimeout = m_receivedTimeout = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_TIMEOUT;
+		m_previous_receiveBufferSize = m_receiveBufferSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVE_BUFFER_SIZE;
+	}
+
+} USB_ADAPTOR_CAN_SETTING_t;
+
+typedef struct usb_adaptor_uart_setting {
+	unsigned long m_uartNumber;
+	unsigned long m_buadRate;
+	unsigned long m_byteSize;
+	unsigned long m_stopBits;
+	unsigned long m_parityCheck;
+	unsigned long m_receiveBufferSize;
+
+	unsigned long m_previous_uartNumber;
+	unsigned long m_previous_buadRate;
+	unsigned long m_previous_byteSize;
+	unsigned long m_previous_stopBits;
+	unsigned long m_previous_parityCheck;
+	unsigned long m_previous_receiveBufferSize;
+
+	usb_adaptor_uart_setting() {
+		Reset();
+	}
+
+	void Reset(void){
+		m_previous_uartNumber = m_uartNumber = DEFAULT_USB_ADAPTOR_UART_NUM;
+		m_previous_buadRate = m_buadRate = DEFAULT_USB_ADAPTOR_UART_BUADRATE;
+		m_previous_byteSize = m_byteSize = DEFAULT_USB_ADAPTOR_UART_BYTESIZE;
+		m_previous_stopBits = m_stopBits = DEFAULT_USB_ADAPTOR_UART_STOPBITS;
+		m_previous_parityCheck = m_parityCheck = DEFAULT_USB_ADAPTOR_UART_PARITYCHECK;
+		m_previous_receiveBufferSize = m_receiveBufferSize = DEFAULT_USB_ADAPTOR_UART_RECEIVE_BUFFER_SIZE;
+	}
+
+}USB_ADAPTOR_UART_SETTING_t;
 
 typedef struct appSettings_t {
 	COMPORT_SETTING_t m_comportSetting;
@@ -83,6 +218,11 @@ typedef struct appSettings_t {
 	unsigned long m_logToFile;/**< Log To File */
 	     wxString m_logFilePath;/**< Log File Path */
 	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
+
+	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
+	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
+	USB_ADAPTOR_CAN_SETTING_t m_usbAdaptorCANSetting;
+	USB_ADAPTOR_UART_SETTING_t m_usbAdaptorUARTSetting[USB_ADAPTOR_UART_SIZE];
 
 	/* ----- Developer Setting ----- */
 	unsigned long m_developerMode;/**< Developer Mode */
@@ -99,6 +239,14 @@ typedef struct appSettings_t {
 		this->m_logToFile = DEFAULT_LOG_TO_FILE;/**< Log To File */
 		this->m_logFilePath = wxString::Format("%s", DEFAULT_LOG_FILE_PATH);
 		this->m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
+
+		this->m_usbAdaptorI2CSetting.Reset();
+		this->m_usbAdaptorSPISetting.Reset();
+		this->m_usbAdaptorCANSetting.Reset();
+
+		for (int idx = 0; idx < USB_ADAPTOR_UART_SIZE; idx++){
+			m_usbAdaptorUARTSetting[idx].Reset();
+		}
 
 		this->m_developerMode = Generic_Disable;
 	}

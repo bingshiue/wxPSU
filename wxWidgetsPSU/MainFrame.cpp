@@ -2684,6 +2684,158 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_comportSetting.m_parityCheck = parityCheck;
 	}
 
+
+	pConfig->SetPath(wxT("/USBAdaptor"));
+
+#ifndef RELOAD_USB_ADAPTOR_SETTINGS_APP_RESTART
+
+	// I2C Bit Rate Speed
+	long i2cBitRateSpeed;
+	if (pConfig->Read(wxT("I2CBitRateSpeed"), &i2cBitRateSpeed) == false){
+		pConfig->Write(wxT("I2CBitRateSpeed"), DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED);
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed = DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_bitRateSpeed = DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed = i2cBitRateSpeed;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_bitRateSpeed = i2cBitRateSpeed;
+	}
+
+	// I2C SMBUS
+	long i2cSMBUS;
+	if (pConfig->Read(wxT("I2CSMBUS"), &i2cSMBUS) == false){
+		pConfig->Write(wxT("I2CSMBUS"), DEFAULT_USB_ADAPTOR_I2C_SMBUS);
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_smBus = DEFAULT_USB_ADAPTOR_I2C_SMBUS;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_smBus = DEFAULT_USB_ADAPTOR_I2C_SMBUS;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_smBus = i2cSMBUS;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_smBus = i2cSMBUS;
+	}
+
+	// I2C COMM
+	long i2cCOMM;
+	if (pConfig->Read(wxT("I2CCOMM"), &i2cCOMM) == false){
+		pConfig->Write(wxT("I2CCOMM"), DEFAULT_USB_ADAPTOR_I2C_COMM);
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_comm = DEFAULT_USB_ADAPTOR_I2C_COMM;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_comm = DEFAULT_USB_ADAPTOR_I2C_COMM;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_comm = i2cCOMM;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_comm = i2cCOMM;
+	}
+
+	// I2C Bus Timeout
+	long i2cBusTimeout;
+	if (pConfig->Read(wxT("I2CBusTimeOut"), &i2cBusTimeout) == false){
+		pConfig->Write(wxT("I2CBusTimeOut"), DEFAULT_USB_ADAPTOR_I2C_BUS_TIMEOUT);
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_busTimeout = DEFAULT_USB_ADAPTOR_I2C_BUS_TIMEOUT;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_busTimeout = DEFAULT_USB_ADAPTOR_I2C_BUS_TIMEOUT;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_busTimeout = i2cBusTimeout;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_busTimeout = i2cBusTimeout;
+	}
+
+	// I2C Receive Buffer Size
+	long i2cReceiveBufferSize;
+	if (pConfig->Read(wxT("I2CReceiveBufferSize"), &i2cReceiveBufferSize) == false){
+		pConfig->Write(wxT("I2CReceiveBufferSize"), DEFAULT_USB_ADAPTOR_I2C_RECEIVE_BUFFER_SIZE);
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_receiveBufferSize = DEFAULT_USB_ADAPTOR_I2C_RECEIVE_BUFFER_SIZE;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_receiveBufferSize = DEFAULT_USB_ADAPTOR_I2C_RECEIVE_BUFFER_SIZE;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_receiveBufferSize = i2cReceiveBufferSize;
+		this->m_appSettings.m_usbAdaptorI2CSetting.m_previous_receiveBufferSize = i2cReceiveBufferSize;
+	}
+
+	// SPI Bit Rate Speed
+	long spiBitRateSpeed;
+	if (pConfig->Read(wxT("SPIBitRateSpeed"), &spiBitRateSpeed) == false){
+		pConfig->Write(wxT("SPIBitRateSpeed"), DEFAULT_USB_ADAPTOR_SPI_BIT_RATE_SPEED);
+		this->m_appSettings.m_usbAdaptorSPISetting.m_bitRateSpeed = DEFAULT_USB_ADAPTOR_SPI_BIT_RATE_SPEED;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_bitRateSpeed = DEFAULT_USB_ADAPTOR_SPI_BIT_RATE_SPEED;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorSPISetting.m_bitRateSpeed = spiBitRateSpeed;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_bitRateSpeed = spiBitRateSpeed;
+	}
+
+	// SPI Received Timeout
+	long spiReceivedTimeout;
+	if (pConfig->Read(wxT("SPIReceivedTimeOut"), &spiReceivedTimeout) == false){
+		pConfig->Write(wxT("SPIReceivedTimeOut"), DEFAULT_USB_ADAPTOR_SPI_RECEIVED_TIMEOUT);
+		this->m_appSettings.m_usbAdaptorSPISetting.m_receivedTimeout = DEFAULT_USB_ADAPTOR_SPI_RECEIVED_TIMEOUT;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_receivedTimeout = DEFAULT_USB_ADAPTOR_SPI_RECEIVED_TIMEOUT;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorSPISetting.m_receivedTimeout = spiReceivedTimeout;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_receivedTimeout = spiReceivedTimeout;
+	}
+
+	// SPI Received Buffer Size
+	long spiReceiveBufferSize;
+	if (pConfig->Read(wxT("SPIReceiveBufferSize"), &spiReceiveBufferSize) == false){
+		pConfig->Write(wxT("SPIReceiveBufferSize"), DEFAULT_USB_ADAPTOR_SPI_RECEIVE_BUFFER_SIZE);
+		this->m_appSettings.m_usbAdaptorSPISetting.m_receiveBufferSize = DEFAULT_USB_ADAPTOR_SPI_RECEIVE_BUFFER_SIZE;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_receiveBufferSize = DEFAULT_USB_ADAPTOR_SPI_RECEIVE_BUFFER_SIZE;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorSPISetting.m_receiveBufferSize = spiReceiveBufferSize;
+		this->m_appSettings.m_usbAdaptorSPISetting.m_previous_receiveBufferSize = spiReceiveBufferSize;
+	}
+
+
+	// CAN Bit Rate Speed
+	long canBitRateSpeed;
+	if (pConfig->Read(wxT("CANBitRateSpeed"), &canBitRateSpeed) == false){
+		pConfig->Write(wxT("CANBitRateSpeed"), DEFAULT_USB_ADAPTOR_CAN_BIT_RATE_SPEED);
+		this->m_appSettings.m_usbAdaptorCANSetting.m_bitRateSpeed = DEFAULT_USB_ADAPTOR_CAN_BIT_RATE_SPEED;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_bitRateSpeed = DEFAULT_USB_ADAPTOR_CAN_BIT_RATE_SPEED;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorCANSetting.m_bitRateSpeed = canBitRateSpeed;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_bitRateSpeed = canBitRateSpeed;
+	}
+
+	// CAN Received MSG Size
+	long canReceivedMSGSize;
+	if (pConfig->Read(wxT("CANReceivedMSGSize"), &canReceivedMSGSize) == false){
+		pConfig->Write(wxT("CANReceivedMSGSize"), DEFAULT_USB_ADAPTOR_CAN_RECEIVED_MSGSIZE);
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receivedMSGSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_MSGSIZE;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receivedMSGSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_MSGSIZE;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receivedMSGSize = canReceivedMSGSize;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receivedMSGSize = canReceivedMSGSize;
+	}
+
+	// CAN Received Timeout
+	long canReceivedTimeout;
+	if (pConfig->Read(wxT("CANReceivedTimeOut"), &canReceivedTimeout) == false){
+		pConfig->Write(wxT("CANReceivedTimeOut"), DEFAULT_USB_ADAPTOR_CAN_RECEIVED_TIMEOUT);
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receivedTimeout = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_TIMEOUT;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receivedTimeout = DEFAULT_USB_ADAPTOR_CAN_RECEIVED_TIMEOUT;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receivedTimeout = canReceivedTimeout;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receivedTimeout = canReceivedTimeout;
+	}
+
+	// CAN Received Buffer Size
+	long canReceiveBufferSize;
+	if (pConfig->Read(wxT("CANReceiveBufferSize"), &canReceiveBufferSize) == false){
+		pConfig->Write(wxT("CANReceiveBufferSize"), DEFAULT_USB_ADAPTOR_CAN_RECEIVE_BUFFER_SIZE);
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receiveBufferSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVE_BUFFER_SIZE;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receiveBufferSize = DEFAULT_USB_ADAPTOR_CAN_RECEIVE_BUFFER_SIZE;
+	}
+	else{
+		this->m_appSettings.m_usbAdaptorCANSetting.m_receiveBufferSize = canReceiveBufferSize;
+		this->m_appSettings.m_usbAdaptorCANSetting.m_previous_receiveBufferSize = canReceiveBufferSize;
+	}
+
+#endif
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;

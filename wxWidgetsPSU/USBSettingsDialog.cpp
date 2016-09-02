@@ -236,11 +236,129 @@ int USBSettingsDialog::CloseIODevice(void){
 	return ret;
 }
 
+void USBSettingsDialog::SaveConfig(void){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	// Save Config
+	wxConfigBase *pConfig = wxConfigBase::Get();
+
+	if (pConfig == NULL) return;
+
+	pConfig->SetPath(wxT("/USBAdaptor"));
+
+	// I2C Bit Rate Speed
+	if (this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_bitRateSpeed != this->m_i2cRs232Panel->i2cBitRateSpeedItemArray[this->m_i2cRs232Panel->m_i2cBitRateCB->GetSelection()]){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save I2C Bit Rate Speed");
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed = this->m_i2cRs232Panel->i2cBitRateSpeedItemArray[this->m_i2cRs232Panel->m_i2cBitRateCB->GetSelection()];
+		pConfig->Write(wxT("I2CBitRateSpeed"), this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed);
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_bitRateSpeed = this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed;
+	}
+
+	// I2C SMBUS
+	if (this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_smBus != ((this->m_i2cRs232Panel->m_smbusCheckBox->GetValue() == false) ? 0 : 1)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save I2C SMBUS");
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_smBus = (this->m_i2cRs232Panel->m_smbusCheckBox->GetValue() == false) ? 0 : 1;
+		pConfig->Write(wxT("I2CSMBUS"), this->m_appSettings->m_usbAdaptorI2CSetting.m_smBus);
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_smBus = this->m_appSettings->m_usbAdaptorI2CSetting.m_smBus;
+	}
+
+	// I2C COMM
+	if (this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_comm != wxAtoi(this->m_i2cRs232Panel->m_commTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save I2C COMM");
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_comm = wxAtoi(this->m_i2cRs232Panel->m_commTC->GetValue());
+		pConfig->Write(wxT("I2CCOMM"), this->m_appSettings->m_usbAdaptorI2CSetting.m_comm);
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_comm = this->m_appSettings->m_usbAdaptorI2CSetting.m_comm;
+	}
+
+	// I2C BUS TIME OUT
+	if (this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_busTimeout != wxAtoi(this->m_i2cRs232Panel->m_BusTimeoutTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save I2C BUS TIME OUT");
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout = wxAtoi(this->m_i2cRs232Panel->m_BusTimeoutTC->GetValue());
+		pConfig->Write(wxT("I2CBusTimeOut"), this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout);
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_busTimeout = this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout;
+	}
+
+	// I2C Receive Buffer Size
+	if (this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_receiveBufferSize != wxAtoi(this->m_i2cRs232Panel->m_i2cRecvBuffSizeTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save I2C Receive Buffer Size");
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_receiveBufferSize = wxAtoi(this->m_i2cRs232Panel->m_i2cRecvBuffSizeTC->GetValue());
+		pConfig->Write(wxT("I2CReceiveBufferSize"), this->m_appSettings->m_usbAdaptorI2CSetting.m_receiveBufferSize);
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_previous_receiveBufferSize = this->m_appSettings->m_usbAdaptorI2CSetting.m_receiveBufferSize;
+	}
+
+	// SPI Bit Rate Speed
+	if (this->m_appSettings->m_usbAdaptorSPISetting.m_previous_bitRateSpeed != this->m_spiCanPanel->spiBitRateSpeedItemArray[this->m_spiCanPanel->m_spiBitRateSpeedCB->GetSelection()]){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save SPI Bit Rate Speed");
+		this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed = this->m_spiCanPanel->spiBitRateSpeedItemArray[this->m_spiCanPanel->m_spiBitRateSpeedCB->GetSelection()];
+		pConfig->Write(wxT("SPIBitRateSpeed"), this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed);
+		this->m_appSettings->m_usbAdaptorSPISetting.m_previous_bitRateSpeed = this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed;
+	}
+
+	// SPI Received Buffer Size
+	if (this->m_appSettings->m_usbAdaptorSPISetting.m_previous_receiveBufferSize != wxAtoi(this->m_spiCanPanel->m_spiRecvBuffSizeTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save SPI Received Buffer Size");
+		this->m_appSettings->m_usbAdaptorSPISetting.m_receiveBufferSize = wxAtoi(this->m_spiCanPanel->m_spiRecvBuffSizeTC->GetValue());
+		pConfig->Write(wxT("SPIReceiveBufferSize"), this->m_appSettings->m_usbAdaptorSPISetting.m_receiveBufferSize);
+		this->m_appSettings->m_usbAdaptorSPISetting.m_previous_receiveBufferSize = this->m_appSettings->m_usbAdaptorSPISetting.m_receiveBufferSize;
+	}
+
+	// SPI Received Time Out
+	if (this->m_appSettings->m_usbAdaptorSPISetting.m_previous_receivedTimeout != wxAtoi(this->m_spiCanPanel->m_spiRecvTimeoutTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save SPI Received Time Out");
+		this->m_appSettings->m_usbAdaptorSPISetting.m_receivedTimeout = wxAtoi(this->m_spiCanPanel->m_spiRecvTimeoutTC->GetValue());
+		pConfig->Write(wxT("SPIReceivedTimeOut"), this->m_appSettings->m_usbAdaptorSPISetting.m_receivedTimeout);
+		this->m_appSettings->m_usbAdaptorSPISetting.m_previous_receivedTimeout = this->m_appSettings->m_usbAdaptorSPISetting.m_receivedTimeout;
+	}
+
+	// CAN Bit Rate Speed
+	if (this->m_appSettings->m_usbAdaptorCANSetting.m_previous_bitRateSpeed != this->m_spiCanPanel->canBitRateSpeedItemArray[this->m_spiCanPanel->m_canBitRateSpeedCB->GetSelection()]){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save CAN Bit Rate Speed");
+		this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed = this->m_spiCanPanel->canBitRateSpeedItemArray[this->m_spiCanPanel->m_canBitRateSpeedCB->GetSelection()];
+		pConfig->Write(wxT("CANBitRateSpeed"), this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed);
+		this->m_appSettings->m_usbAdaptorCANSetting.m_previous_bitRateSpeed = this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed;
+	}
+
+	// CAN Received MSG Size
+	if (this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receivedMSGSize != wxAtoi(this->m_spiCanPanel->m_canRecvMSGSizeTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save CAN Received MSG Size");
+		this->m_appSettings->m_usbAdaptorCANSetting.m_receivedMSGSize = wxAtoi(this->m_spiCanPanel->m_canRecvMSGSizeTC->GetValue());
+		pConfig->Write(wxT("CANReceivedMSGSize"), this->m_appSettings->m_usbAdaptorCANSetting.m_receivedMSGSize);
+		this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receivedMSGSize = this->m_appSettings->m_usbAdaptorCANSetting.m_receivedMSGSize;
+	}
+
+	// CAN Received Buffer Size
+	if (this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receiveBufferSize != wxAtoi(this->m_spiCanPanel->m_canRecvBuffSizeTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save CAN Received Buffer Size");
+		this->m_appSettings->m_usbAdaptorCANSetting.m_receiveBufferSize = wxAtoi(this->m_spiCanPanel->m_canRecvBuffSizeTC->GetValue());
+		pConfig->Write(wxT("CANReceiveBufferSize"), this->m_appSettings->m_usbAdaptorCANSetting.m_receiveBufferSize);
+		this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receiveBufferSize = this->m_appSettings->m_usbAdaptorCANSetting.m_receiveBufferSize;
+	}
+
+	// CAN Received Time Out
+	if (this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receivedTimeout != wxAtoi(this->m_spiCanPanel->m_canRecvTimeoutTC->GetValue())){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Save CAN Received Time Out");
+		this->m_appSettings->m_usbAdaptorCANSetting.m_receivedTimeout = wxAtoi(this->m_spiCanPanel->m_canRecvTimeoutTC->GetValue());
+		pConfig->Write(wxT("CANReceivedTimeOut"), this->m_appSettings->m_usbAdaptorCANSetting.m_receivedTimeout);
+		this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receivedTimeout = this->m_appSettings->m_usbAdaptorCANSetting.m_receivedTimeout;
+	}
+
+	new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
+		this->m_ioaccess,
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed, 
+		this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
+		this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,
+		this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
+	);
+
+}
+
 void USBSettingsDialog::OnOKButton(wxCommandEvent& event){
 
 	//this->CloseIODevice();
 	//wxMilliSleep(200);
 	//this->OpenIODevice();
+	this->SaveConfig();
 
 	this->EndModal(0);
 }
