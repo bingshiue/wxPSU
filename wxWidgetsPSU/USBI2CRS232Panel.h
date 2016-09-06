@@ -21,6 +21,12 @@
 
 class USBI2CRS232Panel : public wxPanel {
 public:
+
+	enum {
+		CID_SMBUS_CHKBOX = 5050,
+	};
+
+
 	/**
 	* @brief Constructor.
 	*/
@@ -72,6 +78,8 @@ public:
 	unsigned long i2cBitRateSpeedItemArray[I2C_BIT_RATE_SPEED_ITEM_SIZE];
 
 private:
+
+	void OnSMBUSCheckBox(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

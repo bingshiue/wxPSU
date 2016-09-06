@@ -44,7 +44,7 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 	m_i2cBitRateCB->SetSelection(select);
 
 	// I2C SMBUS
-	m_smbusCheckBox = new wxCheckBox(m_i2cportSB->GetStaticBox(), wxID_ANY, wxT("SMBus"));
+	m_smbusCheckBox = new wxCheckBox(m_i2cportSB->GetStaticBox(), CID_SMBUS_CHKBOX, wxT("SMBus"));
 
 	m_smbusCheckBox->SetValue(((PMBUSHelper::GetAppSettings())->m_usbAdaptorI2CSetting.m_smBus) == Generic_Unchecked ? false : true);
 
@@ -250,7 +250,10 @@ USBI2CRS232Panel::~USBI2CRS232Panel(){
 
 }
 
+void USBI2CRS232Panel::OnSMBUSCheckBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+}
 
 wxBEGIN_EVENT_TABLE(USBI2CRS232Panel, wxPanel)
-
+EVT_CHECKBOX(CID_SMBUS_CHKBOX, USBI2CRS232Panel::OnSMBUSCheckBox)
 wxEND_EVENT_TABLE()

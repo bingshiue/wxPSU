@@ -95,6 +95,7 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
+    <ClCompile Include="PMBUSBitmapButton.cpp" />
     <ClCompile Include="PMBUSCBCook.cpp" />
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="PEC.h" />
     <ClInclude Include="PMBUSArtProv.h" />
+    <ClInclude Include="PMBUSBitmapButton.h" />
     <ClInclude Include="PMBUSCBCook.h" />
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />

@@ -135,7 +135,7 @@ int SendUSBAdaptorBitRateTask::Main(double elapsedTime){
 	}
 
 	wxString str("Receive Data :");
-	for (unsigned int idx = 0; idx < readBytes; idx++){
+	for (int idx = 0; idx < readBytes; idx++){
 		str += wxString::Format(" %02x ", recvBuffer[idx]);
 	}
 
