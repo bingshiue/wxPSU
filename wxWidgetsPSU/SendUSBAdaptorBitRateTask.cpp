@@ -21,8 +21,16 @@ SendUSBAdaptorBitRateTask::~SendUSBAdaptorBitRateTask(void){
 
 }
 
+#define AUTO_REPORT_MASK   0x01
+#define RESERVED_BIT1_MASK 0x02
+#define SMBUS_MASK         0x04
+#define ENABLE_PWM_MASK    0x20
+#define CLOCKIN_DI6_MASK   0x40
+#define CLOCKIN_DI7_MASK   0x80
+
 unsigned int SendUSBAdaptorBitRateTask::ProductSendBuffer(unsigned char *buffer){
 	unsigned int active_index = 0;
+	unsigned char chkbox_setting = 0x00;
 
 	// Fill Data
 	buffer[active_index++] = 0x0f; //  [0]
@@ -30,7 +38,41 @@ unsigned int SendUSBAdaptorBitRateTask::ProductSendBuffer(unsigned char *buffer)
 	buffer[active_index++] = 0x41; //  0
 	buffer[active_index++] = 0x43; //  1
 	buffer[active_index++] = 0x80; //  2
-	buffer[active_index++] = 0x06; //  3 07 
+	
+	/*** Index 3 ***/ 
+	// Auto Report
+	if (PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_previous_autoReport == Generic_Enable){
+		chkbox_setting |= AUTO_REPORT_MASK;
+	}
+
+	// Reserved Bit 1
+	chkbox_setting |= RESERVED_BIT1_MASK;
+
+	// SMBUS
+	if (PMBUSHelper::GetAppSettings()->m_usbAdaptorI2CSetting.m_smBus == Generic_Enable){
+		chkbox_setting |= SMBUS_MASK;
+	}
+	
+	// Enable PWM 
+	if (PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_enablePWM == Generic_Enable){
+		chkbox_setting |= ENABLE_PWM_MASK;
+	}
+
+	// Clock In DI 6
+	if (PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI6 == Generic_Enable){
+		chkbox_setting |= CLOCKIN_DI6_MASK;
+	}
+
+	// Clock In DI 7
+	if (PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI7 == Generic_Enable){
+		chkbox_setting |= CLOCKIN_DI7_MASK;
+	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "chkbox_setting = %2x", chkbox_setting);
+
+	buffer[active_index++] = chkbox_setting; //  3
+	/*** ***/
+
 	buffer[active_index++] = 0xff; //  4
 	buffer[active_index++] = 0x00; //  5
 	buffer[active_index++] = 0x00; //  6

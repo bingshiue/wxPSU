@@ -2210,6 +2210,14 @@ int MainFrame::OpenIODevice(void){
 
 					this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
+					new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+						this->m_IOAccess,
+						this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed,
+						this->m_appSettings.m_usbAdaptorSPISetting.m_bitRateSpeed,
+						this->m_appSettings.m_usbAdaptorCANSetting.m_bitRateSpeed,
+						this->m_appSettings.m_usbAdaptorI2CSetting.m_busTimeout
+						);
+
 				}
 		
 			}

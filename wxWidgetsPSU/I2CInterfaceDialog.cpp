@@ -255,7 +255,7 @@ void I2CInterfaceDialog::OnComportButton(wxCommandEvent& event){
 }
 
 void I2CInterfaceDialog::OnUSBSettingsButton(wxCommandEvent& event){
-	USBSettingsDialog* usbSettingsDialog = new USBSettingsDialog(this, this->m_ioaccess, this->m_appSettings, this->m_pmbusStatusBar);
+	USBSettingsDialog* usbSettingsDialog = new USBSettingsDialog(this, this->m_ioaccess, this->m_currentUseIO, this->m_appSettings, this->m_pmbusStatusBar);
 	usbSettingsDialog->Centre();
 	usbSettingsDialog->ShowModal();
 
@@ -417,6 +417,14 @@ int I2CInterfaceDialog::OpenIODevice(void){
 				wxString usbDeviceName(wxT("R90000-9271(USB)"));
 
 				this->UpdateStatusBarIOSettingFiled(usbDeviceName);
+
+				new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+					this->m_ioaccess,
+					this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed,
+					this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
+					this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,
+					this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
+					);
 
 			}
 

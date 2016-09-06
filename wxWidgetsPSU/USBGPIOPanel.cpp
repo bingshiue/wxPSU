@@ -73,7 +73,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 
 	/* Top Left Section */
 	m_autoReportCheckBox = new wxCheckBox(this, CID_AUTO_REPORT_CHKBOX, wxT("Auto Report"));
-	m_autoReportCheckBox->SetValue(false);
+	m_autoReportCheckBox->SetValue(PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_autoReport == 0 ? false : true);
 
 	m_digitalOutputSB = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Digital Output"));
 
@@ -235,6 +235,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 
 	/* Top Right Section */
 	m_enablePWMCheckBox = new wxCheckBox(this, CID_ENABLE_PWM_CHKBOX, wxT("Enable PWM (Hz)"));
+	m_enablePWMCheckBox->SetValue(PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_enablePWM == 0 ? false : true);
 
 	m_freqST = new wxStaticText(this, wxID_ANY, wxT("Freq(Hz)"));
 	m_freqTC = new wxTextCtrl(this, wxID_ANY);
@@ -257,12 +258,16 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 	m_pwmTopLevelSizer->Add(m_pwmWriteBB, wxSizerFlags(0).Border().Align(wxALIGN_CENTER_VERTICAL));
 
 	m_clockInDI6CheckBox = new wxCheckBox(this, CID_CLOCK_IN_DI6_CHKBOX, wxT("Clock In DI6"));
+	m_clockInDI6CheckBox->SetValue(PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI6 == 0 ? false : true);
+
 	m_clockInDI6TC = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
 	m_clockInDI6TC->SetValue(wxString::Format("0.0"));
 	m_clockInDI6TC->SetEditable(false);
 	m_clockInDI6TC->SetBackgroundColour(wxColour(255, 239, 133));
 
 	m_clockInDI7CheckBox = new wxCheckBox(this, CID_CLOCK_IN_DI7_CHKBOX, wxT("Clock In DI7"));
+	m_clockInDI7CheckBox->SetValue(PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI7 == 0 ? false : true);
+
 	m_clockInDI7TC = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
 	m_clockInDI7TC->SetValue(wxString::Format("0.0"));
 	m_clockInDI7TC->SetEditable(false);

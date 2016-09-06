@@ -35,12 +35,13 @@ public:
 		CID_OK_BUTTOUN = 3081,
 	};
 
-	USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
+	USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
 
 	~USBSettingsDialog();
 
 	wxWindow *m_parent;
 	IOACCESS *m_ioaccess;
+	unsigned int *m_currentUseIO;
 	AppSettings_t *m_appSettings;
 	PMBUSStatusBar *m_pmbusStatusBar;
 
@@ -90,8 +91,8 @@ private:
 
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
 	int SetIODeviceOption(void);
-	int OpenIODevice(void);
-	int CloseIODevice(void);
+	//int OpenIODevice(void);
+	//int CloseIODevice(void);
 
 	void SaveConfig(void);
 

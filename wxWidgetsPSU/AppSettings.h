@@ -84,6 +84,11 @@ enum {
 #define DEFAULT_USB_ADAPTOR_UART_PARITYCHECK              NOPARITY
 #define DEFAULT_USB_ADAPTOR_UART_RECEIVE_BUFFER_SIZE      1024
 
+#define DEFAULT_ADAPTOR_GPIO_AUTO_REPORT                  (unsigned long)Generic_Unchecked
+#define DEFAULT_ADAPTOR_GPIO_ENABLE_PWM					  (unsigned long)Generic_Unchecked
+#define DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI6                 (unsigned long)Generic_Unchecked
+#define DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI7                 (unsigned long)Generic_Unchecked
+
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
 	unsigned long m_buadRate;
@@ -206,6 +211,30 @@ typedef struct usb_adaptor_uart_setting {
 
 }USB_ADAPTOR_UART_SETTING_t;
 
+typedef struct usb_adaptot_gpio_setting {
+	unsigned long m_autoReport;
+	unsigned long m_enablePWM;
+	unsigned long m_clockInDI6;
+	unsigned long m_clockInDI7;
+
+	unsigned long m_previous_autoReport;
+	unsigned long m_previous_enablePWM;
+	unsigned long m_previous_clockInDI6;
+	unsigned long m_previous_clockInDI7;
+
+	usb_adaptot_gpio_setting(){
+		Reset();
+	}
+
+	void Reset(){
+		m_previous_autoReport = m_autoReport = DEFAULT_ADAPTOR_GPIO_AUTO_REPORT;
+		m_previous_enablePWM = m_enablePWM = DEFAULT_ADAPTOR_GPIO_ENABLE_PWM;
+		m_previous_clockInDI6 = m_clockInDI6 = DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI6;
+		m_previous_clockInDI7 = m_clockInDI7 = DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI7;
+	}
+
+}USB_ADAPTOR_GPIO_SETTING_t;
+
 typedef struct appSettings_t {
 	COMPORT_SETTING_t m_comportSetting;
 	
@@ -223,6 +252,7 @@ typedef struct appSettings_t {
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
 	USB_ADAPTOR_CAN_SETTING_t m_usbAdaptorCANSetting;
 	USB_ADAPTOR_UART_SETTING_t m_usbAdaptorUARTSetting[USB_ADAPTOR_UART_SIZE];
+	USB_ADAPTOR_GPIO_SETTING_t m_usbAdaptorGPIOSetting;
 
 	/* ----- Developer Setting ----- */
 	unsigned long m_developerMode;/**< Developer Mode */
@@ -247,6 +277,8 @@ typedef struct appSettings_t {
 		for (int idx = 0; idx < USB_ADAPTOR_UART_SIZE; idx++){
 			m_usbAdaptorUARTSetting[idx].Reset();
 		}
+
+		this->m_usbAdaptorGPIOSetting.Reset();
 
 		this->m_developerMode = Generic_Disable;
 	}

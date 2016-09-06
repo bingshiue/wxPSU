@@ -4,7 +4,7 @@
 
 #include "USBSettingsDialog.h"
 
-USBSettingsDialog::USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("USB Settings")), wxDefaultPosition) {
+USBSettingsDialog::USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("USB Settings")), wxDefaultPosition) {
 
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(USB_16));
@@ -14,6 +14,7 @@ USBSettingsDialog::USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, AppSe
 
 	m_parent = parent;
 	m_ioaccess = ioaccess;
+	m_currentUseIO = currentUseIO;
 	m_appSettings = appSettings;
 	m_pmbusStatusBar = pmbusStatusBar;
 
@@ -83,6 +84,7 @@ int USBSettingsDialog::SetIODeviceOption(void){
 	return EXIT_SUCCESS;
 }
 
+#if 0
 int USBSettingsDialog::OpenIODevice(void){
 	int ret = EXIT_FAILURE;
 
@@ -235,6 +237,7 @@ int USBSettingsDialog::CloseIODevice(void){
 
 	return ret;
 }
+#endif
 
 void USBSettingsDialog::SaveConfig(void){
 
@@ -343,21 +346,54 @@ void USBSettingsDialog::SaveConfig(void){
 		this->m_appSettings->m_usbAdaptorCANSetting.m_previous_receivedTimeout = this->m_appSettings->m_usbAdaptorCANSetting.m_receivedTimeout;
 	}
 
-	new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
-		this->m_ioaccess,
-		this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed, 
-		this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
-		this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,
-		this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
-	);
 
+	// GPIO Auto Report
+	if (this->m_appSettings->m_usbAdaptorGPIOSetting.m_autoReport != ((this->m_gpioPanel->m_autoReportCheckBox->GetValue() == false) ? 0 : 1)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "GPIO Auto Report");
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_autoReport = (this->m_gpioPanel->m_autoReportCheckBox->GetValue() == false) ? 0 : 1;
+		//pConfig->Write(wxT("I2CSMBUS"), this->m_appSettings->m_usbAdaptorGPIOSetting.m_autoReport);
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_previous_autoReport = this->m_appSettings->m_usbAdaptorGPIOSetting.m_autoReport;
+	}
+
+	// GPIO Enable PWM
+	if (this->m_appSettings->m_usbAdaptorGPIOSetting.m_enablePWM != ((this->m_gpioPanel->m_enablePWMCheckBox->GetValue() == false) ? 0 : 1)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "GPIO Auto Report");
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_enablePWM = (this->m_gpioPanel->m_enablePWMCheckBox->GetValue() == false) ? 0 : 1;
+		//pConfig->Write(wxT("I2CSMBUS"), this->m_appSettings->m_usbAdaptorGPIOSetting.m_enablePWM);
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_previous_enablePWM = this->m_appSettings->m_usbAdaptorGPIOSetting.m_enablePWM;
+	}
+
+	// GPIO Clock In DI 6
+	if (this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI6 != ((this->m_gpioPanel->m_clockInDI6CheckBox->GetValue() == false) ? 0 : 1)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "GPIO Auto Report");
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI6 = (this->m_gpioPanel->m_clockInDI6CheckBox->GetValue() == false) ? 0 : 1;
+		//pConfig->Write(wxT("I2CSMBUS"), this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI6);
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_previous_clockInDI6= this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI6;
+	}
+
+	// GPIO Clock In DI 7
+	if (this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI7 != ((this->m_gpioPanel->m_clockInDI7CheckBox->GetValue() == false) ? 0 : 1)){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "GPIO Auto Report");
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI7 = (this->m_gpioPanel->m_clockInDI7CheckBox->GetValue() == false) ? 0 : 1;
+		//pConfig->Write(wxT("I2CSMBUS"), this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI7);
+		this->m_appSettings->m_usbAdaptorGPIOSetting.m_previous_clockInDI7 = this->m_appSettings->m_usbAdaptorGPIOSetting.m_clockInDI7;
+	}
+
+
+	// 
+	if (this->m_ioaccess[*this->m_currentUseIO].m_GetDeviceStatus() == IODEVICE_OPEN){
+		new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+			this->m_ioaccess,
+			this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed,
+			this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
+			this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,
+			this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
+			);
+	}
 }
 
 void USBSettingsDialog::OnOKButton(wxCommandEvent& event){
 
-	//this->CloseIODevice();
-	//wxMilliSleep(200);
-	//this->OpenIODevice();
 	this->SaveConfig();
 
 	this->EndModal(0);
