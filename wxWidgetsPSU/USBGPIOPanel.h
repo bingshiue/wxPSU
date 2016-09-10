@@ -18,6 +18,7 @@
 
 #include "CommonDef.h"
 #include "PMBUSBitmapButton.h"
+#include "USBI2CRS232Panel.h"
 
 class USBGPIOPanel : public wxPanel {
 public:
@@ -72,11 +73,13 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	USBGPIOPanel(wxWindow* parent);
+	USBGPIOPanel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* currentUseIO, USBI2CRS232Panel* usbI2CRS232Panel);
 	/**
 	* @brief Deconstructor.
 	*/
 	~USBGPIOPanel();
+
+	USBI2CRS232Panel* m_usbI2CRS232Panel;
 
 	wxTextValidator m_decimalValidator;
 	wxTextValidator m_hexValidator;
@@ -176,6 +179,9 @@ public:
 
 private:
 
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentUseIO;
+
 	wxCursor down_cursor;
 
 	wxToolTip *m_DOB1ToolTip;
@@ -202,6 +208,9 @@ private:
 	wxToolTip *m_DIPB6ToolTip;
 	wxToolTip *m_DIPB7ToolTip;
 	wxToolTip *m_DIPB8ToolTip;
+
+	void SendUSBAdaptorConfigAgent(void);
+	void SendUSBAdaptorParameterAgent(void);
 
 	void OnDigitalOutputButton1(wxCommandEvent& event);
 	void OnDigitalOutputButton2(wxCommandEvent& event);

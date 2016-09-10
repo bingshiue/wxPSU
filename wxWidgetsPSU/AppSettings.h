@@ -52,6 +52,9 @@ enum {
 
 #define DEFAULT_PMBUS_READ_METHOD     (unsigned long)PMBUS_ReadMethod_1_1
 
+#define DEFAULT_ACS_SETPOINT_INPUT_MAX  2400
+#define DEFAULT_ACS_SETPOINT_INPUT_MIN  2000
+
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600
 #define DEFAULT_COMPORT_BYTESIZE      8
@@ -88,6 +91,11 @@ enum {
 #define DEFAULT_ADAPTOR_GPIO_ENABLE_PWM					  (unsigned long)Generic_Unchecked
 #define DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI6                 (unsigned long)Generic_Unchecked
 #define DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI7                 (unsigned long)Generic_Unchecked
+
+#define DEFAULT_ADAPTOR_GPIO_DIGITAL_OUTPUT               0xff
+#define DEFAULT_ADAPTOR_GPIO_PWM_FREQUENCE                0
+#define DEFAULT_ADAPTOR_GPIO_PWM_DUTY                     50
+
 
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
@@ -216,11 +224,17 @@ typedef struct usb_adaptot_gpio_setting {
 	unsigned long m_enablePWM;
 	unsigned long m_clockInDI6;
 	unsigned long m_clockInDI7;
+	unsigned long m_digitalOutput;
+	unsigned long m_pwmFreq;
+	unsigned long m_pwmDuty;
 
 	unsigned long m_previous_autoReport;
 	unsigned long m_previous_enablePWM;
 	unsigned long m_previous_clockInDI6;
 	unsigned long m_previous_clockInDI7;
+	unsigned long m_previous_digitalOutput;
+	unsigned long m_previous_pwmFreq;
+	unsigned long m_previous_pwmDuty;
 
 	usb_adaptot_gpio_setting(){
 		Reset();
@@ -231,6 +245,9 @@ typedef struct usb_adaptot_gpio_setting {
 		m_previous_enablePWM = m_enablePWM = DEFAULT_ADAPTOR_GPIO_ENABLE_PWM;
 		m_previous_clockInDI6 = m_clockInDI6 = DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI6;
 		m_previous_clockInDI7 = m_clockInDI7 = DEFAULT_ADAPTOR_GPIO_CLOCK_IN_DI7;
+		m_previous_digitalOutput = m_digitalOutput = DEFAULT_ADAPTOR_GPIO_DIGITAL_OUTPUT;
+		m_previous_pwmFreq = m_pwmFreq = DEFAULT_ADAPTOR_GPIO_PWM_FREQUENCE;
+		m_previous_pwmDuty = m_pwmDuty = DEFAULT_ADAPTOR_GPIO_PWM_DUTY;
 	}
 
 }USB_ADAPTOR_GPIO_SETTING_t;
@@ -247,6 +264,8 @@ typedef struct appSettings_t {
 	unsigned long m_logToFile;/**< Log To File */
 	     wxString m_logFilePath;/**< Log File Path */
 	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
+	unsigned long m_acsSetPointMin;/**< ACE Set Point Minimum Value */
+	unsigned long m_acsSetPointMax;/**< ACE Set Point Maximum Value */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -269,6 +288,8 @@ typedef struct appSettings_t {
 		this->m_logToFile = DEFAULT_LOG_TO_FILE;/**< Log To File */
 		this->m_logFilePath = wxString::Format("%s", DEFAULT_LOG_FILE_PATH);
 		this->m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
+		this->m_acsSetPointMax = DEFAULT_ACS_SETPOINT_INPUT_MAX;
+		this->m_acsSetPointMin = DEFAULT_ACS_SETPOINT_INPUT_MIN;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

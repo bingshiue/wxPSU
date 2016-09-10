@@ -38,9 +38,9 @@ USBSettingsDialog::USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 
 	m_noteBook = new wxNotebook(this, wxID_ANY);
 
-	m_i2cRs232Panel = new USBI2CRS232Panel(m_noteBook);// , wxID_ANY, wxDefaultPosition, wxSize(300, 300));
+	m_i2cRs232Panel = new USBI2CRS232Panel(m_noteBook,this->m_ioaccess, this->m_currentUseIO);
 	m_spiCanPanel = new USBSPICANPanel(m_noteBook);
-	m_gpioPanel = new USBGPIOPanel(m_noteBook);
+	m_gpioPanel = new USBGPIOPanel(m_noteBook, this->m_ioaccess, this->m_currentUseIO, m_i2cRs232Panel);
 	m_infoPanel = new USBInfoPanel(m_noteBook);
 
 	m_noteBook->AddPage(m_i2cRs232Panel, wxT("I2C/RS232"));
@@ -382,8 +382,9 @@ void USBSettingsDialog::SaveConfig(void){
 
 	// 
 	if (this->m_ioaccess[*this->m_currentUseIO].m_GetDeviceStatus() == IODEVICE_OPEN){
-		new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+		new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
 			this->m_ioaccess,
+			this->m_currentUseIO,
 			this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed,
 			this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
 			this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,

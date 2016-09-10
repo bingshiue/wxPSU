@@ -55,6 +55,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(WXWIDGETS_HOME)\include;$(WXWIDGETS_HOME)\lib\vc_lib\mswud;$(SolutionDir)\TaskSystem\;$(SolutionDir)\hidapi-0.7.0\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,6 +116,7 @@
     <ClCompile Include="ReceiveISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="ReceiveISPWriteDataTask.cpp" />
     <ClCompile Include="ReceiveRebootCheckTask.cpp" />
+    <ClCompile Include="ReceiveUSBAdaptorSettingCMDTask.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
     <ClCompile Include="SendISPCheckStatusTask.cpp" />
     <ClCompile Include="SendISPEndCMDTask.cpp" />
@@ -123,6 +125,9 @@
     <ClCompile Include="SendISPWriteDataTask.cpp" />
     <ClCompile Include="SendRebootCheckTask.cpp" />
     <ClCompile Include="SendUSBAdaptorBitRateTask.cpp" />
+    <ClCompile Include="SendUSBAdaptorConfigTask.cpp" />
+    <ClCompile Include="SendUSBAdaptorParameterTask.cpp" />
+    <ClCompile Include="SendUSBAdaptorUARTSettingTask.cpp" />
     <ClCompile Include="SendWriteCMDTask.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="IOPortReadCMDThread.cpp" />

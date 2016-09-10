@@ -5,10 +5,11 @@
 #include "Task.h"
 
 
-SendUSBAdaptorBitRateTask::SendUSBAdaptorBitRateTask(IOACCESS* ioaccess, unsigned short i2cBitRate, unsigned short spiBitRate, unsigned short canBitRate, unsigned short m_i2cBusTimeOut){
+SendUSBAdaptorBitRateTask::SendUSBAdaptorBitRateTask(IOACCESS* ioaccess, unsigned int* currentUseIO, unsigned short i2cBitRate, unsigned short spiBitRate, unsigned short canBitRate, unsigned short m_i2cBusTimeOut){
 	this->m_id = task_ID_SendUSBAdaptorBitRateTask;
 
 	this->m_IOAccess = ioaccess;
+	this->m_currentUseIO = currentUseIO;
 
 	this->m_i2cBitRate = i2cBitRate;
 	this->m_spiBitRate = spiBitRate;

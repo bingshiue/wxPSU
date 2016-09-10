@@ -1006,14 +1006,13 @@ void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
 
 }
 
-#define ACS_SETPOINT_INPUT_MAX  2300
-#define ACS_SETPOINT_INPUT_MIN  1900
 bool CalibrationDialog::ValidateInputData(void){
 	bool ret = true;
 
 	double value1 = 0;
-	int InputValue = 0;
+	unsigned int InputValue = 0;
 	bool result = false;
+	wxString message("");
 
 	if (this->m_calibrationItemCB->GetSelection() == ACS_SETPOINT){
 		value1 = 0;
@@ -1023,8 +1022,11 @@ bool CalibrationDialog::ValidateInputData(void){
 
 			InputValue = (int)value1;
 
-			if (InputValue > ACS_SETPOINT_INPUT_MAX || InputValue < ACS_SETPOINT_INPUT_MIN){
-				wxMessageDialog *dial = new wxMessageDialog(NULL, L" Input Value Range : 1900(12.0V) ~ 2300(12.33V) \n Please Input Again !", L"Input Data Error", wxOK | wxICON_ERROR);
+			if (InputValue > PMBUSHelper::GetAppSettings()->m_acsSetPointMax || InputValue < PMBUSHelper::GetAppSettings()->m_acsSetPointMin){
+				
+				message = wxString::Format(" Input Value Range : %d ~ %d \n \n Please Input Again !", PMBUSHelper::GetAppSettings()->m_acsSetPointMin, PMBUSHelper::GetAppSettings()->m_acsSetPointMax);
+				
+				wxMessageDialog *dial = new wxMessageDialog(NULL, message, L"Input Data Error", wxOK | wxICON_ERROR);
 				dial->ShowModal();
 
 				delete dial;

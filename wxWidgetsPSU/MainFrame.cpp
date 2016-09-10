@@ -2210,8 +2210,9 @@ int MainFrame::OpenIODevice(void){
 
 					this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
-					new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+					new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
 						this->m_IOAccess,
+						&this->m_CurrentUseIOInterface,
 						this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed,
 						this->m_appSettings.m_usbAdaptorSPISetting.m_bitRateSpeed,
 						this->m_appSettings.m_usbAdaptorCANSetting.m_bitRateSpeed,
@@ -2592,6 +2593,26 @@ void MainFrame::CheckAndLoadConfig(void){
 	}
 	else{
 		this->m_appSettings.m_EnableChecksum = enableChecksum;
+	}
+
+	// ACS Set Point Minimum
+	long acsSetPointMin;
+	if (pConfig->Read(wxT("AcsSetPointMin"), &acsSetPointMin) == false){
+		pConfig->Write(wxT("AcsSetPointMin"), DEFAULT_ACS_SETPOINT_INPUT_MIN);
+		this->m_appSettings.m_acsSetPointMin = DEFAULT_ACS_SETPOINT_INPUT_MIN;
+	}
+	else{
+		this->m_appSettings.m_acsSetPointMin = acsSetPointMin;
+	}
+
+	// ACS Set Point Maxmum
+	long acsSetPointMax;
+	if (pConfig->Read(wxT("AcsSetPointMax"), &acsSetPointMax) == false){
+		pConfig->Write(wxT("AcsSetPointMax"), DEFAULT_ACS_SETPOINT_INPUT_MAX);
+		this->m_appSettings.m_acsSetPointMax = DEFAULT_ACS_SETPOINT_INPUT_MAX;
+	}
+	else{
+		this->m_appSettings.m_acsSetPointMax = acsSetPointMax;
 	}
 
 	pConfig->SetPath(wxT("/LOG"));

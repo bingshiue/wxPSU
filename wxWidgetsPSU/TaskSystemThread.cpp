@@ -25,10 +25,13 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 
 	while (this->m_running == true){
 
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "TaskCnt = %d", Task::GetCount());
+
 		nowTick = GetTickCount();
 
 		delta = nowTick - previousTick;
 		previousTick = nowTick;
+
 		Task::RunTask(delta);
 
 		wxMilliSleep(1);

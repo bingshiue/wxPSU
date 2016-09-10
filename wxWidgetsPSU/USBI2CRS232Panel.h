@@ -16,6 +16,7 @@
 #include <wx/animate.h>
 #include <wx/statline.h>
 
+#include "Task.h"
 #include "PMBUSHelper.h"
 #include "USBAdaptorSetting.h"
 
@@ -26,11 +27,18 @@ public:
 		CID_SMBUS_CHKBOX = 5050,
 	};
 
+	enum {
+		CID_UART_BUADRATE_CHKBOX = 5080,
+		CID_UART_DATABITS_CHKBOX,
+		CID_UART_STOPBITS_CHKBOX,
+		CID_UART_PARITYCHK_CHKBOX
+	};
+
 
 	/**
 	* @brief Constructor.
 	*/
-	USBI2CRS232Panel(wxWindow* parent);
+	USBI2CRS232Panel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* currentUseIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -79,7 +87,17 @@ public:
 
 private:
 
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentUseIO;
+
+	void SendUARTSettingAgent(void);
+
 	void OnSMBUSCheckBox(wxCommandEvent& event);
+
+	void OnUARTBuadRateCheckBox(wxCommandEvent& event);
+	void OnUARTDataBitsCheckBox(wxCommandEvent& event);
+	void OnUARTStopBitsCheckBox(wxCommandEvent& event);
+	void OnUARTParityCheckCheckBox(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

@@ -4,12 +4,8 @@
 
 #include "USBGPIOPanel.h"
 
-#define DEFAULT_DIGITAL_OUTPUT          0xff
 #define DEFAULT_DIGITAL_INPUT           0xff
 #define DEFAULT_DIGITAL_INPUT_POLARITY  0xff
-
-#define DEFAULT_PWM_FREQUENCE     0
-#define DEFAULT_PWM_DUTY         50
 
 #define DIGITAL_OUTPUT_1_MASK  0x20
 #define DIGITAL_OUTPUT_2_MASK  0x10
@@ -36,7 +32,12 @@
 #define DIGITAL_INPUT_POLARITY_7_MASK   0x02
 #define DIGITAL_INPUT_POLARITY_8_MASK   0x01
 
-USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
+USBGPIOPanel::USBGPIOPanel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* currentUseIO, USBI2CRS232Panel* usbI2CRS232Panel) : wxPanel(parent){
+
+	this->m_ioaccess = ioaccess;
+	this->m_currentUseIO = currentUseIO;
+
+	this->m_usbI2CRS232Panel = usbI2CRS232Panel;
 
 	/* Initial Sizer */
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -107,7 +108,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 	m_DOB6ToolTip->Enable(true);
 	m_digiOutputLight6->SetToolTip(m_DOB6ToolTip);
 	
-	m_digiOutputTC = new wxTextCtrl(m_digitalOutputSB->GetStaticBox(), wxID_ANY, (wxString::Format("%2x", DEFAULT_DIGITAL_OUTPUT)).Upper(), wxDefaultPosition, wxSize(40, -1));
+	m_digiOutputTC = new wxTextCtrl(m_digitalOutputSB->GetStaticBox(), wxID_ANY, (wxString::Format("%2x", PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_digitalOutput)).Upper(), wxDefaultPosition, wxSize(40, -1));
 	m_digiOutputTC->SetBackgroundColour(wxColour(255,239,133));
 	m_digiOutputTC->SetMaxLength(2);
 	m_digiOutputTC->SetEditable(false);
@@ -239,12 +240,12 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent) : wxPanel(parent){
 
 	m_freqST = new wxStaticText(this, wxID_ANY, wxT("Freq(Hz)"));
 	m_freqTC = new wxTextCtrl(this, wxID_ANY);
-	m_freqTC->SetValue(wxString::Format("%d",DEFAULT_PWM_FREQUENCE));
+	m_freqTC->SetValue(wxString::Format("%d", PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_pwmFreq));
 	m_freqTC->SetValidator(m_decimalValidator);
 
 	m_dutyST = new wxStaticText(this, wxID_ANY, wxT("Duty(%)"));
 	m_dutyTC = new wxTextCtrl(this, wxID_ANY);
-	m_dutyTC->SetValue(wxString::Format("%d", DEFAULT_PWM_DUTY));
+	m_dutyTC->SetValue(wxString::Format("%d", PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_pwmDuty));
 	m_dutyTC->SetValidator(m_decimalValidator);
 
 	m_pwmFGSizer->Add(m_freqST, wxSizerFlags(7).Border().Align(wxALIGN_CENTER_VERTICAL));
@@ -369,6 +370,8 @@ void USBGPIOPanel::OnDigitalOutputButton1(wxCommandEvent& event){
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
 
+	this->SendUSBAdaptorParameterAgent();
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
 
@@ -388,6 +391,8 @@ void USBGPIOPanel::OnDigitalOutputButton2(wxCommandEvent& event){
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
+
+	this->SendUSBAdaptorParameterAgent();
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
@@ -409,6 +414,8 @@ void USBGPIOPanel::OnDigitalOutputButton3(wxCommandEvent& event){
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
 
+	this->SendUSBAdaptorParameterAgent();
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
 
@@ -428,6 +435,8 @@ void USBGPIOPanel::OnDigitalOutputButton4(wxCommandEvent& event){
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
+
+	this->SendUSBAdaptorParameterAgent();
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
@@ -449,6 +458,8 @@ void USBGPIOPanel::OnDigitalOutputButton5(wxCommandEvent& event){
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
 
+	this->SendUSBAdaptorParameterAgent();
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
 
@@ -469,9 +480,10 @@ void USBGPIOPanel::OnDigitalOutputButton6(wxCommandEvent& event){
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
 
+	this->SendUSBAdaptorParameterAgent();
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%x", this->m_digitalOutput);
 }
-
 
 void USBGPIOPanel::OnDigitalInputButton1(wxCommandEvent& event){
 	// Reserved
@@ -504,7 +516,6 @@ void USBGPIOPanel::OnDigitalInputButton7(wxCommandEvent& event){
 void USBGPIOPanel::OnDigitalInputButton8(wxCommandEvent& event){
 	// Reserved
 }
-
 
 void USBGPIOPanel::OnDigitalInputPolarityButton1(wxCommandEvent& event){
 
@@ -669,22 +680,40 @@ void USBGPIOPanel::OnDigitalInputPolarityButton8(wxCommandEvent& event){
 
 void USBGPIOPanel::OnPWMWriteButton(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	this->SendUSBAdaptorParameterAgent();
 }
 
 void USBGPIOPanel::OnAutoReportCheckBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_autoReport = this->m_autoReportCheckBox->GetValue() == false ? 0 : 1;
+
+	this->SendUSBAdaptorConfigAgent();
 }
 
 void USBGPIOPanel::OnEnablePWMCheckBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_enablePWM = this->m_enablePWMCheckBox->GetValue() == false ? 0 : 1;
+
+	this->SendUSBAdaptorConfigAgent();
 }
 
 void USBGPIOPanel::OnDI6InClockCheckBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI6 = this->m_clockInDI6CheckBox->GetValue() == false ? 0 : 1;
+
+	this->SendUSBAdaptorConfigAgent();
 }
 
 void USBGPIOPanel::OnDI7InClockCheckBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI7 = this->m_clockInDI7CheckBox->GetValue() == false ? 0 : 1;
+
+	this->SendUSBAdaptorConfigAgent();
 }
 
 void USBGPIOPanel::SetDigitalInputLight(unsigned int index, unsigned char polarity){
@@ -728,6 +757,38 @@ void USBGPIOPanel::SetDigitalInputLight(unsigned int index, unsigned char polari
 		break;
 	}
 
+}
+
+void USBGPIOPanel::SendUSBAdaptorConfigAgent(void){
+	// Send USB Adaptor Config
+	new(TP_SendUSBAdaptorConfigTask) SendUSBAdaptorConfigTask(
+		this->m_ioaccess,
+		this->m_currentUseIO,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_autoReport,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorI2CSetting.m_smBus,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_enablePWM,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI6,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI7,
+		wxAtoi(this->m_usbI2CRS232Panel->m_BusTimeoutTC->GetValue())
+		);
+}
+
+void USBGPIOPanel::SendUSBAdaptorParameterAgent(void){
+	
+	int count = TaskEx::GetCount(task_ID_SendUSBAdaptorParameterTask);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of SendUSBAdaptorParameterTask = %d", count);
+
+	//if (count == 0){
+		// Send USB Adaptor Parameter
+		new(TP_SendUSBAdaptorParameterTask) SendUSBAdaptorParameterTask(
+			this->m_ioaccess,
+			this->m_currentUseIO,
+			this->m_digitalOutput,
+			wxAtoi(this->m_freqTC->GetValue()),
+			wxAtoi(this->m_dutyTC->GetValue())
+		);
+	//}
 }
 
 wxBEGIN_EVENT_TABLE(USBGPIOPanel, wxPanel)

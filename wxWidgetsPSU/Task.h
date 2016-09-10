@@ -46,8 +46,11 @@
 #define TP_ReceiveRebootCheckTask (0.5f)
 #define TP_UserCancelISPPostDelayTask (0.5f)
 #define TP_UserCancelISPTask (0.9f)
-
 #define TP_SendUSBAdaptorBitRateTask (0.5f)
+#define TP_SendUSBAdaptorUARTSettingTask (0.5f)
+#define TP_SendUSBAdaptorConfigTask (0.5f)
+#define TP_SendUSBAdaptorParameterTask (0.5f)
+#define TP_ReceiveUSBAdaptorSettingCMDTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -66,8 +69,11 @@ enum {
 	task_ID_ReceiveRebootCheckTask,
 	task_ID_UserCancelISPPostDelayTask,
 	task_ID_UserCancelISPTask,
-
-	task_ID_SendUSBAdaptorBitRateTask
+	task_ID_SendUSBAdaptorBitRateTask,
+	task_ID_SendUSBAdaptorUARTSettingTask,
+	task_ID_SendUSBAdaptorConfigTask,
+	task_ID_SendUSBAdaptorParameterTask,
+	task_ID_ReceiveUSBAdaptorSettingCMDTask
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -611,6 +617,38 @@ public :
 
 };
 
+class ReceiveUSBAdaptorSettingCMDTask : public TaskEx {
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	ReceiveUSBAdaptorSettingCMDTask(IOACCESS* ioaccess, unsigned int* currentIO);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~ReceiveUSBAdaptorSettingCMDTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+
+};
+
 class UserCancelISPPostDelayTask : public TaskEx {
 
 	double m_elapsedTimer;/**< for compute elapsed time */
@@ -677,6 +715,7 @@ class SendUSBAdaptorBitRateTask : public TaskEx {
 	double m_elapsedTimer;/**< for compute elapsed time */
 
 	IOACCESS* m_IOAccess;
+	unsigned int *m_currentUseIO;
 
 	unsigned short m_i2cBitRate;
 	unsigned short m_spiBitRate;
@@ -690,12 +729,146 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendUSBAdaptorBitRateTask(IOACCESS* ioaccess, unsigned short i2cBitRate, unsigned short spiBitRate, unsigned short canBitRate, unsigned short m_i2cBusTimeOut);
+	SendUSBAdaptorBitRateTask(IOACCESS* ioaccess, unsigned int* currentUseIO, unsigned short i2cBitRate, unsigned short spiBitRate, unsigned short canBitRate, unsigned short m_i2cBusTimeOut);
 
 	/**
 	* @brief Deconstructor.
 	*/
 	~SendUSBAdaptorBitRateTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+};
+
+class SendUSBAdaptorUARTSettingTask : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS* m_IOAccess;
+	unsigned int *m_currentUseIO;
+
+	unsigned char m_uartPort;
+	unsigned char m_buadRate;
+	unsigned char m_dataBits;
+	unsigned char m_stopBits;
+	unsigned char m_parityCheck;
+
+	unsigned int ProductSendBuffer(unsigned char *buffer);
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	SendUSBAdaptorUARTSettingTask(IOACCESS* ioaccess, unsigned int* currentUseIO, unsigned char UartPort, unsigned char BuadRate, unsigned char DataBits, unsigned char StopBits, unsigned char ParityCheck);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~SendUSBAdaptorUARTSettingTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+
+};
+
+class SendUSBAdaptorConfigTask : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS* m_IOAccess;
+	unsigned int *m_currentUseIO;
+
+	unsigned char  m_AutoReport;
+	unsigned char  m_SMBus;
+	unsigned char  m_PWMEnable;
+	unsigned char  m_ClockInDI6;
+	unsigned char  m_ClockInDI7;
+	unsigned short m_I2CBusTimeout;
+
+	unsigned int ProductSendBuffer(unsigned char *buffer);
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	SendUSBAdaptorConfigTask(
+		IOACCESS*      ioaccess, 
+		unsigned int*  currentUseIO, 
+		unsigned char  AutoReport, 
+		unsigned char  SMBus, 
+		unsigned char  PWMEnable, 
+		unsigned char  ClockInDI6,
+		unsigned char  ClockInDI7,
+		unsigned short I2CBusTimeout
+	);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~SendUSBAdaptorConfigTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+};
+
+class SendUSBAdaptorParameterTask : public TaskEx{
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS* m_IOAccess;
+	unsigned int *m_currentUseIO;
+
+	unsigned char  m_digitalOutput;
+	unsigned short m_pwmFreq;
+	unsigned short m_pwmDuty;
+
+	unsigned int ProductSendBuffer(unsigned char *buffer);
+
+public:
+	/**
+	* @brief Constructor.
+	*/
+	SendUSBAdaptorParameterTask(
+		IOACCESS*      ioaccess,
+		unsigned int*  currentUseIO,
+		unsigned char  digitalOutput,
+		unsigned short pwmFreq,
+		unsigned short pwmDuty
+		);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~SendUSBAdaptorParameterTask(void);
 
 	/**
 	* @brief Draw function.

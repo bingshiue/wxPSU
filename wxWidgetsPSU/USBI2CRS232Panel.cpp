@@ -4,7 +4,10 @@
 
 #include "USBI2CRS232Panel.h"
 
-USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
+USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* currentUseIO) : wxPanel(parent){
+
+	this->m_ioaccess = ioaccess;
+	this->m_currentUseIO = currentUseIO;
 
 	/* Initial Sizer */
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -97,7 +100,7 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 
 
 	m_rs232BuadRateST = new wxStaticText(m_rs232portSB->GetStaticBox(), wxID_ANY, wxT("Buad Rate"));
-	m_rs232BuadRateCB = new wxComboBox(m_rs232portSB->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
+	m_rs232BuadRateCB = new wxComboBox(m_rs232portSB->GetStaticBox(), CID_UART_BUADRATE_CHKBOX, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
 
 	// USB UART Buad Rate
 	typedef struct {
@@ -105,20 +108,19 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 		unsigned long  m_value;
 	} BuadRateArray;
 
-	BuadRateArray buadRatedArray[13] = {
-		{ "110", 110 },
-		{ "300", 300 },
+	BuadRateArray buadRatedArray[12] = {
 		{ "600", 600 },
 		{ "1200", 1200 },
 		{ "2400", 2400 },
 		{ "4800", 4800 },
 		{ "9600", 9600 },
-		{ "11400", 11400 },
+		{ "14400", 14400 },
 		{ "19200", 19200 },
 		{ "38400", 38400 },
 		{ "56000", 56000 },
 		{ "57600", 57600 },
-		{ "115200", 115200 }
+		{ "115200", 115200 },
+		{ "172800", 172800 }
 	};
 
 	for (unsigned int idx = 0; idx < sizeof(buadRatedArray) / sizeof(buadRatedArray[0]); idx++){
@@ -136,10 +138,10 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 	m_rs232BuadRateCB->SetSelection(select);
 
 	m_rs232DataBitsST = new wxStaticText(m_rs232portSB->GetStaticBox(), wxID_ANY, wxT("Data Bits"));
-	m_rs232DataBitsCB = new wxComboBox(m_rs232portSB->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
+	m_rs232DataBitsCB = new wxComboBox(m_rs232portSB->GetStaticBox(), CID_UART_DATABITS_CHKBOX, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
 
 	// USB UART Data Bits
-	unsigned long dataBitsArray[4] = { 5, 6, 7, 8 };
+	unsigned long dataBitsArray[2] = { 8, 9 };
 
 	for (unsigned int idx = 0; idx < sizeof(dataBitsArray) / sizeof(dataBitsArray[0]); idx++){
 		m_rs232DataBitsCB->Append(wxString::Format("%d", dataBitsArray[idx]));
@@ -155,7 +157,7 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 	m_rs232DataBitsCB->SetSelection(select);
 
 	m_rs232StopBitsST = new wxStaticText(m_rs232portSB->GetStaticBox(), wxID_ANY, wxT("Stop Bits"));
-	m_rs232StopBitsCB = new wxComboBox(m_rs232portSB->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
+	m_rs232StopBitsCB = new wxComboBox(m_rs232portSB->GetStaticBox(), CID_UART_STOPBITS_CHKBOX, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
 
 	// USB UART Stop Bits
 	typedef struct {
@@ -163,10 +165,9 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 		unsigned long  m_value;
 	} StopBitsArray;
 
-	StopBitsArray stopBitsArray[3] = {
+	StopBitsArray stopBitsArray[2] = {
 		{ "1", 0 },
-		{ "1.5", 1 },
-		{ "2", 2 },
+		{ "2", 1 },
 	};
 
 	for (unsigned int idx = 0; idx < sizeof(stopBitsArray) / sizeof(stopBitsArray[0]); idx++){
@@ -183,7 +184,7 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 	m_rs232StopBitsCB->SetSelection(select);
 
 	m_rs232ParityCheckST = new wxStaticText(m_rs232portSB->GetStaticBox(), wxID_ANY, wxT("Parity Check"));
-	m_rs232ParityCheckCB = new wxComboBox(m_rs232portSB->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
+	m_rs232ParityCheckCB = new wxComboBox(m_rs232portSB->GetStaticBox(), CID_UART_PARITYCHK_CHKBOX, wxEmptyString, wxDefaultPosition, wxSize(110, -1));
 
 	// USB UART Parity Check
 	typedef struct {
@@ -191,12 +192,10 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 		unsigned long  m_value;
 	} ParityCheckArray;
 
-	ParityCheckArray parityCheckArray[5] = {
+	ParityCheckArray parityCheckArray[3] = {
 		{ "N", 0 },
-		{ "O", 1 },
-		{ "E", 2 },
-		{ "M", 3 },
-		{ "S", 4 }
+		{ "E", 1 },
+		{ "O", 2 },
 	};
 
 	for (unsigned int idx = 0; idx < sizeof(parityCheckArray) / sizeof(parityCheckArray[0]); idx++){
@@ -211,6 +210,12 @@ USBI2CRS232Panel::USBI2CRS232Panel(wxWindow* parent) : wxPanel(parent){
 	}
 
 	m_rs232ParityCheckCB->SetSelection(select);
+
+	// If DataBits == 9, Diable Parity Check Combo Box
+	if (m_rs232DataBitsCB->GetSelection() == 1){
+		m_rs232ParityCheckCB->SetSelection(0);
+		m_rs232ParityCheckCB->Enable(false);
+	}
 
 	m_rs232RecvBuffSizeST = new wxStaticText(m_rs232portSB->GetStaticBox(), wxID_ANY, wxT("Received Buffer Size (bytes)"));
 	m_rs232RecvBuffSizeTC = new wxTextCtrl(m_rs232portSB->GetStaticBox(), wxID_ANY);
@@ -250,10 +255,73 @@ USBI2CRS232Panel::~USBI2CRS232Panel(){
 
 }
 
+void USBI2CRS232Panel::SendUARTSettingAgent(void){
+	new(TP_SendUSBAdaptorUARTSettingTask)SendUSBAdaptorUARTSettingTask(
+		this->m_ioaccess,
+		this->m_currentUseIO,
+		this->m_rs232PortNumberCB->GetSelection(), // UART Port
+		this->m_rs232BuadRateCB->GetSelection(),   // Buad Rate
+		this->m_rs232DataBitsCB->GetSelection(),   // Data Bits
+		this->m_rs232StopBitsCB->GetSelection(),   // Stop Bits
+		this->m_rs232ParityCheckCB->GetSelection()
+		);
+}
+
 void USBI2CRS232Panel::OnSMBUSCheckBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	PMBUSHelper::GetAppSettings()->m_usbAdaptorI2CSetting.m_smBus = this->m_smbusCheckBox->GetValue() == false ? 0 : 1;
+
+	// Send USB Adaptor Config
+	new(TP_SendUSBAdaptorConfigTask) SendUSBAdaptorConfigTask(
+		this->m_ioaccess,
+		this->m_currentUseIO,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_autoReport,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorI2CSetting.m_smBus,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_enablePWM,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI6,
+		PMBUSHelper::GetAppSettings()->m_usbAdaptorGPIOSetting.m_clockInDI7,
+		wxAtoi(this->m_BusTimeoutTC->GetValue())
+	);
+
+}
+
+void USBI2CRS232Panel::OnUARTBuadRateCheckBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	this->SendUARTSettingAgent();
+}
+
+void USBI2CRS232Panel::OnUARTDataBitsCheckBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	// If DataBits == 9, Diable Parity Check Combo Box
+	if (m_rs232DataBitsCB->GetSelection() == 1){
+		m_rs232ParityCheckCB->SetSelection(0);
+		m_rs232ParityCheckCB->Enable(false);
+	} else{
+		m_rs232ParityCheckCB->SetSelection(0);
+		m_rs232ParityCheckCB->Enable(true);
+	}
+
+	this->SendUARTSettingAgent();
+}
+
+void USBI2CRS232Panel::OnUARTStopBitsCheckBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	this->SendUARTSettingAgent();
+}
+
+void USBI2CRS232Panel::OnUARTParityCheckCheckBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	this->SendUARTSettingAgent();
 }
 
 wxBEGIN_EVENT_TABLE(USBI2CRS232Panel, wxPanel)
 EVT_CHECKBOX(CID_SMBUS_CHKBOX, USBI2CRS232Panel::OnSMBUSCheckBox)
+
+EVT_COMBOBOX(CID_UART_BUADRATE_CHKBOX, USBI2CRS232Panel::OnUARTBuadRateCheckBox)
+EVT_COMBOBOX(CID_UART_DATABITS_CHKBOX, USBI2CRS232Panel::OnUARTDataBitsCheckBox)
+EVT_COMBOBOX(CID_UART_STOPBITS_CHKBOX, USBI2CRS232Panel::OnUARTStopBitsCheckBox)
+EVT_COMBOBOX(CID_UART_PARITYCHK_CHKBOX, USBI2CRS232Panel::OnUARTParityCheckCheckBox)
+
 wxEND_EVENT_TABLE()

@@ -418,8 +418,9 @@ int I2CInterfaceDialog::OpenIODevice(void){
 
 				this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
-				new (TP_SendUSBAdaptorBitRateTask)SendUSBAdaptorBitRateTask(
+				new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
 					this->m_ioaccess,
+					this->m_currentUseIO,
 					this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed,
 					this->m_appSettings->m_usbAdaptorSPISetting.m_bitRateSpeed,
 					this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,

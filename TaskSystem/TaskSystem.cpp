@@ -13,10 +13,9 @@ static DWORD g_count = 0;		/**< 表示目前所有執行中的TASK數目 */
 
 wxCriticalSection Task::m_critsect;
 
-
 // 初始化TASK LIST(雙向LIST,LIST中的每一個元素為一個TASK)
 void Task::InitTaskList(void)
-{
+{	
 	ReleaseTaskList();// 先做釋放的動作以防LIST已經初始化過
 
 	g_buf = (BYTE*)malloc(MEM_SIZE);// 申請記憶體空間
@@ -63,6 +62,7 @@ void Task::RunTask(double elapsedTime)
 
 	Task *task, *next;
 	//執行所有的TASK中的Main函式
+
 	for (task = (Task*)m_active; m_active; task = next)
 	{
 		task->Main(elapsedTime);// 呼叫每一個TASK的Main函式
@@ -70,7 +70,9 @@ void Task::RunTask(double elapsedTime)
 		if (next == (Task*)m_active) break;//表示已經找了一輪,中斷for迴圈
 	}
 
+
 	if (g_buf + MEM_SIZE - m_free < DFRG_SIZE) Defrag();// 重新整理記憶體空間
+
 }
 
 // 重新整理記憶體空間
@@ -132,12 +134,12 @@ void Task::Defrag(void)
 // TASK生成,超載 delete 運算子
 void Task::operator delete(void *pTask)
 {	
-	if (pTask == NULL) return;// 檢查是否為空指標
+	wxCriticalSectionLocker locker(m_critsect);
+	
+	if (pTask == NULL) return; // 檢查是否為空指標
 	Task *task = (Task*)pTask;// 取得位址
 
-	wxCriticalSectionLocker locker(m_critsect);
-
-	if (task->m_use == FALSE) return;// 防止重複刪除
+	if (task->m_use == FALSE) return; // 防止重複刪除
 	task->m_use = FALSE;// 設定為非使用
 
 	g_size -= task->m_size;// 計算 g_size
@@ -156,6 +158,7 @@ void Task::operator delete(void *pTask)
 	// 更新相鄰TASK的m_next,m_pre的值
 	task->m_pre->m_next = task->m_next;
 	task->m_next->m_pre = task->m_pre;
+
 }
 
 // TASK生成,超載 new 運算子
@@ -324,3 +327,4 @@ void Task::Dump(const char *filename)
 
 	fclose(fp);
 }
+
