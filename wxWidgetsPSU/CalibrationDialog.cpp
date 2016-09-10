@@ -74,7 +74,7 @@ DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 };
 
-CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration dialog")), wxDefaultPosition, wxSize(600, 400))
+CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(600, 400))
 {
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(CALIBRATION_16));
@@ -522,6 +522,14 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	case IOACCESS_HID:
 
+		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_HID],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
 		break;
 
 	default:
@@ -642,6 +650,14 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 		break;
 
 	case IOACCESS_HID:
+
+		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_HID],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
 
 		break;
 

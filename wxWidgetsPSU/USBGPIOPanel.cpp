@@ -787,8 +787,26 @@ void USBGPIOPanel::SendUSBAdaptorParameterAgent(void){
 			this->m_digitalOutput,
 			wxAtoi(this->m_freqTC->GetValue()),
 			wxAtoi(this->m_dutyTC->GetValue())
-		);
-	//}
+			);
+		//}
+
+
+#if 0
+	// Call Main Fuction Directly For Test __vfptr NULL issue
+	{
+		SendUSBAdaptorParameterTask *task = (SendUSBAdaptorParameterTask *)TaskEx::GetTask(task_ID_SendUSBAdaptorParameterTask, 0);
+
+		int (SendUSBAdaptorParameterTask::*pMain)(double) = &SendUSBAdaptorParameterTask::Main;
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+		if (task){
+			((task)->*pMain)(0);
+		}
+	}
+	//
+#endif
+
 }
 
 wxBEGIN_EVENT_TABLE(USBGPIOPanel, wxPanel)

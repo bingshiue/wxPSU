@@ -32,9 +32,16 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 		delta = nowTick - previousTick;
 		previousTick = nowTick;
 
-		Task::RunTask(delta);
-
-		wxMilliSleep(1);
+		if (Task::GetCount() > 0)
+		{
+			Task::GetCriticalSectionObject().Enter();
+			wxMilliSleep(1);
+			Task::RunTask(delta);
+			Task::GetCriticalSectionObject().Leave();
+		}
+		else{
+			wxMilliSleep(100);
+		}
 	}
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "TaskSystem Thread Finish");

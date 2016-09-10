@@ -55,7 +55,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(WXWIDGETS_HOME)\include;$(WXWIDGETS_HOME)\lib\vc_lib\mswud;$(SolutionDir)\TaskSystem\;$(SolutionDir)\hidapi-0.7.0\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <ExceptionHandling>Async</ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

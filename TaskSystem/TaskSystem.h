@@ -41,7 +41,7 @@ protected:
 	Task* m_next;/**< Pointer to next task */
 
 public:
-	static wxCriticalSection m_critsect; /**< wxCriticalSection Object */
+	//static wxCriticalSection m_critsect; /**< wxCriticalSection Object */
 
 	/**
 	 * @brief virtual deconstructor.
@@ -110,6 +110,13 @@ public:
 	 * @filename File Name
 	 */
 	static void Dump(const char *filename);
+
+	/**
+	* @brief Get wxCriticalSection Object.
+	*
+	* @filename File Name
+	*/
+	static wxCriticalSection& GetCriticalSectionObject(void);
 
 	/**
 	 * @brief Main Process Function.
