@@ -23,7 +23,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.8        |     Support Set USB Adaptor I2C BitRate   |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.9        |     Support Set USB Adaptor GPIO Finction |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.8" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.9" /**< Program Version, Shown in About Dialog */
 
 #endif
