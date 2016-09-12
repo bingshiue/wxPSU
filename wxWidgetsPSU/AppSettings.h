@@ -7,6 +7,12 @@
 #include <Windows.h>
 #include <wx/wx.h>
 
+#include "PMBUSCommandType.h"
+
+enum {
+	Model_FSG003_000G = 0,
+};
+
 enum {
 	RunMode_Iterations = 0,
 	RunMode_Continually,
@@ -96,6 +102,12 @@ enum {
 #define DEFAULT_ADAPTOR_GPIO_PWM_FREQUENCE                0
 #define DEFAULT_ADAPTOR_GPIO_PWM_DUTY                     50
 
+typedef struct model_type {
+	char* m_modelName;
+	PMBUSCOMMAND_t* m_cmdTable;
+	unsigned int m_cmdTableSize;
+
+} MODEL_TYPE_t;
 
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
@@ -219,7 +231,7 @@ typedef struct usb_adaptor_uart_setting {
 
 }USB_ADAPTOR_UART_SETTING_t;
 
-typedef struct usb_adaptot_gpio_setting {
+typedef struct usb_adaptor_gpio_setting {
 	unsigned long m_autoReport;
 	unsigned long m_enablePWM;
 	unsigned long m_clockInDI6;
@@ -236,7 +248,7 @@ typedef struct usb_adaptot_gpio_setting {
 	unsigned long m_previous_pwmFreq;
 	unsigned long m_previous_pwmDuty;
 
-	usb_adaptot_gpio_setting(){
+	usb_adaptor_gpio_setting(){
 		Reset();
 	}
 

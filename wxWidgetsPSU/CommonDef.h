@@ -31,10 +31,6 @@
 #define SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT  1000/**< Timeout of Serial Port Send Semaphore */
 #define SERIAL_PORT_SEND_POLLING_INTERVAL  20/**< Interval of Serial Port Send Polling (Milliseconds) */
 
-#define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
-
-#define SERIALPORT_RECV_BUFF_SIZE  256 /**< Seroal Port Receive Buufer Maximum Size */
-
 #define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
 
 #define UPDATE_PRIMARY_FW_TARGET    0x50 /**< Primary FW Update Target code */

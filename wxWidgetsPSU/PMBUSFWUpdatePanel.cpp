@@ -247,6 +247,7 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
+#if 0
 	/*** Check if Monitor is Running ***/
 	if (*this->m_isMonitorRunning == true){
 		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
@@ -255,6 +256,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 		return;
 	}
+#endif
 
 	/*** If User Cancel ISP Sequence Previous ***/
 	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){

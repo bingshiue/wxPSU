@@ -34,7 +34,6 @@
 #include "PMBUSStatusDCHPanel.h"
 #include "PMBUSFWUpdatePanel.h"
 #include "PMBUSLogTextCtrl.h"
-#include "PMBUSHelper.h"
 #include "PMBUSArtProv.h"
 #include "CalibrationDialog.h"
 #include "I2CInterfaceDialog.h"

@@ -2,6 +2,7 @@
  * @file MainFrame.cpp
  */
 #include "MainFrame.h"
+#include "PMBUSHelper.h"
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
 #include "Acbel.xpm"
@@ -1309,7 +1310,16 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
 
 	if (!this->PMBusPrimaryFWUpdatePanel){
-		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, m_PrimaryTIHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_PRIMARY_FW_TARGET, this->m_appSettings.m_developerMode);
+		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(
+			m_notebook, 
+			path, 
+			m_PrimaryTIHexFileStat, 
+			this->m_IOAccess, 
+			&this->m_CurrentUseIOInterface, 
+			&this->m_monitor_running,
+			UPDATE_PRIMARY_FW_TARGET, 
+			this->m_appSettings.m_developerMode
+		);
 	}
 
 	// Add page to NoteBook
@@ -1434,7 +1444,16 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 
 
 	if (!this->PMBusSecondaryFWUpdatePanel){
-		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(m_notebook, path, m_SecondaryTIHexFileStat, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, UPDATE_SECONDARY_FW_TARGET, this->m_appSettings.m_developerMode);
+		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(
+			m_notebook, 
+			path, 
+			m_SecondaryTIHexFileStat, 
+			this->m_IOAccess, 
+			&this->m_CurrentUseIOInterface, 
+			&this->m_monitor_running,
+			UPDATE_SECONDARY_FW_TARGET, 
+			this->m_appSettings.m_developerMode
+		);
 	}
 	
 	// Add page to NoteBook
@@ -1755,7 +1774,7 @@ void MainFrame::StopMonitor(void){
 
 	(this->m_status_bar->getTimer())->Stop();
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
-	this->m_IOPortSendCMDThread->m_running = false;
+	if(this->m_IOPortSendCMDThread != NULL) this->m_IOPortSendCMDThread->m_running = false;
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
@@ -2390,6 +2409,19 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
 		);
 #endif
+
+	// Check If Monitor is running
+	if(this->m_monitor_running == true){
+		
+#if 0
+		wxMessageBox(wxT("Program will stop monitor automatically !"),
+			wxT("Monitor will stop"),  // caption
+			wxOK | wxICON_INFORMATION);
+#endif
+		PSU_DEBUG_PRINT(MSG_ALERT, "Stop Monitor Automatically Before Do ISP");
+		this->StopMonitor();
+		wxMilliSleep(500);
+	}
 
 	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus);
 
