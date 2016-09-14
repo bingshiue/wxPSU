@@ -41,6 +41,7 @@
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
 #include "ISPSequenceThread.h"
+#include "ModelSelectDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -115,12 +116,14 @@ enum
 class MainFrame : public wxFrame, private wxLog
 {
 public:
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, MODEL_TYPE_t* modelList);
 	virtual ~MainFrame();
+
+	MODEL_TYPE_t* m_modelList;/**< Support Model List */
 
 	PORT_SETTING_t m_portSetting;
 	IOACCESS m_IOAccess[IO_SIZE];
-	PMBUSCOMMAND_t m_PMBusData[PMBUSCOMMAND_SIZE];/**< PM Bus Data */
+	PMBUSCOMMAND_t *m_PMBusData;/**< PM Bus Data */
 
 	AppSettings_t m_appSettings;
 
@@ -337,6 +340,7 @@ private:
 	unsigned int m_CurrentUseIOInterface;/**< Current Use IO Interface */
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
 
+	void SetupModel(void);
 	void SetupPMBusCommandData(void);
 	void SetupPMBusCommandWritePage(void);
 

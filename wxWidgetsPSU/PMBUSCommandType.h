@@ -40,7 +40,7 @@ enum {
 	cmd_need_change_page
 };
 
-#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
+//#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
 #define SERIALPORT_RECV_BUFF_SIZE  256 /**< Seroal Port Receive Buufer Maximum Size */

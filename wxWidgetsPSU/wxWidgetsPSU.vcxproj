@@ -94,6 +94,7 @@
     <ClCompile Include="ISPSequenceThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
+    <ClCompile Include="ModelSelectDialog.cpp" />
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
@@ -173,12 +174,19 @@
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="ComportDialog.h" />
     <ClInclude Include="CustomEvent.h" />
+    <ClInclude Include="FSG003_000G.h" />
+    <ClInclude Include="FSG003_000G_CMDCB.h" />
+    <ClInclude Include="Generic_CMDCB.h" />
+    <ClInclude Include="Generic_Model.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="IOAccess.h" />
     <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
+    <ClInclude Include="ModelList.h" />
+    <ClInclude Include="ModelSelectDialog.h" />
+    <ClInclude Include="ModelType.h" />
     <ClInclude Include="PEC.h" />
     <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSBitmapButton.h" />

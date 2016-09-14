@@ -12,6 +12,7 @@
 #include "version.h"
 #include "main.h"
 #include "MainFrame.h"
+#include "ModelList.h"
 
 wxIMPLEMENT_APP(WXPSU);
 
@@ -39,11 +40,24 @@ bool WXPSU::OnInit()
 	wxSize size = wxGetDisplaySize();
 	size.Scale(0.75, 0.75);
 
+	// Model Selection
+
+	ModelSelectDialog* modelSelectDialog = new ModelSelectDialog(NULL, g_ModelList, MODEL_LIST_SIZE);
+	modelSelectDialog->CenterOnScreen();
+	int msRetValue = modelSelectDialog->ShowModal();
+	
+	if (msRetValue == wxID_CANCEL){
+		delete modelSelectDialog;
+		return false;
+	}
+
+	delete modelSelectDialog;
+
 	/* Window Title */
 	wxString winTitle(wxT("PSU Tool "));
 	winTitle += wxT(VERSION_STRING);
 
-	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size);//wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
+	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size, g_ModelList);//wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 	
 	mainFrame->Show(true);
 	

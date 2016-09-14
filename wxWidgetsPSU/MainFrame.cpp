@@ -5,6 +5,8 @@
 #include "PMBUSHelper.h"
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
+//#include "FSG003_000G_CMDCB.h"
+//#include "ModelList.h"
 #include "Acbel.xpm"
 #include "sample.xpm"
 
@@ -25,13 +27,15 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size) : wxFrame(NULL, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, MODEL_TYPE_t* modelList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
 	RegisterDeviceChangeNotify();
 	
 	wxInitAllImageHandlers();
 
 	CheckAndLoadConfig();
+
+	this->m_modelList = modelList;
 
 	//this->m_ioDeviceOpen = false;
 
@@ -58,7 +62,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Setup Icon
 	SetIcon(wxICON(APP_ICON));//Acbel_xpm);
 
-	// Setup PMNBusCommand Data
+	// Setup Model
+	SetupModel();
+
+	// Setup PMBusCommand Data
 	SetupPMBusCommandData();
 	
 	// Setup Menu
@@ -279,6 +286,9 @@ MainFrame::~MainFrame()
 
 	// Save Config
 	this->SaveConfig();
+
+	// Delete Resource
+	delete[] this->m_PMBusData;
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -684,19 +694,38 @@ void MainFrame::SetupToolBar(void){
 	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
 
 	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
-	m_polling_time_combobox->Append(wxT("0"));
-	m_polling_time_combobox->Append(wxT("10"));
-	m_polling_time_combobox->Append(wxT("20"));
-	m_polling_time_combobox->Append(wxT("50"));
-	m_polling_time_combobox->Append(wxT("100"));
-	m_polling_time_combobox->Append(wxT("200"));
-	m_polling_time_combobox->Append(wxT("300"));
-	m_polling_time_combobox->Append(wxT("500"));
-	m_polling_time_combobox->Append(wxT("1000"));
-	m_polling_time_combobox->Append(wxT("1500"));
 
-	m_polling_time_combobox->SetSelection(2);
+	wchar_t* pollingIntervalArray[10] = {
+		L"0", L"10", L"20", L"50", L"100", L"200", L"300", L"500", L"1000", L"1500"
+	};
+
+	for (int idx = 0; idx < sizeof(pollingIntervalArray) / sizeof(pollingIntervalArray[0]);idx++){
+		m_polling_time_combobox->Append(pollingIntervalArray[idx]);
+	}
+
+	int pollingIntervalValue;
+	int pollingIntervalSelectdIndex = 0;
+	for (int idx = 0; idx < sizeof(pollingIntervalArray) / sizeof(pollingIntervalArray[0]); idx++){
+		pollingIntervalValue = wxAtoi(pollingIntervalArray[idx]);
+		if (pollingIntervalValue == this->m_appSettings.m_pollingInterval){
+			pollingIntervalSelectdIndex = idx;
+			break;
+		}
+	}
+
+	m_polling_time_combobox->SetSelection(pollingIntervalSelectdIndex);
 	m_toolbar->AddControl(m_polling_time_combobox, wxEmptyString);
+
+	//m_polling_time_combobox->Append(wxT("0"));
+	//m_polling_time_combobox->Append(wxT("10"));
+	//m_polling_time_combobox->Append(wxT("20"));
+	//m_polling_time_combobox->Append(wxT("50"));
+	//m_polling_time_combobox->Append(wxT("100"));
+	//m_polling_time_combobox->Append(wxT("200"));
+	//m_polling_time_combobox->Append(wxT("300"));
+	//m_polling_time_combobox->Append(wxT("500"));
+	//m_polling_time_combobox->Append(wxT("1000"));
+	//m_polling_time_combobox->Append(wxT("1500"));
 
 	// Append Separator
 	m_toolbar->AddSeparator();
@@ -750,7 +779,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, CID_CMDLIST_DVC, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
-	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData);
+	m_cmdListModel = new PMBUSCMDListModel(this->m_PMBusData, PMBUSHelper::GetCurrentCMDTableSize());
 	this->m_cmdListDVC->AssociateModel(m_cmdListModel.get());
 
 	// the various columns
@@ -864,24 +893,39 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 
 }
 
+void MainFrame::SetupModel(void){
+	// Setup Model List
+	wxString winTitle = this->GetTitle();
+	winTitle += wxT("  Model : ");
+	winTitle += this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelName;
+
+	this->SetTitle(winTitle);
+
+	// Set CMD Table Size
+	PMBUSHelper::SetCurrentCMDTableSize(this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTableSize);
+
+	// Init PMBusData
+	this->m_PMBusData = new PMBUSCOMMAND_t[PMBUSHelper::GetCurrentCMDTableSize()];
+}
+
 void MainFrame::SetupPMBusCommandData(void){
 	
-	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 
-		this->m_PMBusData[idx].m_toggle = g_PMBUSCommand[idx].m_toggle;
-		sprintf(this->m_PMBusData[idx].m_label, g_PMBUSCommand[idx].m_label);
-		this->m_PMBusData[idx].m_register = g_PMBUSCommand[idx].m_register;
-		sprintf(this->m_PMBusData[idx].m_name, g_PMBUSCommand[idx].m_name);
-		this->m_PMBusData[idx].m_access = g_PMBUSCommand[idx].m_access;
-		this->m_PMBusData[idx].m_query = g_PMBUSCommand[idx].m_query;
-		this->m_PMBusData[idx].m_cook = g_PMBUSCommand[idx].m_cook;
-		this->m_PMBusData[idx].m_responseDataLength = g_PMBUSCommand[idx].m_responseDataLength;
-		this->m_PMBusData[idx].m_cmdStatus = g_PMBUSCommand[idx].m_cmdStatus;
-		this->m_PMBusData[idx].m_cmdCBFunc.m_queryCBFunc = CMDQueryCBFuncArray[idx];
-		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = CMDCookCBFuncArray[idx];
-		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = CMDRawCBFuncArray[idx];
+		this->m_PMBusData[idx].m_toggle = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_toggle;
+		sprintf(this->m_PMBusData[idx].m_label, this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_label);
+		this->m_PMBusData[idx].m_register = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_register;
+		sprintf(this->m_PMBusData[idx].m_name, this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_name);
+		this->m_PMBusData[idx].m_access = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_access;
+		this->m_PMBusData[idx].m_query = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_query;
+		this->m_PMBusData[idx].m_cook = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_cook;
+		this->m_PMBusData[idx].m_responseDataLength = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_responseDataLength;
+		this->m_PMBusData[idx].m_cmdStatus = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_cmdStatus;
+		this->m_PMBusData[idx].m_cmdCBFunc.m_queryCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdQueryCBFunc[idx];
+		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdCookCBFunc[idx];
+		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdRawCBFunc[idx];
+
 	}
-
 }
 
 void MainFrame::SetupPMBusCommandWritePage(void){
@@ -1140,8 +1184,10 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	this->m_sendCMDVector.clear();
 
 	// Stop Task System Thread
-	if (this->m_TaskSystemThread->m_running == true){
-		this->m_TaskSystemThread->m_running = false;
+	if (this->m_TaskSystemThread != NULL){
+		if (this->m_TaskSystemThread->m_running == true){
+			this->m_TaskSystemThread->m_running = false;
+		}
 	}
 
 	// Check TaskSystem Have Task or Not
@@ -1887,6 +1933,7 @@ void MainFrame::OnValueChanged(wxDataViewEvent &event)
 
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
+	this->m_appSettings.m_pollingInterval = this->m_polling_time;
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Select Polling Time is %d", this->m_polling_time);
 	this->m_cmdListDVC->SetFocus();
 }
@@ -1996,14 +2043,14 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 void MainFrame::OnDisableAll(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Disable ALL Commands");
 	// Disable ALL Command
-	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		this->m_PMBusData[idx].m_toggle = false;
 	}
 
 	wxVariant variant;
 	variant = false;
 
-	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		this->m_cmdListModel->SetValueByRow(variant, idx, PMBUSCMDListModel::Col_Toggle);
 		this->m_cmdListModel->RowValueChanged(idx, PMBUSCMDListModel::Col_Toggle);
 	}
@@ -2012,14 +2059,14 @@ void MainFrame::OnDisableAll(wxCommandEvent& event){
 void MainFrame::OnEnableAll(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Enable ALL Commands");
 	// Enable ALL Command
-	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		this->m_PMBusData[idx].m_toggle = true;
 	}
 
 	wxVariant variant;
 	variant = true;
 
-	for (unsigned int idx = 0; idx<PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		this->m_cmdListModel->SetValueByRow(variant, idx, PMBUSCMDListModel::Col_Toggle);
 		this->m_cmdListModel->RowValueChanged(idx, PMBUSCMDListModel::Col_Toggle);
 	}
@@ -2274,7 +2321,7 @@ unsigned int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 
 	unsigned int index = 0;
 
-	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_register == cmd_register){
 			index = idx;
 			break;
@@ -2545,7 +2592,7 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	textOutputStream << header;
 	textOutputStream << endl;
 
-	for (unsigned int row_idx = 0; row_idx < PMBUSCOMMAND_SIZE; row_idx++){
+	for (unsigned int row_idx = 0; row_idx < PMBUSHelper::GetCurrentCMDTableSize(); row_idx++){
 
 		registerValue = wxString::Format("%-12s", this->m_PMBusData[row_idx].m_label);
 
@@ -2576,6 +2623,17 @@ void MainFrame::CheckAndLoadConfig(void){
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(wxT("/APP"));
+	// Model
+	long model;
+	if (pConfig->Read(wxT("Model"), &model) == false){
+		pConfig->Write(wxT("Model"), DEFAULT_MODEL);
+		this->m_appSettings.m_currentUseModel= DEFAULT_MODEL;
+	}
+	else{
+		this->m_appSettings.m_currentUseModel = model;
+	}
+
+
 	// I2C Adaptor Module Board
 	long i2cAdaptorModuleBoard;
 	if (pConfig->Read(wxT("I2CAdaptorModuleBoard"), &i2cAdaptorModuleBoard) == false){
@@ -2605,6 +2663,16 @@ void MainFrame::CheckAndLoadConfig(void){
 	}
 	else{
 		this->m_appSettings.m_runMode = runMode;
+	}
+
+	// Polling Interval
+	long pollingInterval;
+	if (pConfig->Read(wxT("PollingInterval"), &pollingInterval) == false){
+		pConfig->Write(wxT("PollingInterval"), DEFAULT_POLLING_INTERVAL);
+		this->m_appSettings.m_pollingInterval = DEFAULT_POLLING_INTERVAL;
+	}
+	else{
+		this->m_appSettings.m_pollingInterval = pollingInterval;
 	}
 
 	// Iterations
@@ -2921,6 +2989,9 @@ void MainFrame::SaveConfig(void){
 
 	pConfig->SetPath(wxT("/APP"));
 
+	// Model
+	pConfig->Write(wxT("Model"), this->m_appSettings.m_currentUseModel);
+
 	// I2C Adaptor Module Board
 	pConfig->Write(wxT("I2CAdaptorModuleBoard"), this->m_appSettings.m_I2CAdaptorModuleBoard);
 
@@ -2929,6 +3000,9 @@ void MainFrame::SaveConfig(void){
 
 	// Run Mode
 	pConfig->Write(wxT("RunMode"), this->m_appSettings.m_runMode);
+
+	// Polling Interval
+	pConfig->Write(wxT("PollingInterval"), this->m_appSettings.m_pollingInterval);
 
 	// Iterations
 	pConfig->Write(wxT("Iterations"), this->m_appSettings.m_IterationsValue);

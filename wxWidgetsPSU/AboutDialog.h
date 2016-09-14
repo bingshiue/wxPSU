@@ -28,8 +28,6 @@ public:
 
 	~AboutDialog();
 
-	void OnButton(wxCommandEvent& event);
-
 	enum {
 		CID_BTN_OK = 6601,
 	};

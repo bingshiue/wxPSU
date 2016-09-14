@@ -13,6 +13,7 @@ USBINFO PMBUSHelper::m_USBInfo;
 unsigned int PMBUSHelper::IspErrRetry = 0;
 unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
 wxString PMBUSHelper::m_timeString;
+unsigned int PMBUSHelper::CurrentCMDTableSize;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -663,4 +664,12 @@ void PMBUSHelper::GetPIDAndVIDFromString(wxString string, unsigned int* pid, uns
 
 	*vid = PMBUSHelper::HexToDecimal(sVID);
 
+}
+
+void PMBUSHelper::SetCurrentCMDTableSize(unsigned int size){
+	CurrentCMDTableSize = size;
+}
+
+unsigned int PMBUSHelper::GetCurrentCMDTableSize(void){
+	return CurrentCMDTableSize;
 }

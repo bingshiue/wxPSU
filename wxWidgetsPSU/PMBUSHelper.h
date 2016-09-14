@@ -29,6 +29,7 @@ public :
 
 	static unsigned int IspErrRetry;
 	static unsigned int IspStartVerifyRetry;
+	static unsigned int CurrentCMDTableSize;
 
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
@@ -59,6 +60,10 @@ public :
 	static wxString& GetNowTimeString(void);
 
 	static void GetPIDAndVIDFromString(wxString string, unsigned int* pid, unsigned int* vid);
+
+	static void SetCurrentCMDTableSize(unsigned int size);
+
+	static unsigned int GetCurrentCMDTableSize(void);
 
 protected :
 

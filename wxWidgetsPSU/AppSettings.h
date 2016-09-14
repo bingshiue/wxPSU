@@ -7,11 +7,8 @@
 #include <Windows.h>
 #include <wx/wx.h>
 
+#include "ModelType.h"
 #include "PMBUSCommandType.h"
-
-enum {
-	Model_FSG003_000G = 0,
-};
 
 enum {
 	RunMode_Iterations = 0,
@@ -48,7 +45,8 @@ enum {
 
 #define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_95611
 #define DEFAULT_I2C_SLAVEADDRESS    0xb6
-#define DEFAULT_RUN_MODE            (unsigned long)(RunMode_Continually)//0x01 //RunMode_Continually
+#define DEFAULT_RUN_MODE            (unsigned long)(RunMode_Continually)
+#define DEFAULT_POLLING_INTERVAL    20
 #define DEFAULT_ITERATIONS_VALUE    10000
 #define DEFAULT_ENABLE_CHECKSUM     (unsigned long)Generic_Enable
 
@@ -101,13 +99,6 @@ enum {
 #define DEFAULT_ADAPTOR_GPIO_DIGITAL_OUTPUT               0xff
 #define DEFAULT_ADAPTOR_GPIO_PWM_FREQUENCE                0
 #define DEFAULT_ADAPTOR_GPIO_PWM_DUTY                     50
-
-typedef struct model_type {
-	char* m_modelName;
-	PMBUSCOMMAND_t* m_cmdTable;
-	unsigned int m_cmdTableSize;
-
-} MODEL_TYPE_t;
 
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
@@ -265,11 +256,16 @@ typedef struct usb_adaptor_gpio_setting {
 }USB_ADAPTOR_GPIO_SETTING_t;
 
 typedef struct appSettings_t {
-	COMPORT_SETTING_t m_comportSetting;
+
+	unsigned long m_currentUseModel;/**< Current Use Model */
+	//MODEL_TYPE_t* m_modelList;/**< Support Model List */
+
+	COMPORT_SETTING_t m_comportSetting;/**< Serial Port Settings */
 	
 	unsigned long m_I2CAdaptorModuleBoard;/**< I2C Adaptor Module Board */
 	unsigned long m_I2CSlaveAddress;/**< I2C Slave Address */
 	unsigned long m_runMode;/**< Run Mode */
+	unsigned long m_pollingInterval;/**< Polling Interval */
 	unsigned long m_IterationsValue;/**< Iteration Value */
 	unsigned long m_EnableChecksum;/**< Enable Checksum */
 	unsigned long m_logMode;/**< Log Mode */
@@ -289,11 +285,15 @@ typedef struct appSettings_t {
 	unsigned long m_developerMode;/**< Developer Mode */
 
 	void Reset(void){
+		
+		this->m_currentUseModel = DEFAULT_MODEL;
+		
 		this->m_comportSetting.Reset();
 
 		this->m_I2CAdaptorModuleBoard = DEFAULT_I2C_ADAPTOR_MODULE;
 		this->m_I2CSlaveAddress = DEFAULT_I2C_SLAVEADDRESS;
 		this->m_runMode = DEFAULT_RUN_MODE;
+		this->m_pollingInterval = DEFAULT_POLLING_INTERVAL;
 		this->m_IterationsValue = DEFAULT_ITERATIONS_VALUE;
 		this->m_EnableChecksum = Generic_Enable;
 		this->m_logMode = DEFAULT_LOG_MODE;/**< Log Mode */

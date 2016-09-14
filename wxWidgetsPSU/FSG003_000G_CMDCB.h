@@ -1,14 +1,15 @@
 /**
- * @file PMBUSCMDCB.h
+ * @file FSG003_000G_CMDCB.h
  */
-#ifndef _PMBUSCMDCB_H_
-#define _PMBUSCMDCB_H_
+#ifndef _FSG003_000G_CMDCB_H_
+#define _FSG003_000G_CMDCB_H_
 
 #include "PMBUSCBQuery.h"
 #include "PMBUSCBCook.h"
 #include "PMBUSCBRaw.h"
+#include "FSG003_000G.h"
 
-CMDQueryCBFunc CMDQueryCBFuncArray[62] = {
+CMDQueryCBFunc g_FSG003_000G_CMDQueryCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
 	Query_00H,
 	Query_01H,
 	Query_02H,
@@ -73,7 +74,7 @@ CMDQueryCBFunc CMDQueryCBFuncArray[62] = {
 	Query_fcH
 };
 
-CMDCookCBFunc CMDCookCBFuncArray[62] = {
+CMDCookCBFunc g_FSG003_000G_CMDCookCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
 	Cook_00H,
 	Cook_01H,
 	Cook_02H,
@@ -138,7 +139,7 @@ CMDCookCBFunc CMDCookCBFuncArray[62] = {
 	Cook_fcH
 };
 
-CMDRawCBFunc CMDRawCBFuncArray[62] = {
+CMDRawCBFunc g_FSG003_000G_CMDRawCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
 	Raw_00H,
 	Raw_01H,
 	Raw_02H,

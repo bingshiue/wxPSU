@@ -100,7 +100,7 @@ private:
 WX_DECLARE_HASH_MAP(unsigned, wxString, wxIntegerHash, wxIntegerEqual,
 	IntToStringMap);
 
-#define DATAVIEW_LIST_SIZE (PMBUSCOMMAND_SIZE)/**< Size of DataView List */
+//#define DATAVIEW_LIST_SIZE (PMBUSCOMMAND_SIZE)/**< Size of DataView List */
 #define XPM_SIZE  4/**< Size of XPM Array */
 
 class PMBUSCMDListModel : public wxDataViewVirtualListModel
@@ -129,7 +129,9 @@ public:
 		XPM_grey
 	};
 
-	PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand);
+	PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand, unsigned int NumberOfItems);
+
+	~PMBUSCMDListModel();
 
 	// helper methods to change the model
 
@@ -166,7 +168,11 @@ public:
 	bool* getAvailable(void);
 
 private:
-	bool             m_available[DATAVIEW_LIST_SIZE];
+	
+	unsigned int     m_numberOfItems;
+	
+	//bool             m_available[DATAVIEW_LIST_SIZE];
+	bool            *m_available;
 	wxArrayString    m_registerColValues;
 	wxArrayString    m_nameColValues;
 	wxArrayString    m_accessColValues;

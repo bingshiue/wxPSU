@@ -22,22 +22,27 @@ static int my_sort(int *v1, int *v2)
 }
 
 #define USE_PNG
-#define INITIAL_NUMBER_OF_ITEMS  (PMBUSCOMMAND_SIZE)
+//#define INITIAL_NUMBER_OF_ITEMS  (PMBUSCOMMAND_SIZE)
 
-PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewVirtualListModel(INITIAL_NUMBER_OF_ITEMS)
+PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand, unsigned int NumberOfItems) : wxDataViewVirtualListModel(NumberOfItems)
 {
+	
+	m_numberOfItems = NumberOfItems;
+	
 	// the first "DATAVIEW_LIST_SIZE" items are really stored in this model;
 	// all the others are synthesized on request
 	//static const unsigned NUMBER_REAL_ITEMS = DATAVIEW_LIST_SIZE;
 	
 	// Init m_available[] for toggle switch
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_available = new bool[NumberOfItems];
+
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		m_available[idx] = pmBusCommand[idx].m_toggle;
 	}
 
 	// Setup Register
-	m_registerColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_registerColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		wxString tmpStr = wxString::Format(wxT("%s"), pmBusCommand[idx].m_label);
 		//tmpStr.UpperCase();
 		//tmpStr += wxT("h");
@@ -45,15 +50,15 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewV
 	}
 	
 	// Setup Name
-	m_nameColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_nameColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		wxString tmpStr = wxString::Format(wxT("%s"), pmBusCommand[idx].m_name);
 		m_nameColValues.push_back(tmpStr);
 	}
 
 	// Setup Access
-	m_accessColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_accessColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		if (pmBusCommand[idx].m_access == cmd_access_readwrite){
 			m_accessColValues.push_back(wxT("R/W"));
 		}
@@ -75,21 +80,21 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewV
 	}
 
 	// Setup Query
-	m_queryColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_queryColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		m_queryColValues.push_back(wxT(""));
 	}
 
 	// Setup Cook
-	m_cookColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_cookColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		m_cookColValues.push_back(wxT(""));
 	}
 
 
 	// Setup Raw
-	m_rawColValues.reserve(INITIAL_NUMBER_OF_ITEMS);
-	for (unsigned int idx = 0; idx < INITIAL_NUMBER_OF_ITEMS; idx++){
+	m_rawColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
 		m_rawColValues.push_back(wxT(""));
 	}
 
@@ -117,6 +122,10 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand) : wxDataViewV
 
 	// Save PMBus Command Handle
 	m_pmBusCommand = pmBusCommand;
+}
+
+PMBUSCMDListModel::~PMBUSCMDListModel(){
+	delete[] m_available;
 }
 
 void PMBUSCMDListModel::Prepend(const wxString &text)

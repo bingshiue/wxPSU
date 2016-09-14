@@ -335,7 +335,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 		// RunMode is Continally 
 		while (m_running && this->TestDestroy()==false){
 
-			for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE && m_running == true; idx++){
+			for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize() && m_running == true; idx++){
 
 #if 1
 				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
@@ -767,7 +767,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxQueueEvent(m_pHandler->GetEventHandler(), threadSummary_evt);
 
 #if 0
-				if (idx == (PMBUSCOMMAND_SIZE - 1)){
+				if (idx == (PMBUSHelper::GetCurrentCMDTableSize() - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
 				}
@@ -787,11 +787,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					if (iteration >= this->m_appSettings->m_IterationsValue){
 						PSU_DEBUG_PRINT(MSG_ALERT, "IterationsSettingValue : %d, iteration : %d", this->m_appSettings->m_IterationsValue, iteration);
 						this->m_running = false;
-						break;// for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++) 
+						break;// for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++) 
 					}
 				}
 
-			}//for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++)
+			}//for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++)
 		} //while(m_running && this->TestDestroy()==false)
 
 		//this->m_status_bar->getGauge()->SetValue(0);
@@ -941,7 +941,7 @@ unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register, u
 
 	unsigned int index = 0;
 
-	for (unsigned int idx = 0; idx < PMBUSCOMMAND_SIZE; idx++){
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_pmBusCommand[idx].m_register == cmd_register)
 		{
 			if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == need_changePage){
