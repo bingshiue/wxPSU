@@ -27,7 +27,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, MODEL_TYPE_t* modelList) : wxFrame(NULL, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
 	RegisterDeviceChangeNotify();
 	
@@ -35,7 +35,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	CheckAndLoadConfig();
 
-	this->m_modelList = modelList;
+	this->m_customerList = customerList;
+	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
 
 	//this->m_ioDeviceOpen = false;
 
@@ -898,6 +899,11 @@ void MainFrame::SetupModel(void){
 	wxString winTitle = this->GetTitle();
 	winTitle += wxT("  Model : ");
 	winTitle += this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelName;
+
+#if 0
+	winTitle += wxT("  Customer : ");
+	winTitle += this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_customerName;
+#endif
 
 	this->SetTitle(winTitle);
 
@@ -2360,7 +2366,11 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 	this->m_toolbar->Realize();
 
+	// (Work-Around) Set Gauge To Determinate Mode, Seems If the value of gauge is the same as previous the 'SetValue' method don't work
+	this->m_status_bar->getGauge()->SetValue(1);
 	this->m_status_bar->getGauge()->SetValue(0);
+	//
+
 	(this->m_status_bar->getTimer())->Stop();
 }
 
@@ -2623,6 +2633,16 @@ void MainFrame::CheckAndLoadConfig(void){
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(wxT("/APP"));
+	// Customer
+	long customer;
+	if (pConfig->Read(wxT("Customer"), &customer) == false){
+		pConfig->Write(wxT("Customer"), DEFAULT_CUSTOMER);
+		this->m_appSettings.m_currentUseCustomer = DEFAULT_CUSTOMER;
+	}
+	else{
+		this->m_appSettings.m_currentUseCustomer = customer;
+	}
+
 	// Model
 	long model;
 	if (pConfig->Read(wxT("Model"), &model) == false){
@@ -2988,6 +3008,9 @@ void MainFrame::SaveConfig(void){
 	if (pConfig==NULL) return;
 
 	pConfig->SetPath(wxT("/APP"));
+
+	// Customer
+	pConfig->Write(wxT("Customer"), this->m_appSettings.m_currentUseCustomer);
 
 	// Model
 	pConfig->Write(wxT("Model"), this->m_appSettings.m_currentUseModel);

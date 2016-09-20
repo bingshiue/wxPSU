@@ -12,6 +12,7 @@
 #include "version.h"
 #include "main.h"
 #include "MainFrame.h"
+#include "CustomerList.h"
 #include "ModelList.h"
 
 wxIMPLEMENT_APP(WXPSU);
@@ -22,7 +23,6 @@ bool WXPSU::OnInit()
 	this->m_singleInstanceChecker = new wxSingleInstanceChecker;
 
 	if (this->m_singleInstanceChecker->IsAnotherRunning() == true){
-		//wxLogError(_("Another program instance is already running, aborting."));
 
 		wxMessageBox(wxT("Another program instance is already running, aborting."),
 			wxT("Error !"),  // caption
@@ -42,7 +42,7 @@ bool WXPSU::OnInit()
 
 	// Model Selection
 
-	ModelSelectDialog* modelSelectDialog = new ModelSelectDialog(NULL, g_ModelList, MODEL_LIST_SIZE);
+	ModelSelectDialog* modelSelectDialog = new ModelSelectDialog(NULL, g_CustomerList, CUSTOMER_LIST_SIZE);
 	modelSelectDialog->CenterOnScreen();
 	int msRetValue = modelSelectDialog->ShowModal();
 	
@@ -57,7 +57,7 @@ bool WXPSU::OnInit()
 	wxString winTitle(wxT("PSU Tool "));
 	winTitle += wxT(VERSION_STRING);
 
-	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size, g_ModelList);//wxSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
+	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size, g_CustomerList);
 	
 	mainFrame->Show(true);
 	

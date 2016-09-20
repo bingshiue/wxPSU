@@ -45,7 +45,7 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 	//m_checkbox->SetValue(true);
 #endif
 
-	m_gauge = new wxGauge(this, wxID_ANY, 100);
+	m_gauge = new wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH | wxGA_PROGRESS);
 
 	m_gauge->SetValue(0);
 

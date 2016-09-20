@@ -354,6 +354,8 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 		case ISP_Status_ResponseDataError:
 		case ISP_Status_RebootCheckError:
 
+			new(TP_ClearIOReadBufferTask) ClearIOReadBufferTask(this->m_ioaccess, this->m_currentIO);
+
 			threadISPInterrupt_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT);
 			threadISPInterrupt_evt->SetInt((int)*m_ispStatus);
 			wxQueueEvent(this->m_evtHandlerMain, threadISPInterrupt_evt);

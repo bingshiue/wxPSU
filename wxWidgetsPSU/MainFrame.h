@@ -116,9 +116,10 @@ enum
 class MainFrame : public wxFrame, private wxLog
 {
 public:
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, MODEL_TYPE_t* modelList);
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList);
 	virtual ~MainFrame();
 
+	CUSTOMER_TYPE_t* m_customerList;/**< Support Customer List */
 	MODEL_TYPE_t* m_modelList;/**< Support Model List */
 
 	PORT_SETTING_t m_portSetting;

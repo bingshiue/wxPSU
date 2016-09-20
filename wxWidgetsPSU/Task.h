@@ -44,13 +44,14 @@
 #define TP_ReceiveISPEndCMDTask (0.5f)
 #define TP_SendRebootCheckTask (0.5f)
 #define TP_ReceiveRebootCheckTask (0.5f)
-#define TP_UserCancelISPPostDelayTask (0.5f)
+#define TP_UserCancelISPPostDelayTask (0.9f)
 #define TP_UserCancelISPTask (0.9f)
 #define TP_SendUSBAdaptorBitRateTask (0.5f)
 #define TP_SendUSBAdaptorUARTSettingTask (0.5f)
 #define TP_SendUSBAdaptorConfigTask (0.5f)
 #define TP_SendUSBAdaptorParameterTask (0.5f)
 #define TP_ReceiveUSBAdaptorSettingCMDTask (0.5f)
+#define TP_ClearIOReadBufferTask (0.9f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -73,7 +74,8 @@ enum {
 	task_ID_SendUSBAdaptorUARTSettingTask,
 	task_ID_SendUSBAdaptorConfigTask,
 	task_ID_SendUSBAdaptorParameterTask,
-	task_ID_ReceiveUSBAdaptorSettingCMDTask
+	task_ID_ReceiveUSBAdaptorSettingCMDTask,
+	task_ID_ClearIOReadBufferTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -869,6 +871,38 @@ public:
 	* @brief Deconstructor.
 	*/
 	~SendUSBAdaptorParameterTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+};
+
+class ClearIOReadBufferTask : public TaskEx {
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	ClearIOReadBufferTask(IOACCESS* ioaccess, unsigned int* currentIO);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~ClearIOReadBufferTask(void);
 
 	/**
 	* @brief Draw function.

@@ -20,12 +20,16 @@
 
 #include "CommonDef.h"
 #include "PMBUSHelper.h"
+#include "Customers.h"
+#include "Models.h"
+#include "Customers.h"
+#include "CustomerType.h"
 #include "ModelType.h"
 
 class ModelSelectDialog : public wxDialog
 {
 public:
-	ModelSelectDialog(wxWindow *parent, MODEL_TYPE_t* modelList, unsigned int modelListSize);
+	ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize);
 
 	~ModelSelectDialog();
 
@@ -41,7 +45,11 @@ public:
 
 private:
 
+	unsigned long m_currentUseCustomer;
 	unsigned long m_currentUseModel;
+
+	CUSTOMER_TYPE_t* m_customerList;
+	unsigned int m_customerListSize;
 
 	MODEL_TYPE_t *m_modelList;
 	unsigned int  m_modelListSize;
@@ -85,7 +93,10 @@ private:
 	void OnDialogClose(wxCloseEvent& event);
 
 	// Setup Function
-	void SetupComboBox(void);
+	void SetupModelListAndSize(void);
+
+	void SetupCustomerComboBox(void);
+	void SetupModelNameComboBox(void);
 
 	// Save & Load 
 	void LoadConfig(void);

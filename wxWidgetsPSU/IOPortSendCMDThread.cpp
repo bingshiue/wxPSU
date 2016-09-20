@@ -337,6 +337,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 			for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize() && m_running == true; idx++){
 
+				if (this->TestDestroy() == true){
+					break;
+				}
+
+
 #if 1
 				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
 				thread_evt->SetInt(idx);

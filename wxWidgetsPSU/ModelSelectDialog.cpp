@@ -6,13 +6,15 @@
 #include "acbel_large.xpm"
 
 
-ModelSelectDialog::ModelSelectDialog(wxWindow *parent, MODEL_TYPE_t* modelList, unsigned int modelListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(375, 140)){
+ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(375, 140)){
 
-	m_modelList = modelList;
-	m_modelListSize = modelListSize;
+	this->m_customerList = customerList;
+	this->m_customerListSize = customerListSize;
 	
 	LoadConfig();
 
+	this->SetupModelListAndSize();
+	
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	m_line1Sizer = new wxBoxSizer(wxHORIZONTAL);
 	m_line2Sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -38,7 +40,8 @@ ModelSelectDialog::ModelSelectDialog(wxWindow *parent, MODEL_TYPE_t* modelList, 
 	m_modelNameST = new wxStaticText(this, wxID_ANY, wxT("Model Name :"));
 	m_modelNameComboBox = new wxComboBox(this, CID_CBBOX_MODELNAME, wxEmptyString, wxDefaultPosition, wxSize(155, -1), wxArrayString(), wxCB_READONLY);
 
-	SetupComboBox();
+	SetupCustomerComboBox();
+	SetupModelNameComboBox();
 
 	this->m_buttonSizer->Add(m_btnOK, wxSizerFlags().Expand().Border(wxALL, 2));
 	this->m_buttonSizer->Add(m_btnCancel, wxSizerFlags().Expand().Border(wxALL, 2));
@@ -67,11 +70,31 @@ ModelSelectDialog::~ModelSelectDialog(){
 
 }
 
-void ModelSelectDialog::SetupComboBox(void){
+void ModelSelectDialog::SetupModelListAndSize(void){
+
+	m_modelList = this->m_customerList[this->m_currentUseCustomer].m_modelTypeList;
+	m_modelListSize = this->m_customerList[this->m_currentUseCustomer].m_modelTypeListSize;
+
+}
+
+void ModelSelectDialog::SetupCustomerComboBox(void){
+	
 	// Customer ComboBox
+	for (unsigned int idx = 0; idx < m_customerListSize; idx++){
+		m_customerComboBox->Append(m_customerList[idx].m_customerName);
+	}
+
+	m_customerComboBox->Select(this->m_currentUseCustomer);
+
+#if 0
 	m_customerComboBox->Append(wxT("NEC"));
 	m_customerComboBox->Select(0);
 	m_customerComboBox->Enable(false);
+#endif
+
+}
+
+void ModelSelectDialog::SetupModelNameComboBox(void){
 
 	// Model Name ComBox
 	for (unsigned int idx = 0; idx < m_modelListSize; idx++){
@@ -84,6 +107,8 @@ void ModelSelectDialog::SetupComboBox(void){
 void ModelSelectDialog::OnOKButton(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
+	this->SaveConfig();
+
 	this->EndModal(wxID_OK);
 }
 
@@ -95,13 +120,25 @@ void ModelSelectDialog::OnCancelButton(wxCommandEvent& event){
 
 void ModelSelectDialog::OnCustomerComboBox(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	
+	this->m_currentUseCustomer = this->m_customerComboBox->GetSelection();
+
+	this->m_modelNameComboBox->Clear();
+
+	this->SetupModelListAndSize();
+
+
+	this->m_currentUseModel = 0;
+	this->SetupModelNameComboBox();
+
+	//this->SaveConfig();
 }
 
 void ModelSelectDialog::OnModelNameComboBox(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT(MSG_DEBUG, "");
 	this->m_currentUseModel = this->m_modelNameComboBox->GetSelection();
 
-	this->SaveConfig();
+	//this->SaveConfig();
 
 }
 
@@ -121,6 +158,16 @@ void ModelSelectDialog::LoadConfig(void){
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(wxT("/APP"));
+
+	// Customer
+	long customer;
+	if (pConfig->Read(wxT("Customer"), &customer) == false){
+		pConfig->Write(wxT("Customer"), DEFAULT_CUSTOMER);
+		this->m_currentUseCustomer = DEFAULT_CUSTOMER;
+	}
+	else{
+		this->m_currentUseCustomer = customer;
+	}
 	
 	// Model
 	long model;
@@ -141,6 +188,9 @@ void ModelSelectDialog::SaveConfig(void){
 	if (pConfig == NULL) return;
 
 	pConfig->SetPath(wxT("/APP"));
+
+	// Customer
+	pConfig->Write(wxT("Customer"), this->m_currentUseCustomer);
 
 	// Model
 	pConfig->Write(wxT("Model"), this->m_currentUseModel);

@@ -27,6 +27,8 @@ public:
 
 	enum {
 		CID_BTN_CANCELOK = 6060,
+
+		CID_GAUGE_PROGRES,
 	};
 
 	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus);

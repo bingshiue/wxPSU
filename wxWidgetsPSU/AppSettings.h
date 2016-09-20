@@ -7,7 +7,8 @@
 #include <Windows.h>
 #include <wx/wx.h>
 
-#include "ModelType.h"
+#include "Customers.h"
+#include "Models.h"
 #include "PMBUSCommandType.h"
 
 enum {
@@ -42,6 +43,9 @@ enum {
 	I2C_AdaptorModuleBoard_R90000_9271_USB,
 	I2C_AdaptorModuleBoard_TOTALPHASE,
 };
+
+#define DEFAULT_CUSTOMER            (unsigned long)Customer_NEC
+#define DEFAULT_MODEL               (unsigned long)NEC_Model_FSG003_000G
 
 #define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_95611
 #define DEFAULT_I2C_SLAVEADDRESS    0xb6
@@ -257,8 +261,8 @@ typedef struct usb_adaptor_gpio_setting {
 
 typedef struct appSettings_t {
 
+	unsigned long m_currentUseCustomer;/**< Current Use Customer */
 	unsigned long m_currentUseModel;/**< Current Use Model */
-	//MODEL_TYPE_t* m_modelList;/**< Support Model List */
 
 	COMPORT_SETTING_t m_comportSetting;/**< Serial Port Settings */
 	
@@ -286,6 +290,7 @@ typedef struct appSettings_t {
 
 	void Reset(void){
 		
+		this->m_currentUseCustomer = DEFAULT_CUSTOMER;
 		this->m_currentUseModel = DEFAULT_MODEL;
 		
 		this->m_comportSetting.Reset();

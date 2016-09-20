@@ -44,7 +44,7 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	// Initialize GUI Component
 
-	m_gauge = new wxGauge(this, wxID_ANY, range, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL | wxGA_SMOOTH | wxGA_PROGRESS);
+	m_gauge = new wxGauge(this, CID_GAUGE_PROGRES, range, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH | wxGA_PROGRESS);
 
 	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"), wxDefaultPosition, wxSize(250, -1));
 
@@ -233,13 +233,13 @@ void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
 	
 	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
-	new(0.1f) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
+	new(0.5f) UserCancelISPTask(this->m_ispStatus); // This may cause Task System Abnormal
 
 	while (Task::GetCount() > 0){
 		// If Task Count > 0, Wait
 		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
 
-		wxMilliSleep(50);
+		wxMilliSleep(10);
 	};
 
 	this->EndModal(wxID_CANCEL);
@@ -249,17 +249,17 @@ void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 
 	int tmp = 0;
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnCancelOK");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnBtnCancelOK");
 
 	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
-	new(0.1f) UserCancelISPTask(this->m_ispStatus); // This will cause Task System Abnormal
+	new(0.5f) UserCancelISPTask(this->m_ispStatus); // This may cause Task System Abnormal
 
 	while (Task::GetCount() > 0){
 		// If Task Count > 0, Wait
 		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
 
-		wxMilliSleep(50);
+		wxMilliSleep(10);
 	};
 
 	this->EndModal(wxID_CANCEL);

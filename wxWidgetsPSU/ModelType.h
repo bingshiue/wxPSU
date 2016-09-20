@@ -6,16 +6,6 @@
 
 #include "PMBUSCommandType.h"
 
-enum {
-	Model_FSG003_000G = 0,
-	Model_Generic,
-	Model_LIST_Size
-};
-
-#define DEFAULT_MODEL (unsigned long)Model_FSG003_000G
-
-#define MODEL_LIST_SIZE  (Model_LIST_Size)
-
 typedef struct model_type_t {
 	
 	wchar_t* m_modelName;/**< Model Name */
