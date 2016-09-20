@@ -25,7 +25,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
 /* |     1.0.0.9        |     Support Set USB Adaptor GPIO Function |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- */
+/* |     1.0.0.10       |     Add Customer & Model Selection Dialog |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- */
 
-#define VERSION_STRING "1.0.0.9" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.10" /**< Program Version, Shown in About Dialog */
 
 #endif
