@@ -40,6 +40,7 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 	m_ComportNumberCB = new wxComboBox(m_SettingSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(100,-1));
 
 	int comport_cnt = m_ioaccess->m_EnumerateAvailableDevice(this->enumArray, sizeof(this->enumArray) / sizeof(this->enumArray[0]));
+	PSU_DEBUG_PRINT(MSG_DEBUG, "comport_cnt=%d", comport_cnt);
 
 	if (comport_cnt == 0){
 		wxMessageBox(wxT("Can not find any Comport Interface !"),
@@ -73,13 +74,13 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 		}
 
 		// Append Comport Number to Combo Box
-		for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+		for (unsigned int idx = 0; idx < comport_cnt; idx++){
 			m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray[idx]));
 		}
 
 		// Default Select Index
 		unsigned int select_dynamic = 0;
-		for (unsigned int idx = 0; idx < sizeof(comportNumberArray) / sizeof(comportNumberArray[0]); idx++){
+		for (unsigned int idx = 0; idx < comport_cnt; idx++){
 			if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray[idx]){
 				select_dynamic = idx;
 				break;
