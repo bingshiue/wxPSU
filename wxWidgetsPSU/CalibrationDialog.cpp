@@ -6,6 +6,8 @@
 
 //#if USE_MODAL_PRESENTATION
 
+//#define USE_LINEAR_DATA_FORMAT
+
 unsigned char CalibrationDialog::calibrationItemCommand[CALIBRATION_ITEM_SIZE] = {
 	0x00,
 	0x00,
@@ -177,6 +179,10 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	wxString resolution1DefaultText("0.12500000");
 	m_resolution1TC->SetValue(resolution1DefaultText);
 
+#ifndef USE_LINEAR_DATA_FORMAT
+	m_resolution1TC->SetEditable(false);
+#endif
+
 	m_data2ST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT("Data2"), wxDefaultPosition, wxDefaultSize);
 	m_data2TC = new wxTextCtrl(m_settingControlSBS->GetStaticBox(), wxID_ANY);
 
@@ -188,6 +194,10 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 
 	wxString resolution2DefaultText("0.12500000");
 	m_resolution2TC->SetValue(resolution2DefaultText);
+
+#ifndef USE_LINEAR_DATA_FORMAT
+	m_resolution2TC->SetEditable(false);
+#endif
 
 	m_calibrationItemGridSizer->Add(m_pointerST);
 	m_calibrationItemGridSizer->Add(m_pointerCB);
@@ -481,7 +491,6 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 	return active_index;
 }
 
-//#define USE_LINEAR_DATA_FORMAT
 #define CALIBRATION_ITEM_BYTES_TO_READ  6
 void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	

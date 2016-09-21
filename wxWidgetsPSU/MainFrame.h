@@ -37,6 +37,7 @@
 #include "PMBUSArtProv.h"
 #include "CalibrationDialog.h"
 #include "I2CInterfaceDialog.h"
+#include "I2CSlaveAddressDialog.h"
 #include "AboutDialog.h"
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
@@ -73,6 +74,8 @@ enum
 
 	MENU_ID_Administrant,
 	MENU_ID_I2C_Interface,
+
+	MENU_ID_I2C_SlaveAddress,
 
 	MENU_ID_Enable_ALL,
 	MENU_ID_Disable_ALL,
@@ -251,6 +254,7 @@ public:
 
 	wxMenuItem  *m_AdministrantMenuItem;
 	wxMenuItem  *m_I2CInterfaceMenuItem;
+	wxMenuItem  *m_I2CSlaveAddressMenuItem;
 
 	wxMenu      *m_runModeMenu;
 
@@ -367,6 +371,7 @@ private:
 
 	void OnAdministrant(wxCommandEvent& event);
 	void OnI2CInterface(wxCommandEvent& event);
+	void OnI2CSlaveAddress(wxCommandEvent& event);
 
 	void OnDisableAll(wxCommandEvent& event);
 	void OnEnableAll(wxCommandEvent& event);

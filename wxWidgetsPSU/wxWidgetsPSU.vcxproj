@@ -92,6 +92,7 @@
     <ClCompile Include="ComportDialog.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="I2CInterfaceDialog.cpp" />
+    <ClCompile Include="I2CSlaveAddressDialog.cpp" />
     <ClCompile Include="ISPSequenceThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Generic_Model.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
+    <ClInclude Include="I2CSlaveAddressDialog.h" />
     <ClInclude Include="IOAccess.h" />
     <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />

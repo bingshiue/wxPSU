@@ -14,6 +14,7 @@ unsigned int PMBUSHelper::IspErrRetry = 0;
 unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
 wxString PMBUSHelper::m_timeString;
 unsigned int PMBUSHelper::CurrentCMDTableSize;
+wxString PMBUSHelper::m_winTitleBase;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -672,4 +673,12 @@ void PMBUSHelper::SetCurrentCMDTableSize(unsigned int size){
 
 unsigned int PMBUSHelper::GetCurrentCMDTableSize(void){
 	return CurrentCMDTableSize;
+}
+
+void PMBUSHelper::setWinTitleBase(wxString base){
+	m_winTitleBase = base;
+}
+
+wxString& PMBUSHelper::getWinTitleBase(void){
+	return m_winTitleBase;
 }

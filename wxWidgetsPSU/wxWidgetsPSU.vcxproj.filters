@@ -258,6 +258,9 @@
     <ClCompile Include="ClearIOReadBufferTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="I2CSlaveAddressDialog.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -447,6 +450,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="Preprocessor.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="I2CSlaveAddressDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

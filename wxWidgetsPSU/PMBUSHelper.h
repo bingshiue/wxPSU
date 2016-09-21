@@ -65,6 +65,10 @@ public :
 
 	static unsigned int GetCurrentCMDTableSize(void);
 
+	static void setWinTitleBase(wxString base);
+
+	static wxString& getWinTitleBase(void);
+
 protected :
 
 private :
@@ -77,6 +81,8 @@ private :
 	static USBINFO m_USBInfo;
 
 	static wxString m_timeString;
+
+	static wxString m_winTitleBase;
 
 };
 

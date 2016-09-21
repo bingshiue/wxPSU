@@ -5,8 +5,6 @@
 #include "PMBUSHelper.h"
 #include "PMBUSCommand.h"
 #include "PMBUSCMDCB.h"
-//#include "FSG003_000G_CMDCB.h"
-//#include "ModelList.h"
 #include "Acbel.xpm"
 #include "sample.xpm"
 
@@ -24,8 +22,6 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
-
-static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
@@ -459,6 +455,8 @@ void MainFrame::SetupMenuBar(void){
 	|------------------------------------
 	|- I2C  Interface...
 	|------------------------------------
+	|- I2C  Slave Address
+	|------------------------------------
 	|- Disable All
 	|- Enable All
 	|------------------------------------
@@ -499,11 +497,15 @@ void MainFrame::SetupMenuBar(void){
 	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
 	this->m_optionMenu->AppendSeparator();
 
-	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL...\tCtrl-D",
-		"Disable All Commands");
+	// I2C Slave Address
+	this->m_I2CSlaveAddressMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_SlaveAddress, wxT("I2C Slave Address..."), wxT("I2C Slave Address"), wxITEM_NORMAL);
+	this->m_optionMenu->Append(this->m_I2CSlaveAddressMenuItem);
 
-	this->m_optionMenu->Append(MENU_ID_Enable_ALL, "&Enable  ALL...\tCtrl-E",
-		"Enable All Commands");
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL \tCtrl-D", wxT("Disable All Commands"));
+
+	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  "&Enable  ALL \tCtrl-E", wxT("Enable  All Commands"));
 
 	this->m_optionMenu->AppendSeparator();
 
@@ -641,6 +643,8 @@ void MainFrame::SetupMenuBar(void){
 
 void MainFrame::SetupToolBar(void){
 
+	const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
+
 	// Setup Tool Bar
 	long style = TOOLBAR_STYLE;
 	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
@@ -694,7 +698,7 @@ void MainFrame::SetupToolBar(void){
 	m_polling_time_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Polling Time(ms)"));
 	m_toolbar->AddControl(m_polling_time_text, wxEmptyString);
 
-	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_polling_time_combobox = new wxComboBox(m_toolbar, ID_POLLING_TIME_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1), wxArrayString(), wxCB_READONLY);
 
 	wchar_t* pollingIntervalArray[10] = {
 		L"0", L"10", L"20", L"50", L"100", L"200", L"300", L"500", L"1000", L"1500"
@@ -738,7 +742,7 @@ void MainFrame::SetupToolBar(void){
 	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
 
 	wxString SlaveAddressHex = (wxString::Format("%02lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
-	m_address_input->SetLabel(SlaveAddressHex);
+	m_address_input->SetValue(SlaveAddressHex);
 
 	wxTextValidator hexValidator;
 	hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
@@ -904,6 +908,16 @@ void MainFrame::SetupModel(void){
 	winTitle += wxT("  Customer : ");
 	winTitle += this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_customerName;
 #endif
+
+	// Save Windows Title Base String
+	PMBUSHelper::setWinTitleBase(winTitle);
+
+	wxString i2cSA("");
+	i2cSA = wxString::Format("%2x", this->m_appSettings.m_I2CSlaveAddress);
+	i2cSA.UpperCase();
+
+	winTitle += wxT("  I2C Slave Address : ");
+	winTitle += i2cSA;
 
 	this->SetTitle(winTitle);
 
@@ -1615,6 +1629,42 @@ void MainFrame::OnI2CInterface(wxCommandEvent& event){
 	delete i2cIFDialog;
 }
 
+void MainFrame::OnI2CSlaveAddress(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	I2CSlaveAddressDialog* i2cSlaveAddressDialog = new I2CSlaveAddressDialog(this, &this->m_appSettings);
+	i2cSlaveAddressDialog->Centre();
+	int retValue = i2cSlaveAddressDialog->ShowModal();
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "i2cSlaveAddressDialog Return Value = %d", retValue);
+
+	if (retValue != wxID_CANCEL){
+		// Update Address Input TextCtrl in TooBar
+		wxString HexSlaveAddress = wxString::Format("%2x", retValue);
+		HexSlaveAddress.UpperCase();
+		m_address_input->SetValue(HexSlaveAddress);
+
+		// Update 
+		// Reset Windows Title String
+		wxString winTitle = PMBUSHelper::getWinTitleBase();
+		winTitle += wxT("  I2C Slave Address : ");
+		winTitle += HexSlaveAddress;
+		this->SetTitle(winTitle);
+		//
+
+		this->m_infoBar->SetBackgroundColour(wxColour(127, 246, 85));
+
+		this->m_infoBar->ShowMessage(
+			wxString::Format("Change Slave Address To %s", HexSlaveAddress.c_str()), wxICON_INFORMATION
+			);
+
+		this->m_infoBarTimer->Start(3000, true);
+
+	}
+
+	wxDELETE(i2cSlaveAddressDialog);
+}
+
 void MainFrame::OnContinually(wxCommandEvent& event){
 	this->m_appSettings.m_runMode = RunMode_Continually;
 
@@ -1945,10 +1995,29 @@ void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 }
 
 void MainFrame::OnSlaveAddressSetButton(wxCommandEvent& event){
-	this->m_appSettings.m_I2CSlaveAddress = PMBUSHelper::HexToDecimal(this->m_address_input->GetValue().c_str());
+	
+	unsigned long SlaveAddress = PMBUSHelper::HexToDecimal(this->m_address_input->GetValue().c_str());
+	
+	// Check Slave Address Valid ?
+	if (SlaveAddress == 0){
+		wxMessageBox(wxT("Input I2C Slave Address Error ! \n\n Please Input Valid I2C Slave Address"),
+			wxT("Error !"),  // caption
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+	this->m_appSettings.m_I2CSlaveAddress = SlaveAddress;
 	PMBUSHelper::GetSlaveAddress() = this->m_appSettings.m_I2CSlaveAddress;
 	wxString hex = (wxString::Format("%2x", PMBUSHelper::GetSlaveAddress())).Upper();
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Change Slave Address To %s", hex.c_str());
+
+	// Reset Windows Title String
+	wxString winTitle = PMBUSHelper::getWinTitleBase();
+	winTitle += wxT("  I2C Slave Address : ");
+	winTitle += hex;
+	this->SetTitle(winTitle);
+	//
 
 	this->m_infoBar->SetBackgroundColour(wxColour( 127, 246, 85));
 
@@ -3477,6 +3546,7 @@ EVT_MENU(MENU_ID_DisableCalibration, MainFrame::OnDisableCalibration)
 EVT_MENU(MENU_ID_Calibration, MainFrame::OnCalibration)
 EVT_MENU(MENU_ID_Administrant, MainFrame::OnAdministrant)
 EVT_MENU(MENU_ID_I2C_Interface, MainFrame::OnI2CInterface)
+EVT_MENU(MENU_ID_I2C_SlaveAddress, MainFrame::OnI2CSlaveAddress)
 EVT_MENU(MENU_ID_Enable_ALL, MainFrame::OnEnableAll)
 EVT_MENU(MENU_ID_Disable_ALL, MainFrame::OnDisableAll)
 EVT_MENU(MENU_ID_Continually, MainFrame::OnContinually)
