@@ -63,6 +63,8 @@ enum {
 #define DEFAULT_ACS_SETPOINT_INPUT_MAX  2400
 #define DEFAULT_ACS_SETPOINT_INPUT_MIN  2000
 
+#define DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME  20
+
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600
 #define DEFAULT_COMPORT_BYTESIZE      8
@@ -278,6 +280,7 @@ typedef struct appSettings_t {
 	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
 	unsigned long m_acsSetPointMin;/**< ACE Set Point Minimum Value */
 	unsigned long m_acsSetPointMax;/**< ACE Set Point Maximum Value */
+	unsigned long m_ispF3CMDDelayTime;/**< ISP F3 CMD Delay Time */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -307,6 +310,8 @@ typedef struct appSettings_t {
 		this->m_pmbusReadMethod = DEFAULT_PMBUS_READ_METHOD;
 		this->m_acsSetPointMax = DEFAULT_ACS_SETPOINT_INPUT_MAX;
 		this->m_acsSetPointMin = DEFAULT_ACS_SETPOINT_INPUT_MIN;
+
+		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

@@ -74,13 +74,13 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 		}
 
 		// Append Comport Number to Combo Box
-		for (unsigned int idx = 0; idx < comport_cnt; idx++){
+		for (int idx = 0; idx < comport_cnt; idx++){
 			m_ComportNumberCB->Append(wxString::Format("%d", comportNumberArray[idx]));
 		}
 
 		// Default Select Index
 		unsigned int select_dynamic = 0;
-		for (unsigned int idx = 0; idx < comport_cnt; idx++){
+		for (int idx = 0; idx < comport_cnt; idx++){
 			if (this->m_appSettings->m_comportSetting.m_comportNumber == comportNumberArray[idx]){
 				select_dynamic = idx;
 				break;

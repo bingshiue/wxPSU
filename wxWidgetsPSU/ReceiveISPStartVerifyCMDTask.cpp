@@ -115,6 +115,24 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 		}
 #endif
 
+#ifdef ISP_F3_CMD_DELAY
+		// If ISP Target is Primary, 
+		if (UPDATE_PRIMARY_FW_TARGET == PMBUSHelper::getCurrentISPTarget()){
+
+			// If Current Use I/O is Serial Port
+			if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+
+				// If Buad Rate large than '9600'
+				if (PMBUSHelper::GetAppSettings()->m_comportSetting.m_buadRate > CBR_9600){
+
+					// Sleep (For wait primary chip return correct reponse ) 
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+				}
+			}
+		}
+#endif
+
 		new(TP_SendISPCheckStatusTask) SendISPCheckStatusTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 
 	}

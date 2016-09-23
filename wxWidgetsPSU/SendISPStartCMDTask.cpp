@@ -15,6 +15,26 @@ SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* curre
 	this->m_ispStatus = ispStatus;
 
 	this->m_target = target;
+
+	PMBUSHelper::getCurrentISPTarget() = target;
+
+#ifdef ISP_F3_CMD_DELAY
+	// If ISP Target is Primary, 
+	if (UPDATE_PRIMARY_FW_TARGET == PMBUSHelper::getCurrentISPTarget()){
+
+		// If Current Use I/O is Serial Port
+		if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+
+			// If Buad Rate large than '9600'
+			if (PMBUSHelper::GetAppSettings()->m_comportSetting.m_buadRate > CBR_9600){
+
+				// Sleep (For wait primary chip return correct reponse ) 
+				PSU_DEBUG_PRINT(MSG_ALERT, "ISP F3 CMD Delay Time is %d ms", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);				
+			}
+		}
+	}
+#endif
+
 }
 
 SendISPStartCMDTask::~SendISPStartCMDTask(void){

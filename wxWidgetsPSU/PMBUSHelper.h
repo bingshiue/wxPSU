@@ -30,6 +30,7 @@ public :
 	static unsigned int IspErrRetry;
 	static unsigned int IspStartVerifyRetry;
 	static unsigned int CurrentCMDTableSize;
+	static unsigned int CurrentISPTarget;
 
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
@@ -68,6 +69,8 @@ public :
 	static void setWinTitleBase(wxString base);
 
 	static wxString& getWinTitleBase(void);
+
+	static unsigned int& getCurrentISPTarget(void);
 
 protected :
 

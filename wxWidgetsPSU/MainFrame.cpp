@@ -3054,6 +3054,17 @@ void MainFrame::CheckAndLoadConfig(void){
 
 #endif
 
+	pConfig->SetPath(wxT("/ISP"));
+	
+	long f3CMDDelayTime;
+	if (pConfig->Read(wxT("F3CMDDelayTime"), &f3CMDDelayTime) == false){
+		pConfig->Write(wxT("F3CMDDelayTime"), DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME);
+		this->m_appSettings.m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
+	}
+	else{
+		this->m_appSettings.m_ispF3CMDDelayTime = f3CMDDelayTime;
+	}
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;
@@ -3134,6 +3145,12 @@ void MainFrame::SaveConfig(void){
 
 	// Parity Check
 	pConfig->Write(wxT("PARITYCHECK"), this->m_appSettings.m_comportSetting.m_parityCheck);
+
+
+	pConfig->SetPath(wxT("/ISP"));
+
+	// F3 CMD Delay Time
+	pConfig->Write(wxT("F3CMDDelayTime"), this->m_appSettings.m_ispF3CMDDelayTime);
 
 	// Delete wxConfig Object
 	delete wxConfigBase::Set((wxConfigBase *)NULL);

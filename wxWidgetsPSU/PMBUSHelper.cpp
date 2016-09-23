@@ -9,6 +9,7 @@
 unsigned char PMBUSHelper::m_slaveAddress;
 PMBUSSTATUS_t PMBUSHelper::m_pmbusStatus;
 AppSettings_t* PMBUSHelper::m_appSettings;
+unsigned int PMBUSHelper::CurrentISPTarget;
 USBINFO PMBUSHelper::m_USBInfo;
 unsigned int PMBUSHelper::IspErrRetry = 0;
 unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
@@ -681,4 +682,8 @@ void PMBUSHelper::setWinTitleBase(wxString base){
 
 wxString& PMBUSHelper::getWinTitleBase(void){
 	return m_winTitleBase;
+}
+
+unsigned int& PMBUSHelper::getCurrentISPTarget(void){
+	return CurrentISPTarget;
 }
