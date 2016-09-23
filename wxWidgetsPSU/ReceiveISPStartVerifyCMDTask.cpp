@@ -125,9 +125,11 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 				// If Buad Rate large than '9600'
 				if (PMBUSHelper::GetAppSettings()->m_comportSetting.m_buadRate > CBR_9600){
 
-					// Sleep (For wait primary chip return correct reponse ) 
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
-					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+					if (PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime > 0){
+						// Sleep (For wait primary chip return correct reponse ) 
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+						wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+					}
 				}
 			}
 		}
