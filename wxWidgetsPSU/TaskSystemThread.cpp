@@ -23,6 +23,9 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 	DWORD nowTick, previousTick;
 	nowTick = previousTick = GetTickCount();
 
+	unsigned int TaskCnts = 0;
+	unsigned int previousTaskCnts = 0;
+
 	while (this->m_running == true){
 
 		//PSU_DEBUG_PRINT(MSG_DEBUG, "TaskCnt = %d", Task::GetCount());
@@ -32,16 +35,22 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 		delta = nowTick - previousTick;
 		previousTick = nowTick;
 
-		if (Task::GetCount() > 0)
+		TaskCnts = Task::GetCount();
+
+		if (TaskCnts > 0)
 		{
 			Task::GetCriticalSectionObject().Enter();
-			wxMilliSleep(1);
+			if (previousTaskCnts == 0){
+				wxMilliSleep(1);
+			}
 			Task::RunTask(delta);
 			Task::GetCriticalSectionObject().Leave();
 		}
 		else{
 			wxMilliSleep(100);
 		}
+
+		previousTaskCnts = TaskCnts;
 	}
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "TaskSystem Thread Finish");

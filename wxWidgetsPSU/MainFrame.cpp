@@ -195,6 +195,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// If Create Thread Success
 	if (this->m_TaskSystemThread->Create() != wxTHREAD_NO_ERROR){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Task System Thread");
+		this->m_TaskSystemThread->SetPriority(WXTHREAD_DEFAULT_PRIORITY);
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
@@ -2575,6 +2576,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	// If Create Thread Success
 	if (this->m_ispSequenceThread->Create() != wxTHREAD_NO_ERROR){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create ISP Sequence Thread");
+		//m_ispSequenceThread->SetPriority(wxPRIORITY_MAX);
 	}
 	else{
 		this->m_ispSequenceThread->Run();
