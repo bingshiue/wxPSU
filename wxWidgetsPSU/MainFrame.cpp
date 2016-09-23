@@ -1177,15 +1177,8 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		this->m_monitor_running = false;
 		// IOPortSendCMDThread is Running
 		if (this->m_IOPortSendCMDThread->m_running == true && this->m_IOPortSendCMDThread->IsRunning() == true){
+			
 			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread is Running");
-
-#if 0
-			this->m_IOPortSendCMDThread->m_running = false;
-
-			wxThread::Yield();
-
-			Sleep(2000);
-#endif 
 
 			wxThread::ExitCode exitCode;
 			wxThreadError error = this->m_IOPortSendCMDThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
@@ -1196,12 +1189,43 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 				PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
 			}
 
+			// Wait Until Send Thread Complete
 			while (!this->m_sendThreadStopFlag) { PSU_DEBUG_PRINT(MSG_ALERT, "Wait IOPortSendCMDThread Finish"); };
 		}
 	}
 
-	//
+	// Clear Send CMD Vector
 	this->m_sendCMDVector.clear();
+
+	// Check TaskSystem Have Task or Not
+	int cnt = Task::GetCount();
+
+	wxBusyInfo *info = NULL;
+
+	// Wait Until No Tasks
+	while (cnt != 0){
+		
+		if (info == NULL) info = new wxBusyInfo(
+			wxBusyInfoFlags()
+			.Parent(this)
+			.Icon(wxArtProvider::GetIcon(wxART_CLOSE,
+			wxART_OTHER, wxSize(64, 64)))
+			.Title("<b>Close Program</b>")
+			.Text("Please  wait  ...")
+			.Foreground(*wxBLACK)
+			.Background(*wxCYAN)
+			.Transparency(wxALPHA_OPAQUE)// 4 * wxALPHA_OPAQUE / 5)
+			);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
+
+		cnt = Task::GetCount();
+
+		wxMilliSleep(100);
+
+	};
+
+	wxDELETE(info);
 
 	// Stop Task System Thread
 	if (this->m_TaskSystemThread != NULL){
@@ -1210,28 +1234,8 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		}
 	}
 
-	// Check TaskSystem Have Task or Not
-	int cnt = Task::GetCount();
-
-	if(cnt != 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
-	}
-
-#if 0
-	// Check TaskSystem Have Task or Not
-	int cnt = Task::GetCount();
-
-	while (cnt != 0){
-		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
-		cnt = Task::GetCount();
-
-		wxMilliSleep(200);
-	}
-#endif
-
 	// Release Task List
 	TaskEx::ReleaseTaskList();
-
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Close IO Device");
 	// Close IO Device
