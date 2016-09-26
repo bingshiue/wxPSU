@@ -247,6 +247,9 @@ ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t
 
 	// Setup Escapse ID
 	SetEscapeId(wxID_CLOSE);
+
+	// Re-Open Comport
+	this->OpenIODevice();
 }
 
 ComportDialog::~ComportDialog(){

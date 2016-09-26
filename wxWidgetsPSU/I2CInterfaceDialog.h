@@ -79,6 +79,8 @@ public:
 
 private:
 
+	unsigned int m_previousModuleBoardSelectIndex;
+
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
 	int SetIODeviceOption(void);
 

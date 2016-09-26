@@ -48,7 +48,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 		}
 	}
 	m_moduleNameCB->SetSelection(module_select);
-
+	m_previousModuleBoardSelectIndex = module_select;
 
 	m_i2cIFModuleSBS->Add(m_moduleNameST, wxSizerFlags().Align(wxCENTER).Border());
 	m_i2cIFModuleSBS->Add(m_moduleNameCB, wxSizerFlags().Align(wxCENTER).Border());
@@ -189,6 +189,13 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	// Save Settings
 	// I2C Adaptor Module Board
 	select = this->m_moduleNameCB->GetSelection();
+
+	// If Module Board Changed
+	if (m_previousModuleBoardSelectIndex == select){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Module Board Don't Changed");
+		this->EndModal(0);
+		return;
+	}
 
 	switch (select){
 
