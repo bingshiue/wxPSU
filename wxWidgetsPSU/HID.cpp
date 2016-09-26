@@ -160,7 +160,7 @@ int HIDSendData(unsigned char* buff, unsigned int size){
 	return bytes_write;
 }
 
-#define RETRY_TIMES  3
+#define RETRY_TIMES  5
 #define HID_EXPECT_DATA_LENGTH  64/**< HID Expect Data Length */
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	unsigned int retry = 0;
@@ -168,13 +168,14 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 
 	while (retry < RETRY_TIMES && readSize <= 0){
 
+		wxMilliSleep(3);
+
 		readSize = hid_read(handle, buff, sizeOfBuff+2);// Read To [0x0d] [0x0a]
 		if (readSize != HID_EXPECT_DATA_LENGTH){
 			PSU_DEBUG_PRINT(MSG_DEBUG, "readSize = %d", readSize);
 		}
 
 		retry++;
-		wxMilliSleep(10);
 	}
 
 	if (retry >= RETRY_TIMES){

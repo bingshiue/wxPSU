@@ -325,7 +325,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 			wxLog::FlushActive();
 		//}
 
-		wxMilliSleep(33);
+		wxMilliSleep(16);
 	};
 
 	//if (this->m_developerMode == Generic_Disable){

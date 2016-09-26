@@ -258,6 +258,15 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	}
 #endif
 
+	/*** If I/O is Close ***/
+	if (this->m_ioaccess[*this->m_currentIO].m_GetDeviceStatus() == IODEVICE_CLOSE){
+		wxMessageBox(wxT("No I/O Device Found, Please Check Adaptor Card Setting !"),
+			wxT("No I/O Device Found !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+
 	/*** If User Cancel ISP Sequence Previous ***/
 	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){
 		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"

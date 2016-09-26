@@ -64,6 +64,8 @@ ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customer
 	this->m_topLevelSizer->Add(this->m_line2Sizer);
 	this->SetSizerAndFit(m_topLevelSizer);
 
+	this->m_btnOK->SetFocus();
+
 }
 
 ModelSelectDialog::~ModelSelectDialog(){
