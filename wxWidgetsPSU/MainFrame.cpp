@@ -1848,6 +1848,25 @@ void MainFrame::StartMonitor(void){
 	
 	// Select Notebook Page 0
 	this->m_notebook->SetSelection(0);
+
+	// Check Count of Enabled CMD
+	int enabledCount = 0;
+	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		if (this->m_PMBusData[idx].m_toggle == true){
+			enabledCount++;
+		}
+	}
+
+	if (enabledCount == 0){
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "No Enabled CMD");
+
+		wxMessageBox(wxT("No Enabled CMD ! \n\n Please Enable CMD Then Try Again"),
+			wxT("Warning !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
 	
 	this->m_monitor_running = true;
 
