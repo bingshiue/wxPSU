@@ -55,7 +55,7 @@ enum {
 
 enum
 {
-	MENU_ID_Primary_Firmware = 1,
+	MENU_ID_Primary_Firmware = 1011,
 	MENU_ID_Secondary_Firmware,
 	MENU_ID_Monitor,
 

@@ -76,3 +76,7 @@ void BaseWritePage::SetupValidator(void){
 	m_hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_hexValidator.SetCharIncludes(HexCharIncludes);
 }
+
+wxBEGIN_EVENT_TABLE(BaseWritePage, wxPanel)
+// Empty
+wxEND_EVENT_TABLE()
