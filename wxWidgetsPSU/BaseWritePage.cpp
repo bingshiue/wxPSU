@@ -43,6 +43,8 @@ void BaseWritePage::BaseLayOut(void){
 	this->m_writeButton = new wxButton(this, CID_BUTTON_WRITE, L"Write");
 
 	// Initial Padding Static Text
+	m_stPadding_WriteButton = new wxStaticText(this, wxID_ANY, wxString(""), wxDefaultPosition, wxSize(30, PADDING_DEFAULT_HEIGHT));
+
 	m_stPadding_1 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 	m_stPadding_2 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 
@@ -53,6 +55,8 @@ void BaseWritePage::BaseLayOut(void){
 	m_horizonSizer1->Add(this->m_cookRadioButton, 0, wxALIGN_CENTER_VERTICAL);
 
 	m_horizonSizer1->Add(this->m_rawRadioButton, 0, wxALIGN_CENTER_VERTICAL);
+
+	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(1).Expand().Border());
 
 	m_horizonSizer1->Add(this->m_writeButton, 0, wxALIGN_CENTER_VERTICAL);
 

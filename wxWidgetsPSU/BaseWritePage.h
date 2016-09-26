@@ -84,6 +84,8 @@ protected:
 	wxStaticLine *m_staticLine_3;
 
 	/**< Padding Static Text */
+	wxStaticText *m_stPadding_WriteButton;
+
 	wxStaticText *m_stPadding_1;
 	wxStaticText *m_stPadding_2;
 	wxStaticText *m_stPadding_3;
