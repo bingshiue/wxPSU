@@ -280,10 +280,12 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %.2f%%", percentage);
 
 		wxThreadEvent* threadISPSequenceUpdateEvt;
+
 		threadISPSequenceUpdateEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_SEQUENCE_UPDATE);
 		threadISPSequenceUpdateEvt->SetInt((int)percentage);
 		threadISPSequenceUpdateEvt->SetString(information);
 		wxQueueEvent(this->m_evtHandler, threadISPSequenceUpdateEvt);
+		
 
 #if 0
 		// Update Dialogs

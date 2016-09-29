@@ -2593,6 +2593,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 
 
 	m_pmbusProgressDialog->Destroy();
+	wxDELETE(m_pmbusProgressDialog);
 
 }
 
@@ -3403,10 +3404,13 @@ void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned
 			}
 			
 			this->CloseIODevice();
-			//
-			wxMessageBox(wxT("Please Check I/O Device Connection !"),
-				wxT("Lost I/O Device ! !"),  // caption
-				wxOK | wxICON_ERROR);
+			
+			// If ISP Not In Progress, Popup Messages Box To Notify User I/O Device Lost
+			if (m_pmbusProgressDialog == NULL){
+				wxMessageBox(wxT("Please Check I/O Device Connection !"),
+					wxT("Lost I/O Device ! !"),  // caption
+					wxOK | wxICON_ERROR);
+			}
 
 			wxMilliSleep(200);
 		}
