@@ -331,9 +331,9 @@ void MainFrame::SetupMenuBar(void){
 	// Run Menu
 	/*
 	Run
-	|- Monitor
-	|- In System Programming -> |- Update Primary Firmware
-	|                           |- Update Secondary Firmware
+	|- Monitor (Accelerator CTRL+M)
+	|- In System Programming -> |- Update Primary Firmware (Accelerator CTRL+P)
+	|                           |- Update Secondary Firmware (Accelerator CTRL+S)
 	### |- Stop Programming ###
 	|------------------------------------
 	|- I2C Fault Test
@@ -346,8 +346,7 @@ void MainFrame::SetupMenuBar(void){
 
 	*/
 	this->m_runMenu = new wxMenu();
-	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, "&Monitor...\tCtrl-M",
-		"Start Monitor", wxITEM_NORMAL);
+	this->m_monitorMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Monitor, wxT("Monitor...\tCTRL+M"), wxT("Start Monitor"), wxITEM_NORMAL);
 
 	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 
@@ -357,10 +356,10 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
-	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware"), "Load Primary Firmware", wxITEM_NORMAL);
+	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware...\tCTRL+P"), "Load Primary Firmware", wxITEM_NORMAL);
 	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
-	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware"), "Load Secnondary Firmware", wxITEM_NORMAL);
+	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware...\tCTRL+S"), "Load Secnondary Firmware", wxITEM_NORMAL);
 	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
 
 	this->m_ispMenu = new wxMenu();
@@ -383,11 +382,9 @@ void MainFrame::SetupMenuBar(void){
 	//this->m_runMenu->Append(m_stopProgrammingMenuItem);
 	this->m_runMenu->AppendSeparator();
 
-	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"),
-		wxT("I2C Fault Test"), wxITEM_NORMAL);
+	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"), wxT("I2C Fault Test"), wxITEM_NORMAL);
 
-	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"),
-		wxT("Enable Checksum"), wxITEM_CHECK);
+	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"), wxT("Enable Checksum"), wxITEM_CHECK);
 
 	if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
 		this->m_EnableChecksumMenuItem->Check(true);
@@ -397,18 +394,15 @@ void MainFrame::SetupMenuBar(void){
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
 	this->m_runMenu->AppendSeparator();
 
-	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"),
-		wxT("Clear Error Log"), wxITEM_NORMAL);
+	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
 
 	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
 
-	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"),
-		wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
+	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"), wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
 
 	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP_PNG(REFRESH_16));
 
-	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"),
-		wxT("Reset Run Time"), wxITEM_NORMAL);
+	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"), wxT("Reset Run Time"), wxITEM_NORMAL);
 
 	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP_PNG(TIMER_16));
 
@@ -426,13 +420,11 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_psuMenu = new wxMenu();
 
-	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"),
-		wxT("Enable Calibration"), wxITEM_NORMAL);
+	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"), wxT("Enable Calibration"), wxITEM_NORMAL);
 
 	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(ENABLE_16));
 
-	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"),
-		wxT("Disable Calibration"), wxITEM_NORMAL);
+	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"), wxT("Disable Calibration"), wxITEM_NORMAL);
 
 	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(DISABLE_16));
 
@@ -441,8 +433,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_psuMenu->AppendSeparator();
 
-	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"),
-		wxT("Calibration Setting"), wxITEM_NORMAL);
+	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"), wxT("Calibration Setting"), wxITEM_NORMAL);
 
 	this->m_CalibrationMenuItem->SetBitmap(wxBITMAP_PNG(CALIBRATION_16));
 
@@ -452,14 +443,14 @@ void MainFrame::SetupMenuBar(void){
 	// Option Menu
 	/*
 	Option
-	|- Administrant...
+	|- Administrant...(Accelerator CTRL+A)
 	|------------------------------------
 	|- I2C  Interface...
 	|------------------------------------
 	|- I2C  Slave Address
 	|------------------------------------
-	|- Disable All
-	|- Enable All
+	|- Disable All (Accelerator CTRL+D)
+	|- Enable All (Accelerator CTRL+E)
 	|------------------------------------
 	|- Run Mode          -> [V] Continually
 	|                       [V] Interations
@@ -478,8 +469,7 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_optionMenu = new wxMenu();
 
-	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant..."),
-		wxT("Administrant"), wxITEM_NORMAL);
+	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant...\tCTRL+A"), wxT("Administrant"), wxITEM_NORMAL);
 
 	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
 
@@ -490,8 +480,7 @@ void MainFrame::SetupMenuBar(void){
 	this->m_optionMenu->Append(this->m_AdministrantMenuItem);
 	this->m_optionMenu->AppendSeparator();
 
-	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface..."),
-		wxT("I2C Interface"), wxITEM_NORMAL);
+	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface"), wxT("I2C Interface"), wxITEM_NORMAL);
 
 	this->m_I2CInterfaceMenuItem->SetBitmap(wxBITMAP_PNG(HWINFO_16));
 
@@ -499,14 +488,14 @@ void MainFrame::SetupMenuBar(void){
 	this->m_optionMenu->AppendSeparator();
 
 	// I2C Slave Address
-	this->m_I2CSlaveAddressMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_SlaveAddress, wxT("I2C Slave Address..."), wxT("I2C Slave Address"), wxITEM_NORMAL);
+	this->m_I2CSlaveAddressMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_SlaveAddress, wxT("I2C Slave Address"), wxT("I2C Slave Address"), wxITEM_NORMAL);
 	this->m_optionMenu->Append(this->m_I2CSlaveAddressMenuItem);
 
 	this->m_optionMenu->AppendSeparator();
 
-	this->m_optionMenu->Append(MENU_ID_Disable_ALL, "&Disable ALL \tCtrl-D", wxT("Disable All Commands"));
+	this->m_optionMenu->Append(MENU_ID_Disable_ALL, wxT("Disable ALL...\tCTRL+D"), wxT("Disable All Commands"));
 
-	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  "&Enable  ALL \tCtrl-E", wxT("Enable  All Commands"));
+	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  wxT("Enable  ALL...\tCTRL+E"), wxT("Enable All Commands"));
 
 	this->m_optionMenu->AppendSeparator();
 
@@ -548,14 +537,11 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_optionMenu->AppendSubMenu(this->m_runModeMenu, wxT("Run Mode"), wxT("Run Mode"));
 
-	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"),
-		wxT("All"), wxITEM_CHECK);
+	this->m_allMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ALL, wxT("All"), wxT("All"), wxITEM_CHECK);
 
-	this->m_errorOnlyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ErrorOnly, wxT("Error Only"),
-		wxT("Error Only"), wxITEM_CHECK);
+	this->m_errorOnlyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ErrorLog_ErrorOnly, wxT("Error Only"), wxT("Error Only"), wxITEM_CHECK);
 
-	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"),
-		wxT("Log To File"), wxITEM_CHECK);
+	this->m_logToFileMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Log_To_File, wxT("Log To File"), wxT("Log To File"), wxITEM_CHECK);
 
 	this->m_errorLogMenu->Append(this->m_allMenuItem);
 	this->m_errorLogMenu->Append(this->m_errorOnlyMenuItem);
@@ -588,11 +574,9 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_optionMenu->AppendSubMenu(this->m_errorLogMenu, wxT("Error Log Mode"), wxT("Error Log Mode"));
 
-	this->m_pmBus11MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_1, wxT("PMBus1.1 (Single Mode)"),
-		wxT("PMBus1.1 (Single Mode)"), wxITEM_CHECK);
+	this->m_pmBus11MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_1, wxT("PMBus1.1 (Single Mode)"), wxT("PMBus1.1 (Single Mode)"), wxITEM_CHECK);
 
-	this->m_pmBus12MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_2, wxT("PMBus1.2 (Page Plus Mode)"),
-		wxT("PMBus1.2 (Page Plus Mode)"), wxITEM_CHECK);
+	this->m_pmBus12MenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_PMBUS_1_2, wxT("PMBus1.2 (Page Plus Mode)"), wxT("PMBus1.2 (Page Plus Mode)"), wxITEM_CHECK);
 
 	this->m_pmbusReadMethodMenu->Append(this->m_pmBus11MenuItem);
 	this->m_pmbusReadMethodMenu->Append(this->m_pmBus12MenuItem);
@@ -623,8 +607,7 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_helpMenu = new wxMenu();
 
-	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"),
-		wxT("About"), wxITEM_NORMAL);
+	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"), wxT("About"), wxITEM_NORMAL);
 
 	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
 
