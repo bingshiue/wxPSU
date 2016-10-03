@@ -42,6 +42,7 @@
 #include "TIHexFileParser.h"
 #include "TIHexMMAPModel.h"
 #include "ISPSequenceThread.h"
+#include "IncreaseCPUOverHeadThread.h"
 #include "ModelSelectDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
@@ -122,6 +123,8 @@ public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList);
 	virtual ~MainFrame();
 
+	DEV_BROADCAST_DEVICEINTERFACE dbch;
+
 	CUSTOMER_TYPE_t* m_customerList;/**< Support Customer List */
 	MODEL_TYPE_t* m_modelList;/**< Support Model List */
 
@@ -143,7 +146,10 @@ public:
 
 	TaskSystemThread *m_TaskSystemThread;/**< Handle of Task System Thread */
 
+	IncreaseCPUOverHeadThread* m_increaseCPUOverHeadThread;
+
 	bool m_sendThreadStopFlag;
+	bool m_increaseCPUOverHeadThreadStopFlag;
 
 	unsigned char m_destroying;
 
@@ -449,6 +455,9 @@ private:
 
 	void RegisterDeviceChangeNotify(void);
 	void DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned int pid, unsigned int vid);
+
+	void StartInCreaseCPUOverHeadThread(void);
+	void StopInCreaseCPUOverHeadThread(void);
 
 	wxDECLARE_EVENT_TABLE();
 

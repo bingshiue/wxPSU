@@ -19,8 +19,8 @@
 #include "Task.h"
 
 /**
-@brief ISP Sequence Thread.
-*/
+ * @brief ISP Sequence Thread.
+ */
 class ISPSequenceThread : public wxThread {
 public:
 	ISPSequenceThread(

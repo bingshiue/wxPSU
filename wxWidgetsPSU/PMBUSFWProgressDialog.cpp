@@ -7,7 +7,7 @@
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
-PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
+PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
 #if wxUSE_TIMER
 , m_timer(this)
 #endif
@@ -19,6 +19,8 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 	this->SetIcon(icon);
 
 	m_ispStatus = ispStatus;
+
+	m_increaseCPUOverHeadThread = increaseCPUOverHeadThread;
 
 	// Initialize Sizer
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -231,13 +233,19 @@ void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnDialogClose");
 	
-	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
+	*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
-	new(0.5f) UserCancelISPTask(this->m_ispStatus); // This may cause Task System Abnormal
+	//new(0.1f) UserCancelISPTask(this->m_ispStatus); // This sometimes cause GUI thread reply slowly
+
+	#if (INCREASE_CPU_OVERHEAD == TRUE)
+		if (m_increaseCPUOverHeadThread != NULL){
+			m_increaseCPUOverHeadThread->Delete();
+		}
+	#endif
 
 	while (Task::GetCount() > 0){
 		// If Task Count > 0, Wait
-		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
 
 		wxMilliSleep(10);
 	};
@@ -247,17 +255,21 @@ void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
 
 void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 
-	int tmp = 0;
-
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnBtnCancelOK");
 
-	//*this->m_ispStatus = ISP_Status_UserRequestCancel;
+	*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
-	new(0.5f) UserCancelISPTask(this->m_ispStatus); // This may cause Task System Abnormal
+	//new(0.1f) UserCancelISPTask(this->m_ispStatus); // This sometimes cause GUI thread reply slowly
 
-	while (Task::GetCount() > 0){
+	#if (INCREASE_CPU_OVERHEAD == TRUE)
+	if (m_increaseCPUOverHeadThread != NULL){
+		m_increaseCPUOverHeadThread->Delete();
+	}
+	#endif
+
+	while (Task::GetCount() > 0){		
 		// If Task Count > 0, Wait
-		PSU_DEBUG_PRINT(MSG_ALERT, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
 
 		wxMilliSleep(10);
 	};

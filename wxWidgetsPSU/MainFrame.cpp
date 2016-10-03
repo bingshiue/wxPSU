@@ -195,10 +195,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// If Create Thread Success
 	if (this->m_TaskSystemThread->Create() != wxTHREAD_NO_ERROR){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Task System Thread");
-		this->m_TaskSystemThread->SetPriority(WXTHREAD_DEFAULT_PRIORITY);
 	}
 	else{
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
+		this->m_TaskSystemThread->SetPriority(WXTHREAD_DEFAULT_PRIORITY);
 		this->m_TaskSystemThread->Run();
 	}
 
@@ -250,6 +250,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	m_destroying = 0;
 	m_sendThreadStopFlag = true;
+	m_increaseCPUOverHeadThreadStopFlag = true;
 
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);
@@ -277,16 +278,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 MainFrame::~MainFrame()
 {		
-	wxLog::SetActiveTarget(m_oldLogger);
 
-	if (this->m_logFileFFileOutputStream) { delete this->m_logFileFFileOutputStream; }
-	if (this->m_logFileTextOutputStream) { delete this->m_logFileTextOutputStream; }
-
-	// Save Config
-	this->SaveConfig();
-
-	// Delete Resource
-	delete[] this->m_PMBusData;
 }
 
 void MainFrame::SetupMenuBar(void){
@@ -1218,12 +1210,31 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		}
 	}
 
+    #if (INCREASE_CPU_OVERHEAD == TRUE)
+	if (this->m_increaseCPUOverHeadThread != NULL){
+		if (this->m_increaseCPUOverHeadThread->m_running == true){
+			this->m_increaseCPUOverHeadThread->m_running = false;
+		}
+	}
+    #endif
+
 	// Release Task List
 	TaskEx::ReleaseTaskList();
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "Close IO Device");
 	// Close IO Device
 	this->CloseIODevice();
+
+	// Delete Resource
+	delete[] this->m_PMBusData;
+
+	// Save Config
+	this->SaveConfig();
+
+	wxLog::SetActiveTarget(m_oldLogger);
+
+	if (this->m_logFileFFileOutputStream) { wxDELETE(this->m_logFileFFileOutputStream); }
+	if (this->m_logFileTextOutputStream) { wxDELETE(this->m_logFileTextOutputStream); }
 
 	Destroy();
 	//event.Skip();
@@ -1890,10 +1901,24 @@ void MainFrame::OnMonitor(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
 	PSU_DEBUG_PRINT(MSG_DETAIL, "m_monitor_running = %d", this->m_monitor_running);
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "m_ispSequenceThread = %p", this->m_ispSequenceThread);
 
 	int loop = 0;
 
 	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
+
+	/*** If User Cancel ISP Sequence Previous ***/
+	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){
+		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"
+			"Due to Previous ISP Sequence Has been Canceled !", UserCancelISP_POST_DELAY_TIME / 1000);
+
+		wxMessageBox(content,
+			wxT("Please Wait !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+
 
 	// If IO Device not Open, Open IO Device Here
 	this->OpenIODevice();
@@ -2556,7 +2581,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		wxMilliSleep(500);
 	}
 
-	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus);
+	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus, this->m_increaseCPUOverHeadThread);
 
 	switch (target){
 	
@@ -2578,10 +2603,14 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	// If Create Thread Success
 	if (this->m_ispSequenceThread->Create() != wxTHREAD_NO_ERROR){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create ISP Sequence Thread");
-		//m_ispSequenceThread->SetPriority(wxPRIORITY_MAX);
 	}
 	else{
 		this->m_ispSequenceThread->Run();
+		//m_ispSequenceThread->SetPriority(wxPRIORITY_MAX);
+
+        #if (INCREASE_CPU_OVERHEAD == TRUE)
+		this->StartInCreaseCPUOverHeadThread();
+		#endif
 	}
 
 	m_pmbusProgressDialog->Centre();
@@ -2595,6 +2624,9 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	m_pmbusProgressDialog->Destroy();
 	wxDELETE(m_pmbusProgressDialog);
 
+	#if (INCREASE_CPU_OVERHEAD == TRUE)
+	this->StopInCreaseCPUOverHeadThread();
+	#endif
 }
 
 void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
@@ -2619,6 +2651,7 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 			// User Cancel ISP
 			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel ISP Sequence !");
 
+			new(TP_ClearIOReadBufferTask) ClearIOReadBufferTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, false);
 			new(TP_UserCancelISPPostDelayTask) UserCancelISPPostDelayTask();
 
 			break;
@@ -2655,7 +2688,7 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 	//m_progressDialog->Resume();
 
 	//if (m_progressDialog){
-	//m_progressDialog->Destroy();
+		//m_progressDialog->Destroy();
 	//}
 
 }
@@ -3346,7 +3379,7 @@ void MainFrame::RegisterDeviceChangeNotify(void){
 		{ 0x86e0d1e0L, 0x8089, 0x11d0, { 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 } },
 	};
 
-	DEV_BROADCAST_DEVICEINTERFACE dbch;
+	//DEV_BROADCAST_DEVICEINTERFACE dbch;
 	dbch.dbcc_size = sizeof(dbch);
 	dbch.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
 	for (int i = 0; i < sizeof(GuidInterfaceList); i++)
@@ -3555,6 +3588,45 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 	else{
 		// If message was not device insert / remove, call standard handler
 		return wxFrame::MSWWindowProc(nMsg, wParam, lParam);
+	}
+}
+
+void MainFrame::StartInCreaseCPUOverHeadThread(void){
+	// Start IncreaseCPUOverHead Thread
+	if (this->m_increaseCPUOverHeadThreadStopFlag == true){
+		this->m_increaseCPUOverHeadThreadStopFlag = false;
+		this->m_increaseCPUOverHeadThread = new IncreaseCPUOverHeadThread(&this->m_increaseCPUOverHeadThreadStopFlag);
+		// If Create Thread Success
+		if (this->m_increaseCPUOverHeadThread->Create() != wxTHREAD_NO_ERROR){
+			PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create IncreaseCPUOverHeadThread");
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
+			this->m_increaseCPUOverHeadThread->SetPriority(WXTHREAD_DEFAULT_PRIORITY);
+			this->m_increaseCPUOverHeadThread->Run();
+		}
+	}
+}
+
+void MainFrame::StopInCreaseCPUOverHeadThread(void){
+	// Stop IncreaseCPUOverHead Thread
+	wxThread::ExitCode exitCode;
+
+	if (this->m_increaseCPUOverHeadThreadStopFlag == false){
+		wxThreadError error = this->m_increaseCPUOverHeadThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "IncreaseCPUOverHeadThread Exit Code = %d", (int)exitCode);
+
+		if (error != wxTHREAD_NO_ERROR){
+			PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
+		}
+
+		while (this->m_increaseCPUOverHeadThreadStopFlag == false){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Wait IncreaseCPUOverHeadThread Finish")
+			//wxMilliSleep(10);
+		};
+
+		this->m_increaseCPUOverHeadThread = NULL;
 	}
 }
 

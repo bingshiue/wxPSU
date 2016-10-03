@@ -51,7 +51,7 @@
 #define TP_SendUSBAdaptorConfigTask (0.5f)
 #define TP_SendUSBAdaptorParameterTask (0.5f)
 #define TP_ReceiveUSBAdaptorSettingCMDTask (0.5f)
-#define TP_ClearIOReadBufferTask (0.9f)
+#define TP_ClearIOReadBufferTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -892,12 +892,13 @@ class ClearIOReadBufferTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 
 	double m_elapsedTimer;/**< for compute elapsed time */
+	bool m_readUntilNoData;
 
 public:
 	/**
 	 * @brief Constructor.
 	 */
-	ClearIOReadBufferTask(IOACCESS* ioaccess, unsigned int* currentIO);
+	ClearIOReadBufferTask(IOACCESS* ioaccess, unsigned int* currentIO, bool readUntilNoData);
 
 	/**
 	* @brief Deconstructor.

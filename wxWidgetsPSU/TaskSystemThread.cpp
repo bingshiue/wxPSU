@@ -4,7 +4,7 @@
 
 #include "TaskSystemThread.h"
 
-TaskSystemThread::TaskSystemThread(){
+TaskSystemThread::TaskSystemThread() : wxThread(wxTHREAD_DETACHED){
 	// Set m_running to ture
 	this->m_running = true;
 	

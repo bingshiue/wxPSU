@@ -20,6 +20,7 @@
 #include "PMBUSHelper.h"
 #include "PMBUSLogTextCtrl.h"
 #include "Task.h"
+#include "IncreaseCPUOverHeadThread.h"
 
 class PMBUSFWProgressDialog : public wxDialog, private wxLog
 {
@@ -31,7 +32,7 @@ public:
 		CID_GAUGE_PROGRES,
 	};
 
-	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus);
+	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread);
 
 	~PMBUSFWProgressDialog();
 
@@ -58,6 +59,8 @@ private:
 	wxButton *m_okCancelButton;
 
 	PMBUSLogTextCtrl *m_logTC;
+
+	IncreaseCPUOverHeadThread* m_increaseCPUOverHeadThread;
 
 	unsigned char* m_ispStatus;
 

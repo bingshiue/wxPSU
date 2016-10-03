@@ -57,6 +57,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,6 +97,7 @@
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="I2CInterfaceDialog.cpp" />
     <ClCompile Include="I2CSlaveAddressDialog.cpp" />
+    <ClCompile Include="IncreaseCPUOverHeadThread.cpp" />
     <ClCompile Include="ISPSequenceThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrame.cpp" />
@@ -189,6 +191,7 @@
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="I2CSlaveAddressDialog.h" />
+    <ClInclude Include="IncreaseCPUOverHeadThread.h" />
     <ClInclude Include="IOAccess.h" />
     <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />
