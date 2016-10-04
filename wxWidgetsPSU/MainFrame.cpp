@@ -25,9 +25,9 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
-	RegisterDeviceChangeNotify();
-	
 	wxInitAllImageHandlers();
+
+	RegisterDeviceChangeNotify();
 
 	CheckAndLoadConfig();
 

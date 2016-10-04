@@ -561,7 +561,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								{
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length);
-									success++;
+									//success++;
 
 									// copy data to PMBus Command Structure
 									this->m_pmBusCommand[idx].m_recvBuff.m_length = this->m_recvBuff->m_length;
@@ -599,8 +599,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									//wxVariant variantRaw;
 									//variantRaw = RawMsg;
 
-									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status != cmd_status_checksum_error){
+									// Check I2C BUS Not Acknowledge
+									unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
+									if (i2cBusAck == PMBUSHelper::response_ng){
+										this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+										wxString NoAckStr("I2C BUS Not Acknowledge");
+										RawMsg = NoAckStr;
+									}
+
+									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[idx].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
 										this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_success;
+										success++;
 									}
 									PSU_DEBUG_PRINT(MSG_DETAIL, "idx = %d", idx);
 
@@ -614,25 +623,27 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
 
-									// Call Cook Data CB Function
-									memset(CookStr, 0, STR_LENGTH);
-									this->m_pmBusCommand[idx].m_cmdCBFunc.m_cookCBFunc(&(this->m_pmBusCommand[idx]), CookStr, this->m_pmBusCommand[idx].m_responseDataLength);
+									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success){
+										// Call Cook Data CB Function
+										memset(CookStr, 0, STR_LENGTH);
+										this->m_pmBusCommand[idx].m_cmdCBFunc.m_cookCBFunc(&(this->m_pmBusCommand[idx]), CookStr, this->m_pmBusCommand[idx].m_responseDataLength);
 
-									// Update Data View Model Cook Field
-									wxString CookMsg(CookStr);
+										// Update Data View Model Cook Field
+										wxString CookMsg(CookStr);
 
-									//wxVariant variantCook;
-									//variantCook = CookMsg;
+										//wxVariant variantCook;
+										//variantCook = CookMsg;
 
-									wxThreadEvent* threadcook_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK);
-									threadcook_evt->SetInt(idx);
-									threadcook_evt->SetString(CookMsg);
-									wxQueueEvent(m_pHandler->GetEventHandler(), threadcook_evt);
+										wxThreadEvent* threadcook_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK);
+										threadcook_evt->SetInt(idx);
+										threadcook_evt->SetString(CookMsg);
+										wxQueueEvent(m_pHandler->GetEventHandler(), threadcook_evt);
 
-									//this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PMBUSCMDListModel::Col_CookText);
-									//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
+										//this->m_dataViewListCtrl->get()->SetValueByRow(variantCook, idx, PMBUSCMDListModel::Col_CookText);
+										//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
 
-									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
+										PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
+									}
 
 								}
 								//
@@ -649,13 +660,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_failure;
 
 									if (this->m_recvBuff->m_recvBuff[2] == 0x4e && this->m_recvBuff->m_recvBuff[3] == 0x47) {
-										wxString NotFoundMsg(wxT("(I2C Interface Not Found)"));
+										wxString NotFoundMsg(wxT("(I2C BUS Not Acknowledge)"));
+										this->m_pmBusCommand[idx].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
 										//wxVariant variantNotFound = NotFoundMsg;
 
-										wxThreadEvent* threadcook_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK);
-										threadcook_evt->SetInt(idx);
-										threadcook_evt->SetString(NotFoundMsg);
-										wxQueueEvent(m_pHandler->GetEventHandler(), threadcook_evt);
+										wxThreadEvent* threadraw_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW);
+										threadraw_evt->SetInt(idx);
+										threadraw_evt->SetString(NotFoundMsg);
+										wxQueueEvent(m_pHandler->GetEventHandler(), threadraw_evt);
 
 										//this->m_dataViewListCtrl->get()->SetValueByRow(variantNotFound, idx, PMBUSCMDListModel::Col_RawText);
 										//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RawText);
@@ -930,7 +942,7 @@ void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
 
 	// FAN1
 	if (index == this->findPMBUSCMDIndex(0x90)){
-		wxString fan1 = wxString::Format("%5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
+		wxString fan1 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
 		this->m_stdPage->m_tcFAN1->SetValue(fan1);
 	}
 

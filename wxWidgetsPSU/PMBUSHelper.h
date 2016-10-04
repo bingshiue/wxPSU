@@ -72,6 +72,8 @@ public :
 
 	static unsigned int& getCurrentISPTarget(void);
 
+	static unsigned int IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsigned char *buffer, unsigned int SizeOfBuffer);
+
 protected :
 
 private :

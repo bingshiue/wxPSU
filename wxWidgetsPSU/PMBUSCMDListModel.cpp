@@ -235,6 +235,7 @@ void PMBUSCMDListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsi
 
 			case cmd_status_failure:
 			case cmd_status_checksum_error:
+			case cmd_status_i2c_bus_not_acknowledge:
 				variant << wxDataViewIconText(text, m_icon[XPM_red]);
 				break;
 

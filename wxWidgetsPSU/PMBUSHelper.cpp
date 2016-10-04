@@ -620,6 +620,44 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 	return result;
 }
 
+unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsigned char *buffer, unsigned int SizeOfBuffer){
+
+	unsigned int result = response_ok;
+	unsigned int chk_cnt = 0;
+	unsigned char usbhid_no_ack[9] = { 0x15, 0x07, 0x41, 0x43, 0x02, 0x4e, 0x47, 0x0d, 0x0a };
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// Do Handle When I/O is Serial Port
+		break;
+
+	case IOACCESS_HID:
+
+		for (unsigned int idx = 0; idx < sizeof(usbhid_no_ack) / sizeof(usbhid_no_ack[0]); idx++){
+			if (buffer[idx] != usbhid_no_ack[idx]){
+				break;
+			}
+			else{
+				chk_cnt++;
+				continue;
+			}
+		}
+
+		if (chk_cnt == sizeof(usbhid_no_ack) / sizeof(usbhid_no_ack[0])){
+			result = response_ng;
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return result;
+}
+
 unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigned int dataStartIndex, unsigned int dataEndIndex){
 	unsigned char CheckSum = 0x00;
 	unsigned int Sum = 0x00;

@@ -27,7 +27,8 @@ enum {
 	cmd_status_running,
 	cmd_status_success,
 	cmd_status_failure,
-	cmd_status_checksum_error
+	cmd_status_checksum_error,
+	cmd_status_i2c_bus_not_acknowledge,
 };
 
 enum {
