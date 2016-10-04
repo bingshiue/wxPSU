@@ -2609,7 +2609,9 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		//m_ispSequenceThread->SetPriority(wxPRIORITY_MAX);
 
         #if (INCREASE_CPU_OVERHEAD == TRUE)
-		this->StartInCreaseCPUOverHeadThread();
+		if (this->m_CurrentUseIOInterface == IOACCESS_HID){
+			this->StartInCreaseCPUOverHeadThread();
+		}
 		#endif
 	}
 
@@ -2625,7 +2627,9 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	wxDELETE(m_pmbusProgressDialog);
 
 	#if (INCREASE_CPU_OVERHEAD == TRUE)
-	this->StopInCreaseCPUOverHeadThread();
+	if (this->m_CurrentUseIOInterface == IOACCESS_HID){
+		this->StopInCreaseCPUOverHeadThread();
+	}
 	#endif
 }
 

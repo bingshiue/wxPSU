@@ -29,7 +29,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.11       |     Increase ISP Overhead for Avoid CPU Down It;s Core Speed   |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.12       |     Improve ISP Performance When I/O is USBHID Device          |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.11" /**< Program Version, Shown in About Dialog */
+#define VERSION_STRING "1.0.0.12" /**< Program Version, Shown in About Dialog */
 
 #endif
