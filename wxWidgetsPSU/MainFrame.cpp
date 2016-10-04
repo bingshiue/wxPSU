@@ -1236,8 +1236,8 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	if (this->m_logFileFFileOutputStream) { wxDELETE(this->m_logFileFFileOutputStream); }
 	if (this->m_logFileTextOutputStream) { wxDELETE(this->m_logFileTextOutputStream); }
 
-	Destroy();
-	//event.Skip();
+	//Destroy();
+	event.Skip();
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)

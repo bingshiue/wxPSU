@@ -12,6 +12,6 @@
 #define HAVE_GENERIC_MODEL           (TRUE)//(FALSE)
 
 // Increase CPU Overhead When Do ISP
-#define INCREASE_CPU_OVERHEAD        (FALSE)//(FALSE)
+#define INCREASE_CPU_OVERHEAD        (TRUE)//(FALSE)
 
 #endif

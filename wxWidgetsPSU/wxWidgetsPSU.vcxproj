@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;__WXMSW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(WXWIDGETS_HOME)\include;$(WXWIDGETS_HOME)\lib\vc_lib\mswud;$(SolutionDir)\hidapi-0.7.0\hidapi;$(SolutionDir)\TaskSystem\</AdditionalIncludeDirectories>
-      <OpenMPSupport>false</OpenMPSupport>
+      <OpenMPSupport>true</OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
