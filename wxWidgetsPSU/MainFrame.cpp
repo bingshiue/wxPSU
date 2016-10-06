@@ -17,7 +17,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
 
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
@@ -2581,7 +2581,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		wxMilliSleep(500);
 	}
 
-	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus, this->m_increaseCPUOverHeadThread);
+	m_pmbusProgressDialog = new PMBUSFWProgressDialog(this, dialogTitle, 100, &this->m_ispStatus, this->m_increaseCPUOverHeadThread, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 
 	switch (target){
 	
@@ -2633,6 +2633,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	#endif
 }
 
+/*
 void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceInterrupt");
@@ -2689,13 +2690,8 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 		}
 	}
 
-	//m_progressDialog->Resume();
-
-	//if (m_progressDialog){
-		//m_progressDialog->Destroy();
-	//}
-
 }
+*/
 
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	wxVariant Value;
@@ -3685,7 +3681,7 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdat
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
 
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
-EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
+//EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()

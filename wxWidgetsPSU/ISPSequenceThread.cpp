@@ -360,7 +360,8 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 
 			threadISPInterrupt_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT);
 			threadISPInterrupt_evt->SetInt((int)*m_ispStatus);
-			wxQueueEvent(this->m_evtHandlerMain, threadISPInterrupt_evt);
+			wxQueueEvent(this->m_evtHandler, threadISPInterrupt_evt);
+			//wxQueueEvent(this->m_evtHandlerMain, threadISPInterrupt_evt);
 
 			break;
 

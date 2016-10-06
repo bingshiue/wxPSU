@@ -420,7 +420,7 @@ private:
 	void OnSendThreadUpdateSummary(wxThreadEvent& event);
 
 	void OnISPSequenceStart(wxThreadEvent& event);
-	void OnISPSequenceInterrupt(wxThreadEvent& event);
+	//void OnISPSequenceInterrupt(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 

@@ -32,7 +32,7 @@ public:
 		CID_GAUGE_PROGRES,
 	};
 
-	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread);
+	PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread, IOACCESS* ioaccess, unsigned int* currentIO);
 
 	~PMBUSFWProgressDialog();
 
@@ -62,6 +62,10 @@ private:
 
 	IncreaseCPUOverHeadThread* m_increaseCPUOverHeadThread;
 
+	IOACCESS* m_ioaccess;
+	
+	unsigned int* m_currentIO;
+
 	unsigned char* m_ispStatus;
 
 #if wxUSE_TIMER
@@ -78,6 +82,7 @@ private:
 		const wxString& msg);
 
 	void OnISPSequenceUpdate(wxThreadEvent& event);
+	void OnISPSequenceInterrupt(wxThreadEvent& event);
 	void OnISPSequenceEnd(wxThreadEvent& event);
 
 	void OnBtnCancelOK(wxCommandEvent& event);

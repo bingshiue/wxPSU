@@ -5,9 +5,10 @@
 #include "PMBUSFWProgressDialog.h"
 
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
-PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
+PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread, IOACCESS* ioaccess, unsigned int* currentIO) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
 #if wxUSE_TIMER
 , m_timer(this)
 #endif
@@ -21,6 +22,10 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 	m_ispStatus = ispStatus;
 
 	m_increaseCPUOverHeadThread = increaseCPUOverHeadThread;
+
+	m_ioaccess = ioaccess;
+
+	m_currentIO = currentIO;
 
 	// Initialize Sizer
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
@@ -218,6 +223,64 @@ void PMBUSFWProgressDialog::OnISPSequenceUpdate(wxThreadEvent& event){
 	*/
 }
 
+void PMBUSFWProgressDialog::OnISPSequenceInterrupt(wxThreadEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceInterrupt");
+
+	int ispStatus = event.GetInt();
+
+	// If Error Occurs
+	if ((ispStatus & 0xff) > 0x02) {
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ispStatus = 0x%xH", ispStatus);
+
+		switch (ispStatus){
+
+		case ISP_Status_VerifyBeforeStart:
+			// Verify Before Start
+
+			break;
+
+		case ISP_Status_UserRequestCancel:
+			// User Cancel ISP
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel ISP Sequence !");
+
+			new(TP_ClearIOReadBufferTask) ClearIOReadBufferTask(this->m_ioaccess, this->m_currentIO, false);
+			new(TP_UserCancelISPPostDelayTask) UserCancelISPPostDelayTask();
+
+			break;
+
+		case ISP_Status_SendDataFailed:
+			wxMessageBox(wxT("Send Data Failed ! \n\n IO Port Send Data Failed"),
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
+
+			break;
+
+		case ISP_Status_ResponseDataError:
+			wxMessageBox(wxT("Response Data Error ! \n\n This may caused by Unstable IO or Incorrect Image"),
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
+
+			break;
+
+
+		case ISP_Status_RebootCheckError:
+			wxMessageBox(wxT("DSP Reboot Check Error ! \n\n DSP Reboot Failed"),
+				wxT("Error !"),  // caption
+				wxOK | wxICON_ERROR);
+
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs, ispStatus = %02x", ispStatus);
+			break;
+
+		}
+	}
+
+}
+
 void PMBUSFWProgressDialog::OnISPSequenceEnd(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnISPSequenceEnd");
 
@@ -279,6 +342,7 @@ void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 
 wxBEGIN_EVENT_TABLE(PMBUSFWProgressDialog, wxDialog)
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, PMBUSFWProgressDialog::OnISPSequenceUpdate)
+EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, PMBUSFWProgressDialog::OnISPSequenceInterrupt)
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_END, PMBUSFWProgressDialog::OnISPSequenceEnd)
 EVT_BUTTON(CID_BTN_CANCELOK, PMBUSFWProgressDialog::OnBtnCancelOK)
 EVT_CLOSE(PMBUSFWProgressDialog::OnDialogClose)
