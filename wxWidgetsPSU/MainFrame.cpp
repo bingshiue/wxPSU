@@ -2622,6 +2622,10 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		this->m_ispStatus = ISP_Status_UserRequestCancel;
 	}
 
+	// Wait ISP Sequence Thread End
+	m_ispSequenceThread->Wait();
+
+	wxDELETE(m_ispSequenceThread);
 
 	m_pmbusProgressDialog->Destroy();
 	wxDELETE(m_pmbusProgressDialog);

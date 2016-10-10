@@ -32,6 +32,9 @@ public :
 	static unsigned int CurrentCMDTableSize;
 	static unsigned int CurrentISPTarget;
 
+	static unsigned int runInMode;
+	static int runInTimes;
+
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);

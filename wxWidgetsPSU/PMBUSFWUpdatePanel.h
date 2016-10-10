@@ -17,6 +17,7 @@
 #include "wx/progdlg.h"
 
 #include "CommonDef.h"
+#include "AppSettings.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
 #include "TIHexFileParser.h"
@@ -34,6 +35,8 @@ enum {
 
 	CID_WRITE_BUTTON,
 	CID_CLOSE_BUTTON,
+
+	CID_RUN_IN_CHECKBOX,
 };
 
 class PMBUSFWUpdatePanel : public wxPanel, private wxLog {
@@ -85,7 +88,6 @@ private:
 
 	wxStaticLine *m_st1;
 	wxStaticLine *m_st2;
-	//wxStaticLine *m_st3;
 
 	wxStaticText *m_fileNameST;
 	//wxTextCtrl *m_fileNameTC;
@@ -114,6 +116,17 @@ private:
 
 	PMBUSLogTextCtrl *m_logTC;
 
+	wxSizer *m_RunInSizer;
+
+	wxCheckBox *m_RunInCheckBox;
+	//wxStaticText *m_RunInPaddingST;
+	wxStaticText *m_RunInTimesST;
+	wxTextCtrl *m_RunInTimesTC;
+
+	wxTextValidator m_runInTimesNumberValidator;
+
+	wxStaticLine *m_st3;
+
 	wxString m_hexFilePath;
 
 	//PMBUSFWProgressDialog *m_progressDialog;
@@ -134,6 +147,8 @@ private:
 
 	void OnPopUpMenu(wxDataViewEvent &event);
 	void OnSaveHex(wxCommandEvent& event);
+
+	void OnRunInCheckBox(wxCommandEvent& event);
 
 	void OnProgressUpdate(wxThreadEvent& event);
 

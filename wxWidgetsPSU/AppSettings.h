@@ -38,7 +38,7 @@ enum {
 };
 
 enum {
-	I2C_AdaptorModuleBoard_API2CS12_000= 0,
+	I2C_AdaptorModuleBoard_API2CS12_000 = 0,
 	I2C_AdaptorModuleBoard_R90000_95611,
 	I2C_AdaptorModuleBoard_R90000_9271_USB,
 	I2C_AdaptorModuleBoard_TOTALPHASE,
@@ -64,6 +64,8 @@ enum {
 #define DEFAULT_ACS_SETPOINT_INPUT_MIN  2000
 
 #define DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME  0
+
+#define DEFAULT_RUNIN_TIMES  10
 
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600

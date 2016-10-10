@@ -50,6 +50,11 @@ int SendISPStartCMDTask::Main(double elapsedTime){
 
 	int cnt = this->GetCount(task_ID_SendISPStartCMDTask);
 
+	if (PMBUSHelper::runInMode == Generic_Enable){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Run In Mode Enable");
+		PSU_DEBUG_PRINT(MSG_ALERT, "Run In Times = %d", PMBUSHelper::runInTimes);
+	}
+
 	PSU_DEBUG_PRINT(MSG_ALERT, "ISP Send Start CMD");
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Count of Task = %d", cnt);

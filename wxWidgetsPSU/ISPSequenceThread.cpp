@@ -15,7 +15,7 @@ ISPSequenceThread::ISPSequenceThread
 	wxEvtHandler* evtHandler,
 	unsigned char* ispStatus,
 	wxProgressDialog *progressDialog
-	) : wxThread(wxTHREAD_DETACHED)
+	) : wxThread(wxTHREAD_JOINABLE)
 {
 	this->m_hexFilePath = hexFilePath;
 
@@ -121,7 +121,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 	this->m_tiHexFileStat->begin();
 
 	/*** Initialize ISP related Parameters ***/
-	/* unsigned char ispStatus */ *m_ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
+	*m_ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
 	double percentage = 0;
 	wxString information("");
 	//int not_cancel;
@@ -129,36 +129,6 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 	unsigned char header_index = 0;
 	unsigned int try_end = 0;
 
-#if 0
-	/*** Decide Dialog Title String ***/
-	wxString dialogTitle;
-	if (this->m_target == UPDATE_PRIMARY_FW_TARGET){
-		dialogTitle = wxString("Primary FW");
-	}
-	else if (this->m_target == UPDATE_SECONDARY_FW_TARGET){
-		dialogTitle = wxString("Secondary FW");
-	}
-
-	dialogTitle += wxT(" ISP Progress");
-
-	/*** Create Progress Dialog ***/
-	wxProgressDialog dialog(dialogTitle,
-		// "Reserve" enough space for the multiline
-		// messages below, we'll change it anyhow
-		// immediately in the loop below
-		wxString(' ', 100) + "\n\n\n\n",
-		100,    // range
-		NULL,//this, // parent
-		wxPD_CAN_ABORT |
-		//wxPD_CAN_SKIP |
-		wxPD_APP_MODAL |
-		//wxPD_AUTO_HIDE | // -- try this as well
-		wxPD_ELAPSED_TIME |
-		//wxPD_ESTIMATED_TIME |
-		//wxPD_REMAINING_TIME |
-		wxPD_SMOOTH // - makes indeterminate mode bar on WinXP very small
-		);
-#endif
 
 	/*** Create SendISPStartCMD Task ***/
 	new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
@@ -167,61 +137,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 		information = wxString(wxT(""));
 
 		if (*m_ispStatus == ISP_Status_InProgress || *m_ispStatus == ISP_Status_VerifyBeforeStart){
-
-#if 0
-			// Header
-			switch (header_index){
-
-			case 0:
-				information = wxString::Format("PC > - - - - - - - - - DSP");
-				break;
-
-			case 1:
-				information = wxString::Format("PC - > - - - - - - - - DSP");
-				break;
-
-			case 2:
-				information = wxString::Format("PC - - > - - - - - - - DSP");
-				break;
-
-			case 3:
-				information = wxString::Format("PC - - - > - - - - - - DSP");
-				break;
-
-			case 4:
-				information = wxString::Format("PC - - - - > - - - - - DSP");
-				break;
-
-			case 5:
-				information = wxString::Format("PC - - - - - > - - - - DSP");
-				break;
-
-			case 6:
-				information = wxString::Format("PC - - - - - - > - - - DSP");
-				break;
-
-			case 7:
-				information = wxString::Format("PC - - - - - - - > - - DSP");
-				break;
-
-			case 8:
-				information = wxString::Format("PC - - - - - - - - > - DSP");
-				break;
-
-			case 9:
-				information = wxString::Format("PC - - - - - - - - - > DSP");
-				break;
-
-			default:
-				PSU_DEBUG_PRINT(MSG_ALERT, "Something Error")
-					break;
-			}
-			header_index++;
-			header_index %= 10;
-
-			information += wxT("\n");
-#endif
-
+			// 
 		}
 		else if (*m_ispStatus == ISP_Status_ALLDone){
 
@@ -235,6 +151,12 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 		unsigned long currentAddress = this->m_tiHexFileStat->currentAddress();
 
 		if (this->m_developerMode == Generic_Enable){
+			
+			if (PMBUSHelper::runInMode == Generic_Enable){
+				information += wxString::Format("Run In Remain Times : %d", PMBUSHelper::runInTimes);
+				information += wxT("\n");
+			}
+			
 			information += wxString::Format("Current Process Address : %08x", currentAddress);
 			information += wxT("\n");
 		}
@@ -255,16 +177,36 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 			}
 
 			if ((*m_ispStatus & 0xff) <= 0x02){
-				percentage = 100;
-				information = wxT("ISP Progress Complete");
-				information += wxT("\n");
+				
+				if (PMBUSHelper::runInMode == Generic_Enable && --PMBUSHelper::runInTimes > 0){
+					
+					//PMBUSHelper::runInTimes--;
 
-				if (this->m_developerMode == Generic_Enable){
-					information += wxString::Format("Current Process Address : %08x", currentAddress);
-					information += wxT("\n");
+					// Restart ISP Sequence
+					/*** Jump To Start Address of Hex File ***/
+					this->m_tiHexFileStat->begin();
+
+					/*** Initialize ISP related Parameters ***/
+					*m_ispStatus = ISP_Status_VerifyBeforeStart;//ISP_Status_InProgress;
+					percentage = 0;
+
+					/*** Create SendISPStartCMD Task ***/
+					new(TP_SendISPStartCMDTask) SendISPStartCMDTask(m_ioaccess, m_currentIO, CMDF0H, this->m_tiHexFileStat, this->m_ispStatus, this->m_target);
+
+					//
 				}
+				else {
+					percentage = 100;
+					information = wxT("ISP Progress Complete");
+					information += wxT("\n");
 
-				information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+					if (this->m_developerMode == Generic_Enable){
+						information += wxString::Format("Current Process Address : %08x", currentAddress);
+						information += wxT("\n");
+					}
+
+					information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+				}
 			}
 			else{
 				percentage = 99; // Error occurs, set percentage less than 100 

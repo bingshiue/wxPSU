@@ -16,6 +16,8 @@ unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
 wxString PMBUSHelper::m_timeString;
 unsigned int PMBUSHelper::CurrentCMDTableSize;
 wxString PMBUSHelper::m_winTitleBase;
+unsigned int PMBUSHelper::runInMode;
+int PMBUSHelper::runInTimes;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;

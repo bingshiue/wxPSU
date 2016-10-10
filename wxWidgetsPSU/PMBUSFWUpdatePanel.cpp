@@ -62,7 +62,6 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	// Static Line
 	this->m_st1 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 	this->m_st2 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
-	//this->m_st3 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 
 	if (this->m_developerMode == Generic_Enable){
 
@@ -127,12 +126,44 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_statisticSBS->Add(this->m_fileStatFGS, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
 
 	this->m_statisticSBS->Add(this->m_st2, wxSizerFlags(0).Expand().Border(wxALL));
+
+	// Run In Test GUI Component Initialize 
+	if (this->m_developerMode == Generic_Enable){
+
+		this->m_RunInSizer = new wxBoxSizer(wxHORIZONTAL);
+		this->m_RunInCheckBox = new wxCheckBox(this, CID_RUN_IN_CHECKBOX, wxT("Run In Test"));
+		//this->m_RunInPaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString);
+
+		this->m_RunInTimesST = new wxStaticText(this, wxID_ANY, wxT("Run In Times :"));
+		this->m_RunInTimesTC = new wxTextCtrl(this, wxID_ANY, wxString::Format("%d", DEFAULT_RUNIN_TIMES));
+		this->m_RunInTimesTC->Enable(false);
+
+		wxString DecimalCharIncludes = wxT("0123456789");
+		m_runInTimesNumberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+		m_runInTimesNumberValidator.SetCharIncludes(DecimalCharIncludes);
+
+		this->m_RunInTimesTC->SetValidator(m_runInTimesNumberValidator);
+
+		this->m_RunInSizer->Add(this->m_RunInCheckBox, wxSizerFlags(0).Border(wxALL).Align(wxALIGN_CENTER_VERTICAL));
+		//this->m_RunInSizer->Add(this->m_RunInPaddingST, wxSizerFlags(0).Border(wxALL).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_RunInSizer->Add(this->m_RunInTimesST, wxSizerFlags(0).Border(wxALL).Align(wxALIGN_CENTER_VERTICAL));
+		this->m_RunInSizer->Add(this->m_RunInTimesTC, wxSizerFlags(0).Border(wxALL).Align(wxALIGN_CENTER_VERTICAL));
+
+		this->m_statisticSBS->Add(m_RunInSizer, wxSizerFlags(0).Border(wxALL).Align(wxALIGN_CENTRE_HORIZONTAL));
+
+		// Static Line 3
+		this->m_st3 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
+		this->m_statisticSBS->Add(m_st3, wxSizerFlags(0).Expand().Border(wxALL));
+	}
+
+	//
 	
 	this->m_statisticSBS->Add(this->m_buttonSizer, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
+	
 	this->m_topLevelSizer->Add(this->m_statisticSBS, wxSizerFlags(0).Expand());
 
 	if (this->m_developerMode == Generic_Enable){
-
+		
 		this->SetupHexMMAPDVL();
 
 		this->m_topLevelSizer->Add(this->m_tiHexMMAPDVC, wxSizerFlags(1).Expand());
@@ -279,7 +310,31 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 		return;
 	}
 
-	/*** Write Count For Debug Perpose ***/
+	/*** Check Run In Mode ***/
+	if (this->m_developerMode == Generic_Enable){
+		PMBUSHelper::runInMode = this->m_RunInCheckBox->GetValue()==true ? Generic_Enable : Generic_Disable;
+
+		if (PMBUSHelper::runInMode == Generic_Enable){
+			int runInTimes = wxAtoi(this->m_RunInTimesTC->GetValue());
+		
+			if (runInTimes <= 0){
+				wxMessageBox(wxT("Run In Times <= 0 !"),
+					wxT("Run In Times Setup Failed !"),  // caption
+					wxOK | wxICON_WARNING);
+
+				return;
+			}
+			else{
+				PMBUSHelper::runInTimes = runInTimes;
+			}
+		}
+	}
+	else{
+		PMBUSHelper::runInMode = Generic_Disable;
+		PMBUSHelper::runInTimes = 0;
+	}
+
+	/*** Write Count For Debug Purpose ***/
 	this->m_writeCount++;
 	PSU_DEBUG_PRINT(MSG_ALERT, "Write Count = %d", this->m_writeCount);
 
@@ -340,6 +395,11 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	}
 
 	dialogTitle += wxT(" ISP Progress");
+
+	if(PMBUSHelper::runInMode == Generic_Enable){
+		dialogTitle += wxString::Format(" Run In Test Times : %d", PMBUSHelper::runInTimes);
+	}
+
 
 #if 0
 	/*** Create Progress Dialog ***/
@@ -666,6 +726,31 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Save Hex File : %s Successfully", SavePath.c_str());
 }
 
+void PMBUSFWUpdatePanel::OnRunInCheckBox(wxCommandEvent& event){
+
+	int runinCheckBoxStatus = this->m_RunInCheckBox->GetValue()==true ? Generic_Enable : Generic_Disable;
+
+	switch (runinCheckBoxStatus){
+
+	case Generic_Enable:
+
+		this->m_RunInTimesTC->Enable(true);
+
+		break;
+
+	case Generic_Disable:
+
+		this->m_RunInTimesTC->Enable(false);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Errors !");
+		break;
+	
+	}
+
+}
 
 unsigned int& PMBUSFWUpdatePanel::GetIndexOfNotebook(void) {
 	return this->m_indexOfNotebook; 
@@ -775,6 +860,7 @@ wxBEGIN_EVENT_TABLE(PMBUSFWUpdatePanel, wxPanel)
 EVT_BUTTON(CID_WRITE_BUTTON, PMBUSFWUpdatePanel::OnWriteButton)
 EVT_BUTTON(CID_CLOSE_BUTTON, PMBUSFWUpdatePanel::OnCloseButton)
 EVT_MENU(MENU_ID_POPUP_SAVEHEX, PMBUSFWUpdatePanel::OnSaveHex)
+EVT_CHECKBOX(CID_RUN_IN_CHECKBOX, PMBUSFWUpdatePanel::OnRunInCheckBox)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_HEXMMAP_DVC, PMBUSFWUpdatePanel::OnPopUpMenu)
 EVT_THREAD(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, PMBUSFWUpdatePanel::OnProgressUpdate)
 wxEND_EVENT_TABLE()
