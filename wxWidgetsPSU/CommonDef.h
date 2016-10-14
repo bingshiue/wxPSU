@@ -47,7 +47,7 @@
 #define ISP_SLEEP_TIME  10  /**< Sleep Time Between F3(F1) Command (MilliSecond) */
 #endif
 
-#define ISP_START_VERIFY_RETRY  5 /**< ISP Start Verify(F0) Command Fail Retry Times */
+#define ISP_START_VERIFY_RETRY  20 /**< ISP Start Verify(F0) Command Fail Retry Times */
 
 #define ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP /**< Sleep before Start Verify Command Failed Retry */
 #ifdef ISP_START_VERIFY_CMD_FAILED_RETRY_SLEEP 
