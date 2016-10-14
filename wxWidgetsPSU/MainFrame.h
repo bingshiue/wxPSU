@@ -439,6 +439,7 @@ private:
 	int CloseIODevice(void);
 
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
+	void UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed);
 
 	int SaveCMDListToFile(wxTextOutputStream& textOutputStream);
 

@@ -2226,6 +2226,13 @@ void MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
 	this->m_status_bar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
 }
 
+void MainFrame::UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed){
+	wxString i2cBitRateString = wxString::Format("%d", i2cBitRateSpeed);
+	i2cBitRateString += wxT("kHz");
+
+	this->m_status_bar->SetStatusText(i2cBitRateString, PMBUSStatusBar::Field_I2C_Clock);
+}
+
 int MainFrame::SetIODeviceOption(void){
 
 	this->m_portSetting.m_comportNumber = this->m_appSettings.m_comportSetting.m_comportNumber;
@@ -2391,6 +2398,9 @@ int MainFrame::OpenIODevice(void){
 						this->m_appSettings.m_usbAdaptorCANSetting.m_bitRateSpeed,
 						this->m_appSettings.m_usbAdaptorI2CSetting.m_busTimeout
 						);
+
+					// Update I2C Bit Rate Speed Field
+					this->UpdateStatusBarIOSettingFiled(this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed);
 
 				}
 		

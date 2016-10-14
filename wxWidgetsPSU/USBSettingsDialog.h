@@ -90,6 +90,7 @@ public:
 private:
 
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
+	void UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed);
 	int SetIODeviceOption(void);
 	//int OpenIODevice(void);
 	//int CloseIODevice(void);

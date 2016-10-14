@@ -74,6 +74,13 @@ void USBSettingsDialog::UpdateStatusBarIOSettingFiled(wxString io_string){
 	//this->m_pmbusStatusBar->SetStatusText(io_string, PMBUSStatusBar::Field_IO_Setting);
 }
 
+void USBSettingsDialog::UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed){
+	wxString i2cBitRateString = wxString::Format("%d", i2cBitRateSpeed);
+	i2cBitRateString += wxT("kHz");
+
+	this->m_pmbusStatusBar->SetStatusText(i2cBitRateString, PMBUSStatusBar::Field_I2C_Clock);
+}
+
 int USBSettingsDialog::SetIODeviceOption(void){
 	this->m_portSetting.m_comportNumber = this->m_appSettings->m_comportSetting.m_comportNumber;
 	this->m_portSetting.m_buadRate = this->m_appSettings->m_comportSetting.m_buadRate;
@@ -390,6 +397,9 @@ void USBSettingsDialog::SaveConfig(void){
 			this->m_appSettings->m_usbAdaptorCANSetting.m_bitRateSpeed,
 			this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
 			);
+
+		// Update I2C Clock Speed Field
+		this->UpdateStatusBarIOSettingFiled(this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed);
 	}
 }
 

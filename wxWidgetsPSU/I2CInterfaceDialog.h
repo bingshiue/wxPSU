@@ -82,6 +82,7 @@ private:
 	unsigned int m_previousModuleBoardSelectIndex;
 
 	void UpdateStatusBarIOSettingFiled(wxString io_string);
+	void UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed);
 	int SetIODeviceOption(void);
 
 	int OpenIODevice(void);
