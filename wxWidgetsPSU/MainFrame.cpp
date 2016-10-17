@@ -263,11 +263,32 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	retval = this->OpenIODevice();
 	if (retval == EXIT_FAILURE){
 		if (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) {
-			ComportDialog* comportDialog = new ComportDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
-			comportDialog->Centre(wxCENTER_ON_SCREEN);
-			comportDialog->ShowModal();
+			
+			// If Find Acbel USB I2C Adaptor
+			if (this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
 
-			delete comportDialog;
+				// Hint User Can Use USB Adaptor Device
+				wxMessageBox(wxT("Found Acbel USB I2C Adaptor Board \n\nCurrent I/O Setting is Serial Port, You Can Setup I/O to Use USB I2C Adaptor Board in Next Popup Setting Window"),
+					wxT("Found Acbel USB I2C Adaptor Board !"),  // caption
+					wxOK | wxICON_INFORMATION);
+
+				// Popup I2C Interface Dialog 
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar);
+				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
+				i2cIFDialog->ShowModal();
+
+				delete i2cIFDialog;
+
+			}
+			else{
+
+				// Popup Comport Setting Dialog
+				ComportDialog* comportDialog = new ComportDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
+				comportDialog->Centre(wxCENTER_ON_SCREEN);
+				comportDialog->ShowModal();
+
+				delete comportDialog;
+			}
 		}
 	}
 	

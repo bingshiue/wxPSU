@@ -27,6 +27,8 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 	UNREFERENCED_PARAMETER(sizeofArray);
 #endif
 
+	int devicesFound = 0;
+
 	struct hid_device_info *devs, *cur_dev;
 	devs = hid_enumerate(0x0, 0x0);
 	cur_dev = devs;
@@ -49,6 +51,8 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 	devs = hid_enumerate(DEFAULT_VID, DEFAULT_PID);
 	cur_dev = devs;
 	while (cur_dev) {
+		++devicesFound;
+		
 		PSU_DEBUG_PRINT(MSG_ALERT, "Device Found ->");
 		PSU_DEBUG_PRINT(MSG_ALERT, "Type: %04hx %04hx", cur_dev->vendor_id, cur_dev->product_id);
 		
@@ -70,7 +74,7 @@ int EnumerateAvailableHIDDevice(BOOL *array, unsigned int sizeofArray){
 	}
 	hid_free_enumeration(devs);
 
-	return EXIT_SUCCESS;
+	return devicesFound;//EXIT_SUCCESS;
 }
 
 int GetHIDDeviceStatus(void){
