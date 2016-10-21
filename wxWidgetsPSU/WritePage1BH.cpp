@@ -5,7 +5,7 @@
 #include "PMBUSCMDWritePages.h"
 
 
-WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label) : BaseWritePage(parent, label){
+WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_code = new wxStaticText(this, wxID_ANY, wxString(L"Code"), wxDefaultPosition, wxSize(-1, -1));
 	m_codeInputValue = new wxTextCtrl(this, wxID_ANY);
@@ -37,6 +37,13 @@ WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label) : BaseWritePage(pa
 	// Set Validator
 	this->m_codeInputValue->SetValidator(this->m_numberValidator);
 	this->m_maskInputValue->SetValidator(this->m_numberValidator);
+
+	// Save Member
+	this->m_monitor_running = monitor_running;
+	this->m_sendCMDVector = sendCMDVector;
+
+	this->m_ioaccess = ioaccess;
+	this->m_currentIO = currentIO;
 
 }
 

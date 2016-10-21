@@ -169,10 +169,11 @@ int HIDSendData(unsigned char* buff, unsigned int size){
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	unsigned int retry = 0;
 	unsigned int readSize = 0;
+	unsigned int retryTimeArray[RETRY_TIMES] = { 3, 20, 50, 100, 200 };
 
 	while (retry < RETRY_TIMES && readSize <= 0){
 
-		wxMilliSleep(3);
+		wxMilliSleep(retryTimeArray[retry]);//3);
 
 		readSize = hid_read(handle, buff, sizeOfBuff+2);// Read To [0x0d] [0x0a]
 		if (readSize != HID_EXPECT_DATA_LENGTH){
@@ -183,7 +184,7 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	}
 
 	if (retry >= RETRY_TIMES){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Read Data Timeout Occurs, Retry = %d", retry);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Data Timeout Occurs, Retry = %d", retry);
 		readSize = 0;
 		return readSize;
 	}

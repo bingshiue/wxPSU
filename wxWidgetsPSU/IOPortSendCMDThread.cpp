@@ -353,7 +353,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
 
-					if (this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
+					if (PMBUSHelper::isOwnReadAccess(this->m_pmBusCommand[idx].m_access) == true){//this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
 
 						// Check If Need Change Page
 						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){

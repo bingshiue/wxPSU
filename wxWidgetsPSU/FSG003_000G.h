@@ -114,9 +114,9 @@ PMBUSCOMMAND_t g_FSG003_000G_CMDTable[] = { //[FSG003_000G_CMD_TABLE_SIZE] = {
 	// A7h         
 	{ true, "A7H", 0xa7, "MFR_POUT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
 	// A8h         
-	{ true, "A8H", 0xa8, "MFR_AMBIENT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
+	{ true, "A8H", 0xa8, "MFR_TAMBIENT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
 	// A9h         
-	{ true, "A9H", 0xa9, "MFR_AMBIENT_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
+	{ true, "A9H", 0xa9, "MFR_TAMBIENT_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
 	// AAh         
 	{ true, "AAH", 0xaa, "MFR_EFFICIENCY_LL", cmd_access_br, 0, 0, { 0 }, 0x14, { 0 }, { 0 }, { 0 } },
 	// ABh         

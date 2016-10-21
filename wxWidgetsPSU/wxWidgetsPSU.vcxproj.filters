@@ -264,6 +264,30 @@
     <ClCompile Include="IncreaseCPUOverHeadThread.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="GIGABYTE_CRPS001_CBCook.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="GIGABYTE_CRPS001_CBQuery.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="GIGABYTE_CRPS001_CBRaw.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePageC0H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePageC1H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePageC2H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePage31H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePage4AH.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -459,6 +483,21 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="IncreaseCPUOverHeadThread.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001_CMDCB.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001_CBRaw.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001_CBQuery.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001_CBCook.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,7 +11,15 @@
 #include "ModelList.h"
 
 CUSTOMER_TYPE_t g_CustomerList[CUSTOMER_LIST_SIZE] = {
+	
 	{
+		GIGABYTE_CUSTOMER_NAME,
+		g_GIGABYTEModelList,
+		GIGABYTE_MODEL_LIST_SIZE
+	}
+	
+	
+	,{
 		NEC_CUSTOMER_NAME,
 		g_NECModelList,
 		NEC_MODEL_LIST_SIZE

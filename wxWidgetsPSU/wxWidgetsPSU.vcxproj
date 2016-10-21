@@ -94,6 +94,9 @@
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="ClearIOReadBufferTask.cpp" />
     <ClCompile Include="ComportDialog.cpp" />
+    <ClCompile Include="GIGABYTE_CRPS001_CBCook.cpp" />
+    <ClCompile Include="GIGABYTE_CRPS001_CBQuery.cpp" />
+    <ClCompile Include="GIGABYTE_CRPS001_CBRaw.cpp" />
     <ClCompile Include="HID.cpp" />
     <ClCompile Include="I2CInterfaceDialog.cpp" />
     <ClCompile Include="I2CSlaveAddressDialog.cpp" />
@@ -157,8 +160,10 @@
     <ClCompile Include="WritePage02H.cpp" />
     <ClCompile Include="WritePage03H.cpp" />
     <ClCompile Include="WritePage1BH.cpp" />
+    <ClCompile Include="WritePage31H.cpp" />
     <ClCompile Include="WritePage3AH.cpp" />
     <ClCompile Include="WritePage3BH.cpp" />
+    <ClCompile Include="WritePage4AH.cpp" />
     <ClCompile Include="WritePage51H.cpp" />
     <ClCompile Include="WritePage5DH.cpp" />
     <ClCompile Include="WritePage6AH.cpp" />
@@ -169,6 +174,9 @@
     <ClCompile Include="WritePage9CH.cpp" />
     <ClCompile Include="WritePage9DH.cpp" />
     <ClCompile Include="WritePage9EH.cpp" />
+    <ClCompile Include="WritePageC0H.cpp" />
+    <ClCompile Include="WritePageC1H.cpp" />
+    <ClCompile Include="WritePageC2H.cpp" />
     <ClCompile Include="WritePageD0H.cpp" />
     <ClCompile Include="WritePageDCH.cpp" />
     <ClCompile Include="WritePageDDH.cpp" />
@@ -188,6 +196,11 @@
     <ClInclude Include="FSG003_000G_CMDCB.h" />
     <ClInclude Include="Generic_CMDCB.h" />
     <ClInclude Include="Generic_Model.h" />
+    <ClInclude Include="GIGABYTE_CRPS001_CBCook.h" />
+    <ClInclude Include="GIGABYTE_CRPS001_CBQuery.h" />
+    <ClInclude Include="GIGABYTE_CRPS001_CBRaw.h" />
+    <ClInclude Include="GIGABYTE_CRPS001.h" />
+    <ClInclude Include="GIGABYTE_CRPS001_CMDCB.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="I2CSlaveAddressDialog.h" />

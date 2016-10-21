@@ -7,12 +7,39 @@
 #include "Models.h"
 #include "ModelType.h"
 
+// GIGABYTE CRPS 001
+#include "GIGABYTE_CRPS001.h"
+#include "GIGABYTE_CRPS001_CMDCB.h"
 // FSG003-000G
 #include "FSG003_000G.h"
 #include "FSG003_000G_CMDCB.h"
 // Generic Model (For Test Purpose)
 #include "Generic_Model.h"
 #include "Generic_CMDCB.h"
+
+MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
+	// [0]  GIGABYTE CRPS 001
+	{
+		GIGABYTE_CRPS001_MODEL_NAME,
+		g_GIGABYTE_CRPS001_CMDTable,
+		GIGABYTE_CRPS001_CMD_TABLE_SIZE,
+		g_GIGABYTE_CRPS001_CMDQueryCBFunc,
+		g_GIGABYTE_CRPS001_CMDCookCBFunc,
+		g_GIGABYTE_CRPS001_CMDRawCBFunc
+	}
+#if (HAVE_GENERIC_MODEL == TRUE)
+	// [1] Generic Model (For Test Purpose)
+	, {
+		GENERIC_MODEL_NAME,
+		g_Generic_CMDTable,
+		GENERIC_CMD_TABLE_SIZE,
+		g_Generic_CMDQueryCBFunc,
+		g_Generic_CMDCookCBFunc,
+		g_Generic_CMDRawCBFunc
+	}
+#endif
+};
+
 
 MODEL_TYPE_t g_NECModelList[NEC_MODEL_LIST_SIZE] = {
 	// [0]  FSG003-000G

@@ -154,7 +154,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage1BH(wxWindow* parent, wxString& label);
+	WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -169,6 +169,50 @@ protected:
 	wxTextCtrl *m_maskInputValue;
 
 	wxStaticText *m_padding;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* 31H POUT_MAX */
+class WritePage31H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage31H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage31H();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -226,6 +270,44 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePage3BH();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* 4AH IOUT_OC_WARN_LIMIT */
+class WritePage4AH : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage4AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage4AH();
 
 protected:
 
@@ -411,7 +493,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage99H(wxWindow* parent, wxString& label);
+	WritePage99H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -421,6 +503,12 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -439,7 +527,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage9AH(wxWindow* parent, wxString& label);
+	WritePage9AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -449,6 +537,12 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -467,7 +561,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage9BH(wxWindow* parent, wxString& label);
+	WritePage9BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -477,6 +571,12 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -495,7 +595,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage9CH(wxWindow* parent, wxString& label);
+	WritePage9CH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -505,6 +605,12 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -523,7 +629,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage9DH(wxWindow* parent, wxString& label);
+	WritePage9DH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -533,6 +639,12 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 
@@ -551,7 +663,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	WritePage9EH(wxWindow* parent, wxString& label);
+	WritePage9EH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
 	* @brief Deconstructor.
 	*/
@@ -561,6 +673,127 @@ protected:
 
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+
+/* C0H MFR_MAX_TEMP_1 */
+class WritePageC0H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePageC0H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePageC0H();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* C1H MFR_MAX_TEMP_2 */
+class WritePageC1H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePageC1H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePageC1H();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* C2H MFR_MAX_TEMP_3 */
+class WritePageC2H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePageC2H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePageC2H();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
 
 private:
 

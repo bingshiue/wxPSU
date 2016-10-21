@@ -6,6 +6,18 @@
 
 #include "Preprocessor.h"
 
+// GIGABYTE Models
+enum GIGABYTE_MODEL {
+	GIGABYTE_Model_CRPS001 = 0,
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+	GIGABYTE_Model_Generic,
+#endif
+
+	GIGABYTE_Model_LIST_Size
+};
+#define GIGABYTE_MODEL_LIST_SIZE  (GIGABYTE_Model_LIST_Size)
+
 // NEC Models
 enum NEC_MODEL {
 	NEC_Model_FSG003_000G = 0,

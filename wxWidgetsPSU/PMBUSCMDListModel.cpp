@@ -217,7 +217,7 @@ void PMBUSCMDListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsi
 			switch (this->m_pmBusCommand[row].m_cmdStatus.m_status){
 
 			case cmd_status_not_run:
-				if (this->m_pmBusCommand[row].m_access != cmd_access_write){
+				if (PMBUSHelper::isOwnReadAccess(this->m_pmBusCommand[row].m_access) == true){//this->m_pmBusCommand[row].m_access != cmd_access_write){
 					variant << wxDataViewIconText(text, m_icon[XPM_red]);
 				}
 				else{

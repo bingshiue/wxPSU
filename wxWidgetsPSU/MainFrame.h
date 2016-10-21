@@ -326,7 +326,7 @@ public:
 	HDEVNOTIFY NotificationHandle;
 
 	unsigned int getCurrentUseIOInterface(void);
-	unsigned int findPMBUSCMDIndex(unsigned int cmd_register);
+	int findPMBUSCMDIndex(unsigned int cmd_register);
 
 	TASKINITFUNCTION m_taskInitFunc;
 	void TaskInit(void);
@@ -459,6 +459,8 @@ private:
 
 	void StartInCreaseCPUOverHeadThread(void);
 	void StopInCreaseCPUOverHeadThread(void);
+
+	BaseWritePage* getNewPage(int index, int register_number);
 
 	wxDECLARE_EVENT_TABLE();
 

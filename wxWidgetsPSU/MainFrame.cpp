@@ -945,199 +945,387 @@ void MainFrame::SetupPMBusCommandData(void){
 	}
 }
 
+// Create Write Page Instance
+#define NEW_WRITEPAGE(register_number) \
+	new WritePage##register_number##H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+
+BaseWritePage* MainFrame::getNewPage(int index, int register_number){
+	BaseWritePage *page = NULL;
+	wxString label("");
+	label = wxString::Format("%02x", this->m_PMBusData[index].m_register);
+	label.UpperCase();
+	label += wxString::Format("h - %s", this->m_PMBusData[index].m_name);
+
+	switch (register_number){
+
+	// 00H PAGE
+	case 0x00 :
+		page = (BaseWritePage*)NEW_WRITEPAGE(00);
+		break;
+	// 01H OPERATION
+	case 0x01:
+		page = (BaseWritePage*)NEW_WRITEPAGE(01);
+		break;
+	// 02H ON_OFF_CONFIG
+	case 0x02:
+		page = (BaseWritePage*)NEW_WRITEPAGE(02);
+		break;
+	// 03H CLEAR_FAULTS
+	case 0x03:
+		page = (BaseWritePage*)NEW_WRITEPAGE(03);
+		break;
+	// 1BH SMRALERT_MASK
+	case 0x1b:
+		page = (BaseWritePage*)NEW_WRITEPAGE(1B);
+		break;
+    // 31H POUT_MAX
+	case 0x31:
+		page = (BaseWritePage*)NEW_WRITEPAGE(31);
+		break;
+	// 3AH FAN_CONFIG_1_2
+	case 0x3a:
+		page = (BaseWritePage*)NEW_WRITEPAGE(3A);
+		break;
+	// 3BH FAN_COMMAND_1
+	case 0x3b:
+		page = (BaseWritePage*)NEW_WRITEPAGE(3B);
+		break;
+    // 4AH IOUT_OC_WARN_LIMIT
+	case 0x4a:
+		page = (BaseWritePage*)NEW_WRITEPAGE(4A);
+		break;
+	// 51H OT_WARN_LIMIT
+	case 0x51:
+		page = (BaseWritePage*)NEW_WRITEPAGE(51);
+		break;
+	// 5DH IIC_OC_WARN_LIMIT
+	case 0x5d:
+		page = (BaseWritePage*)NEW_WRITEPAGE(5D);
+		break;
+    // 6AH POUT_OP_WARN_LIMIT
+	case 0x6a:
+		page = (BaseWritePage*)NEW_WRITEPAGE(6A);
+		break;
+	// 6BH PIN_OP_WARN_LIMIT
+	case 0x6B:
+		page = (BaseWritePage*)NEW_WRITEPAGE(6B);
+		break;
+	// 99H MFR_ID
+	case 0x99:
+		page = (BaseWritePage*)NEW_WRITEPAGE(99);
+		break;
+	// 9AH MFR_MODEL
+	case 0x9a:
+		page = (BaseWritePage*)NEW_WRITEPAGE(9A);
+		break;
+	// 9BH MFR_REVISION
+	case 0x9b:
+		page = (BaseWritePage*)NEW_WRITEPAGE(9B);
+		break;
+	// 9CH MFR_LOCATION
+	case 0x9c:
+		page = (BaseWritePage*)NEW_WRITEPAGE(9C);
+		break;
+	// 9DH MFR_DATE
+	case 0x9d:
+		page = (BaseWritePage*)NEW_WRITEPAGE(9D);
+		break;
+	// 9EH MFR_SERIAL
+	case 0x9e:
+		page = (BaseWritePage*)NEW_WRITEPAGE(9E);
+		break;
+	// C0H MFR_MAX_TEMP_1
+	case 0xc0:
+		page = (BaseWritePage*)NEW_WRITEPAGE(C0);
+		break;
+	// C1H MFR_MAX_TEMP_2
+	case 0xc1:
+		page = (BaseWritePage*)NEW_WRITEPAGE(C1);
+		break;
+	// C2H MFR_MAX_TEMP_3
+	case 0xc2:
+		page = (BaseWritePage*)NEW_WRITEPAGE(C2);
+		break;
+	// D0H Cold_Redundancy_Config
+	case 0xD0:
+		page = (BaseWritePage*)NEW_WRITEPAGE(D0);
+		break;
+	// DCH Cold_BoxSTATUS
+	case 0xdc:
+		page = (BaseWritePage*)NEW_WRITEPAGE(DC);
+		break;
+	// DDH Black_BOX_Index
+	case 0xdd:
+		page = (BaseWritePage*)NEW_WRITEPAGE(DD);
+		break;
+	// FAH Firmware_Update_Command
+	case 0xfa:
+		page = (BaseWritePage*)NEW_WRITEPAGE(FA);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Setup Write Page of Register %02x", register_number);
+		// For Avoid Crash Use WtitePage00H as Default 
+		page = (BaseWritePage*)NEW_WRITEPAGE(00);
+		break;
+	}
+
+	return page;
+}
+
 void MainFrame::SetupPMBusCommandWritePage(void){
-	unsigned int cmdIndex = 0;
+	
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		if (this->m_PMBusData[idx].m_access == cmd_access_write || this->m_PMBusData[idx].m_access == cmd_access_readwrite ||
+			this->m_PMBusData[idx].m_access == cmd_access_bw || this->m_PMBusData[idx].m_access == cmd_access_brbw){
+
+			this->m_PMBusData[idx].m_writePage = getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+			this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_writePage, "Write");
+			this->m_subNotebook->RemovePage(2);
+
+		}
+		else{
+			continue;
+		}
+
+	}
+
+#if 0
+	int cmdIndex = 0;
 	wxString label("");
 	
 	// 00H PAGE
 	cmdIndex = this->findPMBUSCMDIndex(0x00);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[0].m_writePage = new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[0].m_writePage = getNewPage(cmdIndex, this->m_PMBusData[cmdIndex].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
-	// 01H OPERATUION
+	// 01H OPERATION
 	cmdIndex = this->findPMBUSCMDIndex(0x01);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[1].m_writePage = new WritePage01H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[1].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[1].m_writePage = NEW_WRITEPAGE(01);//new WritePage01H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[1].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 02H ON_OFF_CONFIG
 	cmdIndex = this->findPMBUSCMDIndex(0x02);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[2].m_writePage = new WritePage02H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[2].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[2].m_writePage = NEW_WRITEPAGE(02);//new WritePage02H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[2].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 03H CLEAR_FAULTS
 	cmdIndex = this->findPMBUSCMDIndex(0x03);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[3].m_writePage = new WritePage03H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[3].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Setup Write Page, cmdIndex = %d", cmdIndex);
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[3].m_writePage = NEW_WRITEPAGE(03);//new WritePage03H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[3].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 1BH SMRALERT_MASK
 	cmdIndex = this->findPMBUSCMDIndex(0x1b);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage1BH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(1B);//new WritePage1BH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 3AH FAN_CONFIG_1_2
 	cmdIndex = this->findPMBUSCMDIndex(0x3a);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(3A);//new WritePage3AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 3BH FAN_COMMAND_1
 	cmdIndex = this->findPMBUSCMDIndex(0x3b);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage3BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(3B);//new WritePage3BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 51H OT_WARN_LIMIT
 	cmdIndex = this->findPMBUSCMDIndex(0x51);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage51H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(51);//new WritePage51H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 5DH IIC_OC_WARN_LIMIT
 	cmdIndex = this->findPMBUSCMDIndex(0x5D);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage5DH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(5D);//new WritePage5DH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 6AH POUT_OP_WARN_LIMIT
 	cmdIndex = this->findPMBUSCMDIndex(0x6A);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(6A);//new WritePage6AH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 6BH PIN_OP_WARN_LIMIT
 	cmdIndex = this->findPMBUSCMDIndex(0x6B);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage6BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(6B);//new WritePage6BH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 99H MFR_ID
 	cmdIndex = this->findPMBUSCMDIndex(0x99);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage99H(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(99);//new WritePage99H(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 9AH MFR_MODEL
 	cmdIndex = this->findPMBUSCMDIndex(0x9a);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage9AH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(9A);//new WritePage9AH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 9BH MFR_REVISION
 	cmdIndex = this->findPMBUSCMDIndex(0x9b);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage9BH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(9B);//new WritePage9BH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 9CH MFR_LOCATION
 	cmdIndex = this->findPMBUSCMDIndex(0x9c);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage9CH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(9C);//new WritePage9CH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 9DH MFR_DATE
 	cmdIndex = this->findPMBUSCMDIndex(0x9d);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage9DH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(9D);//new WritePage9DH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// 9EH MFR_SERIAL
 	cmdIndex = this->findPMBUSCMDIndex(0x9e);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePage9EH(this->m_subNotebook, label);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(9E);//new WritePage9EH(this->m_subNotebook, label);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// D0H Cold_Redundancy_Config
 	cmdIndex = this->findPMBUSCMDIndex(0xd0);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageD0H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(D0);//new WritePageD0H(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// DCH Cold_BoxSTATUS
 	cmdIndex = this->findPMBUSCMDIndex(0xdc);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDCH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(DC);//new WritePageDCH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// DDH Black_BOX_Index
 	cmdIndex = this->findPMBUSCMDIndex(0xdd);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageDDH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(DD);//new WritePageDDH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
 
 	// FAH Firmware_Update_Command
 	cmdIndex = this->findPMBUSCMDIndex(0xfa);
-	label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
-	label.UpperCase();
-	label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
-	this->m_PMBusData[cmdIndex].m_writePage = new WritePageFAH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
-	this->m_subNotebook->RemovePage(2);
-
+	if (cmdIndex >= 0){
+		label = wxString::Format("%02x", this->m_PMBusData[cmdIndex].m_register);
+		label.UpperCase();
+		label += wxString::Format("h - %s", this->m_PMBusData[cmdIndex].m_name);
+		this->m_PMBusData[cmdIndex].m_writePage = NEW_WRITEPAGE(FA);//new WritePageFAH(this->m_subNotebook, label, &this->m_monitor_running, &this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+		this->m_subNotebook->AddPage(this->m_PMBusData[cmdIndex].m_writePage, "Write");
+		this->m_subNotebook->RemovePage(2);
+	}
+#endif
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -2411,6 +2599,10 @@ int MainFrame::OpenIODevice(void){
 
 					this->UpdateStatusBarIOSettingFiled(usbDeviceName);
 
+
+					new(TP_ClearIOReadBufferTask) ClearIOReadBufferTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, false);
+
+
 					new (TP_SendUSBAdaptorBitRateTask) SendUSBAdaptorBitRateTask(
 						this->m_IOAccess,
 						&this->m_CurrentUseIOInterface,
@@ -2455,12 +2647,13 @@ int MainFrame::CloseIODevice(void){
 	return ret;
 }
 
-unsigned int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
+int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 
-	unsigned int index = 0;
+	int index = -1;
 
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_register == cmd_register){
+			PSU_DEBUG_PRINT(MSG_DEBUG, "this->m_PMBusData[idx].m_register=%d, cmd_register = %d", this->m_PMBusData[idx].m_register, cmd_register);
 			index = idx;
 			break;
 		}

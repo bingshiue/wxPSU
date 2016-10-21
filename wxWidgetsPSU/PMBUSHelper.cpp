@@ -727,3 +727,29 @@ wxString& PMBUSHelper::getWinTitleBase(void){
 unsigned int& PMBUSHelper::getCurrentISPTarget(void){
 	return CurrentISPTarget;
 }
+
+bool PMBUSHelper::isOwnReadAccess(unsigned int access){
+	bool ret = false;
+
+	switch (access){
+
+	case cmd_access_read:
+	case cmd_access_br:
+	case cmd_access_readwrite:
+	case cmd_access_brbw:
+		ret = true;
+		break;
+
+	case cmd_access_write:
+	case cmd_access_bw:
+		ret = false;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs !");
+		break;
+
+	}
+
+	return ret;
+}

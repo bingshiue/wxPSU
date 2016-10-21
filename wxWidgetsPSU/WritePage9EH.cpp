@@ -5,7 +5,7 @@
 #include "PMBUSCMDWritePages.h"
 
 
-WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label) : BaseWritePage(parent, label){
+WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(-1, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY);
@@ -25,6 +25,13 @@ WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label) : BaseWritePage(pa
 
 	// Set Validator
 	this->m_inputValue->SetValidator(this->m_numberValidator);
+
+	// Save Member
+	this->m_monitor_running = monitor_running;
+	this->m_sendCMDVector = sendCMDVector;
+
+	this->m_ioaccess = ioaccess;
+	this->m_currentIO = currentIO;
 
 }
 

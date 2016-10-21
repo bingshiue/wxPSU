@@ -1,5 +1,5 @@
 /**
- * @file WritePage6AH.cpp
+ * @file WritePage4AH.cpp
  */
 
 #include "PMBUSCMDWritePages.h"
@@ -7,7 +7,7 @@
 #define DEFAULT_VALUE  0/**< Default Value */
 #define DEFAULT_SCALE_VALUE  4/**< Defaut Scale Value */
 
-WritePage6AH::WritePage6AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
+WritePage4AH::WritePage4AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
 	m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Exponent"), wxDefaultPosition, wxSize(80, -1));
@@ -46,12 +46,12 @@ WritePage6AH::WritePage6AH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 }
 
-WritePage6AH::~WritePage6AH(){
+WritePage4AH::~WritePage4AH(){
 
 }
 
 
-void WritePage6AH::OnRadioButtonCook(wxCommandEvent& event){
+void WritePage4AH::OnRadioButtonCook(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
@@ -74,7 +74,7 @@ void WritePage6AH::OnRadioButtonCook(wxCommandEvent& event){
 
 }
 
-void WritePage6AH::OnRadioButtonRaw(wxCommandEvent& event){
+void WritePage4AH::OnRadioButtonRaw(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
@@ -95,22 +95,22 @@ void WritePage6AH::OnRadioButtonRaw(wxCommandEvent& event){
 
 }
 
-#define CMD_6AH_BYTES_TO_READ  6/**< Bytes To Read */
-void WritePage6AH::OnButtonWrite(wxCommandEvent& event){
+#define CMD_4AH_BYTES_TO_READ  6/**< Bytes To Read */
+void WritePage4AH::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "");
 
-	double poutOPWarnValue = 0;
+	double iOutOCWarnLimitValue = 0;
 	double scale;
 
 	this->m_scaleValue->GetValue().ToDouble(&scale);
 
 	if (this->m_rawRadioButton->GetValue() == true){
-		poutOPWarnValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", poutOPWarnValue);
+		iOutOCWarnLimitValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", iOutOCWarnLimitValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
-		this->m_inputValue->GetValue().ToDouble(&poutOPWarnValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", poutOPWarnValue);
+		this->m_inputValue->GetValue().ToDouble(&iOutOCWarnLimitValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", iOutOCWarnLimitValue);
 	}
 
 #if 0
@@ -128,30 +128,30 @@ void WritePage6AH::OnButtonWrite(wxCommandEvent& event){
 	SendBuffer[6] = separate_pec;
 #endif
 
-	unsigned char poutOPWarnValueArray[2];
-	PMBUSHelper::ProductLinearData(poutOPWarnValueArray, (double)poutOPWarnValue, scale);
+	unsigned char iOutOCWarnLimitValueArray[2];
+	PMBUSHelper::ProductLinearData(iOutOCWarnLimitValueArray, (double)iOutOCWarnLimitValue, scale);
 
 	unsigned char SendBuffer[64];
 	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
 		m_currentIO,
 		SendBuffer,
 		sizeof(SendBuffer),
-		0x6A, // CMD
-		poutOPWarnValueArray,
-		sizeof(poutOPWarnValueArray)
+		0x4A, // CMD
+		iOutOCWarnLimitValueArray,
+		sizeof(iOutOCWarnLimitValueArray)
 		);
 
-	PMBUSSendCOMMAND_t CMD6AH;
+	PMBUSSendCOMMAND_t CMD4AH;
 
-	CMD6AH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD6AH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_6AH_BYTES_TO_READ : CMD_6AH_BYTES_TO_READ+1;
+	CMD4AH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD4AH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_4AH_BYTES_TO_READ : CMD_4AH_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
-		CMD6AH.m_sendData[idx] = SendBuffer[idx];
+		CMD4AH.m_sendData[idx] = SendBuffer[idx];
 	}
 
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
-			this->m_sendCMDVector->push_back(CMD6AH);
+			this->m_sendCMDVector->push_back(CMD4AH);
 			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
 		}
 	}
@@ -160,13 +160,13 @@ void WritePage6AH::OnButtonWrite(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask)SendWriteCMDTask(m_ioaccess, m_currentIO, CMD6AH);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD4AH);
 	}
 
 }
 
-wxBEGIN_EVENT_TABLE(WritePage31H, wxPanel)
-EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage31H::OnRadioButtonCook)
-EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage31H::OnRadioButtonRaw)
-EVT_BUTTON(CID_BUTTON_WRITE, WritePage31H::OnButtonWrite)
+wxBEGIN_EVENT_TABLE(WritePage4AH, wxPanel)
+EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage4AH::OnRadioButtonCook)
+EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage4AH::OnRadioButtonRaw)
+EVT_BUTTON(CID_BUTTON_WRITE, WritePage4AH::OnButtonWrite)
 wxEND_EVENT_TABLE()

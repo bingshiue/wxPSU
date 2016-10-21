@@ -77,6 +77,8 @@ public :
 
 	static unsigned int IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsigned char *buffer, unsigned int SizeOfBuffer);
 
+	static bool isOwnReadAccess(unsigned int access);
+
 protected :
 
 private :
