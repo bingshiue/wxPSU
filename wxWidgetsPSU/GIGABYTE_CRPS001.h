@@ -30,7 +30,7 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 30H [8]
 	{ true, "30H", 0x30, "COEFFICIENTS", cmd_access_brbw, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 } },
 	// 31H [9]
-	{ true, "31H", 0x31, "POUT_MAX", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
+	//{ true, "31H", 0x31, "POUT_MAX", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
 	// 4AH [10]
 	{ true, "4AH", 0x4a, "IOUT_OC_WARN_LIMIT", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 } },
 	// 51h [11]       
