@@ -122,6 +122,7 @@ typedef struct pmbuscmd_t {
 	CMDCBFUNC_t     m_cmdCBFunc;/**< CallBack Function */
 
 	wxPanel        *m_writePage;/**< Write Page */
+	wxPanel        *m_readPage;/**< Read Page */
 
 } PMBUSCOMMAND_t;
 
