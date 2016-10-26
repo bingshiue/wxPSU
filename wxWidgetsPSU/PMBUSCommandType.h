@@ -20,6 +20,8 @@ enum {
 	cmd_access_bw,// = cmd_access_write,
 	cmd_access_readwrite,
 	cmd_access_brbw,// = cmd_access_readwrite
+	cmd_access_bwr_read,// Block Write - Block Read Process Call
+	cmd_access_bwr_readwrite,//  Block Write - Block Read Process Call, Also have write operation 
 };
 
 enum {
@@ -63,7 +65,8 @@ typedef struct recvbuff_t {
 typedef struct cmdstatus_t {
 	unsigned char m_status;/**< Status of CMD (running, success, failure) */
 	unsigned char m_alsoSendWriteData;/**< Also Send Write Data */
-	unsigned char m_AddtionalData[2];/**< Addition Data */
+	unsigned char m_AddtionalDataLength;/**< Additional Data Length */
+	unsigned char m_AddtionalData[3];/**< Addition Data */
 	unsigned char m_NeedChangePage;/**< Need Change Page */
 	unsigned char m_cmdPage;/**< Command Page */
 

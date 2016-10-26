@@ -92,6 +92,115 @@ int GB_CRPS_Cook_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+#define CMD_SUPPORT_MASK         (0x80)
+#define CMD_ACCSSS_WRITE_MASK    (0x40)
+#define CMD_ACCSSS_READ_MASK     (0x20)
+#define CMD_ACCSSS_FORMAT_MASK   (0x1C)
+#define CMD_ACCSSS_RESERVED_MASK (0x03)
+
+int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){	
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// Bits     Value                 Meaning
+	//  7         1           Command is supported
+	//	          0           Command is not supported
+	//  6         1           Command is supported for write
+	//            0           Command is not supported for write
+	//  5         1           Command is supported for read
+	//	          0           Command is not supported for read
+	// 4:2       000          Linear Data Format used
+	//           001          16 bit signed number
+	//           010          Reserved
+	//           011          Direct Mode Format used
+	//           100          8 bit unsigned number
+	//           101          VID Mode Format used
+	//           110          Manufacturer specific format used
+	//           111          Command does not return numeric data.This is also used for commands that return blocks of data.
+	// 1:0       XXX          Reserved for future use
+	unsigned char support = 0;
+	unsigned char write =0;
+	unsigned char read =0;
+	unsigned char format =0;
+
+	const wchar_t* tmp_wchar;
+
+	wxString wxstr("");
+
+	wxstr += wxString::Format("CMD:%02x ", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+
+	// Support
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_SUPPORT_MASK){
+		wxstr += wxString::Format("Support ");
+	}
+	else{
+		wxstr += wxString::Format("Not Support ");
+	}
+
+	// Write 
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+		wxstr += wxString::Format("Write ");
+	}
+	else{
+		wxstr += wxString::Format("");
+	}
+
+	// Read 
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+		wxstr += wxString::Format("Read ");
+	}
+	else{
+		wxstr += wxString::Format("");
+	}
+
+	// Data Format
+	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 3){
+
+	case 0x000:
+		wxstr += wxString::Format("Linear");
+		break;
+
+	case 0x001:
+		wxstr += wxString::Format("16 bit signed");
+		break;
+
+	case 0x010:
+		wxstr += wxString::Format("Reserved");
+		break;
+
+	case 0x011:
+		wxstr += wxString::Format("Direct");
+		break;
+
+	case 0x100:
+		wxstr += wxString::Format("8 bit unsigned");
+		break;
+
+	case 0x101:
+		wxstr += wxString::Format("VID Mode");
+		break;
+
+	case 0x110:
+		wxstr += wxString::Format("Manufacturer specific format");
+		break;
+
+	case 0x111:
+		wxstr += wxString::Format("Return block datas or Don't return numeric data");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs");
+		break;
+	}
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
 int GB_CRPS_Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -2188,11 +2297,6 @@ int GB_CRPS_Cook_19H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	lstrcpyn(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	return EXIT_SUCCESS;
 }

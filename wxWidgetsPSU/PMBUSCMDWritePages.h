@@ -148,6 +148,57 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
+/* 05H PAGE PLUS WRITE */
+class WritePage05H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage05H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage05H();
+
+protected:
+
+	wxBoxSizer* m_pageSizer;
+	wxBoxSizer* m_cmdSizer;
+
+	wxStaticText *m_pageST;
+	wxTextCtrl *m_pageTC;
+
+	wxStaticText *m_cmdST;
+	wxTextCtrl *m_cmdTC;
+
+	wxStaticText *m_code;
+	wxTextCtrl *m_codeInputValue;
+
+	wxStaticText *m_mask;
+	wxTextCtrl *m_maskInputValue;
+
+	wxStaticText *m_padding;
+	wxStaticText *m_padding2;
+	wxStaticText *m_padding3;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+
 /* 1BH SMBALERT_MASK */
 class WritePage1BH : public BaseWritePage {
 public:

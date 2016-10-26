@@ -125,12 +125,23 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[4] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
 			this->m_sendBuff[5] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
 
-			this->m_sendBuff[6] = 0x0d;
-			this->m_sendBuff[7] = 0x0a;
-			this->m_sendBuff[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
-			this->m_sendBuff[9] = responseDataLength;
-			this->m_sendBuff[10] = 0x0d;
-			this->m_sendBuff[11] = 0x0a;
+			if (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength > 2){
+				this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[2];// Addtional Data [2]
+				this->m_sendBuff[7] = 0x0d;
+				this->m_sendBuff[8] = 0x0a;
+				this->m_sendBuff[9] = PMBUSHelper::GetSlaveAddress() | 0x01;
+				this->m_sendBuff[10] = responseDataLength;
+				this->m_sendBuff[11] = 0x0d;
+				this->m_sendBuff[12] = 0x0a;
+			}
+			else{
+				this->m_sendBuff[6] = 0x0d;
+				this->m_sendBuff[7] = 0x0a;
+				this->m_sendBuff[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
+				this->m_sendBuff[9] = responseDataLength;
+				this->m_sendBuff[10] = 0x0d;
+				this->m_sendBuff[11] = 0x0a;
+			}
 
 		}
 		break;
@@ -213,17 +224,29 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[3] = 0x44;
 			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[5] = command;        // Command is 0x3a
-			this->m_sendBuff[6] = 0x01;
-			this->m_sendBuff[7] = 0x78;
-			this->m_sendBuff[8] = 0x0d;
-			this->m_sendBuff[9] = 0x0a;
-			this->m_sendBuff[10] = PMBUSHelper::GetSlaveAddress() | 0x01;
-			this->m_sendBuff[11] = responseDataLength; // Response Data Length
-			this->m_sendBuff[12] = 0x0d;
-			this->m_sendBuff[13] = 0x0a;
-			this->m_sendBuff[14] = 0x00;
-			this->m_sendBuff[15] = 0x00;
+			this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
+			this->m_sendBuff[7] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
 
+			if (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength > 2){
+				this->m_sendBuff[8] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[2];// Addtional Data [2]
+				this->m_sendBuff[9] = 0x0d;
+				this->m_sendBuff[10] = 0x0a;
+				this->m_sendBuff[11] = PMBUSHelper::GetSlaveAddress() | 0x01;
+				this->m_sendBuff[12] = responseDataLength; // Response Data Length
+				this->m_sendBuff[13] = 0x0d;
+				this->m_sendBuff[14] = 0x0a;
+			}
+			else{
+				this->m_sendBuff[8] = 0x0d;
+				this->m_sendBuff[9] = 0x0a;
+				this->m_sendBuff[10] = PMBUSHelper::GetSlaveAddress() | 0x01;
+				this->m_sendBuff[11] = responseDataLength; // Response Data Length
+				this->m_sendBuff[12] = 0x0d;
+				this->m_sendBuff[13] = 0x0a;
+				this->m_sendBuff[14] = 0x00;
+			}
+	
+			this->m_sendBuff[15] = 0x00;
 			this->m_sendBuff[16] = 0x00;
 			this->m_sendBuff[17] = 0x00;
 			this->m_sendBuff[18] = 0x00;
@@ -479,7 +502,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									sendDataLength = SERIAL_SEND_DATA_SIZE;
 								}
 								else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-									sendDataLength = SERIAL_SEND_DATA_SIZE + 2;
+									sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength;//2;
 								}
 							}
 							else{// HID

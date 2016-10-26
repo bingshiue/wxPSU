@@ -974,6 +974,10 @@ BaseWritePage* MainFrame::getNewPage(int index, int register_number){
 	case 0x03:
 		page = (BaseWritePage*)NEW_WRITEPAGE(03);
 		break;
+    // 05H PAGE_PLUS_WRITE
+	case 0x05:
+		page = (BaseWritePage*)NEW_WRITEPAGE(05);
+		break;
 	// 1BH SMRALERT_MASK
 	case 0x1b:
 		page = (BaseWritePage*)NEW_WRITEPAGE(1B);
@@ -1066,7 +1070,10 @@ BaseWritePage* MainFrame::getNewPage(int index, int register_number){
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Setup Write Page of Register %02x", register_number);
 		// For Avoid Crash Use WtitePage00H as Default 
-		page = (BaseWritePage*)NEW_WRITEPAGE(00);
+		//page = (BaseWritePage*)NEW_WRITEPAGE(00);
+
+		page = NULL;
+
 		break;
 	}
 
@@ -1077,11 +1084,20 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_access == cmd_access_write || this->m_PMBusData[idx].m_access == cmd_access_readwrite ||
-			this->m_PMBusData[idx].m_access == cmd_access_bw || this->m_PMBusData[idx].m_access == cmd_access_brbw){
+			this->m_PMBusData[idx].m_access == cmd_access_bw || this->m_PMBusData[idx].m_access == cmd_access_brbw || 
+			this->m_PMBusData[idx].m_access == cmd_access_bwr_readwrite){
 
-			this->m_PMBusData[idx].m_writePage = getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-			this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_writePage, "Write");
-			this->m_subNotebook->RemovePage(2);
+			BaseWritePage* CMDWritePage = NULL;
+			CMDWritePage = getNewPage(idx, this->m_PMBusData[idx].m_register);
+
+			if (CMDWritePage != NULL){
+				this->m_PMBusData[idx].m_writePage = CMDWritePage;// getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+				this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_writePage, "Write");
+				this->m_subNotebook->RemovePage(2);
+			}
+			else{
+				this->m_PMBusData[idx].m_writePage = NULL;
+			}
 
 		}
 		else{
@@ -2308,6 +2324,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	case cmd_access_read:
 	case cmd_access_br:
+	case cmd_access_bwr_read:
 		if (this->m_subNotebook->GetPageCount() == 3){
 			this->m_subNotebook->RemovePage(2);
 		}
@@ -2320,6 +2337,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	case cmd_access_bw:
 	case cmd_access_readwrite:
 	case cmd_access_brbw:
+	case cmd_access_bwr_readwrite:
 
 		switch (this->m_subNotebook->GetPageCount()){
 		
@@ -2328,7 +2346,9 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
 				this->m_subNotebook->SetSelection(2);
 			}
-
+			else{
+				this->m_subNotebook->SetSelection(0);
+			}
 
 			break;
 
@@ -2338,6 +2358,9 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 			if (this->m_PMBusData[row].m_writePage != NULL){
 				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
 				this->m_subNotebook->SetSelection(2);
+			}
+			else{
+				this->m_subNotebook->SetSelection(0);
 			}
 
 			break;

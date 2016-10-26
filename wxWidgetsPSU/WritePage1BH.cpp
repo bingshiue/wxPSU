@@ -4,14 +4,20 @@
 
 #include "PMBUSCMDWritePages.h"
 
+#define DEFAULT_CODE  0x01/**< Default Code */
+#define DEFAULT_MASK  0x78/**< Default Mask */
 
 WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_code = new wxStaticText(this, wxID_ANY, wxString(L"Code"), wxDefaultPosition, wxSize(-1, -1));
 	m_codeInputValue = new wxTextCtrl(this, wxID_ANY);
+	wxString codeSTR = wxString::Format("%d", DEFAULT_CODE);
+	m_codeInputValue->SetValue(codeSTR);
 
 	m_mask = new wxStaticText(this, wxID_ANY, wxString(L"Mask"), wxDefaultPosition, wxSize(-1, -1));
 	m_maskInputValue = new wxTextCtrl(this, wxID_ANY);
+	wxString maskSTR = wxString::Format("%d", DEFAULT_MASK);
+	m_maskInputValue->SetValue(maskSTR);
 
 	m_padding = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 
@@ -53,7 +59,7 @@ WritePage1BH::~WritePage1BH(){
 
 
 void WritePage1BH::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_codeInputValue->SetValidator(this->m_numberValidator);
 
@@ -76,7 +82,7 @@ void WritePage1BH::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage1BH::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_codeInputValue->SetValidator(this->m_hexValidator);
 
@@ -96,8 +102,69 @@ void WritePage1BH::OnRadioButtonRaw(wxCommandEvent& event){
 
 }
 
+#define CMD_1BH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage1BH::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	unsigned char code = 0;
+	unsigned char mask = 0;
+
+	double code_double = 0;
+	double mask_double = 0;
+
+	// Raw
+	if (this->m_rawRadioButton->GetValue() == true){
+		code = (unsigned char)PMBUSHelper::HexToDecimal(this->m_codeInputValue->GetValue().c_str());
+		mask = (unsigned char)PMBUSHelper::HexToDecimal(this->m_maskInputValue->GetValue().c_str());
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, code = %02x, mask = %02x", code, mask);
+	}
+	// Cook
+	else if (this->m_cookRadioButton->GetValue() == true){
+		this->m_codeInputValue->GetValue().ToDouble(&code_double);
+		code = (unsigned char)code_double;
+
+		this->m_maskInputValue->GetValue().ToDouble(&mask_double);
+		mask = (unsigned char)mask_double;
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, code = %d, mask = %d", code, mask);
+	}
+
+	unsigned char smbAlertValueArray[2];
+	smbAlertValueArray[0] = code;
+	smbAlertValueArray[1] = mask;
+
+	unsigned char SendBuffer[64];
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		m_currentIO,
+		SendBuffer,
+		sizeof(SendBuffer),
+		0x1B, // CMD
+		smbAlertValueArray,
+		sizeof(smbAlertValueArray)
+		);
+
+	PMBUSSendCOMMAND_t CMD1BH;
+
+	CMD1BH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD1BH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_1BH_BYTES_TO_READ : CMD_1BH_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
+		CMD1BH.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	if (*this->m_monitor_running == true){
+		if (this->m_sendCMDVector->size() == 0){
+			this->m_sendCMDVector->push_back(CMD1BH);
+			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD1BH);
+	}
+
 }
 
 wxBEGIN_EVENT_TABLE(WritePage1BH, wxPanel)

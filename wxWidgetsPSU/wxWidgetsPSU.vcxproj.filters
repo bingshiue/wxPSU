@@ -288,6 +288,9 @@
     <ClCompile Include="WritePage4AH.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="WritePage05H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">

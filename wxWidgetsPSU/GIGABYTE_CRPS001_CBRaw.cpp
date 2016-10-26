@@ -22,6 +22,89 @@ int GB_CRPS_Raw_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Raw_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){
+
+	bool checkSumError = false;
+	unsigned int count = 0;
+	const wchar_t* tmp_wchar;
+	unsigned char tmp_buffer[256];
+
+	if (string == NULL) return -1;
+
+	// Sample : B6-1A-XX-XX-B7-01(Block Count)-00(Query Data)-PEC
+
+	wxString wxstr("");
+
+	// I2C Address
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress()).Upper();
+	tmp_buffer[0] = PMBUSHelper::GetSlaveAddress();
+
+	wxstr += "-";
+
+	// Command (Register)
+	wxstr += wxString::Format("%02x", pmbuscmd->m_register);
+	tmp_buffer[1] = pmbuscmd->m_register;
+
+	wxstr += "-";
+
+	// Addtional Data
+	wxstr += wxString::Format("%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[0]);
+	tmp_buffer[2] = pmbuscmd->m_cmdStatus.m_AddtionalData[0];
+	wxstr += "-";
+
+	wxstr += wxString::Format("%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+	tmp_buffer[3] = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+	wxstr += "-";
+
+	// Read Command
+	//wxstr += L"B7";
+	wxstr += wxString::Format("%02x", PMBUSHelper::GetSlaveAddress() | 0x01).Upper();
+	tmp_buffer[4] = (PMBUSHelper::GetSlaveAddress() | 0x01);
+
+	for (unsigned int idx = 0; idx < dataBytesLength; idx++){
+		wxstr += "-";
+		wxstr += wxString::Format("%02x", pmbuscmd->m_recvBuff.m_dataBuff[idx]);
+		tmp_buffer[5 + idx] = pmbuscmd->m_recvBuff.m_dataBuff[idx];
+	}
+
+	wxstr.UpperCase();
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	// Check If CheckSum Error
+	unsigned char verify_pec = 0;
+	if (PMBUSHelper::GetAppSettings()->m_EnableChecksum == Generic_Enable){
+		verify_pec = PMBusSlave_Crc8MakeBitwise(0, 7, tmp_buffer + 0, ((dataBytesLength + 5) - 1));
+
+		PSU_DEBUG_PRINT(MSG_DETAIL, "verify_pec = %02x, pec = %02x", verify_pec, pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength - 1]);
+
+		if (verify_pec != pmbuscmd->m_recvBuff.m_dataBuff[dataBytesLength - 1]){
+			wxstr += L" (Checksum Error)";
+			pmbuscmd->m_cmdStatus.m_status = cmd_status_checksum_error;
+		}
+
+	}
+
+#if 0
+	// At present If all the data bytes (incluing PEC) are 0xff, this data should be CheckSum Error
+	for (unsigned int idx = 0; idx < dataBytesLength; idx++){
+		if (pmbuscmd->m_recvBuff.m_dataBuff[idx] == 0xff){
+			count++;
+		}
+	}
+
+	if (count == dataBytesLength) {// CheckSum Error Occurs
+		wxstr += L" (Checksum Error)";
+		pmbuscmd->m_cmdStatus.m_status = cmd_status_checksum_error;
+	}
+#endif
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	return EXIT_SUCCESS;
+}
+
 int GB_CRPS_Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){
 
 	bool checkSumError = false;
@@ -31,7 +114,7 @@ int GB_CRPS_Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 
 	if (string == NULL) return -1;
 
-	// Sample : B6-1B-01-78-B7-01-00-97
+	// Sample : B6-1B-01-78-B7-01(Block Count)-00(Mask Byte)-97
 
 	wxString wxstr("");
 
@@ -245,11 +328,6 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 }
 
 int GB_CRPS_Raw_19H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){
-
-	return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength);
-}
-
-int GB_CRPS_Raw_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){
 
 	return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength);
 }

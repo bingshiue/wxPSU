@@ -5,7 +5,7 @@
 #include "PMBUSCMDWritePages.h"
 
 #define DEFAULT_VALUE  0/**< Default Value */
-#define DEFAULT_SCALE_VALUE  4/**< Defaut Scale Value */
+#define DEFAULT_SCALE_VALUE  0.25/**< Defaut Scale Value */
 
 WritePage4AH::WritePage4AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -14,7 +14,7 @@ WritePage4AH::WritePage4AH(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_inputValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 	m_scaleValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 
-	wxString default_scale = wxString::Format("%d", DEFAULT_SCALE_VALUE);
+	wxString default_scale = wxString::Format("%.2f", DEFAULT_SCALE_VALUE);
 	m_scaleValue->SetValue(default_scale);
 
 	// Initial Sizer
@@ -52,7 +52,7 @@ WritePage4AH::~WritePage4AH(){
 
 
 void WritePage4AH::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -75,7 +75,7 @@ void WritePage4AH::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage4AH::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -97,7 +97,7 @@ void WritePage4AH::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_4AH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage4AH::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	double iOutOCWarnLimitValue = 0;
 	double scale;

@@ -737,6 +737,8 @@ bool PMBUSHelper::isOwnReadAccess(unsigned int access){
 	case cmd_access_br:
 	case cmd_access_readwrite:
 	case cmd_access_brbw:
+	case cmd_access_bwr_read:
+	case cmd_access_bwr_readwrite:
 		ret = true;
 		break;
 

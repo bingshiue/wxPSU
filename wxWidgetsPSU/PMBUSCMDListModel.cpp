@@ -77,6 +77,12 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand, unsigned int 
 		else if (pmBusCommand[idx].m_access == cmd_access_bw){
 			m_accessColValues.push_back(wxT("BW"));
 		}
+		else if (pmBusCommand[idx].m_access == cmd_access_bwr_read){
+			m_accessColValues.push_back(wxT("BWP/BRP"));
+		}
+		else if (pmBusCommand[idx].m_access == cmd_access_bwr_readwrite){
+			m_accessColValues.push_back(wxT("BWP/BRP W"));
+		}
 	}
 
 	// Setup Query
