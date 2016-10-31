@@ -1,10 +1,10 @@
 /**
- * @file BaseWritePage.cpp
+ * @file BaseReadPage.cpp
  */
 
-#include "BaseWritePage.h"
+#include "BaseReadPage.h"
 
-BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent) {
+BaseReadPage::BaseReadPage(wxWindow* parent, wxString& label) : wxPanel(parent) {
 
 	// Set Parent
 	this->m_parent = parent;
@@ -19,15 +19,15 @@ BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent
 	this->SetupValidator();
 
 	// Set Background Color
-	this->SetBackgroundColour(wxColour(248,168,133));
+	this->SetBackgroundColour(wxColour(162, 219, 168));
 }
 
 
-BaseWritePage::~BaseWritePage(){
+BaseReadPage::~BaseReadPage(){
 
 }
 
-void BaseWritePage::BaseLayOut(void){
+void BaseReadPage::BaseLayOut(void){
 	// Initial Static Box
 	m_staticBox = new wxStaticBox(this, wxID_ANY, this->m_Label);
 
@@ -40,7 +40,7 @@ void BaseWritePage::BaseLayOut(void){
 	this->m_rawRadioButton = new wxRadioButton(this, CID_RADIO_BOX_RAW, L"raw", wxDefaultPosition, wxSize(75, -1));
 
 	// Initial Button
-	this->m_writeButton = new wxButton(this, CID_BUTTON_WRITE, L"Write");
+	this->m_setButton = new wxButton(this, CID_BUTTON_SET, L"Set");
 
 	// Initial Padding Static Text
 	m_stPadding_WriteButton = new wxStaticText(this, wxID_ANY, wxString(""), wxDefaultPosition, wxSize(30, PADDING_DEFAULT_HEIGHT));
@@ -58,7 +58,7 @@ void BaseWritePage::BaseLayOut(void){
 
 	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(1).Expand().Border());
 
-	m_horizonSizer1->Add(this->m_writeButton, 0, wxALIGN_CENTER_VERTICAL);
+	m_horizonSizer1->Add(this->m_setButton, 0, wxALIGN_CENTER_VERTICAL);
 
 	m_staticBoxlSizer->Add(m_horizonSizer1);
 
@@ -71,7 +71,7 @@ void BaseWritePage::BaseLayOut(void){
 	SetSizer(m_staticBoxlSizer);
 }
 
-void BaseWritePage::SetupValidator(void){
+void BaseReadPage::SetupValidator(void){
 	DecimalCharIncludes = wxT("0123456789.");
 	m_numberValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_numberValidator.SetCharIncludes(DecimalCharIncludes);
@@ -81,6 +81,6 @@ void BaseWritePage::SetupValidator(void){
 	m_hexValidator.SetCharIncludes(HexCharIncludes);
 }
 
-wxBEGIN_EVENT_TABLE(BaseWritePage, wxPanel)
+wxBEGIN_EVENT_TABLE(BaseReadPage, wxPanel)
 // Empty
 wxEND_EVENT_TABLE()

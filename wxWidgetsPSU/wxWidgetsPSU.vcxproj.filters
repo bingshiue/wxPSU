@@ -291,6 +291,21 @@
     <ClCompile Include="WritePage05H.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="BaseReadPage.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadPage06H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadPage1AH.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadPage1BH.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadPage30H.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -501,6 +516,12 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="GIGABYTE_CRPS001_CBCook.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseReadPage.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCMDReadPages.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

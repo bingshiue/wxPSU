@@ -27,7 +27,9 @@
 #include "PMBUSCommandType.h"
 #include "STDPage.h"
 #include "BaseWritePage.h"
+#include "BaseReadPage.h"
 #include "PMBUSCMDWritePages.h"
+#include "PMBUSCMDReadPages.h"
 #include "PMBUSMFRPanel.h"
 #include "PMBUSVerificationPanel.h"
 #include "PMBUSStatusPanel.h"
@@ -130,7 +132,7 @@ public:
 
 	PORT_SETTING_t m_portSetting;
 	IOACCESS m_IOAccess[IO_SIZE];
-	PMBUSCOMMAND_t *m_PMBusData;/**< PM Bus Data */
+	PMBUSCOMMAND_t *m_PMBusData;/**< PM Bus CMD Data */
 
 	AppSettings_t m_appSettings;
 
@@ -354,6 +356,7 @@ private:
 	void SetupModel(void);
 	void SetupPMBusCommandData(void);
 	void SetupPMBusCommandWritePage(void);
+	void SetupPMBusCommandReadPage(void);
 
 	void SetupMenuBar(void);
 	void SetupToolBar(void);
@@ -460,7 +463,8 @@ private:
 	void StartInCreaseCPUOverHeadThread(void);
 	void StopInCreaseCPUOverHeadThread(void);
 
-	BaseWritePage* getNewPage(int index, int register_number);
+	BaseWritePage* getNewWritePage(int index, int register_number);
+	BaseReadPage*  getNewReadPage(int index, int register_number);
 
 	wxDECLARE_EVENT_TABLE();
 

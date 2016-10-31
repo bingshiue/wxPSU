@@ -151,19 +151,25 @@ private:
 /* 05H PAGE PLUS WRITE */
 class WritePage05H : public BaseWritePage {
 public:
+	
+	enum {
+		CID_DATA_COUNT_COMBOBOX = 7901,
+	};
+	
 	/**
-	* @brief Constructor.
-	*/
+	 * @brief Constructor.
+	 */
 	WritePage05H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
 	/**
-	* @brief Deconstructor.
-	*/
+	 * @brief Deconstructor.
+	 */
 	~WritePage05H();
 
 protected:
 
 	wxBoxSizer* m_pageSizer;
 	wxBoxSizer* m_cmdSizer;
+	wxBoxSizer* m_dataCountSZ;
 
 	wxStaticText *m_pageST;
 	wxTextCtrl *m_pageTC;
@@ -171,15 +177,20 @@ protected:
 	wxStaticText *m_cmdST;
 	wxTextCtrl *m_cmdTC;
 
-	wxStaticText *m_code;
-	wxTextCtrl *m_codeInputValue;
+	wxStaticText *m_dataCountST;
+	wxStaticText *m_dataCountPaddingST;
+	wxComboBox* m_dataCountCB;
 
-	wxStaticText *m_mask;
-	wxTextCtrl *m_maskInputValue;
+	wxStaticText *m_data1;
+	wxTextCtrl *m_data1InputValue;
+
+	wxStaticText *m_data2;
+	wxTextCtrl *m_data2InputValue;
 
 	wxStaticText *m_padding;
 	wxStaticText *m_padding2;
 	wxStaticText *m_padding3;
+	wxStaticText *m_padding4;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
@@ -194,6 +205,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnDataCountComboBox(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };

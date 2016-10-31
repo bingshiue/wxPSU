@@ -44,8 +44,8 @@ enum {
 	I2C_AdaptorModuleBoard_TOTALPHASE,
 };
 
-#define DEFAULT_CUSTOMER            (unsigned long)Customer_NEC
-#define DEFAULT_MODEL               (unsigned long)NEC_Model_FSG003_000G
+#define DEFAULT_CUSTOMER            (unsigned long)Customer_GIGABYTE//Customer_NEC
+#define DEFAULT_MODEL               (unsigned long)GIGABYTE_Model_CRPS001//NEC_Model_FSG003_000G
 
 #define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_95611
 #define DEFAULT_I2C_SLAVEADDRESS    0xb6

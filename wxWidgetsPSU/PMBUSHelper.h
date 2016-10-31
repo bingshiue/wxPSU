@@ -11,6 +11,7 @@
 
 #include "CommonDef.h"
 #include "PMBUSStatus.h"
+#include "PMBUSCommandType.h"
 #include "AppSettings.h"
 #include "USBInfoType.h"
 
@@ -79,6 +80,10 @@ public :
 
 	static bool isOwnReadAccess(unsigned int access);
 
+	static void setPMBUSCMDData(PMBUSCOMMAND_t *PMBusCMDData);
+
+	static PMBUSCOMMAND_t* getPMBUSCMDData(void);
+
 protected :
 
 private :
@@ -93,6 +98,8 @@ private :
 	static wxString m_timeString;
 
 	static wxString m_winTitleBase;
+
+	static PMBUSCOMMAND_t *m_PMBusCMDData;
 
 };
 

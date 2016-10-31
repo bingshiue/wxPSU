@@ -16,6 +16,7 @@ unsigned int PMBUSHelper::IspStartVerifyRetry = 0;
 wxString PMBUSHelper::m_timeString;
 unsigned int PMBUSHelper::CurrentCMDTableSize;
 wxString PMBUSHelper::m_winTitleBase;
+PMBUSCOMMAND_t* PMBUSHelper::m_PMBusCMDData;
 unsigned int PMBUSHelper::runInMode;
 int PMBUSHelper::runInTimes;
 
@@ -41,6 +42,14 @@ void PMBUSHelper::SetAppSettings(AppSettings_t* appSettings){
 
 AppSettings_t* PMBUSHelper::GetAppSettings(void){
 	return m_appSettings;
+}
+
+void PMBUSHelper::setPMBUSCMDData(PMBUSCOMMAND_t *PMBusCMDData){
+	m_PMBusCMDData = PMBusCMDData;
+}
+
+PMBUSCOMMAND_t* PMBUSHelper::getPMBUSCMDData(void){
+	return m_PMBusCMDData;
 }
 
 

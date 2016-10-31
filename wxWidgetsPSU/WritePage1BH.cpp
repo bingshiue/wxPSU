@@ -4,12 +4,12 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_CODE  0x01/**< Default Code */
-#define DEFAULT_MASK  0x78/**< Default Mask */
+#define DEFAULT_CODE  0x78/**< Default Code */
+#define DEFAULT_MASK  0x02/**< Default Mask */
 
 WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_code = new wxStaticText(this, wxID_ANY, wxString(L"Code"), wxDefaultPosition, wxSize(-1, -1));
+	m_code = new wxStaticText(this, wxID_ANY, wxString(L"STATUS_x CMD"), wxDefaultPosition, wxSize(-1, -1));
 	m_codeInputValue = new wxTextCtrl(this, wxID_ANY);
 	wxString codeSTR = wxString::Format("%d", DEFAULT_CODE);
 	m_codeInputValue->SetValue(codeSTR);
@@ -126,7 +126,7 @@ void WritePage1BH::OnButtonWrite(wxCommandEvent& event){
 		this->m_maskInputValue->GetValue().ToDouble(&mask_double);
 		mask = (unsigned char)mask_double;
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, code = %d, mask = %d", code, mask);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, code = %d, mask = %d", code, mask);
 	}
 
 	unsigned char smbAlertValueArray[2];

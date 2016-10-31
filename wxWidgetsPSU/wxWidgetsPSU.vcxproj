@@ -57,7 +57,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OpenMPSupport>true</OpenMPSupport>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="BaseReadPage.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="ClearIOReadBufferTask.cpp" />
     <ClCompile Include="ComportDialog.cpp" />
@@ -121,6 +122,10 @@
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="PMBUSVerificationPanel.cpp" />
+    <ClCompile Include="ReadPage06H.cpp" />
+    <ClCompile Include="ReadPage1AH.cpp" />
+    <ClCompile Include="ReadPage1BH.cpp" />
+    <ClCompile Include="ReadPage30H.cpp" />
     <ClCompile Include="ReceiveISPCheckStatusTask.cpp" />
     <ClCompile Include="ReceiveISPEndCMDTask.cpp" />
     <ClCompile Include="ReceiveISPStartCMDTask.cpp" />
@@ -186,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AppSettings.h" />
+    <ClInclude Include="BaseReadPage.h" />
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="ComportDialog.h" />
@@ -221,6 +227,7 @@
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
+    <ClInclude Include="PMBUSCMDReadPages.h" />
     <ClInclude Include="PMBUSCMDWritePages.h" />
     <ClInclude Include="PMBUSCommand.h" />
     <ClInclude Include="PMBUSCommandType.h" />

@@ -127,14 +127,22 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("CMD:%02x ", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+	wxstr += wxString::Format("CMD:%02xH ", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+	wxstr.UpperCase();
 
 	// Support
 	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_SUPPORT_MASK){
-		wxstr += wxString::Format("Support ");
+		wxstr += wxString::Format("Support, ");
 	}
 	else{
 		wxstr += wxString::Format("Not Support ");
+
+		tmp_wchar = wxstr.wc_str();
+		lstrcpyn(string, tmp_wchar, 256);
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+		return EXIT_SUCCESS;
 	}
 
 	// Write 
@@ -146,45 +154,48 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	}
 
 	// Read 
-	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
-		wxstr += wxString::Format("Read ");
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_READ_MASK){
+		wxstr += wxString::Format("/ Read ");
 	}
 	else{
 		wxstr += wxString::Format("");
 	}
 
-	// Data Format
-	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 3){
+	wxstr += wxString::Format(",");
 
-	case 0x000:
+	// Data Format
+	PSU_DEBUG_PRINT(MSG_DEBUG, "format=%02x", (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2);
+	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2){
+
+	case 0:
 		wxstr += wxString::Format("Linear");
 		break;
 
-	case 0x001:
+	case 1:
 		wxstr += wxString::Format("16 bit signed");
 		break;
 
-	case 0x010:
+	case 2:
 		wxstr += wxString::Format("Reserved");
 		break;
 
-	case 0x011:
+	case 3:
 		wxstr += wxString::Format("Direct");
 		break;
 
-	case 0x100:
+	case 4:
 		wxstr += wxString::Format("8 bit unsigned");
 		break;
 
-	case 0x101:
+	case 5:
 		wxstr += wxString::Format("VID Mode");
 		break;
 
-	case 0x110:
+	case 6:
 		wxstr += wxString::Format("Manufacturer specific format");
 		break;
 
-	case 0x111:
+	case 7:
 		wxstr += wxString::Format("Return block datas or Don't return numeric data");
 		break;
 
@@ -209,7 +220,7 @@ int GB_CRPS_Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("%02x", pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	wxstr += wxString::Format("MASK:%02x", pmbuscmd->m_recvBuff.m_dataBuff[1]);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2218,7 +2229,40 @@ int GB_CRPS_Cook_05H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 int GB_CRPS_Cook_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
-	return EXIT_SUCCESS;
+	unsigned char tmp_buff[256] = { 0 };
+
+	// Get rid of block size byte
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "m_recvBuff.m_length=%d", pmbuscmd->m_recvBuff.m_length);
+	memcpy(tmp_buff, pmbuscmd->m_recvBuff.m_dataBuff+1, 256 -1);
+
+	memcpy(pmbuscmd->m_recvBuff.m_dataBuff, tmp_buff, 256 -1);
+	pmbuscmd->m_recvBuff.m_dataBuff[255] = 0;
+	
+	// Call Corresponding Raw Handler
+	CMDCookCBFunc cookCBFunc = NULL;
+
+	// Get Index 
+	int Index = -1;
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == pmbuscmd->m_cmdStatus.m_AddtionalData[2]){
+			Index = idx;
+			break;
+		}
+	}
+
+	if (Index < 0){
+		return EXIT_SUCCESS;
+	}
+
+	if (PMBUSHelper::getPMBUSCMDData()[Index].m_cmdCBFunc.m_cookCBFunc != NULL){
+		cookCBFunc = PMBUSHelper::getPMBUSCMDData()[Index].m_cmdCBFunc.m_cookCBFunc;
+
+		return cookCBFunc(pmbuscmd, string, sizeOfstr);
+	}
+	else{
+		return EXIT_SUCCESS;
+	}
+
 }
 
 #define PACKET_ERROR_CHECKING_MASK   0x80
@@ -2302,6 +2346,48 @@ int GB_CRPS_Cook_19H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	short m, b;
+	char R;
+
+	const wchar_t* tmp_wchar;
+
+	wxString wxstr("");
+
+	/*
+	[1]	Lower byte of m
+	[2]	Upper byte of m
+	[3]	Lower byte of b
+	[4]	Upper byte of b
+	[5]	Single byte of R 
+	*/
+	wxstr += L"m:";
+
+	m = (pmbuscmd->m_recvBuff.m_dataBuff[2] << 8) | pmbuscmd->m_recvBuff.m_dataBuff[1];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", m);
+	wxstr += wxString::Format("%d", m);
+
+	wxstr += L",";
+	wxstr += L" b:";
+
+	b = (pmbuscmd->m_recvBuff.m_dataBuff[4] << 8) | pmbuscmd->m_recvBuff.m_dataBuff[3];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", b);
+	wxstr += wxString::Format("%d", b);
+
+	wxstr += L",";
+	wxstr += L" R:";
+
+	R = pmbuscmd->m_recvBuff.m_dataBuff[5];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", R);
+	wxstr += wxString::Format("%d", R);
+
+	//
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 	return EXIT_SUCCESS;
 }

@@ -92,10 +92,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_splitterWindowTopLevel = new wxSplitterWindow(this->GeneralPanel, SplitterWindowTopLevelID);
 
 	m_splitterWindowTopLevel->SetSashGravity(0.8);
+	m_splitterWindowTopLevel->SetMinimumPaneSize(5);
 
 	m_splitterWindow = new wxSplitterWindow(this->m_splitterWindowTopLevel, SplitterWindowID);
 
 	m_splitterWindow->SetSashGravity(0.3);
+	m_splitterWindow->SetMinimumPaneSize(5);
 
 	// Sub Notebook
 	this->m_subNotebook = new wxNotebook(this->m_splitterWindow, wxID_ANY);
@@ -103,7 +105,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->DebugLogPanel = new wxPanel(this->m_splitterWindowTopLevel, wxID_ANY);
 
 	this->m_stdPage = new STDPage(this->m_subNotebook);
-	this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
+	//this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
 	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 
 	this->m_debugLogStaticBoxSizer = new wxStaticBoxSizer(wxVERTICAL, this->DebugLogPanel, wxT("Error Log"));
@@ -146,6 +148,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_debugLogTC->SetFocus();
 	
 	SetupCMDListDVL(GeneralPanel);
+	SetupPMBusCommandReadPage();
 	SetupPMBusCommandWritePage();
 
 	this->PMBusStatusPanel = new PMBUSStatusPanel(m_notebook);
@@ -856,7 +859,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 #endif
 
 	this->m_subNotebook->AddPage(this->m_stdPage, "STD");
-	this->m_subNotebook->AddPage(this->ReadPanel, "Read");
+	//this->m_subNotebook->AddPage(this->ReadPanel, "Read");
 	//this->m_subNotebook->AddPage(this->m_PMBusData[0].m_writePage, "Write"); // Don't show write page after APP initialized
 	//this->m_subNotebook->RemovePage(2);// Don't show write page after APP initialized
 
@@ -943,13 +946,15 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdRawCBFunc[idx];
 
 	}
+
+	PMBUSHelper::setPMBUSCMDData(this->m_PMBusData);
 }
 
 // Create Write Page Instance
 #define NEW_WRITEPAGE(register_number) \
 	new WritePage##register_number##H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 
-BaseWritePage* MainFrame::getNewPage(int index, int register_number){
+BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 	BaseWritePage *page = NULL;
 	wxString label("");
 	label = wxString::Format("%02x", this->m_PMBusData[index].m_register);
@@ -1085,15 +1090,17 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_access == cmd_access_write || this->m_PMBusData[idx].m_access == cmd_access_readwrite ||
 			this->m_PMBusData[idx].m_access == cmd_access_bw || this->m_PMBusData[idx].m_access == cmd_access_brbw || 
+			/* this->m_PMBusData[idx].m_access == cmd_access_bwr_read || */
 			this->m_PMBusData[idx].m_access == cmd_access_bwr_readwrite){
 
 			BaseWritePage* CMDWritePage = NULL;
-			CMDWritePage = getNewPage(idx, this->m_PMBusData[idx].m_register);
+			CMDWritePage = getNewWritePage(idx, this->m_PMBusData[idx].m_register);
 
 			if (CMDWritePage != NULL){
+				PSU_DEBUG_PRINT(MSG_ALERT, "Add Write Page : CMD %02x", this->m_PMBusData[idx].m_register);
 				this->m_PMBusData[idx].m_writePage = CMDWritePage;// getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 				this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_writePage, "Write");
-				this->m_subNotebook->RemovePage(2);
+				this->m_subNotebook->RemovePage(1);
 			}
 			else{
 				this->m_PMBusData[idx].m_writePage = NULL;
@@ -1101,6 +1108,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 
 		}
 		else{
+			this->m_PMBusData[idx].m_writePage = NULL;
 			continue;
 		}
 
@@ -1342,6 +1350,81 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 		this->m_subNotebook->RemovePage(2);
 	}
 #endif
+}
+
+// Create Read Page Instance
+#define NEW_READPAGE(register_number) \
+	new ReadPage##register_number##H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+
+BaseReadPage* MainFrame::getNewReadPage(int index, int register_number){
+	BaseReadPage *page = NULL;
+	wxString label("");
+	label = wxString::Format("%02x", this->m_PMBusData[index].m_register);
+	label.UpperCase();
+	label += wxString::Format("h - %s", this->m_PMBusData[index].m_name);
+
+	switch (register_number){
+
+	// 06H PAGE_PLUS_READ
+	case 0x06:
+		page = (BaseReadPage*)NEW_READPAGE(06);
+		break;
+
+	case 0x1A:
+		page = (BaseReadPage*)NEW_READPAGE(1A);
+		break;
+
+	case 0x1B:
+		page = (BaseReadPage*)NEW_READPAGE(1B);
+		break;
+
+	case 0x30:
+		page = (BaseReadPage*)NEW_READPAGE(30);
+		break;
+
+	// Default
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Setup Read Page of Register %02x", register_number);
+		page = NULL;
+
+		break;
+	}
+
+	return page;
+}
+
+void MainFrame::SetupPMBusCommandReadPage(void){
+	
+	BaseReadPage* CMDReadPage = NULL;
+	
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		if (this->m_PMBusData[idx].m_access == cmd_access_bwr_read ||
+			this->m_PMBusData[idx].m_access == cmd_access_bwr_readwrite){
+
+			CMDReadPage = NULL;
+			CMDReadPage = getNewReadPage(idx, this->m_PMBusData[idx].m_register);
+
+			if (CMDReadPage != NULL){
+				PSU_DEBUG_PRINT(MSG_ALERT, "Add Read Page : CMD %02x", this->m_PMBusData[idx].m_register);
+				this->m_PMBusData[idx].m_readPage = CMDReadPage;// getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);		
+				this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_readPage, "Read");
+				this->m_subNotebook->RemovePage(1);
+			}
+			else{
+				this->m_PMBusData[idx].m_readPage = NULL;
+				
+				//this->m_PMBusData[idx].m_readPage = this->ReadPanel;
+				//this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_readPage, "Read");
+				//this->m_subNotebook->RemovePage(1);
+			}
+
+		}
+		else{
+			this->m_PMBusData[idx].m_readPage = NULL;
+			continue;
+		}
+
+	}
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -2311,6 +2394,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	}
 #endif
 
+
 	wxDataViewItem item = event.GetItem();
 
 	//PSUDataViewListModel* model = (PSUDataViewListModel*)this->m_dataViewCtrl->GetModel();
@@ -2320,6 +2404,33 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Selected Row is : %d", row);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
 
+	// Add Read And Write Page into Notebook Dynamically
+
+	// Check Current Page Counts of Notebook
+	unsigned int page_counts = this->m_subNotebook->GetPageCount();
+	if(page_counts > 1){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Current Page Counts = %d", page_counts);
+		 // Remove Current Read/Write Pages
+		for(unsigned int idx=page_counts-1; idx > 0; idx--){
+			this->m_subNotebook->RemovePage(idx);
+		}
+	}
+
+	// Add Read Pages
+	if (this->m_PMBusData[row].m_readPage != NULL){
+		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_readPage, "Read");
+	}
+
+	// Add Write Pages 
+	if (this->m_PMBusData[row].m_writePage != NULL){
+		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
+	}
+
+	// Select Page
+	page_counts = this->m_subNotebook->GetPageCount();
+	this->m_subNotebook->SetSelection(page_counts-1);
+
+#if 0
 	switch (this->m_PMBusData[row].m_access){
 
 	case cmd_access_read:
@@ -2377,6 +2488,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 		break;
 	}
 
+#endif
 }
 
 void MainFrame::OnDisableAll(wxCommandEvent& event){

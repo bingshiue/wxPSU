@@ -218,8 +218,8 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[63] = 0x00;
 		}
 		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-			this->m_sendBuff[0] = 0x05;           // Report ID is 0x05
-			this->m_sendBuff[1] = 0x0c;
+			this->m_sendBuff[0] = 0x05;// Report ID is 0x05
+			this->m_sendBuff[1] = 0x0c + (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength - 2);//0x0c;// Data Length
 			this->m_sendBuff[2] = 0x41;
 			this->m_sendBuff[3] = 0x44;
 			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();

@@ -90,5 +90,6 @@ int GB_CRPS_Query_c0H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int size
 int GB_CRPS_Query_c1H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_c2H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_d9H(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Query_dcH(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
 
 #endif
