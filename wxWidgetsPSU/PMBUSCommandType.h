@@ -43,6 +43,17 @@ enum {
 	cmd_need_change_page
 };
 
+enum {
+	cmd_data_format_LinearData_Format =0,
+	cmd_data_format_16bit_Signed_Number,
+	cmd_data_format_Reserved,
+	cmd_data_format_DirectData_Format,
+	cmd_data_format_8bit_Unsigned_Number,
+	cmd_data_format_VID_Mode,
+	cmd_data_format_Manufacturer_Specific,
+	cmd_data_format_Don_t_Return_Numeric_Data
+};
+
 //#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
@@ -58,6 +69,25 @@ typedef struct recvbuff_t {
 	unsigned char m_recvBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Receive Data Buff */
 	unsigned char m_dataBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Data Buff (Only contain the data bytes) */
 }RECVBUFF_t;
+
+/**
+ * @brief Direct Data Format
+ */
+typedef struct directDataFormat_t {
+	short m_M;/**< M */
+	short m_B;/**< B */
+	char  m_R;/**< R */
+
+}DirectDataFormat_t;
+
+/**
+ * @brief Struct for CMD Data Format.
+ */
+typedef struct dataFormat_t {
+	unsigned char m_formatType;/**< Data Format Type */
+	DirectDataFormat_t m_directDataFormat;/**< Direct Data Format */
+
+}DataFormat_t;
 
 /**
  * @brief Struct for CMD Status
@@ -123,6 +153,7 @@ typedef struct pmbuscmd_t {
 
 	wxPanel        *m_writePage;/**< Write Page */
 	wxPanel        *m_readPage;/**< Read Page */
+	DataFormat_t    m_dataFormat;/**< Data Format */
 
 } PMBUSCOMMAND_t;
 

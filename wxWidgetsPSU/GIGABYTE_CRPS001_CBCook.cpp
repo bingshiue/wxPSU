@@ -164,45 +164,87 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	wxstr += wxString::Format(",");
 
 	// Data Format
+	/* Update Data Format in CMD */
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Data Format in CMD");
+	// Get Query CMD
+	int queryCMD;
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+
+	// Get Index of Query CMD 
+	int queryCMDIndex = -1;
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+			queryCMDIndex = idx;
+			break;
+		}
+	}
+
+	if (queryCMDIndex < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		return EXIT_FAILURE;
+	}
+
+	// Set Direct Data Fomat Coefficient
+	pmbuscmd_t* target;
+	target = PMBUSHelper::getPMBUSCMDData();
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "format=%02x", (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2);
 	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2){
 
 	case 0:
 		wxstr += wxString::Format("Linear");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_LinearData_Format;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 1:
 		wxstr += wxString::Format("16 bit signed");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_16bit_Signed_Number;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 2:
 		wxstr += wxString::Format("Reserved");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Reserved;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 3:
 		wxstr += wxString::Format("Direct");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_DirectData_Format;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 4:
 		wxstr += wxString::Format("8 bit unsigned");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_8bit_Unsigned_Number;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 5:
 		wxstr += wxString::Format("VID Mode");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_VID_Mode;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 6:
 		wxstr += wxString::Format("Manufacturer specific format");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Manufacturer_Specific;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	case 7:
 		wxstr += wxString::Format("Return block datas or Don't return numeric data");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Don_t_Return_Numeric_Data;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Something Error Occurs");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
 		break;
 	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Data Format in CMD");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2389,6 +2431,39 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	/* Update Direct Data Format in CMD */
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
+	// Get Query CMD
+	int queryCMD;
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[2];
+
+	// Get Index of Query CMD 
+	int queryCMDIndex = -1;
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+			queryCMDIndex = idx;
+			break;
+		}
+	}
+
+	if (queryCMDIndex < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		return EXIT_FAILURE;
+	}
+
+	// Set Direct Data Fomat Coefficient
+	pmbuscmd_t* target;
+	target = PMBUSHelper::getPMBUSCMDData();
+
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M = m;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "M=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B = b;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "B=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R = R;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Direct Data Format in CMD");
+	
 	return EXIT_SUCCESS;
 }
 

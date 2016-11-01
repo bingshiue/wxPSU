@@ -3,7 +3,7 @@
  */
 #include "PMBUSCMDReadPages.h"
 
-#define DEFAULT_CMD   0x00/**< Default CMD */
+#define DEFAULT_CMD   0x87/**< Default CMD */
 
 ReadPage1AH::ReadPage1AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseReadPage(parent, label){
 	// Initial Input Fields
