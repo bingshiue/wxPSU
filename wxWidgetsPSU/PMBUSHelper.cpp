@@ -137,7 +137,7 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "buffer[0]=%02x,buffer[1]=%02x,rawData=%x", buffer[0], buffer[1], rawData);
-	PSU_DEBUG_PRINT(MSG_DETAIL, "Y=%d,N=%d,Result=%4.5f", Y, N, result);
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "Y=%d,N=%d,Result=%4.5f", Y, N, result);
 
 	return result;
 
