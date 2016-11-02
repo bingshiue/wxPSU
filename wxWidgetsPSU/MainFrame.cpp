@@ -352,6 +352,7 @@ void MainFrame::SetupMenuBar(void){
 	|- In System Programming -> |- Update Primary Firmware (Accelerator CTRL+P)
 	|                           |- Update Secondary Firmware (Accelerator CTRL+S)
 	### |- Stop Programming ###
+	|- Query All PMBUS Commands
 	|------------------------------------
 	|- I2C Fault Test
 	|- [V] Enable Checksum
@@ -397,6 +398,11 @@ void MainFrame::SetupMenuBar(void){
 		//"Stop Programming", wxITEM_NORMAL);
 
 	//this->m_runMenu->Append(m_stopProgrammingMenuItem);
+
+	this->m_queryAllCommandsMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Query_All_Commands, wxT("Query ALL PMBUS Commands"), wxT("Query ALL PMBUS Commands"), wxITEM_NORMAL);
+	this->m_queryAllCommandsMenuItem->SetBitmap(wxBITMAP_PNG(QUERY_16));
+	this->m_runMenu->Append(m_queryAllCommandsMenuItem);
+
 	this->m_runMenu->AppendSeparator();
 
 	this->m_i2cFaultTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Fault_Test, wxT("I2C Fault Test"), wxT("I2C Fault Test"), wxITEM_NORMAL);
@@ -1838,6 +1844,10 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 
 void MainFrame::OnStopProgramming(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+}
+
+void MainFrame::OnQueryAllCommands(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnQueryAllCommands");
 }
 
 void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
@@ -4010,6 +4020,7 @@ EVT_MENU(MENU_ID_Monitor, MainFrame::OnMonitor)
 EVT_MENU(MENU_ID_Update_Primary_Firmware, MainFrame::OnUpdatePrimaryFirmware)
 EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware)
 //EVT_MENU(MENU_ID_Stop_Programming, MainFrame::OnStopProgramming)
+EVT_MENU(MENU_ID_Query_All_Commands, MainFrame::OnQueryAllCommands)
 EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
 EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)

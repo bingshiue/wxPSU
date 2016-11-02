@@ -65,6 +65,7 @@ enum
 	MENU_ID_Update_Primary_Firmware,
 	MENU_ID_Update_Secondary_Firmware,
 	MENU_ID_Stop_Programming,
+	MENU_ID_Query_All_Commands,
 	MENU_ID_I2C_Fault_Test,
 	MENU_ID_Enable_Checksum,
 	MENU_ID_Clear_Error_Log,
@@ -246,6 +247,7 @@ public:
 	wxMenuItem  *m_updatePrimaryFirmwareMenuItem;
 	wxMenuItem  *m_updateSecondaryFirmwareMenuItem;
 	wxMenuItem  *m_stopProgrammingMenuItem;
+	wxMenuItem  *m_queryAllCommandsMenuItem;
 	wxMenuItem  *m_i2cFaultTestMenuItem;
 	wxMenuItem  *m_EnableChecksumMenuItem;
 	wxMenuItem  *m_ClearErrorLogMenuItem;
@@ -369,6 +371,7 @@ private:
 	void OnUpdatePrimaryFirmware(wxCommandEvent& event);
 	void OnUpdateSecondaryFirmware(wxCommandEvent& event);
 	void OnStopProgramming(wxCommandEvent& event);
+	void OnQueryAllCommands(wxCommandEvent& event);
 	void OnI2CFaultTest(wxCommandEvent& event);
 	void OnEnableChecksum(wxCommandEvent& event);
 	void OnClearErrorLog(wxCommandEvent& event);
