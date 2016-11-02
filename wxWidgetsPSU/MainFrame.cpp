@@ -12,6 +12,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
@@ -2850,6 +2851,15 @@ void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
 	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RawText);
 }
 
+void MainFrame::OnSendThreadUpdateQuery(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Update Query Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+	wxVariant variantRaw;
+	variantRaw = event.GetString();
+
+	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_QueryText);
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_QueryText);
+}
+
 void MainFrame::OnSendThreadUpdateCook(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DETAIL, "SendThreadUpdateCook Thread Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
 
@@ -4037,6 +4047,7 @@ EVT_TIMER(wxID_ANY, MainFrame::OnInfoBarTimer)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_START, MainFrame::OnSendThreadStart)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, MainFrame::OnSendThreadUpdateRaw)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY, MainFrame::OnSendThreadUpdateQuery)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, MainFrame::OnSendThreadUpdateCook)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
 
