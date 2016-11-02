@@ -1185,7 +1185,7 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-//#define FOLLOW_SPEC
+#define GB_CRPS_Cook_86H_FOLLOW_SPEC
 int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1210,7 +1210,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 	int samples_of_input_power = 0;
 
-#ifdef FOLLOW_SPEC
+#ifdef GB_CRPS_Cook_86H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
 	int Maximum_Linear_Format_Value = pow(2.0f, 15); // 32768
@@ -1223,7 +1223,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 
 	wxString wxstr("");
-#ifdef FOLLOW_SPEC
+#ifdef GB_CRPS_Cook_86H_FOLLOW_SPEC
 	accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
 #else
 	accumulator = pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
@@ -1235,7 +1235,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	Energy_Count = ROLLOVER_COUNT * Maximum_Linear_Format_Value + accumulator;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
 	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
@@ -1247,6 +1247,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+#define GB_CRPS_Cook_87H_FOLLOW_SPEC
 int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1271,7 +1272,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 	int samples_of_input_power = 0;
 
-#ifdef FOLLOW_SPEC
+#ifdef GB_CRPS_Cook_87H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
 	int Maximum_Linear_Format_Value = pow(2.0f, 15); // 32768
@@ -1284,7 +1285,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 
 	wxString wxstr("");
-#ifdef FOLLOW_SPEC
+#ifdef GB_CRPS_Cook_87H_FOLLOW_SPEC
 	accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
 #else
 	accumulator = pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
@@ -1296,7 +1297,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	Energy_Count = ROLLOVER_COUNT * Maximum_Linear_Format_Value + accumulator;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "ROLLOVER_COUNT=%d,Maximum_Linear_Format_Value =%d,accumulator=%d,samples_of_input_power=%d", ROLLOVER_COUNT, Maximum_Linear_Format_Value, accumulator, samples_of_input_power);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "%02xh", -1);
 
 	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
