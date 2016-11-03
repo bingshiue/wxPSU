@@ -324,7 +324,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	DWORD iteration = 0;
 	DWORD success = 0;
 	DWORD timeout = 0;
-	//wchar_t QueryStr[STR_LENGTH];
+	wchar_t QueryStr[STR_LENGTH];
 	wchar_t CookStr[STR_LENGTH];
 	wchar_t RawStr[STR_LENGTH];
 
@@ -646,6 +646,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
 
+									bool updateQuery = true;
+
 									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success){
 										// Call Cook Data CB Function
 										memset(CookStr, 0, STR_LENGTH);
@@ -666,6 +668,44 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 										//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_CookText);
 
 										PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CookMsg.c_str());
+
+										// If this is Query Command(0x1A), Update Query Filed
+										if (this->m_pmBusCommand[idx].m_register == 0x1A){
+											
+											// Get Query CMD
+											int queryCMD;
+											queryCMD = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];
+
+											// Get Index of Query CMD 
+											int queryCMDIndex = -1;
+											for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+												if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+													queryCMDIndex = idx;
+													break;
+												}
+											}
+
+											if (queryCMDIndex < 0){
+												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+												updateQuery = false;
+											}
+											
+											if (updateQuery == true){
+												// Call Query Data CB Function
+												memset(QueryStr, 0, STR_LENGTH);
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[idx]), QueryStr, this->m_pmBusCommand[idx].m_responseDataLength);
+
+												wxString QueryMsg(QueryStr);
+
+												wxThreadEvent* threadquery_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY);
+												threadquery_evt->SetInt(queryCMDIndex);
+												threadquery_evt->SetString(QueryMsg);
+												wxQueueEvent(m_pHandler->GetEventHandler(), threadquery_evt);
+
+												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
+											}
+
+										}
 									}
 
 								}

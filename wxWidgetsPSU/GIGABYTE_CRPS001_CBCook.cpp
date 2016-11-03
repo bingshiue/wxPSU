@@ -98,7 +98,7 @@ int GB_CRPS_Cook_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 #define CMD_ACCSSS_FORMAT_MASK   (0x1C)
 #define CMD_ACCSSS_RESERVED_MASK (0x03)
 
-int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){	
+int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
@@ -119,9 +119,9 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	//           111          Command does not return numeric data.This is also used for commands that return blocks of data.
 	// 1:0       XXX          Reserved for future use
 	unsigned char support = 0;
-	unsigned char write =0;
-	unsigned char read =0;
-	unsigned char format =0;
+	unsigned char write = 0;
+	unsigned char read = 0;
+	unsigned char format = 0;
 
 	const wchar_t* tmp_wchar;
 
@@ -146,16 +146,23 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	}
 
 	// Write 
-	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
-		wxstr += wxString::Format("Write ");
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_READ_MASK){
+		wxstr += wxString::Format("Read");
 	}
 	else{
 		wxstr += wxString::Format("");
 	}
 
-	// Read 
+	// for "/"
 	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_READ_MASK){
-		wxstr += wxString::Format("/ Read ");
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+			wxstr += wxString::Format("/");
+		}
+	}
+
+	// Read 
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+		wxstr += wxString::Format("Write ");
 	}
 	else{
 		wxstr += wxString::Format("");
@@ -251,6 +258,10 @@ int GB_CRPS_Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	// Call Query Command's Query CB Function
+	//wchar_t QueryStr[256];
+	//target->m_cmdCBFunc.m_queryCBFunc(&target->m_recvBuff, QueryStr, sizeOfstr);
+
 	return EXIT_SUCCESS;
 }
 
@@ -262,7 +273,7 @@ int GB_CRPS_Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("MASK:%02x", pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	wxstr += wxString::Format("CMD:%02xH MASK:%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[1], pmbuscmd->m_recvBuff.m_dataBuff[1]);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1185,7 +1196,7 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-#define GB_CRPS_Cook_86H_FOLLOW_SPEC
+//#define GB_CRPS_Cook_86H_FOLLOW_SPEC
 int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1213,7 +1224,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 #ifdef GB_CRPS_Cook_86H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
-	int Maximum_Linear_Format_Value = pow(2.0f, 15); // 32768
+	int Maximum_Linear_Format_Value = pow(2.0f, 15) - 1; // 32767
 #endif
 
 	unsigned long long Energy_Count = 0;
@@ -1247,7 +1258,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-#define GB_CRPS_Cook_87H_FOLLOW_SPEC
+//#define GB_CRPS_Cook_87H_FOLLOW_SPEC
 int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1275,7 +1286,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 #ifdef GB_CRPS_Cook_87H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
-	int Maximum_Linear_Format_Value = pow(2.0f, 15); // 32768
+	int Maximum_Linear_Format_Value = pow(2.0f, 15) -1; // 32767
 #endif
 
 	unsigned long long Energy_Count = 0;

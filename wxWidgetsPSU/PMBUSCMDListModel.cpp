@@ -429,6 +429,8 @@ bool PMBUSCMDListModel::SetValueByRow(const wxVariant &variant, unsigned int row
 		break;
 	case Col_QueryText:
 
+		m_queryColValues[row] = variant.GetString();
+
 		break;
 	case Col_CookText:
 

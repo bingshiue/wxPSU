@@ -105,7 +105,7 @@ typedef struct cmdstatus_t {
 /**
  * @brief Command Query Call Back Function.
  */
-typedef int(*CMDQueryCBFunc)(RECVBUFF_t* recvBuff_t, wchar_t* string, unsigned int sizeOfstr);
+typedef int(*CMDQueryCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 /**
  * @brief Command Cook Call Back Function.

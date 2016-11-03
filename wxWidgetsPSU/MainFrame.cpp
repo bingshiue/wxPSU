@@ -827,9 +827,9 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 	this->m_cmdListDVC->AppendTextColumn("Query",
 		PMBUSCMDListModel::Col_QueryText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
+		75,//wxCOL_WIDTH_AUTOSIZE,
 		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Cook",
 		PMBUSCMDListModel::Col_CookText,
