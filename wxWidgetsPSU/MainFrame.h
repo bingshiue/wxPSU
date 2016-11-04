@@ -421,6 +421,7 @@ private:
 	void OnSendThreadUpdate(wxThreadEvent& event);
 	void OnSendThreadUpdateRaw(wxThreadEvent& event);
 	void OnSendThreadUpdateQuery(wxThreadEvent& event);
+	void OnSendThreadUpdateCoefficients(wxThreadEvent& event);
 	void OnSendThreadUpdateCook(wxThreadEvent& event);
 
 	void OnSendThreadUpdateCMDName(wxThreadEvent& event);

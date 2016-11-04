@@ -320,11 +320,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int ExpectReceiveDataLength = 0;
 	int retry = 0;
 	int sendDataLength = 0;
+	int QueryCMDIndex = 0;
+	int CoefficientsCMDIndex = 0;
 	bool sendRetryStillFailed = false;
 	DWORD iteration = 0;
 	DWORD success = 0;
 	DWORD timeout = 0;
 	wchar_t QueryStr[STR_LENGTH];
+	wchar_t CoefficientsStr[STR_LENGTH];
 	wchar_t CookStr[STR_LENGTH];
 	wchar_t RawStr[STR_LENGTH];
 
@@ -364,7 +367,6 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					break;
 				}
 
-
 #if 1
 				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
 				thread_evt->SetInt(idx);
@@ -373,15 +375,408 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE));
 #endif
 
+				/*** If toggle is enable ***/
+				if (this->m_pmBusCommand[idx].m_toggle == true){
 
-				if (this->m_pmBusCommand[idx].m_toggle == true){// If toggle is enable
+					
+					
+					/*** Query Command (0x1A) ***/
+					if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
 
+						// Find Query Command (0x1A)'s Index
+						QueryCMDIndex = -1;
+						for (unsigned int local=0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
+							if (this->m_pmBusCommand[local].m_register == 0x1A){
+								QueryCMDIndex = local;
+								break;
+							}
+						}
+
+						if (QueryCMDIndex >= 0){					
+							// Prepare Send Buffer
+							this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+
+							// Send Query Command
+							retry = 0;
+							do {
+								// Decide Send Data Length
+								if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+									if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+										sendDataLength = SERIAL_SEND_DATA_SIZE;
+									}
+									else if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+										sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+									}
+								}
+								else{// HID
+									sendDataLength = HID_SEND_DATA_SIZE;
+								}
+
+								PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
+
+								// Send Data
+								sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
+								if (sendResult <= 0){
+									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
+									// Retry 
+									retry++;
+									if (retry >= 3){
+										PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
+										sendRetryStillFailed = true;
+										break;
+									}
+									else{
+										PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
+									}
+
+								}
+								else{
+#ifdef OUTPUT_SEND_DATA
+									wxString sentData(wxT("Sent Data : "));
+									for (int idx = 0; idx < sendDataLength; idx++){
+										sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+									}
+									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
+#endif
+									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+								}
+
+							} while (sendResult <= 0);
+
+							if (sendRetryStillFailed == true){
+								PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
+								m_running = false;
+								break;
+							}
+
+							// Read Quert Result
+							unsigned int bytesToRead = this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[QueryCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+
+							// If Create Thread Success
+							if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+								PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
+							}
+							else{
+								this->m_IOPortReadCMDThread->Run();
+							}
+						
+							// Semaphore Wait for Read Thread Complete
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[QueryCMDIndex].m_register);
+							ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+						
+							if (ret != wxSEMA_NO_ERROR){
+								PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+							}
+							else{
+
+								if (this->m_recvBuff->m_length == 0){
+									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[QueryCMDIndex].m_register);
+									this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
+									//timeout++;
+								}
+								else{
+									// Get Expect Data Length
+									ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+									PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
+
+									//
+									if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
+
+										PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_recvBuff->m_length);
+										//success++;
+
+										// copy data to PMBus Command Structure
+										this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
+										for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
+											this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
+											PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
+										}
+
+										// Prepare Data Buffer
+										this->productDataBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+
+#ifdef OUTPUT_RECEIVE_DATA
+										wxString recvBytes("");
+										for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+											recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+										}
+
+										PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
+
+#endif
+
+										// Check I2C BUS Not Acknowledge
+										unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
+										if (i2cBusAck == PMBUSHelper::response_ng){
+											this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+										}
+
+										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
+											this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_success;
+											//success++;
+										}
+
+										bool PreUpdateQuery = true;
+
+										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status == cmd_status_success){
+
+											// Get Query CMD
+											int queryCMD;
+											queryCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
+
+											// Get Index of Query CMD 
+											int queryCMDIndex = -1;
+											for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
+												if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
+													queryCMDIndex = idx2;
+													break;
+												}
+											}
+
+											if (queryCMDIndex < 0){
+												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+												PreUpdateQuery = false;
+											}
+
+											if (PreUpdateQuery == true){
+												// Call Query Data CB Function
+												memset(QueryStr, 0, STR_LENGTH);
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[QueryCMDIndex]), QueryStr, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+
+												wxString QueryMsg(QueryStr);
+
+												wxThreadEvent* threadquery_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY);
+												threadquery_evt->SetInt(queryCMDIndex);
+												threadquery_evt->SetString(QueryMsg);
+												wxQueueEvent(m_pHandler->GetEventHandler(), threadquery_evt);
+
+												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
+
+
+												/*** If Data Format is Direct Data Format Type, Call Coefficients CMD¡@(0x30) To Get Coefficients ***/
+
+												// Find Query Command (0x1A)'s Index
+												CoefficientsCMDIndex = -1;
+												for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
+													if (this->m_pmBusCommand[local2].m_register == 0x30){
+														CoefficientsCMDIndex = local2;
+														break;
+													}
+												}
+
+												if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format 
+													/* || this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_8bit_Unsigned_Number */){
+
+													if (CoefficientsCMDIndex >= 0){
+														// Prepare Send Buffer
+														this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+
+														// Send Query Command
+														retry = 0;
+														do {
+															// Decide Send Data Length
+															if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+																if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+																	sendDataLength = SERIAL_SEND_DATA_SIZE;
+																}
+																else if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+																	sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+																}
+															}
+															else{// HID
+																sendDataLength = HID_SEND_DATA_SIZE;
+															}
+
+															PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
+
+															// Send Data
+															sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
+															if (sendResult <= 0){
+																PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
+																// Retry 
+																retry++;
+																if (retry >= 3){
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
+																	sendRetryStillFailed = true;
+																	break;
+																}
+																else{
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
+																}
+
+															}
+															else{
+#ifdef OUTPUT_SEND_DATA
+																wxString sentData(wxT("Sent Data : "));
+																for (int idx = 0; idx < sendDataLength; idx++){
+																	sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+																}
+																PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
+#endif
+																PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+															}
+
+														} while (sendResult <= 0);
+
+														if (sendRetryStillFailed == true){
+															PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
+															m_running = false;
+															break;
+														}
+
+														// Read Quert Result
+														unsigned int bytesToRead = this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+														this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[CoefficientsCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+
+														// If Create Thread Success
+														if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+															PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
+														}
+														else{
+															this->m_IOPortReadCMDThread->Run();
+														}
+
+														// Semaphore Wait for Read Thread Complete
+														PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
+														ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+
+														if (ret != wxSEMA_NO_ERROR){
+															PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+														}
+														else{
+															if (this->m_recvBuff->m_length == 0){
+																PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
+																this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
+																//timeout++;
+															}
+															else{
+																// Get Expect Data Length
+																ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+																PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
+
+																//
+																if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
+
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_recvBuff->m_length);
+																	//success++;
+
+																	// copy data to PMBus Command Structure
+																	this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
+																	for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
+																		this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
+																		PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
+																	}
+
+																	// Prepare Data Buffer
+																	this->productDataBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+
+#ifdef OUTPUT_RECEIVE_DATA
+																	wxString recvBytes("");
+																	for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+																		recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+																	}
+
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
+
+#endif
+
+																	// Check I2C BUS Not Acknowledge
+																	unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
+																	if (i2cBusAck == PMBUSHelper::response_ng){
+																		this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+																	}
+
+																	if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
+																		this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_success;
+																		//success++;
+																	}
+
+																	bool PreUpdateCoefficients = true;
+
+																	if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status == cmd_status_success){
+
+																		// Get Query CMD
+																		int queryCMD;
+																		queryCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
+
+																		// Get Index of Query CMD 
+																		int queryCMDIndex = -1;
+																		for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
+																			if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
+																				queryCMDIndex = idx2;
+																				break;
+																			}
+																		}
+
+																		if (queryCMDIndex < 0){
+																			PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+																			PreUpdateCoefficients = false;
+																		}
+
+																		if (PreUpdateCoefficients == true){
+																			// Call Coefficients Data CB Function
+																			memset(CoefficientsStr, 0, STR_LENGTH);
+																			this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[CoefficientsCMDIndex]), CoefficientsStr, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+
+																			wxString CoefficientsMsg(CoefficientsStr);
+
+																			wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
+																			threadcoefficients_evt->SetInt(queryCMDIndex);
+																			threadcoefficients_evt->SetString(CoefficientsMsg);
+																			wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
+
+																			PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CoefficientsMsg.c_str());
+																		}
+
+																	}
+
+																}
+
+															}
+
+														}
+
+													}
+
+												}// if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format)
+												else{
+													wxString PaddingStr(wxT("---"));
+
+													wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
+													threadcoefficients_evt->SetInt(queryCMDIndex);
+													threadcoefficients_evt->SetString(PaddingStr);
+													wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
+												}
+
+											}// if (PreUpdateQuery == true)
+										
+										}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success)
+
+									}// if (this->m_recvBuff->m_length == ExpectReceiveDataLength) 
+
+								}// else (if (this->m_recvBuff->m_length == 0))
+
+							} // else if (ret != wxSEMA_NO_ERROR)
+						
+						}// if (QueryCMDIndex >= 0)
+		
+						// Just Doing Once in Every Send Thread Start 
+						this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
+
+					}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet)
+
+
+					/*** If Own Read Access (No Need To Polling If CMD Don't Have Read Access) ***/
 					if (PMBUSHelper::isOwnReadAccess(this->m_pmBusCommand[idx].m_access) == true){//this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
 
-						// Check If Need Change Page
+						/*-------------------- Check If Need Change Page --------------------*/
 						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){
 							char cmdPageValue = this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage == 1 ? 0x01 : 0x00;
 							unsigned char pec = 0;;
+
 #if 0
 							unsigned char changePageSendBuffer[8] = {
 								0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
@@ -476,9 +871,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								}
 							}
 
-						}//if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page)
+						}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page)
 
-						/*--------------------------------------------------------------------------------------------------------------*/
+						/*-------------------- Polling Each Command --------------------*/
 
 						iteration++;
 
@@ -558,11 +953,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							this->m_IOPortReadCMDThread->Run();
 						}
 
-						//
-
 						// Semaphore Wait for Read Thread Complete
 						PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
 						ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+
 						if (ret != wxSEMA_NO_ERROR){
 							PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
 						}
@@ -647,6 +1041,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", RawMsg.c_str());
 
 									bool updateQuery = true;
+									bool updateCoefficients = true;
 
 									if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success){
 										// Call Cook Data CB Function
@@ -678,9 +1073,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 											// Get Index of Query CMD 
 											int queryCMDIndex = -1;
-											for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
-												if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
-													queryCMDIndex = idx;
+											for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
+												if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
+													queryCMDIndex = idx2;
 													break;
 												}
 											}
@@ -705,7 +1100,45 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
 											}
 
-										}
+										}// if (this->m_pmBusCommand[idx].m_register == 0x1A)
+
+										// If this is Coefficients Command(0x30), Update Coefficients Filed
+										if (this->m_pmBusCommand[idx].m_register == 0x30){
+
+											// Get Query CMD
+											int queryCMD;
+											queryCMD = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];
+
+											// Get Index of Query CMD 
+											int queryCMDIndex = -1;
+											for (int idx3 = 0; idx3 < (signed)PMBUSHelper::CurrentCMDTableSize; idx3++){
+												if (PMBUSHelper::getPMBUSCMDData()[idx3].m_register == queryCMD){
+													queryCMDIndex = idx3;
+													break;
+												}
+											}
+
+											if (queryCMDIndex < 0){
+												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+												updateCoefficients = false;
+											}
+
+											if (updateCoefficients == true){
+												// Call Query Data CB Function
+												memset(CoefficientsStr, 0, STR_LENGTH);
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[idx]), CoefficientsStr, this->m_pmBusCommand[idx].m_responseDataLength);
+
+												wxString CoefficientsMsg(CoefficientsStr);
+
+												wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
+												threadcoefficients_evt->SetInt(queryCMDIndex);
+												threadcoefficients_evt->SetString(CoefficientsMsg);
+												wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
+
+												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CoefficientsMsg.c_str());
+											}
+
+										}// if (this->m_pmBusCommand[idx].m_register == 0x30)
 									}
 
 								}
@@ -745,14 +1178,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						} // else if (ret != wxSEMA_NO_ERROR)
 
 						//Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+
 					} // if (this->m_pmBusCommand[idx].m_access != cmd_access_write)
 				}// if (this->m_pmBusCommand[idx].m_toggle == true)
 				else{
 					//continue;
 				}
 
-				/*--------------------------------------------------------------------------------------------------------------*/
-				// Send if user issue send CMD on write page when monitor is running 
+				/*-------------------- Send if user issue send CMD on write page when monitor is running  --------------------*/
 				if (this->m_sendCMDVector->size() > 0){
 
 					vector<PMBUSSendCOMMAND_t>::iterator sendCMDVector_Iterator;
@@ -826,10 +1259,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 					// Clear Vector 
 					this->m_sendCMDVector->clear();
-				}
+				
+				}//if (this->m_sendCMDVector->size() > 0)
+				
 				/*--------------------------------------------------------------------------------------------------------------*/
-
-
+				
 				// Set Monitoring Name / Monitoring Summary of Status Bar
 				wxString monitor("Monitoring...[");
 				wxString cmd(wxString::Format("%02x", this->m_pmBusCommand[idx].m_register).Upper());
@@ -872,6 +1306,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				}
 
 			}//for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++)
+		
 		} //while(m_running && this->TestDestroy()==false)
 
 		//this->m_status_bar->getGauge()->SetValue(0);
@@ -893,6 +1328,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	}
 #endif
 
+	// Emit Thread Completed Event 
 	wxThreadEvent* threadFinish_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_COMPLETED);
 	threadFinish_evt->SetInt(sendRetryStillFailed == true ? TRUE : FALSE);
 	wxQueueEvent(m_pHandler->GetEventHandler(), threadFinish_evt);
@@ -927,7 +1363,6 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 		break;
 	}
 }
-
 
 void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
 	

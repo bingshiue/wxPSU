@@ -113,6 +113,7 @@ public:
 		Col_NameText,
 		Col_AccessText,
 		Col_QueryText,
+		Col_CoefficientsText,
 		Col_CookText,
 		Col_RawText,
 		Col_Date,
@@ -177,6 +178,7 @@ private:
 	wxArrayString    m_nameColValues;
 	wxArrayString    m_accessColValues;
 	wxArrayString    m_queryColValues;
+	wxArrayString    m_coefficientsColValues;
 	wxArrayString    m_cookColValues;
 	wxArrayString    m_rawColValues;
 	IntToStringMap   m_customColValues;

@@ -54,6 +54,11 @@ enum {
 	cmd_data_format_Don_t_Return_Numeric_Data
 };
 
+enum {
+	cmd_query_not_yet = 0,
+	cmd_query_done
+};
+
 //#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
@@ -99,6 +104,7 @@ typedef struct cmdstatus_t {
 	unsigned char m_AddtionalData[3];/**< Addition Data */
 	unsigned char m_NeedChangePage;/**< Need Change Page */
 	unsigned char m_cmdPage;/**< Command Page */
+	unsigned char m_queried;/**< Queried */
 
 }CMDSTATUS_t;
 
@@ -106,6 +112,11 @@ typedef struct cmdstatus_t {
  * @brief Command Query Call Back Function.
  */
 typedef int(*CMDQueryCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+
+/**
+ * @brief Command Coefficients Call Back Function.
+ */
+typedef int(*CMDCoefficientsCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 /**
  * @brief Command Cook Call Back Function.
@@ -121,9 +132,10 @@ typedef int(*CMDRawCBFunc)(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int d
  * @brief Struct for CB Functions
  */
 typedef struct cmdcbfunc_t {
-	CMDQueryCBFunc m_queryCBFunc;/**< Query CB Function */
-	CMDCookCBFunc  m_cookCBFunc;/**< Query CB Function */
-	CMDRawCBFunc   m_rawCBFunc;/**< Query CB Function */
+	CMDQueryCBFunc        m_queryCBFunc;/**< Query CB Function */
+	CMDCoefficientsCBFunc m_coefficientsCBFunc;/**< Coefficients CB Function */
+	CMDCookCBFunc         m_cookCBFunc;/**< Query Cook Function */
+	CMDRawCBFunc          m_rawCBFunc;/**< Query Raw Function */
 
 }CMDCBFUNC_t;
 

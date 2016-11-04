@@ -24,6 +24,7 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 		g_GIGABYTE_CRPS001_CMDTable,
 		GIGABYTE_CRPS001_CMD_TABLE_SIZE,
 		g_GIGABYTE_CRPS001_CMDQueryCBFunc,
+		g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc,
 		g_GIGABYTE_CRPS001_CMDCookCBFunc,
 		g_GIGABYTE_CRPS001_CMDRawCBFunc
 	}
@@ -34,6 +35,7 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 		g_Generic_CMDTable,
 		GENERIC_CMD_TABLE_SIZE,
 		g_Generic_CMDQueryCBFunc,
+		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
 		g_Generic_CMDRawCBFunc
 	}
@@ -48,6 +50,7 @@ MODEL_TYPE_t g_NECModelList[NEC_MODEL_LIST_SIZE] = {
 		g_FSG003_000G_CMDTable,
 		FSG003_000G_CMD_TABLE_SIZE,
 		g_FSG003_000G_CMDQueryCBFunc,
+		g_FSG003_000G_CMDCoefficientsCBFunc,
 		g_FSG003_000G_CMDCookCBFunc,
 		g_FSG003_000G_CMDRawCBFunc
 	}
@@ -58,6 +61,7 @@ MODEL_TYPE_t g_NECModelList[NEC_MODEL_LIST_SIZE] = {
 		g_Generic_CMDTable,
 		GENERIC_CMD_TABLE_SIZE,
 		g_Generic_CMDQueryCBFunc,
+		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
 		g_Generic_CMDRawCBFunc
 	}
@@ -71,6 +75,7 @@ MODEL_TYPE_t g_GENERICModelList[GENERIC_MODEL_LIST_SIZE] = {
 		g_Generic_CMDTable,
 		GENERIC_CMD_TABLE_SIZE,
 		g_Generic_CMDQueryCBFunc,
+		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
 		g_Generic_CMDRawCBFunc
 	}

@@ -13,6 +13,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
@@ -831,6 +832,13 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
 
+	this->m_cmdListDVC->AppendTextColumn("Coefficients",
+		PMBUSCMDListModel::Col_CoefficientsText,
+		wxDATAVIEW_CELL_ACTIVATABLE,
+		75,//wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_CENTER_HORIZONTAL,
+		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
+
 	this->m_cmdListDVC->AppendTextColumn("Cook",
 		PMBUSCMDListModel::Col_CookText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
@@ -949,6 +957,7 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_responseDataLength = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_responseDataLength;
 		this->m_PMBusData[idx].m_cmdStatus = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable[idx].m_cmdStatus;
 		this->m_PMBusData[idx].m_cmdCBFunc.m_queryCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdQueryCBFunc[idx];
+		this->m_PMBusData[idx].m_cmdCBFunc.m_coefficientsCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdCoefficientsFunc[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdCookCBFunc[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdRawCBFunc[idx];
 
@@ -2199,6 +2208,12 @@ void MainFrame::StartMonitor(void){
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create Send Command Thread");
 	}
 	else{
+		
+		// Clear Query Filed 
+		for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+			this->m_PMBusData[idx].m_cmdStatus.m_queried = cmd_query_not_yet;
+		}
+		
 		this->m_IOPortSendCMDThread->Run();
 		this->m_sendThreadStopFlag = false;
 	}
@@ -2868,6 +2883,15 @@ void MainFrame::OnSendThreadUpdateQuery(wxThreadEvent& event){
 
 	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_QueryText);
 	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_QueryText);
+}
+
+void MainFrame::OnSendThreadUpdateCoefficients(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DETAIL, "Update Coefficients Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+	wxVariant variantRaw;
+	variantRaw = event.GetString();
+
+	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_CoefficientsText);
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_CoefficientsText);
 }
 
 void MainFrame::OnSendThreadUpdateCook(wxThreadEvent& event){
@@ -4059,6 +4083,7 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_START, MainFrame::OnSendThreadStart)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE, MainFrame::OnSendThreadUpdate)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_RAW, MainFrame::OnSendThreadUpdateRaw)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY, MainFrame::OnSendThreadUpdateQuery)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS, MainFrame::OnSendThreadUpdateCoefficients)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, MainFrame::OnSendThreadUpdateCook)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion)
 

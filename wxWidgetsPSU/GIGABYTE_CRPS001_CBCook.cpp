@@ -2409,6 +2409,7 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	const wchar_t* tmp_wchar;
 
 	wxString wxstr("");
+	wxstr += wxString::Format("CMD:%02xH,", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
 
 	/*
 	[1]	Lower byte of m

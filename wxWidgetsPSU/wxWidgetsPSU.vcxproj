@@ -95,6 +95,7 @@
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="ClearIOReadBufferTask.cpp" />
     <ClCompile Include="ComportDialog.cpp" />
+    <ClCompile Include="GIGABYTE_CRPS001_CBCoefficients.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBCook.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBQuery.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBRaw.cpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
+    <ClCompile Include="PMBUSCBCoefficients.cpp" />
     <ClCompile Include="PMBUSCBCook.cpp" />
     <ClCompile Include="PMBUSCBQuery.cpp" />
     <ClCompile Include="PMBUSCBRaw.cpp" />
@@ -203,6 +205,7 @@
     <ClInclude Include="FSG003_000G_CMDCB.h" />
     <ClInclude Include="Generic_CMDCB.h" />
     <ClInclude Include="Generic_Model.h" />
+    <ClInclude Include="GIGABYTE_CRPS001_CBCoefficients.h" />
     <ClInclude Include="GIGABYTE_CRPS001_CBCook.h" />
     <ClInclude Include="GIGABYTE_CRPS001_CBQuery.h" />
     <ClInclude Include="GIGABYTE_CRPS001_CBRaw.h" />
@@ -223,6 +226,7 @@
     <ClInclude Include="PEC.h" />
     <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSBitmapButton.h" />
+    <ClInclude Include="PMBUSCBCoefficients.h" />
     <ClInclude Include="PMBUSCBCook.h" />
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />

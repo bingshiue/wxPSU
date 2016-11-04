@@ -22,7 +22,7 @@ PMBUSCOMMAND_t g_Generic_CMDTable[] = {
 	// 03H
 	{ true, "03H", 0x03, "CLEAR_FAULTS", cmd_access_write, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 1BH
-	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 20H
 	{ true, "20H", 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 3AH

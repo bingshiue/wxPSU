@@ -5,6 +5,7 @@
 #define _GENERIC_CMDCB_H_
 
 #include "PMBUSCBQuery.h"
+#include "PMBUSCBCoefficients.h"
 #include "PMBUSCBCook.h"
 #include "PMBUSCBRaw.h"
 #include "Generic_MODEL.h"
@@ -21,6 +22,20 @@ CMDQueryCBFunc g_Generic_CMDQueryCBFunc[GENERIC_CMD_TABLE_SIZE] = {
 	Query_3bH,
 	Query_51H,
 	Query_5dH,
+};
+
+CMDCoefficientsCBFunc g_Generic_CMDCoefficientsCBFunc[GENERIC_CMD_TABLE_SIZE] = {
+	Coefficients_f5H,
+	Coefficients_00H,
+	Coefficients_01H,
+	Coefficients_02H,
+	Coefficients_03H,
+	Coefficients_1bH,
+	Coefficients_20H,
+	Coefficients_3aH,
+	Coefficients_3bH,
+	Coefficients_51H,
+	Coefficients_5dH,
 };
 
 CMDCookCBFunc g_Generic_CMDCookCBFunc[GENERIC_CMD_TABLE_SIZE] = {

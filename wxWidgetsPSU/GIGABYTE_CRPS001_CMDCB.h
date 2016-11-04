@@ -5,6 +5,7 @@
 #define _GIGABYTE_CRPS0001_CMDCB_H_
 
 #include "GIGABYTE_CRPS001_CBQuery.h"
+#include "GIGABYTE_CRPS001_CBCoefficients.h"
 #include "GIGABYTE_CRPS001_CBCook.h"
 #include "GIGABYTE_CRPS001_CBRaw.h"
 #include "GIGABYTE_CRPS001.h"
@@ -66,6 +67,66 @@ CMDQueryCBFunc g_GIGABYTE_CRPS001_CMDQueryCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE
 	GB_CRPS_Query_c2H, // New
 	GB_CRPS_Query_d9H, // New
 	GB_CRPS_Query_dcH,
+
+};
+
+CMDCoefficientsCBFunc g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] = {
+	GB_CRPS_Coefficients_00H,
+	GB_CRPS_Coefficients_03H,
+	GB_CRPS_Coefficients_05H, // New
+	GB_CRPS_Coefficients_06H, // New
+	GB_CRPS_Coefficients_19H, // New
+	GB_CRPS_Coefficients_1aH, // New
+	GB_CRPS_Coefficients_1bH,
+	GB_CRPS_Coefficients_20H,
+	GB_CRPS_Coefficients_30H, // New
+	//GB_CRPS_Coefficients_31H, // New
+	GB_CRPS_Coefficients_4aH, // New
+	GB_CRPS_Coefficients_51H,
+	GB_CRPS_Coefficients_70H, // New
+	GB_CRPS_Coefficients_79H,
+	GB_CRPS_Coefficients_7aH,
+	GB_CRPS_Coefficients_7bH,
+	GB_CRPS_Coefficients_7cH,
+	GB_CRPS_Coefficients_7dH,
+	GB_CRPS_Coefficients_7eH,
+	GB_CRPS_Coefficients_81H,
+	GB_CRPS_Coefficients_86H,
+	GB_CRPS_Coefficients_87H,
+	GB_CRPS_Coefficients_88H,
+	GB_CRPS_Coefficients_89H,
+	GB_CRPS_Coefficients_8b00H,
+	GB_CRPS_Coefficients_8c00H,
+	GB_CRPS_Coefficients_8b01H,
+	GB_CRPS_Coefficients_8c01H,
+	GB_CRPS_Coefficients_8dH,
+	GB_CRPS_Coefficients_8eH,
+	GB_CRPS_Coefficients_8fH,
+	GB_CRPS_Coefficients_90H,
+	GB_CRPS_Coefficients_91H, // New
+	GB_CRPS_Coefficients_96H,
+	GB_CRPS_Coefficients_97H,
+	GB_CRPS_Coefficients_98H,
+	GB_CRPS_Coefficients_9aH,
+	GB_CRPS_Coefficients_9bH,
+	GB_CRPS_Coefficients_9eH,
+	GB_CRPS_Coefficients_a0H,
+	GB_CRPS_Coefficients_a1H,
+	GB_CRPS_Coefficients_a2H,
+	GB_CRPS_Coefficients_a3H,
+	GB_CRPS_Coefficients_a4H,
+	GB_CRPS_Coefficients_a5H,
+	GB_CRPS_Coefficients_a6H,
+	GB_CRPS_Coefficients_a7H,
+	GB_CRPS_Coefficients_a8H,
+	GB_CRPS_Coefficients_a9H,
+	GB_CRPS_Coefficients_aaH,
+	GB_CRPS_Coefficients_abH,
+	GB_CRPS_Coefficients_c0H, // New
+	GB_CRPS_Coefficients_c1H, // New
+	GB_CRPS_Coefficients_c2H, // New
+	GB_CRPS_Coefficients_d9H, // New
+	GB_CRPS_Coefficients_dcH,
 
 };
 

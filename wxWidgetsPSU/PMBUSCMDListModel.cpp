@@ -91,6 +91,12 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand, unsigned int 
 		m_queryColValues.push_back(wxT(""));
 	}
 
+	// Setup Coefficients
+	m_coefficientsColValues.reserve(m_numberOfItems);
+	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
+		m_coefficientsColValues.push_back(wxT(""));
+	}
+
 	// Setup Cook
 	m_cookColValues.reserve(m_numberOfItems);
 	for (unsigned int idx = 0; idx < m_numberOfItems; idx++){
@@ -275,6 +281,12 @@ void PMBUSCMDListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsi
 		variant = m_queryColValues[row];
 
 		break;
+
+	case Col_CoefficientsText:
+		variant = m_coefficientsColValues[row];
+
+		break;
+
 	case Col_CookText:
 
 		variant = m_cookColValues[row];
@@ -335,6 +347,7 @@ bool PMBUSCMDListModel::GetAttrByRow(unsigned int row, unsigned int col,
 	case Col_NameText:
 	case Col_AccessText:
 	case Col_QueryText:
+	case Col_CoefficientsText:
 	case Col_CookText:
 	case Col_RawText: 
 		return false;
@@ -427,16 +440,25 @@ bool PMBUSCMDListModel::SetValueByRow(const wxVariant &variant, unsigned int row
 	case Col_AccessText:
 
 		break;
+
 	case Col_QueryText:
 
 		m_queryColValues[row] = variant.GetString();
 
 		break;
+
+	case Col_CoefficientsText:
+
+		m_coefficientsColValues[row] = variant.GetString();
+
+		break;
+
 	case Col_CookText:
 
 		m_cookColValues[row] = variant.GetString();
 
 		break;
+
 	case Col_RawText:
 #ifdef PRINT_RAW_IN_FEILD
 		PSU_DEBUG_PRINT(MSG_DETAIL, "");

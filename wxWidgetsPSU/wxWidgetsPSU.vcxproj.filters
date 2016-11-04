@@ -306,6 +306,12 @@
     <ClCompile Include="ReadPage30H.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PMBUSCBCoefficients.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="GIGABYTE_CRPS001_CBCoefficients.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -522,6 +528,12 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="PMBUSCMDReadPages.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSCBCoefficients.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GIGABYTE_CRPS001_CBCoefficients.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

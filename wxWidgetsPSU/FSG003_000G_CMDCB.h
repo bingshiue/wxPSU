@@ -5,6 +5,7 @@
 #define _FSG003_000G_CMDCB_H_
 
 #include "PMBUSCBQuery.h"
+#include "PMBUSCBCoefficients.h"
 #include "PMBUSCBCook.h"
 #include "PMBUSCBRaw.h"
 #include "FSG003_000G.h"
@@ -72,6 +73,71 @@ CMDQueryCBFunc g_FSG003_000G_CMDQueryCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
 	Query_f5H,
 	Query_faH,
 	Query_fcH
+};
+
+CMDQueryCBFunc g_FSG003_000G_CMDCoefficientsCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
+	Coefficients_00H,
+	Coefficients_01H,
+	Coefficients_02H,
+	Coefficients_03H,
+	Coefficients_1bH,
+	Coefficients_20H,
+	Coefficients_3aH,
+	Coefficients_3bH,
+	Coefficients_51H,
+	Coefficients_5dH,
+	Coefficients_6aH,
+	Coefficients_6bH,
+	Coefficients_78H,
+	Coefficients_79H,
+	Coefficients_7aH,
+	Coefficients_7bH,
+	Coefficients_7cH,
+	Coefficients_7dH,
+	Coefficients_7eH,
+	Coefficients_7fH,
+	Coefficients_81H,
+	Coefficients_86H,
+	Coefficients_87H,
+	Coefficients_88H,
+	Coefficients_89H,
+	Coefficients_8aH,
+	Coefficients_8b00H,
+	Coefficients_8c00H,
+	Coefficients_8b01H,
+	Coefficients_8c01H,
+	Coefficients_8dH,
+	Coefficients_8eH,
+	Coefficients_8fH,
+	Coefficients_90H,
+	Coefficients_96H,
+	Coefficients_97H,
+	Coefficients_98H,
+	Coefficients_99H,
+	Coefficients_9aH,
+	Coefficients_9bH,
+	Coefficients_9cH,
+	Coefficients_9dH,
+	Coefficients_9eH,
+	Coefficients_a0H,
+	Coefficients_a1H,
+	Coefficients_a2H,
+	Coefficients_a3H,
+	Coefficients_a4H,
+	Coefficients_a5H,
+	Coefficients_a6H,
+	Coefficients_a7H,
+	Coefficients_a8H,
+	Coefficients_a9H,
+	Coefficients_aaH,
+	Coefficients_abH,
+	Coefficients_d0H,
+	Coefficients_dbH,
+	Coefficients_dcH,
+	Coefficients_ddH,
+	Coefficients_f5H,
+	Coefficients_faH,
+	Coefficients_fcH
 };
 
 CMDCookCBFunc g_FSG003_000G_CMDCookCBFunc[FSG003_000G_CMD_TABLE_SIZE] = {
