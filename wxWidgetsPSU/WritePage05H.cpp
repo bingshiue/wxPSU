@@ -12,9 +12,16 @@
 WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_pageST = new wxStaticText(this, wxID_ANY, wxString(L"PAGE"), wxDefaultPosition, wxSize(-1, -1));
-	m_pageTC = new wxTextCtrl(this, wxID_ANY);
+	//m_pageTC = new wxTextCtrl(this, wxID_ANY);
+	m_pagePaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80, -1));
+	m_pageCB = new wxComboBox(this, CID_PAGE_COMBOBOX);
+
 	wxString pageSTR = wxString::Format("%d", DEFAULT_PAGE);
-	m_pageTC->SetValue(pageSTR);
+	//m_pageTC->SetValue(pageSTR);
+	m_pageCB->Append(wxT("0"));
+	m_pageCB->Append(wxT("1"));
+	m_pageCB->Select(0);
+
 
 	m_cmdST = new wxStaticText(this, wxID_ANY, wxString(L"CMD"), wxDefaultPosition, wxSize(-1, -1));
 	m_cmdTC = new wxTextCtrl(this, wxID_ANY);
@@ -55,8 +62,9 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_horizonSizer3 = new wxBoxSizer(wxHORIZONTAL);
 
 	// Add Components To Sizer
-	this->m_pageSizer->Add(m_pageST, 1, wxALIGN_CENTER_VERTICAL);
-	this->m_pageSizer->Add(m_pageTC, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_pageSizer->Add(m_pageST, 0, wxALIGN_CENTER_VERTICAL);
+	this->m_pageSizer->Add(m_pagePaddingST, 0, wxALIGN_CENTER_VERTICAL);
+	this->m_pageSizer->Add(m_pageCB, 0, wxALIGN_CENTER_VERTICAL);
 
 	this->m_cmdSizer->Add(m_cmdST, 1, wxALIGN_CENTER_VERTICAL);
 	this->m_cmdSizer->Add(m_cmdTC, 1, wxALIGN_CENTER_VERTICAL);
@@ -86,7 +94,7 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_rawRadioButton->SetValue(false);
 
 	// Set Validator
-	this->m_pageTC->SetValidator(this->m_numberValidator);
+	//this->m_pageTC->SetValidator(this->m_numberValidator);
 	this->m_cmdTC->SetValidator(this->m_numberValidator);
 	this->m_data1InputValue->SetValidator(this->m_numberValidator);
 	this->m_data2InputValue->SetValidator(this->m_numberValidator);
@@ -108,6 +116,7 @@ WritePage05H::~WritePage05H(){
 void WritePage05H::OnRadioButtonCook(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
+#if 0
 	this->m_pageTC->SetValidator(this->m_numberValidator);
 
 	if (this->m_pageTC->GetValue() == wxEmptyString) return;
@@ -115,6 +124,7 @@ void WritePage05H::OnRadioButtonCook(wxCommandEvent& event){
 	long decimal4 = PMBUSHelper::HexToDecimal(this->m_pageTC->GetValue().c_str());
 
 	this->m_pageTC->SetValue(wxString::Format("%ld", decimal4));
+#endif
 
 	/* ------------------- */
 	
@@ -151,12 +161,14 @@ void WritePage05H::OnRadioButtonCook(wxCommandEvent& event){
 void WritePage05H::OnRadioButtonRaw(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
+#if 0
 	this->m_pageTC->SetValidator(this->m_hexValidator);
 
 	if (this->m_pageTC->GetValue() == wxEmptyString) return;
 
 	wxString hexString4 = wxString::Format("%02lx", wxAtoi(this->m_pageTC->GetValue()));
 	this->m_pageTC->SetValue(hexString4);
+#endif
 
 	/* ------------------- */
 
@@ -187,6 +199,10 @@ void WritePage05H::OnRadioButtonRaw(wxCommandEvent& event){
 
 }
 
+void WritePage05H::OnPageComboBox(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+}
+
 void WritePage05H::OnDataCountComboBox(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
@@ -213,9 +229,28 @@ void WritePage05H::OnButtonWrite(wxCommandEvent& event){
 	double data1_double = 0;
 	double data2_double = 0;
 
+	// Get Page
+
+	switch (this->m_pageCB->GetSelection()){
+
+	case 0:
+		page = 0;
+		break;
+
+	case 1:
+		page = 1;
+		break;
+
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+		break;
+	}
+
+
 	// Raw
 	if (this->m_rawRadioButton->GetValue() == true){
-		page = (unsigned char)PMBUSHelper::HexToDecimal(this->m_pageTC->GetValue().c_str());
+		//page = (unsigned char)PMBUSHelper::HexToDecimal(this->m_pageTC->GetValue().c_str());
 		cmd  = (unsigned char)PMBUSHelper::HexToDecimal(this->m_cmdTC->GetValue().c_str());
 		data1 = (unsigned char)PMBUSHelper::HexToDecimal(this->m_data1InputValue->GetValue().c_str());
 		data2 = (unsigned char)PMBUSHelper::HexToDecimal(this->m_data2InputValue->GetValue().c_str());
@@ -224,8 +259,8 @@ void WritePage05H::OnButtonWrite(wxCommandEvent& event){
 	// Cook
 	else if (this->m_cookRadioButton->GetValue() == true){
 
-		this->m_pageTC->GetValue().ToDouble(&page_double);
-		page = (unsigned char)page_double;
+		//this->m_pageTC->GetValue().ToDouble(&page_double);
+		//page = (unsigned char)page_double;
 
 		this->m_cmdTC->GetValue().ToDouble(&cmd_double);
 		cmd  = (unsigned char)cmd_double;
@@ -283,6 +318,7 @@ void WritePage05H::OnButtonWrite(wxCommandEvent& event){
 wxBEGIN_EVENT_TABLE(WritePage05H, wxPanel)
 EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage05H::OnRadioButtonCook)
 EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage05H::OnRadioButtonRaw)
+EVT_COMBOBOX(CID_PAGE_COMBOBOX, WritePage05H::OnPageComboBox)
 EVT_COMBOBOX(CID_DATA_COUNT_COMBOBOX, WritePage05H::OnDataCountComboBox)
 EVT_BUTTON(CID_BUTTON_WRITE, WritePage05H::OnButtonWrite)
 wxEND_EVENT_TABLE()

@@ -15,6 +15,11 @@
 /* 06H PAGE_PLUS_WRITE */
 class ReadPage06H : public BaseReadPage {
 public:
+
+	enum {
+		CID_BLOCK_SIZE_COMBOBOX = 6701,
+	};
+
 	/**
 	 * @brief Constructor.
 	 */
@@ -26,13 +31,25 @@ public:
 
 protected:
 
+	wxBoxSizer   *m_blockSizeSizer;
+	wxBoxSizer   *m_data1Sizer;
+
+	wxStaticText *m_blockSizeST;
+	wxStaticText *m_blockSizePaddingST;
+	wxComboBox   *m_blockSizeCB;
+
 	wxStaticText *m_page;
 	wxTextCtrl *m_pageInputValue;
 
 	wxStaticText *m_cmd;
 	wxTextCtrl *m_cmdInputValue;
 
+	wxStaticText *m_data1ST;
+	wxTextCtrl *m_data1InputValue;
+
 	wxStaticText *m_padding;
+	wxStaticText *m_padding2;
+	wxStaticText *m_padding3;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
@@ -45,6 +62,8 @@ private:
 	void OnRadioButtonCook(wxCommandEvent& event);
 
 	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnBlockSizeCB(wxCommandEvent& event);
 
 	void OnButtonSet(wxCommandEvent& event);
 

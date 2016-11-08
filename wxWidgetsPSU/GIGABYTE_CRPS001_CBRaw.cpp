@@ -327,6 +327,7 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 	unsigned int count = 0;
 	const wchar_t* tmp_wchar;
 	unsigned char tmp_buffer[256];
+	unsigned char tmp_buffer_idx = 0;
 
 	if (string == NULL) return -1;
 
@@ -336,16 +337,23 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 
 	// I2C Address "B6"
 	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress()).Upper();
-	tmp_buffer[0] = PMBUSHelper::GetSlaveAddress();
+	tmp_buffer[tmp_buffer_idx++] = PMBUSHelper::GetSlaveAddress();
 
 	wxstr += "-";
 
 	// Command (Register) "06"
 	wxstr += wxString::Format("%02x", pmbuscmd->m_register);
-	tmp_buffer[1] = pmbuscmd->m_register;
+	tmp_buffer[tmp_buffer_idx++] = pmbuscmd->m_register;
 
 	wxstr += "-";
 
+	for(unsigned int idx=0; idx<pmbuscmd->m_cmdStatus.m_AddtionalDataLength; idx++){
+		wxstr += wxString::Format("%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[idx]);
+		tmp_buffer[tmp_buffer_idx++] = pmbuscmd->m_cmdStatus.m_AddtionalData[idx];
+		wxstr += "-";
+	}
+
+#if 0
 	// Addtional Data
 	wxstr += wxString::Format("%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[0]);
 	tmp_buffer[2] = pmbuscmd->m_cmdStatus.m_AddtionalData[0];
@@ -358,13 +366,14 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 	wxstr += wxString::Format("%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[2]);
 	tmp_buffer[4] = pmbuscmd->m_cmdStatus.m_AddtionalData[2];
 	wxstr += "-";
+#endif
 
 	// Read Command
 	//wxstr += L"B7";
 	wxstr += wxString::Format("%02x", PMBUSHelper::GetSlaveAddress() | 0x01).Upper();
-	tmp_buffer[5] = (PMBUSHelper::GetSlaveAddress() | 0x01);
+	tmp_buffer[tmp_buffer_idx++] = (PMBUSHelper::GetSlaveAddress() | 0x01);
 
-	unsigned int dataStartIndex = 6;
+	unsigned int dataStartIndex = tmp_buffer_idx;
 	unsigned int dataStartIndex_Static = dataStartIndex;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "dataBytesLength = %2d", dataBytesLength);
@@ -401,6 +410,7 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 		}
 	}
 
+	//
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
 

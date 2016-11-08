@@ -45,6 +45,8 @@ public :
 	static AppSettings_t* GetAppSettings(void);
 
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
+	static double ParseDirectDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer, PMBUSCOMMAND_t* PMBusCMDData);
+
 	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
@@ -83,6 +85,8 @@ public :
 	static void setPMBUSCMDData(PMBUSCOMMAND_t *PMBusCMDData);
 
 	static PMBUSCOMMAND_t* getPMBUSCMDData(void);
+
+	static int getIndexOfCMD(int cmd, int page = 0);
 
 protected :
 

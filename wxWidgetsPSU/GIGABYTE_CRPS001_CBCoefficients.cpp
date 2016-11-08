@@ -130,5 +130,47 @@ int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned 
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
+	/* Update Direct Data Format in CMD */
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
+	// Get Query CMD
+	int queryCMD;
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+
+	// Get Index of Query CMD 
+	int queryCMDIndex = -1;
+
+	                                                     // CMD's Page
+	queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, sizeOfstr);
+
+#if 0
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+			queryCMDIndex = idx;
+			break;
+		}
+	}
+#endif
+
+	if (queryCMDIndex < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		return EXIT_FAILURE;
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_DEBUG, "queryCMDIndex = %d", queryCMDIndex);
+	}
+
+	// Set Direct Data Fomat Coefficient
+	pmbuscmd_t* target;
+	target = PMBUSHelper::getPMBUSCMDData();
+
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M = m;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B = b;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
+	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R = R;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Direct Data Format in CMD");
+
 	return EXIT_SUCCESS;
 }

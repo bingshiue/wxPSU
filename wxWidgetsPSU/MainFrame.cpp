@@ -3106,16 +3106,17 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	wxString line("");
 	wxDataViewItem dataViewItem;
 
-	char* format[6] = {
-		"%-12s",
-		"%-30s",
-		"%-9s",
-		"%-8s",
-		"%-140s",
-		"%s"
+	char* format[7] = {
+		"%-12s", // Register
+		"%-30s", // Name
+		"%-12s",  // Access
+		"%-40s", // Query
+		"%-20s", // Coefficients
+		"%-140s",// Cook
+		"%s"     // Raw
 	};
 
-	wxString header = wxString::Format("%-12s%-30s%-9s%-8s%-140s%s", "Register", "Name", "Access", "Query", "Cook", "Raw");
+	wxString header = wxString::Format("%-12s%-30s%-12s%-40s%-20s%-140s%s", "Register", "Name", "Access", "Query", "Coefficients", "Cook", "Raw");
 
 	textOutputStream << header;
 	textOutputStream << endl;

@@ -55,6 +55,11 @@ enum {
 };
 
 enum {
+	cmd_unsupport = 0,
+	cmd_support
+};
+
+enum {
 	cmd_query_not_yet = 0,
 	cmd_query_done
 };
@@ -98,10 +103,11 @@ typedef struct dataFormat_t {
  * @brief Struct for CMD Status
  */
 typedef struct cmdstatus_t {
+	unsigned char m_support;/**< Support */
 	unsigned char m_status;/**< Status of CMD (running, success, failure) */
 	unsigned char m_alsoSendWriteData;/**< Also Send Write Data */
 	unsigned char m_AddtionalDataLength;/**< Additional Data Length */
-	unsigned char m_AddtionalData[3];/**< Addition Data */
+	unsigned char m_AddtionalData[4];/**< Addition Data */
 	unsigned char m_NeedChangePage;/**< Need Change Page */
 	unsigned char m_cmdPage;/**< Command Page */
 	unsigned char m_queried;/**< Queried */

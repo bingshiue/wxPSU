@@ -18,7 +18,7 @@ PMBUSCOMMAND_t g_PMBUSCommand[62] = {
 // 03H
 	{ true, "03H", 0x03, "CLEAR_FAULTS", cmd_access_write, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 // 1BH
-	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 // 20H
 	{ true, "20H", 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 // 3AH
@@ -62,13 +62,13 @@ PMBUSCOMMAND_t g_PMBUSCommand[62] = {
 // 8Ah         
 	{ true, "8AH", 0x8a, "READ VCAP", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 // 8Bh (00h)   
-	{ true, "8Bh (00h)", 0x8b, "READ_VOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Bh (00h)", 0x8b, "READ_VOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 // 8Ch (00h)   
-	{ true, "8Ch (00h)", 0x8c, "READ_IOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Ch (00h)", 0x8c, "READ_IOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 // 8Bh (01h)   
-	{ true, "8Bh (01h)", 0x8b, "READ_VOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Bh (01h)", 0x8b, "READ_VOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 // 8Ch (01h)   
-	{ true, "8Ch (01h)", 0x8c, "READ_IOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Ch (01h)", 0x8c, "READ_IOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 // 8Dh         
 	{ true, "8DH", 0x8d, "READ_TEMPERATURE_1(Ambient)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 // 8Eh         

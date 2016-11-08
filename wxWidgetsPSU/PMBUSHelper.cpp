@@ -52,6 +52,44 @@ PMBUSCOMMAND_t* PMBUSHelper::getPMBUSCMDData(void){
 	return m_PMBusCMDData;
 }
 
+/**
+ * @brief Parse Direct Data
+ *
+ * @param buffer Buffer contains "Y"
+ * @param sizeOfBuffer Size of Buffer
+ * @param PMBusCMDData PMBUS CMD Data
+ * @retval Parse Result
+ */
+double PMBUSHelper::ParseDirectDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer, PMBUSCOMMAND_t* PMBusCMDData){
+	// Direct Data Format : result = 1/m * ( (Y * 10^(-R)) - b)
+	
+	double result = 0;
+	short Y = 0;
+
+	if (PMBusCMDData == NULL){
+		PSU_DEBUG_PRINT(MSG_ERROR, "PMBusCMDData==NULL");
+		return 0.0f;
+	}
+
+	if (!buffer || sizeOfBuffer < 2) {
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs !");
+		return -1;
+	}
+
+	Y = buffer[0] | buffer[1] << 8;
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Y=%d", Y);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_M);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_R);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_B);
+
+	result = (((double)Y * (double)(pow(10, -PMBusCMDData->m_dataFormat.m_directDataFormat.m_R))) - PMBusCMDData->m_dataFormat.m_directDataFormat.m_B) / (double)PMBusCMDData->m_dataFormat.m_directDataFormat.m_M;
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "result=%5.4f", result);
+
+	return result;
+}
+
 
 #define N_VALUE_MASK  0xf800
 #define Y_VALUE_MASK  0x07ff
@@ -763,4 +801,31 @@ bool PMBUSHelper::isOwnReadAccess(unsigned int access){
 	}
 
 	return ret;
+}
+
+int PMBUSHelper::getIndexOfCMD(int cmd, int page){
+	int index = -1;
+
+	// If Page is 0
+	if (page==0){
+		for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+			if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == cmd){
+				index = idx;
+				break;
+			}
+		}
+	}
+	// Have Specified Page 
+	else{
+		for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+			if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == cmd){
+				if (PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_cmdPage == page){
+					index = idx;
+					break;
+				}
+			}
+		}
+	}
+
+	return index;
 }

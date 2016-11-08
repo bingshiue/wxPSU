@@ -1221,10 +1221,29 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 	int samples_of_input_power = 0;
 
+
+	int Maximum_Linear_Format_Value;
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format :
+		Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
+		break;
+
+	case cmd_data_format_DirectData_Format :
+		Maximum_Linear_Format_Value = pow(2.0f, 15) - 1; // 32767
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+#if 0
 #ifdef GB_CRPS_Cook_86H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
 	int Maximum_Linear_Format_Value = pow(2.0f, 15) - 1; // 32767
+#endif
 #endif
 
 	unsigned long long Energy_Count = 0;
@@ -1234,10 +1253,30 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 
 	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format :
+		accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
+		break;
+
+	case cmd_data_format_DirectData_Format:
+		accumulator = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2, pmbuscmd);
+		              //pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+
+#if 0
 #ifdef GB_CRPS_Cook_86H_FOLLOW_SPEC
 	accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
 #else
 	accumulator = pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
+#endif
 #endif
 
 	ROLLOVER_COUNT = pmbuscmd->m_recvBuff.m_dataBuff[3];
@@ -1283,10 +1322,28 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 	int samples_of_input_power = 0;
 
+	int Maximum_Linear_Format_Value;
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format :
+		Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
+		break;
+
+	case cmd_data_format_DirectData_Format:
+		Maximum_Linear_Format_Value = pow(2.0f, 15) - 1; // 32767
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		break;
+}
+
+#if 0
 #ifdef GB_CRPS_Cook_87H_FOLLOW_SPEC
 	int Maximum_Linear_Format_Value = (pow(2.0f, 10) - 1) * pow(2.0f, 15);
 #else
 	int Maximum_Linear_Format_Value = pow(2.0f, 15) -1; // 32767
+#endif
 #endif
 
 	unsigned long long Energy_Count = 0;
@@ -1296,10 +1353,29 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	*/
 
 	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format :
+		accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
+		break;
+
+	case cmd_data_format_DirectData_Format:
+		accumulator = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2, pmbuscmd);
+		//pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		break;
+}
+
+#if 0
 #ifdef GB_CRPS_Cook_87H_FOLLOW_SPEC
 	accumulator = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 1, 2);
 #else
 	accumulator = pmbuscmd->m_recvBuff.m_dataBuff[1] | pmbuscmd->m_recvBuff.m_dataBuff[2] << 8;
+#endif
 #endif
 
 	ROLLOVER_COUNT = pmbuscmd->m_recvBuff.m_dataBuff[3];
@@ -2448,7 +2524,7 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
 	// Get Query CMD
 	int queryCMD;
-	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[2];
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
 
 	// Get Index of Query CMD 
 	int queryCMDIndex = -1;
@@ -2469,9 +2545,9 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	target = PMBUSHelper::getPMBUSCMDData();
 
 	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M = m;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "M=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
 	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B = b;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "B=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
 	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R = R;
 	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R);
 

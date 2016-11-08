@@ -100,6 +100,8 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 
 void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength){
 	
+	unsigned int baseIndex = 0;
+
 	switch (*this->m_CurrentIO){
 
 	case IOACCESS_SERIALPORT:
@@ -118,13 +120,26 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 		}
 		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
 			
-			this->m_sendBuff[0] = 0x41;
-			this->m_sendBuff[1] = 0x44;
-			this->m_sendBuff[2] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[3] = command;
-			this->m_sendBuff[4] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
-			this->m_sendBuff[5] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
+			this->m_sendBuff[baseIndex++] = 0x41;
+			this->m_sendBuff[baseIndex++] = 0x44;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;
+			
+			//this->m_sendBuff[4] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
+			//this->m_sendBuff[5] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
 
+			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+			}
+
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength;
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+
+			/*
 			if (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength > 2){
 				this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[2];// Addtional Data [2]
 				this->m_sendBuff[7] = 0x0d;
@@ -142,6 +157,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 				this->m_sendBuff[10] = 0x0d;
 				this->m_sendBuff[11] = 0x0a;
 			}
+			*/
 
 		}
 		break;
@@ -218,15 +234,34 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[63] = 0x00;
 		}
 		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-			this->m_sendBuff[0] = 0x05;// Report ID is 0x05
-			this->m_sendBuff[1] = 0x0c + (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength - 2);//0x0c;// Data Length
-			this->m_sendBuff[2] = 0x41;
-			this->m_sendBuff[3] = 0x44;
-			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[5] = command;        // Command is 0x3a
-			this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
-			this->m_sendBuff[7] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
+			
+			this->m_sendBuff[baseIndex++] = 0x05;// Report ID is 0x05
+			this->m_sendBuff[baseIndex++] = 0x0c + (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength - 2);//0x0c;// Data Length
+			this->m_sendBuff[baseIndex++] = 0x41;
+			this->m_sendBuff[baseIndex++] = 0x44;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;        // Command is 0x3a
+			
+			//this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
+			//this->m_sendBuff[7] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
 
+			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+			}
+
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+			this->m_sendBuff[baseIndex++] = 0x00;
+
+			for(unsigned int target = baseIndex; target < 25; target++){
+				this->m_sendBuff[baseIndex++] = 0x00;
+			}
+
+#if 0
 			if (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength > 2){
 				this->m_sendBuff[8] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[2];// Addtional Data [2]
 				this->m_sendBuff[9] = 0x0d;
@@ -256,6 +291,8 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[22] = 0x00;
 			this->m_sendBuff[23] = 0x00;
 			this->m_sendBuff[24] = 0x00;
+#endif
+
 			this->m_sendBuff[25] = 0x01;
 			this->m_sendBuff[26] = responseDataLength; // Response Data Length
 			this->m_sendBuff[27] = 0x00;
@@ -394,8 +431,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						if (QueryCMDIndex >= 0){					
 							// Prepare Send Buffer
-							this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+							this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
 							// Send Query Command
 							retry = 0;
@@ -528,22 +565,20 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 											// Get Index of Query CMD 
 											int queryCMDIndex = -1;
-											for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
-												if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
-													queryCMDIndex = idx2;
-													break;
-												}
-											}
+											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 											if (queryCMDIndex < 0){
 												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
 												PreUpdateQuery = false;
 											}
+											else{
+												PSU_DEBUG_PRINT(MSG_DEBUG, "Find Index of Query CMD %02x is %d", queryCMD, queryCMDIndex);
+											}
 
 											if (PreUpdateQuery == true){
 												// Call Query Data CB Function
-												memset(QueryStr, 0, STR_LENGTH);
-												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[QueryCMDIndex]), QueryStr, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+												memset(QueryStr, 0, STR_LENGTH * sizeof(wchar_t));                                                              // CMD's Page
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[QueryCMDIndex]), QueryStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 												wxString QueryMsg(QueryStr);
 
@@ -557,7 +592,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 												/*** If Data Format is Direct Data Format Type, Call Coefficients CMD¡@(0x30) To Get Coefficients ***/
 
-												// Find Query Command (0x1A)'s Index
+												// Find Coefficients Command (0x1A)'s Index
 												CoefficientsCMDIndex = -1;
 												for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
 													if (this->m_pmBusCommand[local2].m_register == 0x30){
@@ -571,8 +606,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 													if (CoefficientsCMDIndex >= 0){
 														// Prepare Send Buffer
-														this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+														this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
 														// Send Query Command
 														retry = 0;
@@ -704,12 +739,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 																		// Get Index of Query CMD 
 																		int queryCMDIndex = -1;
+
+																		queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+
+																		#if 0
 																		for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
 																			if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
 																				queryCMDIndex = idx2;
 																				break;
 																			}
 																		}
+                                                                        #endif
 
 																		if (queryCMDIndex < 0){
 																			PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -718,8 +758,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 																		if (PreUpdateCoefficients == true){
 																			// Call Coefficients Data CB Function
-																			memset(CoefficientsStr, 0, STR_LENGTH);
-																			this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[CoefficientsCMDIndex]), CoefficientsStr, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+																			memset(CoefficientsStr, 0, STR_LENGTH * sizeof(wchar_t));																			 // CMD's Page
+																			this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[CoefficientsCMDIndex]), CoefficientsStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 																			wxString CoefficientsMsg(CoefficientsStr);
 

@@ -344,9 +344,18 @@ bool PMBUSCMDListModel::GetAttrByRow(unsigned int row, unsigned int col,
 
 		break;
 
+	case Col_QueryText:
+		if (this->m_pmBusCommand[row].m_cmdStatus.m_support == cmd_unsupport){
+			attr.SetColour(*wxRED);
+		}
+		else{
+			attr.SetColour(wxColour(68,160,119));
+		}
+
+		break;
+
 	case Col_NameText:
 	case Col_AccessText:
-	case Col_QueryText:
 	case Col_CoefficientsText:
 	case Col_CookText:
 	case Col_RawText: 

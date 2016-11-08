@@ -18,17 +18,17 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 05H [2]
 	{ true, "05H", 0x05, "PAGE_PLUS_WRITE", cmd_access_bw, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 06H [3]
-	{ true, "06H", 0x06, "PAGE_PLUS_READ", cmd_access_bwr_read, 0, 0, { 0 }, 0x04, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x00, 0x79 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "06H", 0x06, "PAGE_PLUS_READ", cmd_access_bwr_read, 0, 0, { 0 }, 0x04, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x00, 0x79 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 19H [4]
 	{ true, "19H", 0x19, "CAPABILITY", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 1AH [5]
-	{ true, "1AH", 0x1a, "QUERY", cmd_access_bwr_read, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x87 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "1AH", 0x1a, "QUERY", cmd_access_bwr_read, 0, 0, { 0 }, 0x03, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x87 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 1BH [6]
-	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_bwr_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "1BH", 0x1b, "SMBALERT_MASK", cmd_access_bwr_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x02, { 0x01, 0x78 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 20H [7]
 	{ true, "20H", 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL },
 	// 30H [8]
-	{ true, "30H", 0x30, "COEFFICIENTS", cmd_access_bwr_read, 0, 0, { 0 }, 0x07, { 0 }, { cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x86, 0x00 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "30H", 0x30, "COEFFICIENTS", cmd_access_bwr_read, 0, 0, { 0 }, 0x07, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x86, 0x00 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 31H 
 	//{ true, "31H", 0x31, "POUT_MAX", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL , { 0 } },
 	// 4AH [9]
@@ -52,21 +52,21 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 81h [18]       
 	{ true, "81H", 0x81, "STATUS FAN_1_2", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 86h [19]        
-	{ true, "86H", 0x86, "READ EIN", cmd_access_read, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "86H", 0x86, "READ EIN", cmd_access_br, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 87h [20]        
-	{ true, "87H", 0x87, "READ EOUT", cmd_access_read, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "87H", 0x87, "READ EOUT", cmd_access_br, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 88h [21]        
 	{ true, "88H", 0x88, "READ VIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 89h [22]       
 	{ true, "89H", 0x89, "READ IIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 8Bh (00h) [23]   
-	{ true, "8Bh (00h)", 0x8b, "READ_VOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Bh (00h)", 0x8b, "READ_VOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 8Ch (00h) [24]  
-	{ true, "8Ch (00h)", 0x8c, "READ_IOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Ch (00h)", 0x8c, "READ_IOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 8Bh (01h) [25]  
-	{ true, "8Bh (01h)", 0x8b, "READ_VOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Bh (01h)", 0x8b, "READ_VOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 8Ch (01h) [26]  
-	{ true, "8Ch (01h)", 0x8c, "READ_IOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "8Ch (01h)", 0x8c, "READ_IOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 8Dh [27]        
 	{ true, "8DH", 0x8d, "READ_TEMPERATURE_1(Ambient)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 8Eh [28]        

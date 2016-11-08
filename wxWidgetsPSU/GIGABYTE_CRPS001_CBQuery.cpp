@@ -120,11 +120,11 @@ int GB_CRPS_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int siz
 	wxString wxstr("");
 
 	// Support
-	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_SUPPORT_MASK){
-		wxstr += wxString::Format("S, ");
-	}
-	else{
-		wxstr += wxString::Format("U, ");
+	if (!(pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_SUPPORT_MASK)){
+
+		support = cmd_unsupport;
+
+		wxstr += wxString::Format("Unsupport");
 
 		tmp_wchar = wxstr.wc_str();
 		lstrcpyn(string, tmp_wchar, 256);
@@ -132,6 +132,9 @@ int GB_CRPS_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int siz
 		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 		return EXIT_SUCCESS;
+	}
+	else{
+		support = cmd_support;
 	}
 
 	// Write 
@@ -168,12 +171,17 @@ int GB_CRPS_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int siz
 
 	// Get Index of Query CMD 
 	int queryCMDIndex = -1;
+	                                                     // CMD's Page
+	queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, sizeOfstr);
+
+#if 0
 	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
 		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
 			queryCMDIndex = idx;
 			break;
 		}
 	}
+#endif
 
 	if (queryCMDIndex < 0){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -183,6 +191,9 @@ int GB_CRPS_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int siz
 	// Set Direct Data Fomat Coefficient
 	pmbuscmd_t* target;
 	target = PMBUSHelper::getPMBUSCMDData();
+
+	// Update support field
+	target[queryCMDIndex].m_cmdStatus.m_support = support;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "format=%02x", (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2);
 	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2){

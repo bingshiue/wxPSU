@@ -153,7 +153,8 @@ class WritePage05H : public BaseWritePage {
 public:
 	
 	enum {
-		CID_DATA_COUNT_COMBOBOX = 7901,
+		CID_PAGE_COMBOBOX = 7901,
+		CID_DATA_COUNT_COMBOBOX,
 	};
 	
 	/**
@@ -172,7 +173,9 @@ protected:
 	wxBoxSizer* m_dataCountSZ;
 
 	wxStaticText *m_pageST;
-	wxTextCtrl *m_pageTC;
+	wxStaticText *m_pagePaddingST;
+	wxComboBox   *m_pageCB;
+	//wxTextCtrl *m_pageTC;
 
 	wxStaticText *m_cmdST;
 	wxTextCtrl *m_cmdTC;
@@ -205,6 +208,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnPageComboBox(wxCommandEvent& event);
 
 	void OnDataCountComboBox(wxCommandEvent& event);
 
