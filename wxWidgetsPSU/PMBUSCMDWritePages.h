@@ -366,6 +366,44 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
+/* 46H IOUT_OC_FAULT_LIMIT */
+class WritePage46H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage46H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage46H();
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxTextCtrl *m_inputValue;
+	wxTextCtrl *m_scaleValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
 /* 4AH IOUT_OC_WARN_LIMIT */
 class WritePage4AH : public BaseWritePage {
 public:

@@ -171,6 +171,7 @@
     <ClCompile Include="WritePage31H.cpp" />
     <ClCompile Include="WritePage3AH.cpp" />
     <ClCompile Include="WritePage3BH.cpp" />
+    <ClCompile Include="WritePage46H.cpp" />
     <ClCompile Include="WritePage4AH.cpp" />
     <ClCompile Include="WritePage51H.cpp" />
     <ClCompile Include="WritePage5DH.cpp" />

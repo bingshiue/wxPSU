@@ -36,8 +36,8 @@ void BaseWritePage::BaseLayOut(void){
 	m_horizonSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
 	// Initialize Radio Button
-	this->m_cookRadioButton = new wxRadioButton(this, CID_RADIO_BOX_COOK, L"cook", wxDefaultPosition, wxSize(75, -1));
-	this->m_rawRadioButton = new wxRadioButton(this, CID_RADIO_BOX_RAW, L"raw", wxDefaultPosition, wxSize(75, -1));
+	this->m_cookRadioButton = new wxRadioButton(this, CID_RADIO_BOX_COOK, L"decimal", wxDefaultPosition, wxSize(75, -1));
+	this->m_rawRadioButton = new wxRadioButton(this, CID_RADIO_BOX_RAW, L"hex", wxDefaultPosition, wxSize(75, -1));
 
 	// Initial Button
 	this->m_writeButton = new wxButton(this, CID_BUTTON_WRITE, L"Write");

@@ -18,6 +18,7 @@ int GB_CRPS_Query_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOf
 int GB_CRPS_Query_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Query_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Query_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Query_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Query_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Query_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Query_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Query_Common(pmbuscmd, string, sizeOfstr); }

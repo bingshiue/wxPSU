@@ -1015,6 +1015,10 @@ BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 	case 0x3b:
 		page = (BaseWritePage*)NEW_WRITEPAGE(3B);
 		break;
+    // 46H IOUT_OC_FAULT_LIMIT
+	case 0x46:
+		page = (BaseWritePage*)NEW_WRITEPAGE(46);
+		break;
     // 4AH IOUT_OC_WARN_LIMIT
 	case 0x4a:
 		page = (BaseWritePage*)NEW_WRITEPAGE(4A);

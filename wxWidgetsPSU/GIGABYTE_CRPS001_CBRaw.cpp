@@ -191,6 +191,7 @@ int GB_CRPS_Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 int GB_CRPS_Raw_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int GB_CRPS_Raw_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int GB_CRPS_Raw_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
+int GB_CRPS_Raw_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int GB_CRPS_Raw_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int GB_CRPS_Raw_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int GB_CRPS_Raw_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return GB_CRPS_Raw_Common(pmbuscmd, string, dataBytesLength); }

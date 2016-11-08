@@ -18,6 +18,7 @@ int GB_CRPS_Coefficients_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int
 int GB_CRPS_Coefficients_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Coefficients_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }

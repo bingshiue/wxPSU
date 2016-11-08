@@ -439,6 +439,27 @@ int GB_CRPS_Cook_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double iin = 0;
+
+	wxString wxstr("");
+
+	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+	wxstr += wxString::Format("%dA", (long)iin);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
 int GB_CRPS_Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
