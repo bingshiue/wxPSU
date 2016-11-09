@@ -27,6 +27,18 @@ WritePage6BH::WritePage6BH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
+#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+	// Set Default Value of Radio Buttons
+	this->m_cookRadioButton->SetValue(false);
+	this->m_rawRadioButton->SetValue(true);
+
+	wxString hexString = wxString::Format("%02lx", DEFAULT_VALUE);
+	this->m_inputValue->SetValue(hexString);
+
+	// Set Validator
+	this->m_inputValue->SetValidator(this->m_hexValidator);
+
+#else
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
@@ -36,6 +48,8 @@ WritePage6BH::WritePage6BH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Validator
 	this->m_inputValue->SetValidator(this->m_numberValidator);
+
+#endif
 
 	// Save Member
 	this->m_monitor_running = monitor_running;
@@ -106,11 +120,11 @@ void WritePage6BH::OnButtonWrite(wxCommandEvent& event){
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		pinOPWarnValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", pinOPWarnValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", pinOPWarnValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_inputValue->GetValue().ToDouble(&pinOPWarnValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", pinOPWarnValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %f", pinOPWarnValue);
 	}
 
 #if 0

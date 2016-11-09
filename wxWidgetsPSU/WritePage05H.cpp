@@ -22,11 +22,8 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_pageCB->Append(wxT("1"));
 	m_pageCB->Select(0);
 
-
 	m_cmdST = new wxStaticText(this, wxID_ANY, wxString(L"CMD"), wxDefaultPosition, wxSize(-1, -1));
 	m_cmdTC = new wxTextCtrl(this, wxID_ANY);
-	wxString cmdSTR = wxString::Format("%d", DEFAULT_CMD);
-	m_cmdTC->SetValue(cmdSTR);
 	
 	m_dataCountST = new wxStaticText(this, wxID_ANY, wxString(L"DATA BYTES"), wxDefaultPosition, wxSize(-1, -1));
 	m_dataCountPaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(41, -1));
@@ -37,13 +34,9 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	m_data1 = new wxStaticText(this, wxID_ANY, wxString(L"DATA 1"), wxDefaultPosition, wxSize(-1, -1));
 	m_data1InputValue = new wxTextCtrl(this, wxID_ANY);
-	wxString codeSTR = wxString::Format("%d", DEFAULT_DATA1);
-	m_data1InputValue->SetValue(codeSTR);
 
 	m_data2 = new wxStaticText(this, wxID_ANY, wxString(L"DATA 2"), wxDefaultPosition, wxSize(-1, -1));
 	m_data2InputValue = new wxTextCtrl(this, wxID_ANY);
-	wxString maskSTR = wxString::Format("%d", DEFAULT_DATA2);
-	m_data2InputValue->SetValue(maskSTR);
 
 	if (m_dataCountCB->GetSelection() == 0){
 		m_data2InputValue->Enable(false);
@@ -89,15 +82,47 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_staticBoxlSizer->Add(this->m_padding);
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer3);
 
+#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+	// Set Default Value of Radio Buttons
+	this->m_cookRadioButton->SetValue(false);
+	this->m_rawRadioButton->SetValue(true);
+
+	wxString hexString3 = wxString::Format("%02lx", DEFAULT_CMD);
+	this->m_cmdTC->SetValue(hexString3);
+
+	wxString hexString = wxString::Format("%02lx", DEFAULT_DATA1);
+	this->m_data1InputValue->SetValue(hexString);
+
+	wxString hexString2 = wxString::Format("%02lx", DEFAULT_DATA2);
+	this->m_data2InputValue->SetValue(hexString2);
+
+	// Set Validator
+	//this->m_pageTC->SetValidator(this->m_numberValidator);
+	this->m_cmdTC->SetValidator(this->m_hexValidator);
+	this->m_data1InputValue->SetValidator(this->m_hexValidator);
+	this->m_data2InputValue->SetValidator(this->m_hexValidator);
+
+#else
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
+
+	wxString cmdSTR = wxString::Format("%d", DEFAULT_CMD);
+	m_cmdTC->SetValue(cmdSTR);
+
+	wxString codeSTR = wxString::Format("%d", DEFAULT_DATA1);
+	m_data1InputValue->SetValue(codeSTR);
+
+	wxString maskSTR = wxString::Format("%d", DEFAULT_DATA2);
+	m_data2InputValue->SetValue(maskSTR);
 
 	// Set Validator
 	//this->m_pageTC->SetValidator(this->m_numberValidator);
 	this->m_cmdTC->SetValidator(this->m_numberValidator);
 	this->m_data1InputValue->SetValidator(this->m_numberValidator);
 	this->m_data2InputValue->SetValidator(this->m_numberValidator);
+
+#endif
 
 	// Save Member
 	this->m_monitor_running = monitor_running;

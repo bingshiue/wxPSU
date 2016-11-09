@@ -20,6 +20,18 @@ WritePageFAH::WritePageFAH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer2);
 
+#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+	// Set Default Value of Radio Buttons
+	this->m_cookRadioButton->SetValue(false);
+	this->m_rawRadioButton->SetValue(true);
+
+	wxString hexString = wxString::Format("%02lx", DEFAULT_VALUE);
+	this->m_inputValue->SetValue(hexString);
+
+	// Set Validator
+	this->m_inputValue->SetValidator(this->m_numberValidator);
+
+#else
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
@@ -29,6 +41,8 @@ WritePageFAH::WritePageFAH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Validator
 	this->m_inputValue->SetValidator(this->m_numberValidator);
+
+#endif
 
 	// Save Member
 	this->m_monitor_running = monitor_running;

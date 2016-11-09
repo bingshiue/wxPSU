@@ -17,4 +17,7 @@
 // Write Pages Input Parameter Default Format (Decimal or Hex)
 #define WRITE_PAGES_DEFAULT_FORMAT_HEX     (TRUE)//(FALSE)
 
+// Read Pages Input Parameter Default Format (Decimal or Hex)
+#define READ_PAGES_DEFAULT_FORMAT_HEX      (TRUE)//(FALSE)
+
 #endif

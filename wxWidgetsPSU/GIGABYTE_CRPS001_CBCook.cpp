@@ -494,7 +494,7 @@ int GB_CRPS_Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
 
-	wxstr += wxString::Format("%dA", (long)iin);
+	wxstr += wxString::Format("%4.4fA", iin);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

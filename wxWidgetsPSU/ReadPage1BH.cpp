@@ -9,8 +9,6 @@ ReadPage1BH::ReadPage1BH(wxWindow* parent, wxString& label, bool* monitor_runnin
 	// Initial Input Fields
 	m_cmd = new wxStaticText(this, wxID_ANY, wxString(L"STATUS_x CMD"), wxDefaultPosition, wxSize(-1, -1));
 	m_cmdInputValue = new wxTextCtrl(this, wxID_ANY);
-	wxString maskSTR = wxString::Format("%d", DEFAULT_CMD);
-	m_cmdInputValue->SetValue(maskSTR);
 
 	//m_padding = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 
@@ -26,12 +24,29 @@ ReadPage1BH::ReadPage1BH(wxWindow* parent, wxString& label, bool* monitor_runnin
 	//this->m_staticBoxlSizer->Add(this->m_padding);
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer3);
 
+#if READ_PAGES_DEFAULT_FORMAT_HEX == TRUE
+	// Set Default Value of Radio Buttons
+	this->m_cookRadioButton->SetValue(false);
+	this->m_rawRadioButton->SetValue(true);
+
+	wxString hexString2 = wxString::Format("%02lx", DEFAULT_CMD);
+	this->m_cmdInputValue->SetValue(hexString2);
+
+	// Set Validator
+	this->m_cmdInputValue->SetValidator(this->m_hexValidator);
+
+#else
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
 
+	wxString maskSTR = wxString::Format("%d", DEFAULT_CMD);
+	m_cmdInputValue->SetValue(maskSTR);
+
 	// Set Validator
 	this->m_cmdInputValue->SetValidator(this->m_numberValidator);
+
+#endif
 
 	// Save Member
 	this->m_monitor_running = monitor_running;

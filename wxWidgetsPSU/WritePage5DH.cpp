@@ -4,8 +4,8 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_VALUE  0/**< Default Value */
-#define DEFAULT_SCALE_VALUE  0.25/**< Defaut Scale Value */
+#define DEFAULT_VALUE  14/**< Default Value */
+#define DEFAULT_SCALE_VALUE  0.0625/**< Defaut Scale Value */
 
 WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -27,6 +27,18 @@ WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
+#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+	// Set Default Value of Radio Buttons
+	this->m_cookRadioButton->SetValue(false);
+	this->m_rawRadioButton->SetValue(true);
+
+	wxString hexString = wxString::Format("%02lx", DEFAULT_VALUE);
+	this->m_inputValue->SetValue(hexString);
+
+	// Set Validator
+	this->m_inputValue->SetValidator(this->m_hexValidator);
+
+#else
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
@@ -36,6 +48,8 @@ WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Validator
 	this->m_inputValue->SetValidator(this->m_numberValidator);
+
+#endif
 
 	// Save Member
 	this->m_monitor_running = monitor_running;
@@ -106,11 +120,11 @@ void WritePage5DH::OnButtonWrite(wxCommandEvent& event){
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		iinOCWarnValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", iinOCWarnValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", iinOCWarnValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_inputValue->GetValue().ToDouble(&iinOCWarnValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %4.1f", iinOCWarnValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %f", iinOCWarnValue);
 	}
 
 #if 0

@@ -336,7 +336,7 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 
 	/*** Write Count For Debug Purpose ***/
 	this->m_writeCount++;
-	PSU_DEBUG_PRINT(MSG_ALERT, "Write Count = %d", this->m_writeCount);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Write Count = %d", this->m_writeCount);
 
 	/*** Save Old Log Active Target ***/
 	//wxLog* oldLogger = wxLog::GetActiveTarget();
