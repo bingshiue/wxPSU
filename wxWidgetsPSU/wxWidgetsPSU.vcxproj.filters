@@ -315,6 +315,12 @@
     <ClCompile Include="WritePage46H.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PMBUSQUERYProgressDialog.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="QUERYSequenceThread.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -537,6 +543,12 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="GIGABYTE_CRPS001_CBCoefficients.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PMBUSQUERYProgressDialog.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="QUERYSequenceThread.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

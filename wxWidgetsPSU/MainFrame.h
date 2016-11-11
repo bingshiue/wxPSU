@@ -46,6 +46,8 @@
 #include "ISPSequenceThread.h"
 #include "IncreaseCPUOverHeadThread.h"
 #include "ModelSelectDialog.h"
+#include "PMBUSQUERYProgressDialog.h"
+#include "QUERYSequenceThread.h"
 
 #define DEFAULT_WINDOW_WIDTH   864
 #define DEFAULT_WINDOW_HEIGHT  660
@@ -96,6 +98,7 @@ enum
 	MENU_ID_PMBUS_1_2,
 
 	MENU_ID_ABOUT,
+	MENU_ID_ACBEL_WEBSITE,
 
 	MENU_ID_POPUP_FONT,
 	MENU_ID_POPUP_PRINT_SCREEN,
@@ -146,6 +149,8 @@ public:
 	IOPortSendCMDThread *m_IOPortSendCMDThread;/**< Handle of IO Port Send Command Thread */
 
 	ISPSequenceThread* m_ispSequenceThread;
+
+	QUERYSequenceThread* m_querySequenceThread;
 
 	TaskSystemThread *m_TaskSystemThread;/**< Handle of Task System Thread */
 
@@ -286,6 +291,7 @@ public:
 	wxMenu      *m_helpMenu;
 
 	wxMenuItem  *m_aboutMenuItem;
+	wxMenuItem  *m_acbelWebSiteMenuItem;
 
 	// CMD List Popup Menu
 	wxMenu      *m_cmdListPopupMenu;
@@ -345,6 +351,8 @@ protected:
 
 	//wxProgressDialog *m_progressDialog;
 	PMBUSFWProgressDialog *m_pmbusProgressDialog;
+
+	PMBUSQUERYProgressDialog *m_pmbusQUERYProgressDialog;
 
 private:
 
@@ -406,6 +414,7 @@ private:
 	void OnWindowClose(wxCloseEvent& event);
 
 	void OnAbout(wxCommandEvent& event);
+	void OnAcbelWebSite(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
 	void OnDVSelectionChanged(wxDataViewEvent &event);
@@ -429,6 +438,8 @@ private:
 
 	void OnISPSequenceStart(wxThreadEvent& event);
 	//void OnISPSequenceInterrupt(wxThreadEvent& event);
+
+	void OnQUERYSequenceStart(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 

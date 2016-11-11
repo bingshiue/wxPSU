@@ -50,7 +50,10 @@ public :
 	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
+	static void ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer,unsigned int* currentIO,unsigned int idx, unsigned int command, unsigned int responseDataLength);
 	static int ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+
+	static void ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength);
 
 	static long HexToDecimal(wxString string);
 

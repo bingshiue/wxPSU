@@ -24,6 +24,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
+wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_START, wxThreadEvent);
+
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
@@ -628,6 +630,7 @@ void MainFrame::SetupMenuBar(void){
 	/*
 	Help
 	|- About
+	|- ACBEL WebSite
 	*/
 	this->m_helpMenu = new wxMenu();
 
@@ -635,7 +638,13 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
 
+	this->m_acbelWebSiteMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ACBEL_WEBSITE, wxT("ACBEL Website"), wxT("ACBEL Website"), wxITEM_NORMAL);
+
+	this->m_acbelWebSiteMenuItem->SetBitmap(wxBITMAP_PNG(WEB_16));
+
 	this->m_helpMenu->Append(this->m_aboutMenuItem);
+
+	this->m_helpMenu->Append(this->m_acbelWebSiteMenuItem);
 
 	// Create MenuBar Instance
 	this->m_menuBar = new wxMenuBar();
@@ -1117,7 +1126,7 @@ void MainFrame::SetupPMBusCommandWritePage(void){
 			CMDWritePage = getNewWritePage(idx, this->m_PMBusData[idx].m_register);
 
 			if (CMDWritePage != NULL){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Add Write Page : CMD %02x", this->m_PMBusData[idx].m_register);
+				PSU_DEBUG_PRINT(MSG_DEBUG, "Add Write Page : CMD %02x", this->m_PMBusData[idx].m_register);
 				this->m_PMBusData[idx].m_writePage = CMDWritePage;// getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 				this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_writePage, "Write");
 				this->m_subNotebook->RemovePage(1);
@@ -1425,7 +1434,7 @@ void MainFrame::SetupPMBusCommandReadPage(void){
 			CMDReadPage = getNewReadPage(idx, this->m_PMBusData[idx].m_register);
 
 			if (CMDReadPage != NULL){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Add Read Page : CMD %02x", this->m_PMBusData[idx].m_register);
+				PSU_DEBUG_PRINT(MSG_DEBUG, "Add Read Page : CMD %02x", this->m_PMBusData[idx].m_register);
 				this->m_PMBusData[idx].m_readPage = CMDReadPage;// getNewPage(idx, this->m_PMBusData[idx].m_register);//new WritePage00H(this->m_subNotebook, label, &this->m_monitor_running,&this->m_sendCMDVector, this->m_IOAccess, &this->m_CurrentUseIOInterface);		
 				this->m_subNotebook->AddPage(this->m_PMBusData[idx].m_readPage, "Read");
 				this->m_subNotebook->RemovePage(1);
@@ -1577,6 +1586,10 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 	aboutDialog->ShowModal();
 
 	delete aboutDialog;
+}
+
+void MainFrame::OnAcbelWebSite(wxCommandEvent& event){
+	wxLaunchDefaultBrowser(wxT("http://www.acbel.com.tw"));
 }
 
 void MainFrame::OnPrimaryFirmware(wxCommandEvent& event){
@@ -1860,7 +1873,25 @@ void MainFrame::OnStopProgramming(wxCommandEvent& event){
 }
 
 void MainFrame::OnQueryAllCommands(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "OnQueryAllCommands");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnQueryAllCommands");
+
+	/*** If I/O is Close ***/
+	if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_CLOSE){
+		wxMessageBox(wxT("No I/O Device Found, Please Check Adaptor Card Setting !"),
+			wxT("No I/O Device Found !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+
+	/*** Send Query Start Event To Handler Function ***/
+	wxThreadEvent *threadQueryStart_evt;
+
+	threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
+	threadQueryStart_evt->SetString(wxT("Query All Commands"));
+	wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
+
+
 }
 
 void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
@@ -3104,6 +3135,49 @@ void MainFrame::OnISPSequenceInterrupt(wxThreadEvent& event){
 }
 */
 
+void MainFrame::OnQUERYSequenceStart(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnQUERYSequenceStart");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Title  = %s", event.GetString().c_str());
+
+	// Check If Monitor is running
+	if (this->m_monitor_running == true){
+		wxMessageBox(wxT("Please Stop Monitor Then Try Again !"),
+			wxT("Monitor is Running !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+
+	// Call Dialog
+	m_pmbusQUERYProgressDialog = new PMBUSQUERYProgressDialog(this, event.GetString(), this->m_IOAccess, &this->m_CurrentUseIOInterface);
+
+	// Start QUERY Sequence Thread
+	m_querySequenceThread = new QUERYSequenceThread(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->GetEventHandler(), m_pmbusQUERYProgressDialog->GetEventHandler(), NULL);
+	// If Create Thread Success
+	if (m_querySequenceThread->Create() != wxTHREAD_NO_ERROR){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create QUERY Sequence Thread");
+	}
+	else{
+		m_querySequenceThread->Run();
+	}
+
+	m_pmbusQUERYProgressDialog->Centre();
+	int retCode = m_pmbusQUERYProgressDialog->ShowModal();
+
+	if (retCode == wxID_CANCEL){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "m_pmbusQUERYProgressDialog return wxID_CANCEL");
+	}
+
+	// Wait ISP Sequence Thread End
+	m_querySequenceThread->Wait();
+
+	wxDELETE(m_querySequenceThread);
+
+	m_pmbusQUERYProgressDialog->Destroy();
+	wxDELETE(m_pmbusQUERYProgressDialog);
+}
+
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	wxVariant Value;
 	wxString registerValue("");
@@ -4074,6 +4148,7 @@ EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
 EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
 EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
 EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
+EVT_MENU(MENU_ID_ACBEL_WEBSITE, MainFrame::OnAcbelWebSite)
 
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
 EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
@@ -4097,6 +4172,8 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdat
 
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 //EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
+
+EVT_THREAD(wxEVT_COMMAND_QUERY_SEQUENCE_START, MainFrame::OnQUERYSequenceStart)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()

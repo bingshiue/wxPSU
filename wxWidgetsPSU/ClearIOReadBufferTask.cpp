@@ -28,7 +28,7 @@ int ClearIOReadBufferTask::Main(double elapsedTime){
 
 	do {
 		
-		PSU_DEBUG_PRINT(MSG_ALERT, "ClearIOReadBufferTask");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ClearIOReadBufferTask");
 		
 		readLength = 0;
 

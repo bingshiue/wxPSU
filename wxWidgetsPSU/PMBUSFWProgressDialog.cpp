@@ -60,7 +60,7 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	m_logSB->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
 
-	// Add Component To Sizer
+	// Add Sizer To Top Level Sizer
 	//this->m_topLevelSizer->Add(this->m_infoST, wxSizerFlags(0).Border());
 	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(0).Border().Expand());
 

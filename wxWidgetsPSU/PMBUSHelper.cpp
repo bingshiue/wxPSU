@@ -340,6 +340,196 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 	return 0;
 }
 
+void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer, unsigned int* currentIO, unsigned int idx, unsigned int command, unsigned int responseDataLength){
+
+	unsigned int baseIndex = 0;
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+
+			sendBuffer[0] = 0x41;
+			sendBuffer[1] = 0x44;
+			sendBuffer[2] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[3] = command;
+			sendBuffer[4] = 0x0d;
+			sendBuffer[5] = 0x0a;
+			sendBuffer[6] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[7] = responseDataLength;
+			sendBuffer[8] = 0x0d;
+			sendBuffer[9] = 0x0a;
+		}
+		else if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			sendBuffer[baseIndex++] = 0x41;
+			sendBuffer[baseIndex++] = 0x44;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[baseIndex++] = command;
+
+			for (unsigned int len = 0; len < pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+			}
+
+			sendBuffer[baseIndex++] = 0x0d;
+			sendBuffer[baseIndex++] = 0x0a;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[baseIndex++] = responseDataLength;
+			sendBuffer[baseIndex++] = 0x0d;
+			sendBuffer[baseIndex++] = 0x0a;
+
+		}
+		break;
+
+	case IOACCESS_HID:
+		if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+
+			sendBuffer[0] = 0x05;           // Report ID is 0x05
+			sendBuffer[1] = 0x0a;
+			sendBuffer[2] = 0x41;
+			sendBuffer[3] = 0x44;
+			sendBuffer[4] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[5] = command;        // Command is 0x3a
+			sendBuffer[6] = 0x0d;
+			sendBuffer[7] = 0x0a;
+			sendBuffer[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[9] = responseDataLength; // Response Data Length
+			sendBuffer[10] = 0x0d;
+			sendBuffer[11] = 0x0a;
+			sendBuffer[12] = 0x01;
+			sendBuffer[13] = 0x00;
+			sendBuffer[14] = 0x00;
+			sendBuffer[15] = 0x00;
+
+			sendBuffer[16] = 0x00;
+			sendBuffer[17] = 0x00;
+			sendBuffer[18] = 0x00;
+			sendBuffer[19] = 0x00;
+			sendBuffer[20] = 0x00;
+			sendBuffer[21] = 0x00;
+			sendBuffer[22] = 0x00;
+			sendBuffer[23] = 0x00;
+			sendBuffer[24] = 0x00;
+			sendBuffer[25] = 0x01;
+			sendBuffer[26] = responseDataLength; // Response Data Length
+			sendBuffer[27] = 0x00;
+			sendBuffer[28] = 0x00;
+			sendBuffer[29] = 0x02;
+			sendBuffer[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[31] = responseDataLength; // Response Data Length
+
+			sendBuffer[32] = 0x00;
+			sendBuffer[33] = 0x01; //
+			sendBuffer[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[35] = 0x00;
+			sendBuffer[36] = 0x00;
+			sendBuffer[37] = 0x00;
+			sendBuffer[38] = 0x00;
+			sendBuffer[39] = 0x00;
+			sendBuffer[40] = 0x00;
+			sendBuffer[41] = 0x00;
+			sendBuffer[42] = 0x00;
+			sendBuffer[43] = 0x00;
+			sendBuffer[44] = 0x00;
+			sendBuffer[45] = 0x00;
+			sendBuffer[46] = 0x00;
+			sendBuffer[47] = 0x00;
+
+			sendBuffer[48] = 0x00;
+			sendBuffer[49] = 0x00;
+			sendBuffer[50] = 0x00;
+			sendBuffer[51] = 0x00;
+			sendBuffer[52] = 0x00;
+			sendBuffer[53] = 0x00;
+			sendBuffer[54] = 0x00;
+			sendBuffer[55] = 0x00;
+			sendBuffer[56] = 0x00;
+			sendBuffer[57] = 0x00;
+			sendBuffer[58] = 0x00;
+			sendBuffer[59] = 0x00;
+			sendBuffer[60] = 0x00;
+			sendBuffer[61] = 0x00;
+			sendBuffer[62] = 0x00;
+			sendBuffer[63] = 0x00;
+		}
+		else if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			sendBuffer[baseIndex++] = 0x05;// Report ID is 0x05
+			sendBuffer[baseIndex++] = 0x0c + (pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength - 2);// Data Length
+			sendBuffer[baseIndex++] = 0x41;
+			sendBuffer[baseIndex++] = 0x44;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[baseIndex++] = command; // Command
+
+			for (unsigned int len = 0; len < pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+			}
+
+			sendBuffer[baseIndex++] = 0x0d;
+			sendBuffer[baseIndex++] = 0x0a;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[baseIndex++] = responseDataLength; // Response Data Length
+			sendBuffer[baseIndex++] = 0x0d;
+			sendBuffer[baseIndex++] = 0x0a;
+			sendBuffer[baseIndex++] = 0x00;
+
+			for (unsigned int target = baseIndex; target < 25; target++){
+				sendBuffer[baseIndex++] = 0x00;
+			}
+
+			sendBuffer[25] = 0x01;
+			sendBuffer[26] = responseDataLength; // Response Data Length
+			sendBuffer[27] = 0x00;
+			sendBuffer[28] = 0x00;
+			sendBuffer[29] = 0x02;
+			sendBuffer[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[31] = responseDataLength; // Response Data Length
+
+			sendBuffer[32] = 0x00;
+			sendBuffer[33] = 0x01; //
+			sendBuffer[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[35] = 0x00;
+			sendBuffer[36] = 0x00;
+			sendBuffer[37] = 0x00;
+			sendBuffer[38] = 0x00;
+			sendBuffer[39] = 0x00;
+			sendBuffer[40] = 0x00;
+			sendBuffer[41] = 0x00;
+			sendBuffer[42] = 0x00;
+			sendBuffer[43] = 0x00;
+			sendBuffer[44] = 0x00;
+			sendBuffer[45] = 0x00;
+			sendBuffer[46] = 0x00;
+			sendBuffer[47] = 0x00;
+
+			sendBuffer[48] = 0x00;
+			sendBuffer[49] = 0x00;
+			sendBuffer[50] = 0x00;
+			sendBuffer[51] = 0x00;
+			sendBuffer[52] = 0x00;
+			sendBuffer[53] = 0x00;
+			sendBuffer[54] = 0x00;
+			sendBuffer[55] = 0x00;
+			sendBuffer[56] = 0x00;
+			sendBuffer[57] = 0x00;
+			sendBuffer[58] = 0x00;
+			sendBuffer[59] = 0x00;
+			sendBuffer[60] = 0x00;
+			sendBuffer[61] = 0x00;
+			sendBuffer[62] = 0x00;
+			sendBuffer[63] = 0x00;
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+}
+
+
 int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer){
 
 	unsigned int pec_start_index = 0;
@@ -416,6 +606,33 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 	}
 
 	return pec_start_index;
+}
+
+void PMBUSHelper::ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength){
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
+		}
+
+		break;
+
+	case IOACCESS_HID:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx + 6];
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Wrong !");
+		break;
+	}
+
 }
 
 long PMBUSHelper::HexToDecimal(wxString string){

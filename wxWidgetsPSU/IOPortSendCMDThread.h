@@ -23,8 +23,8 @@
 #include "STDPage.h"
 #include "PEC.h"
 
-#define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
-#define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */
+//#define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
+//#define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */
 
 class MainFrame;
 

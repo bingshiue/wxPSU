@@ -120,10 +120,12 @@
     <ClCompile Include="PMBUSHelper.cpp" />
     <ClCompile Include="PMBUSLogTextCtrl.cpp" />
     <ClCompile Include="PMBUSMFRPanel.cpp" />
+    <ClCompile Include="PMBUSQUERYProgressDialog.cpp" />
     <ClCompile Include="PMBUSStatusDCHPanel.cpp" />
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="PMBUSVerificationPanel.cpp" />
+    <ClCompile Include="QUERYSequenceThread.cpp" />
     <ClCompile Include="ReadPage06H.cpp" />
     <ClCompile Include="ReadPage1AH.cpp" />
     <ClCompile Include="ReadPage1BH.cpp" />
@@ -243,12 +245,14 @@
     <ClInclude Include="PMBUSLog.h" />
     <ClInclude Include="PMBUSLogTextCtrl.h" />
     <ClInclude Include="PMBUSMFRPanel.h" />
+    <ClInclude Include="PMBUSQUERYProgressDialog.h" />
     <ClInclude Include="PMBUSStatus.h" />
     <ClInclude Include="PMBUSStatusDCHPanel.h" />
     <ClInclude Include="PMBUSStatusPanel.h" />
     <ClInclude Include="PMBUSStatusBar.h" />
     <ClInclude Include="PMBUSVerificationPanel.h" />
     <ClInclude Include="Preprocessor.h" />
+    <ClInclude Include="QUERYSequenceThread.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="IOPortReadCMDThread.h" />
     <ClInclude Include="IOPortSendCMDThread.h" />

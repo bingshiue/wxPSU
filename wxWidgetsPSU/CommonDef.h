@@ -78,6 +78,9 @@
 
 #define RELOAD_USB_ADAPTOR_SETTINGS_APP_RESTART  /**< Reload USB Adaptor's Setting when APP restart */
 
+#define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
+#define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */
+
 /* ----- Below is for debug only ------ */
 
 //#define ISP_DONT_WAIT_RESPONSE /**< For debug, Do ISP Sequence without waiting DSP's response */

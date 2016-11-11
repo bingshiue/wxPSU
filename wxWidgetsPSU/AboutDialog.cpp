@@ -40,27 +40,27 @@ AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString
 
 	m_btnOK = new wxButton(this, CID_BTN_OK, wxT("OK"));
 
-	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxALIGN_CENTER));
 
-	m_topLevelSizer->Add(m_acbelLogoSB, wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(m_acbelLogoSB, wxSizerFlags(0).Align(wxALIGN_CENTER));
 
-	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxALIGN_CENTER));
 
-	m_topLevelSizer->Add(m_line1ST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_line2ST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_buildDateST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_line3ST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_line4ST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_line5ST, wxSizerFlags(0).Align(wxCENTER));
-	m_topLevelSizer->Add(m_line6ST, wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(m_line1ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_line2ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_buildDateST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_line3ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_line4ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_line5ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
+	m_topLevelSizer->Add(m_line6ST, wxSizerFlags(0).Align(wxALIGN_CENTER));
 
-	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxALIGN_CENTER));
 
 	m_topLevelSizer->Add(m_sl, wxSizerFlags(0).Expand());
 
-	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(new wxStaticText(this, wxID_ANY, wxT(" "), wxDefaultPosition, wxDefaultSize), wxSizerFlags(0).Align(wxALIGN_CENTER));
 
-	m_topLevelSizer->Add(m_btnOK, wxSizerFlags(0).Align(wxCENTER));
+	m_topLevelSizer->Add(m_btnOK, wxSizerFlags(0).Align(wxALIGN_CENTER));
 
 	SetSizer(m_topLevelSizer);
 
