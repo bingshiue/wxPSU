@@ -629,8 +629,8 @@ void MainFrame::SetupMenuBar(void){
 	// Help Menu
 	/*
 	Help
-	|- About
 	|- ACBEL WebSite
+	|- About
 	*/
 	this->m_helpMenu = new wxMenu();
 
@@ -642,9 +642,9 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_acbelWebSiteMenuItem->SetBitmap(wxBITMAP_PNG(WEB_16));
 
-	this->m_helpMenu->Append(this->m_aboutMenuItem);
-
 	this->m_helpMenu->Append(this->m_acbelWebSiteMenuItem);
+
+	this->m_helpMenu->Append(this->m_aboutMenuItem);
 
 	// Create MenuBar Instance
 	this->m_menuBar = new wxMenuBar();

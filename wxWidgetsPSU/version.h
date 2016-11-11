@@ -33,7 +33,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.13       |     Add ISP Run In Test Function                               |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.14       |     Implement Query Function                                   |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.13" /**< Program Version, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.14" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif

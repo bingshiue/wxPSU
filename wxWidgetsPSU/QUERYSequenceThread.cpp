@@ -24,6 +24,11 @@ QUERYSequenceThread::QUERYSequenceThread(
 
 	this->m_rxTxSemaphore = new wxSemaphore(0, 0);
 
+	// Reset Query Field
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_queried = cmd_query_not_yet;
+	}
+
 }
 
 QUERYSequenceThread::~QUERYSequenceThread(){

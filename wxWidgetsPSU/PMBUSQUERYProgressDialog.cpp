@@ -24,7 +24,7 @@ PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString ti
 
 	// Initialize Sizer
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
-	m_statisticsSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Statistics"));
+	m_statisticsSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Query Commands"));
 
 	// Initialize GUI Component
 	m_infoST = new wxStaticText(this->m_statisticsSB->GetStaticBox(), wxID_ANY, wxT("00000/00000"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL | wxST_NO_AUTORESIZE);
