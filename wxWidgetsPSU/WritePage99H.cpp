@@ -51,7 +51,7 @@ WritePage99H::~WritePage99H(){
 
 
 void WritePage99H::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -64,7 +64,7 @@ void WritePage99H::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage99H::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -76,7 +76,7 @@ void WritePage99H::OnRadioButtonRaw(wxCommandEvent& event){
 }
 
 void WritePage99H::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 }
 
 wxBEGIN_EVENT_TABLE(WritePage99H, wxPanel)

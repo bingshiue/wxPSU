@@ -66,7 +66,7 @@ WritePage3BH::~WritePage3BH(){
 
 
 void WritePage3BH::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -89,7 +89,7 @@ void WritePage3BH::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage3BH::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -111,7 +111,7 @@ void WritePage3BH::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_3BH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage3BH::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	unsigned short DiagValue = 0;
 	double scale;

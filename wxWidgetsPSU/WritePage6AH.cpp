@@ -4,8 +4,10 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_VALUE  0/**< Default Value */
+#define DEFAULT_VALUE        2200/**< Default Value */
 #define DEFAULT_SCALE_VALUE  4/**< Defaut Scale Value */
+
+#define WRITE_PAGES_6AH_DEFAULT_FORMAT_HEX  FALSE
 
 WritePage6AH::WritePage6AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -27,7 +29,7 @@ WritePage6AH::WritePage6AH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
-#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+#if WRITE_PAGES_6AH_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
@@ -66,7 +68,7 @@ WritePage6AH::~WritePage6AH(){
 
 
 void WritePage6AH::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -89,7 +91,7 @@ void WritePage6AH::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage6AH::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -111,7 +113,7 @@ void WritePage6AH::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_6AH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage6AH::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	double poutOPWarnValue = 0;
 	double scale;
@@ -119,7 +121,7 @@ void WritePage6AH::OnButtonWrite(wxCommandEvent& event){
 	this->m_scaleValue->GetValue().ToDouble(&scale);
 
 	if (this->m_rawRadioButton->GetValue() == true){
-		poutOPWarnValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
+		poutOPWarnValue = (unsigned int)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", poutOPWarnValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){

@@ -4,8 +4,10 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_DIAG_VALUE  66.0f/**< Default Diag Value */
+#define DEFAULT_DIAG_VALUE  61.0f/**< Default Diag Value */
 #define DEFAULT_SCALE_VALUE  0.5/**< Defaut Scale Value */
+
+#define WRITE_PAGES_51H_DEFAULT_FORMAT_HEX  FALSE
 
 WritePage51H::WritePage51H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -27,7 +29,7 @@ WritePage51H::WritePage51H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
-#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+#if WRITE_PAGES_51H_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
@@ -66,7 +68,7 @@ WritePage51H::~WritePage51H(){
 
 
 void WritePage51H::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -89,7 +91,7 @@ void WritePage51H::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage51H::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -114,7 +116,7 @@ void WritePage51H::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_51H_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage51H::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	double otWarnLimitValue = 0;
 	double scale;

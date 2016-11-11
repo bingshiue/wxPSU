@@ -4,8 +4,10 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_VALUE  0/**< Default Value */
+#define DEFAULT_VALUE        200/**< Default Value */
 #define DEFAULT_SCALE_VALUE  0.25/**< Defaut Scale Value */
+
+#define WRITE_PAGES_46H_DEFAULT_FORMAT_HEX  FALSE
 
 WritePage46H::WritePage46H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -27,7 +29,7 @@ WritePage46H::WritePage46H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
-#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+#if WRITE_PAGES_46H_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
@@ -119,7 +121,7 @@ void WritePage46H::OnButtonWrite(wxCommandEvent& event){
 	this->m_scaleValue->GetValue().ToDouble(&scale);
 
 	if (this->m_rawRadioButton->GetValue() == true){
-		iOutOCFaultLimitValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
+		iOutOCFaultLimitValue = (unsigned int)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", iOutOCFaultLimitValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){

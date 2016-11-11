@@ -59,7 +59,7 @@ WritePageD0H::~WritePageD0H(){
 
 
 void WritePageD0H::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -72,7 +72,7 @@ void WritePageD0H::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePageD0H::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -85,7 +85,7 @@ void WritePageD0H::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_D0H_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePageD0H::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	unsigned char sendValue;
 

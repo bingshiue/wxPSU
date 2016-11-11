@@ -4,8 +4,10 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_VALUE  14/**< Default Value */
+#define DEFAULT_VALUE        14.5/**< Default Value */
 #define DEFAULT_SCALE_VALUE  0.0625/**< Defaut Scale Value */
+
+#define WRITE_PAGES_5DH_DEFAULT_FORMAT_HEX  FALSE
 
 WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
@@ -27,7 +29,7 @@ WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
-#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+#if WRITE_PAGES_5DH_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
@@ -43,7 +45,7 @@ WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
 
-	wxString default_value = wxString::Format("%d", DEFAULT_VALUE);
+	wxString default_value = wxString::Format("%.1f", DEFAULT_VALUE);
 	this->m_inputValue->SetValue(default_value);
 
 	// Set Validator
@@ -66,7 +68,7 @@ WritePage5DH::~WritePage5DH(){
 
 
 void WritePage5DH::OnRadioButtonCook(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_numberValidator);
 
@@ -89,7 +91,7 @@ void WritePage5DH::OnRadioButtonCook(wxCommandEvent& event){
 }
 
 void WritePage5DH::OnRadioButtonRaw(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	this->m_inputValue->SetValidator(this->m_hexValidator);
 
@@ -111,7 +113,7 @@ void WritePage5DH::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_5DH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage5DH::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	double iinOCWarnValue = 0;
 	double scale;
@@ -119,7 +121,7 @@ void WritePage5DH::OnButtonWrite(wxCommandEvent& event){
 	this->m_scaleValue->GetValue().ToDouble(&scale);
 
 	if (this->m_rawRadioButton->GetValue() == true){
-		iinOCWarnValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
+		iinOCWarnValue = (unsigned int)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", iinOCWarnValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
