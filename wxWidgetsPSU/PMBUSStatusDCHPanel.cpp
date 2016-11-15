@@ -389,7 +389,7 @@ PMBUSStatusDCHPanel::PMBUSStatusDCHPanel(wxWindow* parent) : wxScrolledWindow(pa
 	m_stIOUT_UC_FAULT_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("IOUT_UC_FAULT"));
 	m_stCURRENT_SHARE_FAULT_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("CURRENT_SHARE_FAULT"));
 	m_stIN_POWER_LIMITING_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("IN_POWER_LIMITING"));
-	m_stPOUT_OC_FAULT_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("POUT_OC_FAULT"));
+	m_stPOUT_OC_FAULT_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("POUT_OP_FAULT"));
 	m_stPOUT_OP_WARNING_Iout1 = new wxStaticText(this->m_statusIout1SBS->GetStaticBox(), wxID_ANY, wxT("POUT_OP_WARNING(LSB)"));
 
 	m_statusIout1_HS_1->Add(m_stbIOUT_OC_FAULT_Iout1, 0, wxALIGN_CENTER_VERTICAL);

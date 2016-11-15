@@ -181,6 +181,27 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 
 }
 
+static int ProductDirectData(unsigned char *dest, double value, PMBUSCOMMAND_t* PMBusCMDData){
+	// Y(result) = (mX+b) * 10^R 
+
+	short result = 0;
+
+	if (dest == NULL || PMBusCMDData==NULL){
+		return -1;
+	}
+
+	result = ((PMBusCMDData->m_dataFormat.m_directDataFormat.m_M * value) + PMBusCMDData->m_dataFormat.m_directDataFormat.m_B) * pow(10, PMBusCMDData->m_dataFormat.m_directDataFormat.m_R);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "result=%d(%xH)", result, result);
+
+	dest[0] = result & 0x00ff;
+
+	dest[1] = (result & 0xff00) >> 8;
+
+	return 0;
+}
+
+
 int PMBUSHelper::ProductFakeLinearData(unsigned char *dest, double value, double scale){
 	short result = 0;
 

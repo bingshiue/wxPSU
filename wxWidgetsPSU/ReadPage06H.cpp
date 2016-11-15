@@ -5,7 +5,7 @@
 
 #define DEFAULT_PAGE  0x00/**< Default Page */
 #define DEFAULT_CMD   0x1b/**< Default CMD */
-#define DEFAULT_DATA1 0x01/**< Default DATA 1 */
+#define DEFAULT_DATA1 0x79/**< Default DATA 1 */
 
 ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseReadPage(parent, label){
 	// Initial Input Fields
@@ -14,7 +14,7 @@ ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_runnin
 	m_blockSizeCB = new wxComboBox(this, CID_BLOCK_SIZE_COMBOBOX);
 	m_blockSizeCB->Append(wxT("2")); // Block Count 2
 	m_blockSizeCB->Append(wxT("3")); // Block Count 3
-	m_blockSizeCB->Select(0);
+	m_blockSizeCB->Select(1);
 	
 	m_page = new wxStaticText(this, wxID_ANY, wxString(L"PAGE"), wxDefaultPosition, wxSize(-1, -1));
 	m_pageInputValue = new wxTextCtrl(this, wxID_ANY);

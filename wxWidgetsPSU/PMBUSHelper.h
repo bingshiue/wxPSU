@@ -47,6 +47,8 @@ public :
 	static double ParseLinearDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer);
 	static double ParseDirectDataFormat(unsigned char* buffer, unsigned int sizeOfBuffer, PMBUSCOMMAND_t* PMBusCMDData);
 
+	static int ProductDirectData(unsigned char *dest, double value, PMBUSCOMMAND_t* PMBusCMDData);
+
 	static int ProductFakeLinearData(unsigned char *dest, double value, double scale);
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 

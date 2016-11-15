@@ -18,7 +18,7 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 05H [2]
 	{ true, "05H", 0x05, "PAGE_PLUS_WRITE", cmd_access_bw, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 06H [3]
-	{ true, "06H", 0x06, "PAGE_PLUS_READ", cmd_access_bwr_read, 0, 0, { 0 }, 0x04, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x00, 0x79 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "06H", 0x06, "PAGE_PLUS_READ", cmd_access_bwr_read, 0, 0, { 0 }, 0x03, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x04, { 0x03, 0x00, 0x1b, 0x79 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 19H [4]
 	{ true, "19H", 0x19, "CAPABILITY", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 1AH [5]
@@ -92,11 +92,11 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 98h [38]        
 	{ true, "98H", 0x98, "PMBUS_REVISION", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 9Ah [39]        
-	{ true, "9AH", 0x9a, "MFR_MODEL", cmd_access_brbw, 0, 0, { 0 }, 0x0f, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "9AH", 0x9a, "MFR_MODEL", cmd_access_brbw, 0, 0, { 0 }, 0x0d, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 9Bh [40]       
-	{ true, "9BH", 0x9b, "MFR_REVISION", cmd_access_brbw, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "9BH", 0x9b, "MFR_REVISION", cmd_access_brbw, 0, 0, { 0 }, 0x04, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 9Eh [41]       
-	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x13, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x1c, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// A0h [42]       
 	{ true, "A0H", 0xa0, "MFR_VIN_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// A1h [43]        
@@ -118,9 +118,9 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// A9h [51]        
 	{ true, "A9H", 0xa9, "MFR_TAMBIENT_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// AAh [52]        
-	{ true, "AAH", 0xaa, "MFR_EFFICIENCY_LL", cmd_access_br, 0, 0, { 0 }, 0x14, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "AAH", 0xaa, "MFR_EFFICIENCY_LL", cmd_access_br, 0, 0, { 0 }, 0x10, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// ABh [53]        
-	{ true, "ABH", 0xab, "MFR_EFFICIENCY_HL", cmd_access_br, 0, 0, { 0 }, 0x14, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "ABH", 0xab, "MFR_EFFICIENCY_HL", cmd_access_br, 0, 0, { 0 }, 0x10, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// C0h [54]
 	{ true, "C0H", 0xc0, "MFR_MAX_TEMP_1", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// C1h [55]

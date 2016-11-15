@@ -273,7 +273,17 @@ int GB_CRPS_Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	wxstr += wxString::Format("CMD:%02xH MASK:%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[1], pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	if (pmbuscmd->m_register == 0x1b){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "0x1b");
+		wxstr += wxString::Format("CMD:%02xH MASK:%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[1], pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	}
+	else if (pmbuscmd->m_register == 0x06){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "0x06");
+		wxstr += wxString::Format("CMD:%02xH MASK:%02x", pmbuscmd->m_cmdStatus.m_AddtionalData[3], pmbuscmd->m_recvBuff.m_dataBuff[1]);
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Unknow Error Occurs");
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1811,10 +1821,16 @@ int GB_CRPS_Cook_9aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_MODEL
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr(wxT("MODEL: "));
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1+idx]);
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1828,10 +1844,16 @@ int GB_CRPS_Cook_9bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_REVISION
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr("REVISION: ");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1879,10 +1901,16 @@ int GB_CRPS_Cook_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_SERIAL
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr("SERIAL: ");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2147,11 +2175,13 @@ int GB_CRPS_Cook_aaH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 13, 2);
 	wxstr += wxString::Format(" %ld%%,", (long)result);
 
+#if 0	
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 15, 2);
 	wxstr += wxString::Format(" %ldW,", (long)result);
 
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 17, 2);
 	wxstr += wxString::Format(" %ld%%,", (long)result);
+#endif
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2195,11 +2225,13 @@ int GB_CRPS_Cook_abH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 13, 2);
 	wxstr += wxString::Format(" %ld%%,", (long)result);
 
+#if 0	
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 15, 2);
 	wxstr += wxString::Format(" %ldW,", (long)result);
 
 	result = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff + 17, 2);
 	wxstr += wxString::Format(" %ld%%,", (long)result);
+#endif
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2382,12 +2414,13 @@ int GB_CRPS_Cook_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	unsigned char tmp_buff[256] = { 0 };
 
-	// Get rid of block size byte
-	//PSU_DEBUG_PRINT(MSG_DEBUG, "m_recvBuff.m_length=%d", pmbuscmd->m_recvBuff.m_length);
-	memcpy(tmp_buff, pmbuscmd->m_recvBuff.m_dataBuff+1, 256 -1);
-
-	memcpy(pmbuscmd->m_recvBuff.m_dataBuff, tmp_buff, 256 -1);
-	pmbuscmd->m_recvBuff.m_dataBuff[255] = 0;
+	if (PMBUSHelper::getPMBUSCMDData()[PMBUSHelper::getIndexOfCMD(pmbuscmd->m_cmdStatus.m_AddtionalData[2])].m_cmdStatus.m_alsoSendWriteData != cmd_also_send_write_data){
+		// Get rid of block size byte
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "m_recvBuff.m_length=%d", pmbuscmd->m_recvBuff.m_length);
+		memcpy(tmp_buff, pmbuscmd->m_recvBuff.m_dataBuff + 1, 256 - 1);
+		memcpy(pmbuscmd->m_recvBuff.m_dataBuff, tmp_buff, 256 - 1);
+		pmbuscmd->m_recvBuff.m_dataBuff[255] = 0;
+	}
 	
 	// Call Corresponding Raw Handler
 	CMDCookCBFunc cookCBFunc = NULL;

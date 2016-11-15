@@ -20,8 +20,8 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	// Initial Sizer 
 	m_staticBoxlSizer = new wxStaticBoxSizer(this->m_staticBox,wxVERTICAL);
 
-	m_gridSizer_1 = new wxFlexGridSizer(4, 4, 1, 1);
-	m_gridSizer_2 = new wxFlexGridSizer(4, 4, 1, 1);
+	m_gridSizer_1 = new wxFlexGridSizer(4, 4, 3, 3);
+	m_gridSizer_2 = new wxFlexGridSizer(4, 4, 3, 3);
 
 	m_horizonSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -74,22 +74,38 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	// Initail TextCtrl 
 	m_tcPIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPIN->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcPOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPOUT->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcVIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVIN->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcIIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIIN->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcVOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVOUT->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcIOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIOUT->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcVoSBY = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVoSBY->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcIoSBY = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIoSBY->SetBackgroundColour(wxColour(248, 220, 133));
 
 	m_tcVCAP = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVCAP->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcAMD8D = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcAMD8D->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcSEC8E = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcSEC8E->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcPRI8F = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPRI8F->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcFAN1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN1->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcFAN2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN2->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcFAN3 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN3->SetBackgroundColour(wxColour(248, 220, 133));
 	m_tcFAN4 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN4->SetBackgroundColour(wxColour(248, 220, 133));
 
 	// Add Component to Sizer
 	m_gridSizer_1->Add(m_stPIN);

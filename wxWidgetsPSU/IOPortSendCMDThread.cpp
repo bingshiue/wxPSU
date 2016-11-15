@@ -46,7 +46,6 @@ IOPortSendCMDThread::~IOPortSendCMDThread() {
 	this->m_pHandler->m_sendThreadStopFlag = true;
 }
 
-
 void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 
 	unsigned short pec;
@@ -107,16 +106,21 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 	case IOACCESS_SERIALPORT:
 		if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 
-			this->m_sendBuff[0] = 0x41;
-			this->m_sendBuff[1] = 0x44;
-			this->m_sendBuff[2] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[3] = command;
-			this->m_sendBuff[4] = 0x0d;
-			this->m_sendBuff[5] = 0x0a;
-			this->m_sendBuff[6] = PMBUSHelper::GetSlaveAddress() | 0x01;
-			this->m_sendBuff[7] = responseDataLength;
-			this->m_sendBuff[8] = 0x0d;
-			this->m_sendBuff[9] = 0x0a;
+			this->m_sendBuff[baseIndex++] = 0x41;
+			this->m_sendBuff[baseIndex++] = 0x44;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength;
+
+			if (this->m_sendBuff[baseIndex-1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
+
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
 		}
 		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
 			
@@ -136,6 +140,11 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[baseIndex++] = 0x0a;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[baseIndex++] = responseDataLength;
+
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
+
 			this->m_sendBuff[baseIndex++] = 0x0d;
 			this->m_sendBuff[baseIndex++] = 0x0a;
 
@@ -165,43 +174,57 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 	case IOACCESS_HID:
 		if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 
-			this->m_sendBuff[0] = 0x05;           // Report ID is 0x05
-			this->m_sendBuff[1] = 0x0a;
-			this->m_sendBuff[2] = 0x41;
-			this->m_sendBuff[3] = 0x44;
-			this->m_sendBuff[4] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[5] = command;        // Command is 0x3a
-			this->m_sendBuff[6] = 0x0d;
-			this->m_sendBuff[7] = 0x0a;
-			this->m_sendBuff[8] = PMBUSHelper::GetSlaveAddress() | 0x01;
-			this->m_sendBuff[9] = responseDataLength; // Response Data Length
-			this->m_sendBuff[10] = 0x0d;
-			this->m_sendBuff[11] = 0x0a;
-			this->m_sendBuff[12] = 0x01;
-			this->m_sendBuff[13] = 0x00;
-			this->m_sendBuff[14] = 0x00;
-			this->m_sendBuff[15] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x05;           // Report ID is 0x05
+			this->m_sendBuff[baseIndex++] = 0x0a;           // Total Data Length
+			this->m_sendBuff[baseIndex++] = 0x41;
+			this->m_sendBuff[baseIndex++] = 0x44;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;        // Command is 0x3a
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
 
-			this->m_sendBuff[16] = 0x00;
-			this->m_sendBuff[17] = 0x00;
-			this->m_sendBuff[18] = 0x00;
-			this->m_sendBuff[19] = 0x00;
-			this->m_sendBuff[20] = 0x00;
-			this->m_sendBuff[21] = 0x00;
-			this->m_sendBuff[22] = 0x00;
-			this->m_sendBuff[23] = 0x00;
-			this->m_sendBuff[24] = 0x00;
-			this->m_sendBuff[25] = 0x01;
-			this->m_sendBuff[26] = responseDataLength; // Response Data Length
-			this->m_sendBuff[27] = 0x00;
-			this->m_sendBuff[28] = 0x00;
-			this->m_sendBuff[29] = 0x02;
-			this->m_sendBuff[30] = PMBUSHelper::GetSlaveAddress() | 0x01;
-			this->m_sendBuff[31] = responseDataLength; // Response Data Length
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
 
-			this->m_sendBuff[32] = 0x00;
-			this->m_sendBuff[33] = 0x01; //
-			this->m_sendBuff[34] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = 0x0d;
+			this->m_sendBuff[baseIndex++] = 0x0a;
+
+			this->m_sendBuff[1] = (baseIndex - 2);
+
+			this->m_sendBuff[baseIndex++] = 0x01;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x02;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x01; //
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+
+			for(int local=baseIndex; local<64; local++){
+				this->m_sendBuff[local] = 0;
+			}
+
+#if 0
 			this->m_sendBuff[35] = 0x00;
 			this->m_sendBuff[36] = 0x00;
 			this->m_sendBuff[37] = 0x00;
@@ -232,6 +255,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 			this->m_sendBuff[61] = 0x00;
 			this->m_sendBuff[62] = 0x00;
 			this->m_sendBuff[63] = 0x00;
+#endif
 		}
 		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
 			
@@ -247,14 +271,23 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 
 			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
 				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+				PSU_DEBUG_PRINT(MSG_DEBUG, "idx=%d, AddtionalData[%d]=%xH", idx, len, this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len]);
 			}
 
 			this->m_sendBuff[baseIndex++] = 0x0d;
 			this->m_sendBuff[baseIndex++] = 0x0a;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
 			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
+
 			this->m_sendBuff[baseIndex++] = 0x0d;
 			this->m_sendBuff[baseIndex++] = 0x0a;
+
+			this->m_sendBuff[1] = (baseIndex - 2);
+
 			this->m_sendBuff[baseIndex++] = 0x00;
 
 			for(unsigned int target = baseIndex; target < 25; target++){
@@ -359,6 +392,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int sendDataLength = 0;
 	int QueryCMDIndex = 0;
 	int CoefficientsCMDIndex = 0;
+	int PreviousQueryCMDAdditionalCMD = 0;
+	int PreviousCoefficientsCMDAdditionalCMD = 0;
 	bool sendRetryStillFailed = false;
 	DWORD iteration = 0;
 	DWORD success = 0;
@@ -431,6 +466,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						if (QueryCMDIndex >= 0){					
 							// Prepare Send Buffer
+							PreviousQueryCMDAdditionalCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
 							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
 							this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
@@ -487,7 +523,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								break;
 							}
 
-							// Read Quert Result
+							// Read Query Result
 							unsigned int bytesToRead = this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
 							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[QueryCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 
@@ -589,7 +625,6 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
 
-
 												/*** If Data Format is Direct Data Format Type, Call Coefficients CMD¡@(0x30) To Get Coefficients ***/
 
 												// Find Coefficients Command (0x1A)'s Index
@@ -606,6 +641,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 													if (CoefficientsCMDIndex >= 0){
 														// Prepare Send Buffer
+														PreviousCoefficientsCMDAdditionalCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
 														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
 														this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
@@ -779,6 +815,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 														}
 
+														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousCoefficientsCMDAdditionalCMD;
+
 													}
 
 												}// if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format)
@@ -801,6 +839,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							} // else if (ret != wxSEMA_NO_ERROR)
 						
+							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousQueryCMDAdditionalCMD;
+
 						}// if (QueryCMDIndex >= 0)
 		
 						// Just Doing Once in Every Send Thread Start 
