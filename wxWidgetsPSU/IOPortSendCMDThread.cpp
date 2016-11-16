@@ -97,7 +97,7 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 	}
 }
 
-void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength){
+int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength){
 	
 	unsigned int baseIndex = 0;
 
@@ -376,6 +376,7 @@ void IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command
 		break;
 	}
 
+	return baseIndex;
 }
 
 #define BASE_RESPONSE_DATA_LENGTH  6
@@ -390,6 +391,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int ExpectReceiveDataLength = 0;
 	int retry = 0;
 	int sendDataLength = 0;
+	int uartSendDataLength = 0;
 	int QueryCMDIndex = 0;
 	int CoefficientsCMDIndex = 0;
 	int PreviousQueryCMDAdditionalCMD = 0;
@@ -458,7 +460,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						// Find Query Command (0x1A)'s Index
 						QueryCMDIndex = -1;
 						for (unsigned int local=0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
-							if (this->m_pmBusCommand[local].m_register == 0x1A){
+							if (this->m_pmBusCommand[local].m_register == PMBUSCMD_1AH_QUERY){
 								QueryCMDIndex = local;
 								break;
 							}
@@ -468,7 +470,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// Prepare Send Buffer
 							PreviousQueryCMDAdditionalCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
 							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
-							this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+							uartSendDataLength = this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
 							// Send Query Command
 							retry = 0;
@@ -476,10 +478,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								// Decide Send Data Length
 								if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
 									if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-										sendDataLength = SERIAL_SEND_DATA_SIZE;
+										sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE;
 									}
 									else if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-										sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+										sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
 									}
 								}
 								else{// HID
@@ -630,7 +632,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 												// Find Coefficients Command (0x1A)'s Index
 												CoefficientsCMDIndex = -1;
 												for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
-													if (this->m_pmBusCommand[local2].m_register == 0x30){
+													if (this->m_pmBusCommand[local2].m_register == PMBUSCMD_30H_COEFFICIENTS){
 														CoefficientsCMDIndex = local2;
 														break;
 													}
@@ -643,7 +645,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 														// Prepare Send Buffer
 														PreviousCoefficientsCMDAdditionalCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
 														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
-														this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+														uartSendDataLength = this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
 														// Send Query Command
 														retry = 0;
@@ -651,10 +653,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 															// Decide Send Data Length
 															if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
 																if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-																	sendDataLength = SERIAL_SEND_DATA_SIZE;
+																	sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
 																}
 																else if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-																	sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+																	sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
 																}
 															}
 															else{// HID
@@ -962,7 +964,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RegisterIconText);
 
 						// Prepare Send Buffer
-						this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
+						uartSendDataLength = this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
 
 						PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Send");
 						// Sleep Polling Time
@@ -974,10 +976,10 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// Decide Send Data Length
 							if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
 								if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-									sendDataLength = SERIAL_SEND_DATA_SIZE;
+									sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
 								}
 								else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-									sendDataLength = SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength;//2;
+									sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength;//2;
 								}
 							}
 							else{// HID
@@ -1262,6 +1264,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					} // if (this->m_pmBusCommand[idx].m_access != cmd_access_write)
 				}// if (this->m_pmBusCommand[idx].m_toggle == true)
 				else{
+					// Don't Do Polling So fast
 					//continue;
 				}
 

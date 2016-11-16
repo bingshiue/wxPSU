@@ -5,7 +5,7 @@
 #include "PMBUSCMDWritePages.h"
 
 #define DEFAULT_VALUE        14.5/**< Default Value */
-#define DEFAULT_SCALE_VALUE  0.0625/**< Defaut Scale Value */
+#define DEFAULT_SCALE_VALUE  0.03125/**< Defaut Scale Value */
 
 #define WRITE_PAGES_5DH_DEFAULT_FORMAT_HEX  FALSE
 

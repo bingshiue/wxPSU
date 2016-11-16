@@ -19,7 +19,8 @@ BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent
 	this->SetupValidator();
 
 	// Set Background Color
-	this->SetBackgroundColour(wxColour(248,168,133));
+	this->SetBackgroundColour(wxColour(248, 168, 133));//255, 94, 25
+
 }
 
 
@@ -43,7 +44,7 @@ void BaseWritePage::BaseLayOut(void){
 	this->m_writeButton = new wxButton(this, CID_BUTTON_WRITE, L"Write");
 
 	// Initial Padding Static Text
-	m_stPadding_WriteButton = new wxStaticText(this, wxID_ANY, wxString(""), wxDefaultPosition, wxSize(30, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_WriteButton = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(30, PADDING_DEFAULT_HEIGHT));
 
 	m_stPadding_1 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 	m_stPadding_2 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
@@ -56,15 +57,15 @@ void BaseWritePage::BaseLayOut(void){
 
 	m_horizonSizer1->Add(this->m_rawRadioButton, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(1).Expand().Border());
+	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(0).Expand().Border());
 
-	m_horizonSizer1->Add(this->m_writeButton, 0, wxALIGN_CENTER_VERTICAL);
+	m_horizonSizer1->Add(this->m_writeButton, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL));
 
-	m_staticBoxlSizer->Add(m_horizonSizer1);
+	m_staticBoxlSizer->Add(m_horizonSizer1, wxSizerFlags(0).Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_1);
 
-	m_staticBoxlSizer->Add(m_staticLine_1);
+	m_staticBoxlSizer->Add(m_staticLine_1, wxSizerFlags(0).Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_2);
 

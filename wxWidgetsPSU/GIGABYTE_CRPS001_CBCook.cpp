@@ -1829,7 +1829,10 @@ int GB_CRPS_Cook_9aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
-		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1+idx]);
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
 	}
 
 	tmp_wchar = wxstr.wc_str();
@@ -1852,7 +1855,10 @@ int GB_CRPS_Cook_9bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
-		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
 	}
 
 	tmp_wchar = wxstr.wc_str();
@@ -1909,7 +1915,10 @@ int GB_CRPS_Cook_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
-		wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
 	}
 
 	tmp_wchar = wxstr.wc_str();

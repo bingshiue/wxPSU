@@ -77,7 +77,7 @@ public:
 
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
-	void productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
+	int productSendBuff(unsigned int idx, unsigned int command, unsigned int responseDataLength);
 	void productWritePageSendBuff(char cmdPageValue);
 
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);

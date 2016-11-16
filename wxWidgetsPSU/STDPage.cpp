@@ -64,7 +64,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	m_stIoSBY = new wxStaticText(this, wxID_ANY, wxString("IoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 
 	m_stVCAP = new wxStaticText(this, wxID_ANY, wxString("VCAP"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stAMD8D = new wxStaticText(this, wxID_ANY, wxString("AMD(8D)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stAMD8D = new wxStaticText(this, wxID_ANY, wxString("AMB(8D)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 	m_stSEC8E = new wxStaticText(this, wxID_ANY, wxString("SEC(8E)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 	m_stPRI8F = new wxStaticText(this, wxID_ANY, wxString("PRI(8F)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 	m_stFAN1 = new wxStaticText(this, wxID_ANY, wxString("FAN1"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));

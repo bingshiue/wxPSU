@@ -65,7 +65,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 				// Find Query Command (0x1A)'s Index
 				QueryCMDIndex = -1;
 				for (unsigned int local = 0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
-					if (PMBUSHelper::getPMBUSCMDData()[local].m_register == 0x1A){
+					if (PMBUSHelper::getPMBUSCMDData()[local].m_register == PMBUSCMD_1AH_QUERY){
 						QueryCMDIndex = local;
 						break;
 					}
@@ -240,7 +240,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 										// Find Coefficients Command (0x1A)'s Index
 										CoefficientsCMDIndex = -1;
 										for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
-											if (PMBUSHelper::getPMBUSCMDData()[local2].m_register == 0x30){
+											if (PMBUSHelper::getPMBUSCMDData()[local2].m_register == PMBUSCMD_30H_COEFFICIENTS){
 												CoefficientsCMDIndex = local2;
 												break;
 											}

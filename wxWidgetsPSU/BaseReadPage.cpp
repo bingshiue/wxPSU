@@ -19,7 +19,7 @@ BaseReadPage::BaseReadPage(wxWindow* parent, wxString& label) : wxPanel(parent) 
 	this->SetupValidator();
 
 	// Set Background Color
-	this->SetBackgroundColour(wxColour(162, 219, 168));
+	this->SetBackgroundColour(wxColour(130, 201, 169));////162, 219, 168));
 }
 
 
@@ -56,15 +56,15 @@ void BaseReadPage::BaseLayOut(void){
 
 	m_horizonSizer1->Add(this->m_rawRadioButton, 0, wxALIGN_CENTER_VERTICAL);
 
-	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(1).Expand().Border());
+	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(0).Expand().Border());
 
-	m_horizonSizer1->Add(this->m_setButton, 0, wxALIGN_CENTER_VERTICAL);
+	m_horizonSizer1->Add(this->m_setButton, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL));
 
-	m_staticBoxlSizer->Add(m_horizonSizer1);
+	m_staticBoxlSizer->Add(m_horizonSizer1, wxSizerFlags(0).Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_1);
 
-	m_staticBoxlSizer->Add(m_staticLine_1);
+	m_staticBoxlSizer->Add(m_staticLine_1, wxSizerFlags(0).Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_2);
 

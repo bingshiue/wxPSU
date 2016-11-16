@@ -165,10 +165,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	// Add each panl into notebook component
 	m_notebook->AddPage(this->GeneralPanel, "General");
-	m_notebook->AddPage(this->PMBusStatusPanel, "PM Bus Status");
+	m_notebook->AddPage(this->PMBusStatusPanel, "STATUS");//"PM Bus Status");
+	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 	m_notebook->AddPage(this->PMBusMFRPanel, "PMBus MFR");
 	m_notebook->AddPage(this->PMBusVerificationPanel, "Verification");
-	m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
+	//m_notebook->AddPage(this->PMBusStatusDCHPanel, "STATUS(DCH)");
 
 	m_infoBar = new wxInfoBar(this);
 	m_infoBar->SetFont(GetFont().Bold().Larger());

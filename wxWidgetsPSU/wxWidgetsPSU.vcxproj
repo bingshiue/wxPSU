@@ -233,6 +233,7 @@
     <ClInclude Include="PMBUSCBCook.h" />
     <ClInclude Include="PMBUSCBQuery.h" />
     <ClInclude Include="PMBUSCBRaw.h" />
+    <ClInclude Include="PMBUSCMD.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
     <ClInclude Include="PMBUSCMDReadPages.h" />
     <ClInclude Include="PMBUSCMDWritePages.h" />

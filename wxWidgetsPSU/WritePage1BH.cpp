@@ -4,8 +4,8 @@
 
 #include "PMBUSCMDWritePages.h"
 
-#define DEFAULT_CODE  0x78/**< Default Code */
-#define DEFAULT_MASK  0x02/**< Default Mask */
+#define DEFAULT_CODE  0x7a/**< Default Code */
+#define DEFAULT_MASK  0x90/**< Default Mask */
 
 WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields

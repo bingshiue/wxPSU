@@ -5,7 +5,7 @@
 
 #define DEFAULT_PAGE  0x00/**< Default Page */
 #define DEFAULT_CMD   0x1b/**< Default CMD */
-#define DEFAULT_DATA1 0x79/**< Default DATA 1 */
+#define DEFAULT_DATA1 0x7a/**< Default DATA 1 */
 
 ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseReadPage(parent, label){
 	// Initial Input Fields
