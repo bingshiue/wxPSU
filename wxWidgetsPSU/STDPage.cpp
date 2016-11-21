@@ -47,6 +47,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	m_comboBox->Append(wxT("5"));
 
 	m_comboBox->SetSelection(0);
+	m_comboBox->Enable(false);
 
 	// Initail Static Line
 	m_staticLine_1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition);

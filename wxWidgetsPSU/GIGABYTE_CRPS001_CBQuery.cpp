@@ -185,8 +185,11 @@ int GB_CRPS_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int siz
 #endif
 
 	if (queryCMDIndex < 0){
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD, queryCMD=%02xH, CMD's page=%d", queryCMD, sizeOfstr);
 		return EXIT_FAILURE;
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_DEBUG, "queryCMDIndex = %d", queryCMDIndex);
 	}
 
 	// Set Direct Data Fomat Coefficient

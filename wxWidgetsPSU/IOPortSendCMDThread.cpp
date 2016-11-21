@@ -1155,12 +1155,20 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 											// Get Index of Query CMD 
 											int queryCMDIndex = -1;
+
+											/* In Polling Each Command Section, The Secondary Parameter of getIndexOfCMD function should be
+											"The Page of Query CMD not 'this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage' due to 'idx' is 0x1A's idx"
+											*/
+											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+
+                                            #if 0
 											for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
 												if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
 													queryCMDIndex = idx2;
 													break;
 												}
 											}
+                                            #endif
 
 											if (queryCMDIndex < 0){
 												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -1170,7 +1178,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 											if (updateQuery == true){
 												// Call Query Data CB Function
 												memset(QueryStr, 0, STR_LENGTH);
-												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[idx]), QueryStr, this->m_pmBusCommand[idx].m_responseDataLength);
+												                                                                                                      // CMD's Page
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[idx]), QueryStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 												wxString QueryMsg(QueryStr);
 
@@ -1193,12 +1202,20 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 											// Get Index of Query CMD 
 											int queryCMDIndex = -1;
+
+											/* In Polling Each Command Section, The Secondary Parameter of getIndexOfCMD function should be
+											   "The Page of Query CMD not 'this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage' due to 'idx' is 0x1A's idx"
+											*/
+											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+
+                                            #if 0
 											for (int idx3 = 0; idx3 < (signed)PMBUSHelper::CurrentCMDTableSize; idx3++){
 												if (PMBUSHelper::getPMBUSCMDData()[idx3].m_register == queryCMD){
 													queryCMDIndex = idx3;
 													break;
 												}
 											}
+                                            #endif
 
 											if (queryCMDIndex < 0){
 												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -1208,7 +1225,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 											if (updateCoefficients == true){
 												// Call Query Data CB Function
 												memset(CoefficientsStr, 0, STR_LENGTH);
-												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[idx]), CoefficientsStr, this->m_pmBusCommand[idx].m_responseDataLength);
+												                                                                                                                    // CMD's Page
+												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[idx]), CoefficientsStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 												wxString CoefficientsMsg(CoefficientsStr);
 

@@ -153,7 +153,7 @@ int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned 
 #endif
 
 	if (queryCMDIndex < 0){
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD, queryCMD = % 02xH, CMD's page=%d", queryCMD, sizeOfstr);
 		return EXIT_FAILURE;
 	}
 	else{
