@@ -112,7 +112,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//this->ReadPanel = new wxPanel(this->m_subNotebook, wxID_ANY);
 	//this->m_writePage = new WritePage00H(this->m_subNotebook, wxString(L"00h-PAGE"));
 
-	this->m_debugLogStaticBoxSizer = new wxStaticBoxSizer(wxVERTICAL, this->DebugLogPanel, wxT("Error Log"));
+	this->m_debugLogStaticBoxSizer = new wxStaticBoxSizer(wxVERTICAL, this->DebugLogPanel, wxT("Operation Log"));
 
 	// create the logging text control and a header showing the meaning of the
 	// different columns
@@ -144,7 +144,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	}
 
 	// use fixed width font to align output in nice columns
-	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
+	wxFont font(wxNORMAL_FONT->GetPointSize()+1, wxFONTFAMILY_TELETYPE,
 		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
 	//m_header->SetFont(font);

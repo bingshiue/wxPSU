@@ -30,10 +30,12 @@ public:
 	wxStaticBox *m_staticBox;
 	
 	/**< Box Sizer */
+	wxBoxSizer *m_topLevelSizer;
+
 	wxStaticBoxSizer *m_staticBoxlSizer;
 
-	wxFlexGridSizer *m_gridSizer_1;
-	wxFlexGridSizer *m_gridSizer_2;
+	wxGridSizer *m_gridSizer_1;
+	wxGridSizer *m_gridSizer_2;
 
 	wxBoxSizer *m_horizonSizer1;
 	wxBoxSizer *m_horizonSizer2;

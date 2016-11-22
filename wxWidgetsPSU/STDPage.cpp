@@ -7,38 +7,39 @@
 #define PADDING_DEFAULT_WIDTH  50
 #define PADDING_DEFAULT_HEIGHT 10
 
-#define TEXT_DEFAULT_WIDTH  60
+#define TEXT_DEFAULT_WIDTH  50
 #define TEXT_DEFAULT_HEIGHT 20
 
 #define TEXTCTRL_DEFAULT_WIDTH  70
 #define TEXTCTRL_DEFAULT_HEIGHT 20
 
 STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
+	// Set Parent
+	this->m_parent = parent;
+	
 	// Initial Static Box
 	m_staticBox = new wxStaticBox(this, wxID_ANY, wxString("Real-Time Data"));
 	
 	// Initial Sizer 
+	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	m_staticBoxlSizer = new wxStaticBoxSizer(this->m_staticBox,wxVERTICAL);
 
-	m_gridSizer_1 = new wxFlexGridSizer(4, 4, 3, 3);
-	m_gridSizer_2 = new wxFlexGridSizer(4, 4, 3, 3);
+	m_gridSizer_1 = new wxGridSizer(4, 4, 3, 1);
+	m_gridSizer_2 = new wxGridSizer(4, 4, 3, 1);
 
 	m_horizonSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
-	// Set Parent
-	this->m_parent = parent;
-
 	// Initial Padding Static Text
-	m_stPadding_1 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
-	m_stPadding_2 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
-	m_stPadding_3 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
-	m_stPadding_4 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
-	m_stPadding_5 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_1 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_2 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_3 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_4 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+	m_stPadding_5 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 
 	// Initial Combo Box
-	m_stPage = new wxStaticText(this, wxID_ANY, wxString("Page"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stPage = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("Page"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 
-	m_comboBox = new wxComboBox(this, PAGE_SELECT_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
+	m_comboBox = new wxComboBox(this->m_staticBoxlSizer->GetStaticBox(), PAGE_SELECT_COMBO, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
 	m_comboBox->Append(wxT("0"));
 	m_comboBox->Append(wxT("1"));
 	m_comboBox->Append(wxT("2"));
@@ -55,57 +56,57 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	m_staticLine_3 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition);
 	
 	// Initail Static Text
-	m_stPIN = new wxStaticText(this, wxID_ANY, wxString("PIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stPOUT = new wxStaticText(this, wxID_ANY, wxString("POUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stVIN = new wxStaticText(this, wxID_ANY, wxString("VIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stIIN = new wxStaticText(this, wxID_ANY, wxString("IIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stVOUT = new wxStaticText(this, wxID_ANY, wxString("VOUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stIOUT = new wxStaticText(this, wxID_ANY, wxString("IOUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stVoSBY = new wxStaticText(this, wxID_ANY, wxString("VoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stIoSBY = new wxStaticText(this, wxID_ANY, wxString("IoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stPIN = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("PIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stPOUT = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("POUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stVIN = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("VIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stIIN = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("IIN"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stVOUT = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("VOUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stIOUT = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("IOUT"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stVoSBY = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("VoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stIoSBY = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("IoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 
-	m_stVCAP = new wxStaticText(this, wxID_ANY, wxString("VCAP"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stAMD8D = new wxStaticText(this, wxID_ANY, wxString("AMB(8D)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stSEC8E = new wxStaticText(this, wxID_ANY, wxString("SEC(8E)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stPRI8F = new wxStaticText(this, wxID_ANY, wxString("PRI(8F)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stFAN1 = new wxStaticText(this, wxID_ANY, wxString("FAN1"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stFAN2 = new wxStaticText(this, wxID_ANY, wxString("FAN2"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stFAN3 = new wxStaticText(this, wxID_ANY, wxString("FAN3"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stFAN4 = new wxStaticText(this, wxID_ANY, wxString("FAN4"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stVCAP = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("VCAP"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stAMD8D = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("AMB(8D)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stSEC8E = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("SEC(8E)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stPRI8F = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("PRI(8F)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stFAN1 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("FAN1"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stFAN2 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("FAN2"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stFAN3 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("FAN3"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+	m_stFAN4 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("FAN4"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 
 	// Initail TextCtrl 
-	m_tcPIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPIN = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcPIN->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcPOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPOUT = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcPOUT->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcVIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVIN = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcVIN->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcIIN = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIIN = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcIIN->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcVOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVOUT = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcVOUT->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcIOUT = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIOUT = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcIOUT->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcVoSBY = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVoSBY = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcVoSBY->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcIoSBY = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcIoSBY = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcIoSBY->SetBackgroundColour(wxColour(248, 220, 133));
 
-	m_tcVCAP = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcVCAP = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcVCAP->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcAMD8D = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcAMD8D = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcAMD8D->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcSEC8E = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcSEC8E = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcSEC8E->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcPRI8F = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcPRI8F = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcPRI8F->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcFAN1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN1 = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcFAN1->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcFAN2 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN2 = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcFAN2->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcFAN3 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN3 = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcFAN3->SetBackgroundColour(wxColour(248, 220, 133));
-	m_tcFAN4 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
+	m_tcFAN4 = new wxTextCtrl(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(TEXTCTRL_DEFAULT_WIDTH, TEXTCTRL_DEFAULT_HEIGHT), wxTE_READONLY);
 	m_tcFAN4->SetBackgroundColour(wxColour(248, 220, 133));
 
 	// Add Component to Sizer
@@ -161,7 +162,7 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	m_staticBoxlSizer->Add(m_stPadding_2);// Padding Static Text
 
-	m_staticBoxlSizer->Add(m_gridSizer_1);
+	m_staticBoxlSizer->Add(m_gridSizer_1, wxSizerFlags().Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_3);// Padding Static Text
 
@@ -169,13 +170,17 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 
 	m_staticBoxlSizer->Add(m_stPadding_4);// Padding Static Text
 
-	m_staticBoxlSizer->Add(m_gridSizer_2);
+	m_staticBoxlSizer->Add(m_gridSizer_2, wxSizerFlags().Expand());
 
 	m_staticBoxlSizer->Add(m_stPadding_5);// Padding Static Text
 
 	m_staticBoxlSizer->Add(m_staticLine_3, wxSizerFlags().Expand());
+	
+	// Add Sizer To Top Level Sizer
+	m_topLevelSizer->Add(m_staticBoxlSizer, wxSizerFlags().Expand());
 
-	SetSizer(m_staticBoxlSizer);
+	// Setup Sizer
+	SetSizer(m_topLevelSizer);
 }
 
 STDPage::~STDPage(){
