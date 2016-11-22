@@ -349,7 +349,37 @@ bool PMBUSCMDListModel::GetAttrByRow(unsigned int row, unsigned int col,
 			attr.SetColour(*wxRED);
 		}
 		else{
-			attr.SetColour(wxColour(68,160,119));
+			
+			switch (this->m_pmBusCommand[row].m_dataFormat.m_formatType){
+
+			case cmd_data_format_LinearData_Format:
+
+				attr.SetColour(wxColour( 0, 0, 255));
+
+				break;
+
+			case cmd_data_format_DirectData_Format:
+
+				attr.SetColour(wxColour(255, 0, 255));
+
+				break;
+
+			case cmd_data_format_16bit_Signed_Number:
+			case cmd_data_format_8bit_Unsigned_Number:
+			case cmd_data_format_VID_Mode:
+			case cmd_data_format_Manufacturer_Specific:
+			case cmd_data_format_Reserved:
+			case cmd_data_format_Don_t_Return_Numeric_Data:
+
+				attr.SetColour(wxColour(68, 160, 119));
+
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+				break;
+			}
+			
 		}
 
 		break;
