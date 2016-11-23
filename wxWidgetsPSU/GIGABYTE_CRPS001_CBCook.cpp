@@ -458,7 +458,24 @@ int GB_CRPS_Cook_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+		
+		iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+		
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		iin = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dA", (long)iin);
 
@@ -479,7 +496,24 @@ int GB_CRPS_Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.1fC", temperature);
 
@@ -502,7 +536,24 @@ int GB_CRPS_Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		iin = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.4fA", iin);
 
@@ -523,7 +574,24 @@ int GB_CRPS_Cook_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	pout = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		pout = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		pout = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dW", (long)pout);
 
@@ -545,7 +613,24 @@ int GB_CRPS_Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	pin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		pin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		pin = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("Value : %5.2f(W)", pin);
 
@@ -1265,7 +1350,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
 		break;
 	}
 
@@ -1365,7 +1450,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
 		break;
 }
 
@@ -1437,7 +1522,25 @@ int GB_CRPS_Cook_88H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveVIN(voltage);
 	//  (Max:114.0, Min:113.5)
 	wxstr += wxString::Format("%4.5fV (Max:%4.1f, Min:%4.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VIN_Max, PMBUSHelper::GetPMBusStatus()->m_VIN_Min);
@@ -1460,7 +1563,25 @@ int GB_CRPS_Cook_89H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		current = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveIIN(current);
 
 	wxstr += wxString::Format("%4.5fA (Max:%4.5f, Min:%4.5f)", current, PMBUSHelper::GetPMBusStatus()->m_IIN_Max, PMBUSHelper::GetPMBusStatus()->m_IIN_Min);
@@ -1483,7 +1604,25 @@ int GB_CRPS_Cook_8aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveVCAP(voltage);
 
 	wxstr += wxString::Format("%.0fV (Max:%.1f, Min:%.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VCAP_Max, PMBUSHelper::GetPMBusStatus()->m_VCAP_Min);
@@ -1505,7 +1644,24 @@ int GB_CRPS_Cook_8b00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	voltage *= PMBUSHelper::GetPMBusStatus()->m_vout_mode_exponent;
 
@@ -1530,7 +1686,25 @@ int GB_CRPS_Cook_8c00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 
 	wxString wxstr("");
 
-	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		current = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveIOUT(current);
 	// 0.000A (Max:0.484, Min:0.000) 
 	wxstr += wxString::Format("%4.3fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IOUT_Max, PMBUSHelper::GetPMBusStatus()->m_IOUT_Min);
@@ -1552,7 +1726,24 @@ int GB_CRPS_Cook_8b01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	voltage *= PMBUSHelper::GetPMBusStatus()->m_vout_mode_exponent;
 
@@ -1578,7 +1769,25 @@ int GB_CRPS_Cook_8c01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 
 	wxString wxstr("");
 
-	current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		current = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		current = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveIoSBY(current);
 	// 0.000A (Max:0.484, Min:0.000) 
 	wxstr += wxString::Format("%4.8fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Max, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Min);
@@ -1601,10 +1810,28 @@ int GB_CRPS_Cook_8dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveAMD_8D(temperature);
 
-	wxstr += wxString::Format("%.0fC (Max:%.1f, Min:%.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Max, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Min);
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Max, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1624,10 +1851,28 @@ int GB_CRPS_Cook_8eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveSEC_8E(temperature);
 
-	wxstr += wxString::Format("%.0fC (Max:%.1f, Min:%.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Max, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Min);
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Max, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1647,10 +1892,28 @@ int GB_CRPS_Cook_8fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SavePRI_8F(temperature);
 
-	wxstr += wxString::Format("%.0fC (Max:%.0f, Min:%.0f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Max, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Min);
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Max, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -1670,7 +1933,25 @@ int GB_CRPS_Cook_90H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	rpm = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		rpm = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		rpm = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2,pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveFAN1(rpm);
 
 	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN1_Max, PMBUSHelper::GetPMBusStatus()->m_FAN1_Min);
@@ -1692,7 +1973,25 @@ int GB_CRPS_Cook_96H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		watt = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2,pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}	
+	
 	PMBUSHelper::GetPMBusStatus()->SavePOUT(watt);
 
 	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_POUT_Max, PMBUSHelper::GetPMBusStatus()->m_POUT_Min);
@@ -1714,7 +2013,25 @@ int GB_CRPS_Cook_97H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		watt = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SavePIN(watt);
 
 	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_PIN_Max, PMBUSHelper::GetPMBusStatus()->m_PIN_Min);
@@ -1938,7 +2255,24 @@ int GB_CRPS_Cook_a0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2,pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dV", voltage);
 
@@ -1959,7 +2293,24 @@ int GB_CRPS_Cook_a1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		voltage = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		voltage = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dV", voltage);
 
@@ -1980,7 +2331,24 @@ int GB_CRPS_Cook_a2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	iin_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		iin_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		iin_max = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.4fA", iin_max);
 
@@ -2003,7 +2371,24 @@ int GB_CRPS_Cook_a3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		watt = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		watt = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dW", watt);
 
@@ -2024,7 +2409,24 @@ int GB_CRPS_Cook_a4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	vout_min = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		vout_min = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		vout_min = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.4fV", vout_min);
 
@@ -2047,7 +2449,24 @@ int GB_CRPS_Cook_a5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	vout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		vout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		vout_max = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.4fV", vout_max);
 
@@ -2070,7 +2489,24 @@ int GB_CRPS_Cook_a6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	iout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		iout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		iout_max = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%4.4fA", iout_max);
 
@@ -2093,7 +2529,24 @@ int GB_CRPS_Cook_a7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	pout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		pout_max = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		pout_max = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dW", pout_max);
 
@@ -2114,7 +2567,24 @@ int GB_CRPS_Cook_a8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%.1fC", temperature);
 
@@ -2137,7 +2607,24 @@ int GB_CRPS_Cook_a9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%.1fC", temperature);
 
@@ -2650,7 +3137,24 @@ int GB_CRPS_Cook_4aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		iin = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		iin = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%dA", (long)iin);
 
@@ -2696,7 +3200,25 @@ int GB_CRPS_Cook_91H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	rpm = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		rpm = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		rpm = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+	
 	PMBUSHelper::GetPMBusStatus()->SaveFAN1(rpm);
 
 	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN1_Max, PMBUSHelper::GetPMBusStatus()->m_FAN1_Min);
@@ -2718,7 +3240,24 @@ int GB_CRPS_Cook_c0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%.1fC", temperature);
 
@@ -2741,7 +3280,24 @@ int GB_CRPS_Cook_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%.1fC", temperature);
 
@@ -2764,7 +3320,24 @@ int GB_CRPS_Cook_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	wxString wxstr("");
 
-	temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
 
 	wxstr += wxString::Format("%.1fC", temperature);
 

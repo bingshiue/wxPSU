@@ -22,6 +22,8 @@ public:
 	 */
 	~BaseWritePage();
 
+	wxStaticBox* getStaticBox(void);
+
 protected:
 	enum {
 		PADDING_DEFAULT_HEIGHT = 10,

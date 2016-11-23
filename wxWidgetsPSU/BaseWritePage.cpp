@@ -82,6 +82,10 @@ void BaseWritePage::SetupValidator(void){
 	m_hexValidator.SetCharIncludes(HexCharIncludes);
 }
 
+wxStaticBox* BaseWritePage::getStaticBox(void){
+	return this->m_staticBox;
+}
+
 wxBEGIN_EVENT_TABLE(BaseWritePage, wxPanel)
 // Empty
 wxEND_EVENT_TABLE()

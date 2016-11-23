@@ -2483,8 +2483,46 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_readPage, "Read");
 	}
 
+	wxString PageLabel("");
 	// Add Write Pages 
 	if (this->m_PMBusData[row].m_writePage != NULL){
+		
+		switch (this->m_PMBusData[row].m_dataFormat.m_formatType){
+
+		case cmd_data_format_LinearData_Format:
+
+			PageLabel = wxString::Format("%02x", this->m_PMBusData[row].m_register);
+			PageLabel.UpperCase();
+			PageLabel += wxString::Format("h - %s", this->m_PMBusData[row].m_name);
+			PageLabel += wxString::Format("( %s )", wxT("Format : Linear"));
+
+			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->getStaticBox()->SetLabelText(PageLabel);
+
+			//#define GET_WRITEPAGE(register_number) (WritePage##register_number##H*)
+			//(GET_WRITEPAGE(46)this->m_PMBusData[row].m_writePage)->m_scaleValue->Enable(false);
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageLabel.c_str());
+
+			break;
+
+		case cmd_data_format_DirectData_Format:
+
+			PageLabel = wxString::Format("%02x", this->m_PMBusData[row].m_register);
+			PageLabel.UpperCase();
+			PageLabel += wxString::Format("h - %s", this->m_PMBusData[row].m_name);
+			PageLabel += wxString::Format("( %s )", wxT("Format : Direct"));
+
+			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->getStaticBox()->SetLabelText(PageLabel);
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageLabel.c_str());
+
+			break;
+
+		default:
+			// Do Nothing
+			break;
+		}
+		
 		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
 	}
 

@@ -378,14 +378,14 @@ public:
 	*/
 	~WritePage46H();
 
-protected:
-
 	wxStaticText *m_hintName;
 
 	wxStaticText *m_scale;
 
 	wxTextCtrl *m_inputValue;
 	wxTextCtrl *m_scaleValue;
+
+protected:
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
