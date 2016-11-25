@@ -79,11 +79,11 @@ double PMBUSHelper::ParseDirectDataFormat(unsigned char* buffer, unsigned int si
 	Y = buffer[0] | buffer[1] << 8;
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Y=%d", Y);
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_M);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_R);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", PMBusCMDData->m_dataFormat.m_directDataFormat.m_B);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_M);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_R);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_B);
 
-	result = (((double)Y * (double)(pow(10, -PMBusCMDData->m_dataFormat.m_directDataFormat.m_R))) - PMBusCMDData->m_dataFormat.m_directDataFormat.m_B) / (double)PMBusCMDData->m_dataFormat.m_directDataFormat.m_M;
+	result = (((double)Y * (double)(pow(10, -PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_R))) - PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_B) / (double)PMBusCMDData->m_dataFormat.m_ReadCoefficients.m_M;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "result=%5.4f", result);
 
@@ -181,7 +181,7 @@ double PMBUSHelper::ParseLinearDataFormat(unsigned char* buffer, unsigned int si
 
 }
 
-static int ProductDirectData(unsigned char *dest, double value, PMBUSCOMMAND_t* PMBusCMDData){
+int PMBUSHelper::ProductDirectData(unsigned char *dest, double value, PMBUSCOMMAND_t* PMBusCMDData){
 	// Y(result) = (mX+b) * 10^R 
 
 	short result = 0;
@@ -190,8 +190,9 @@ static int ProductDirectData(unsigned char *dest, double value, PMBUSCOMMAND_t* 
 		return -1;
 	}
 
-	result = ((PMBusCMDData->m_dataFormat.m_directDataFormat.m_M * value) + PMBusCMDData->m_dataFormat.m_directDataFormat.m_B) * pow(10, PMBusCMDData->m_dataFormat.m_directDataFormat.m_R);
+	result = ((PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_M * value) + PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_B) * pow(10, PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_R);
 
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d, b=%d, R=%d", PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_M, PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_B, PMBusCMDData->m_dataFormat.m_WriteCoefficients.m_R);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "result=%d(%xH)", result, result);
 
 	dest[0] = result & 0x00ff;
@@ -549,7 +550,6 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 	}
 
 }
-
 
 int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer){
 

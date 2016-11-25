@@ -75,7 +75,8 @@ void PMBUSQUERYProgressDialog::OnQUERYSequenceInterrupt(wxThreadEvent& event){
 
 void PMBUSQUERYProgressDialog::OnQUERYSequenceEnd(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnQUERYSequenceEnd");
-
+	// Close Dialog
+	this->EndModal(wxID_OK);
 }
 
 void PMBUSQUERYProgressDialog::OnBtnOK(wxCommandEvent& event){

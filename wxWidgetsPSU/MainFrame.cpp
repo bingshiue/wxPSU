@@ -676,6 +676,9 @@ void MainFrame::SetupToolBar(void){
 	// Append Monitor Button
 	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
 
+	// Append Query All Commands Button
+	m_toolbar->AddTool(MENU_ID_Query_All_Commands, wxEmptyString, wxBITMAP_PNG(QUERY_32), wxT("Query All Commands"), wxITEM_NORMAL);
+
 	// Append Enable Calibration Button
 	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP_PNG(ENABLE_32), wxT("Enable Calibration"), wxITEM_NORMAL);
 
@@ -2483,38 +2486,24 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_readPage, "Read");
 	}
 
-	wxString PageLabel("");
 	// Add Write Pages 
 	if (this->m_PMBusData[row].m_writePage != NULL){
 		
 		switch (this->m_PMBusData[row].m_dataFormat.m_formatType){
 
 		case cmd_data_format_LinearData_Format:
+			
+			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->changeLayOutByDataFormat(cmd_data_format_LinearData_Format, &this->m_PMBusData[row]);// cmd_data_format_LinearData_Format);
 
-			PageLabel = wxString::Format("%02x", this->m_PMBusData[row].m_register);
-			PageLabel.UpperCase();
-			PageLabel += wxString::Format("h - %s", this->m_PMBusData[row].m_name);
-			PageLabel += wxString::Format("( %s )", wxT("Format : Linear"));
-
-			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->getStaticBox()->SetLabelText(PageLabel);
-
+			// Test purpose only
 			//#define GET_WRITEPAGE(register_number) (WritePage##register_number##H*)
 			//(GET_WRITEPAGE(46)this->m_PMBusData[row].m_writePage)->m_scaleValue->Enable(false);
-
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageLabel.c_str());
 
 			break;
 
 		case cmd_data_format_DirectData_Format:
-
-			PageLabel = wxString::Format("%02x", this->m_PMBusData[row].m_register);
-			PageLabel.UpperCase();
-			PageLabel += wxString::Format("h - %s", this->m_PMBusData[row].m_name);
-			PageLabel += wxString::Format("( %s )", wxT("Format : Direct"));
-
-			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->getStaticBox()->SetLabelText(PageLabel);
-
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", PageLabel.c_str());
+			
+			((BaseWritePage*)this->m_PMBusData[row].m_writePage)->changeLayOutByDataFormat(cmd_data_format_DirectData_Format, &this->m_PMBusData[row]);
 
 			break;
 
@@ -2852,6 +2841,19 @@ int MainFrame::OpenIODevice(void){
 
 				}
 		
+				//
+				while (TaskEx::GetCount(task_ID_SendUSBAdaptorBitRateTask) != 0){
+
+					wxMilliSleep(200);
+				}
+
+				/*** Send Query Start Event To Handler Function ***/
+				wxThreadEvent *threadQueryStart_evt;
+
+				threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
+				threadQueryStart_evt->SetString(wxT("Query All Commands"));
+				wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
+
 			}
 		}
 	//}
@@ -3187,6 +3189,9 @@ void MainFrame::OnQUERYSequenceStart(wxThreadEvent& event){
 
 		return;
 	}
+
+	// Select Row 1
+	this->m_cmdListDVC->Select(this->m_cmdListModel->GetItem(0));
 
 	// Call Dialog
 	m_pmbusQUERYProgressDialog = new PMBUSQUERYProgressDialog(this, event.GetString(), this->m_IOAccess, &this->m_CurrentUseIOInterface);
@@ -4216,4 +4221,3 @@ EVT_THREAD(wxEVT_COMMAND_QUERY_SEQUENCE_START, MainFrame::OnQUERYSequenceStart)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()
-

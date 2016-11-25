@@ -11,6 +11,8 @@
 
 #include <wx/statline.h>
 
+#include "CommonDef.h"
+
 class BaseWritePage : public wxPanel {
 public:
 	/**
@@ -23,6 +25,9 @@ public:
 	~BaseWritePage();
 
 	wxStaticBox* getStaticBox(void);
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
 
 protected:
 	enum {
@@ -46,6 +51,8 @@ protected:
 	void BaseLayOut(void);
 
 	void SetupValidator(void);
+
+	unsigned int m_dataFormat;
 
 	/**<  Label */
 	wxString m_Label;
@@ -93,6 +100,9 @@ protected:
 	wxStaticText *m_stPadding_3;
 	wxStaticText *m_stPadding_4;
 	wxStaticText *m_stPadding_5;
+	wxStaticText *m_stPadding_6;
+
+	wxStaticText *m_coefficientsST;
 
 	/**< wxValidator */
 	wxTextValidator m_numberValidator;

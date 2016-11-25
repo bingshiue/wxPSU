@@ -92,5 +92,9 @@ int GB_CRPS_Raw_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 int GB_CRPS_Raw_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int GB_CRPS_Raw_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int GB_CRPS_Raw_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int GB_CRPS_Raw_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int GB_CRPS_Raw_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int GB_CRPS_Raw_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int GB_CRPS_Raw_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 
 #endif

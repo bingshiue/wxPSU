@@ -554,6 +554,9 @@
     <ClInclude Include="PMBUSCMD.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="PMBUSCMDDefault.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

@@ -28,7 +28,7 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 20H [7]
 	{ true, "20H", 0x20, "VOUT_MODE", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL },
 	// 30H [8]
-	{ true, "30H", 0x30, "COEFFICIENTS", cmd_access_bwr_read, 0, 0, { 0 }, 0x07, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, 0x86, 0x00 }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "30H", 0x30, "COEFFICIENTS", cmd_access_bwr_read, 0, 0, { 0 }, 0x07, { 0 }, { cmd_unsupport, cmd_status_not_run, cmd_also_send_write_data, 0x03, { 0x02, DEF_30H_READ_CMD_BYTE, DEF_30H_READ_RW_BYTE }, cmd_no_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
 	// 31H 
 	//{ true, "31H", 0x31, "POUT_MAX", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL , { 0 } },
 	// 46H [9]
@@ -131,9 +131,17 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	{ true, "D9H", 0xd9, "F.W.Revision", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// DCh [58]       
 	{ true, "DCH", 0xdc, "Read_BoxSTATUS", cmd_access_br, 0, 0, { 0 }, 0x0C, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	// E0h [59]        
+	{ true, "E0H", 0xe0, "PFC_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	// E1h [60]        
+	{ true, "E1H", 0xe1, "PFC_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	// E2h [61]        
+	{ true, "E2H", 0xe2, "SR_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	// E3h [62]        
+	{ true, "E3H", 0xe3, "SR_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 
 };
 
-#define GIGABYTE_CRPS001_CMD_TABLE_SIZE  sizeof(g_GIGABYTE_CRPS001_CMDTable)/sizeof(PMBUSCOMMAND_t) // 55 + 4
+#define GIGABYTE_CRPS001_CMD_TABLE_SIZE  sizeof(g_GIGABYTE_CRPS001_CMDTable)/sizeof(PMBUSCOMMAND_t) // 55 + 4 + 4
 
 #endif

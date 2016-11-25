@@ -585,6 +585,12 @@ typedef struct pmbusStatus_t {
 	double m_FAN3;
 	double m_FAN4;
 
+	double m_PFC1;
+	double m_PFC2;
+
+	double m_SR1;
+	double m_SR2;
+
 
 	double m_VIN_Max;
 	double m_VIN_Min;
@@ -638,6 +644,22 @@ typedef struct pmbusStatus_t {
 	double m_IoSBY_Min;
 	char   m_IoSBY_Set;
 
+	double m_PFC1_Max;
+	double m_PFC1_Min;
+	char   m_PFC1_Set;
+
+	double m_PFC2_Max;
+	double m_PFC2_Min;
+	char   m_PFC2_Set;
+
+	double m_SR1_Max;
+	double m_SR1_Min;
+	char   m_SR1_Set;
+
+	double m_SR2_Max;
+	double m_SR2_Min;
+	char   m_SR2_Set;
+
 	void ResetMaxMin(void){
 		this->m_VIN_Max = 0;
 		this->m_VIN_Min = 0;
@@ -690,6 +712,22 @@ typedef struct pmbusStatus_t {
 		this->m_IoSBY_Max = 0;
 		this->m_IoSBY_Min = 0;
 		this->m_IoSBY_Set = 0;
+
+		this->m_PFC1_Max  = 0;
+		this->m_PFC1_Min  = 0;
+		this->m_PFC1_Set  = 0;
+
+		this->m_PFC2_Max  = 0;
+		this->m_PFC2_Min  = 0;
+		this->m_PFC2_Set  = 0;
+
+		this->m_SR1_Max   = 0;
+		this->m_SR1_Min   = 0;
+		this->m_SR1_Set   = 0;
+
+		this->m_SR2_Max   = 0;
+		this->m_SR2_Min   = 0;
+		this->m_SR2_Set   = 0;
 	}
 
 	void SaveIoSBY(double ioSBY){
@@ -858,6 +896,58 @@ typedef struct pmbusStatus_t {
 		if (this->m_PIN < this->m_PIN_Min || m_PIN_Set == 0){
 			this->m_PIN_Min = this->m_PIN;
 			m_PIN_Set = 1;
+		}
+	}
+
+	void SavePFC1(double pfc1){
+		this->m_PFC1 = pfc1;
+		// Maximun
+		if (this->m_PFC1 > this->m_PFC1_Max){
+			this->m_PFC1_Max = this->m_PFC1;
+		}
+		// Mininum
+		if (this->m_PFC1 < this->m_PFC1_Min || m_PFC1_Set == 0){
+			this->m_PFC1_Min = this->m_PFC1;
+			m_PFC1_Set = 1;
+		}
+	}
+
+	void SavePFC2(double pfc2){
+		this->m_PFC2 = pfc2;
+		// Maximun
+		if (this->m_PFC2 > this->m_PFC2_Max){
+			this->m_PFC2_Max = this->m_PFC2;
+		}
+		// Mininum
+		if (this->m_PFC2 < this->m_PFC2_Min || m_PFC2_Set == 0){
+			this->m_PFC2_Min = this->m_PFC2;
+			m_PFC2_Set = 1;
+		}
+	}
+
+	void SaveSR1(double sr1){
+		this->m_SR1 = sr1;
+		// Maximun
+		if (this->m_SR1 > this->m_SR1_Max){
+			this->m_SR1_Max = this->m_SR1;
+		}
+		// Mininum
+		if (this->m_SR1 < this->m_SR1_Min || m_SR1_Set == 0){
+			this->m_SR1_Min = this->m_SR1;
+			m_SR1_Set = 1;
+		}
+	}
+
+	void SaveSR2(double sr2){
+		this->m_SR2 = sr2;
+		// Maximun
+		if (this->m_SR2 > this->m_SR2_Max){
+			this->m_SR2_Max = this->m_SR2;
+		}
+		// Mininum
+		if (this->m_SR2 < this->m_SR2_Min || m_SR2_Set == 0){
+			this->m_SR2_Min = this->m_SR2;
+			m_SR2_Set = 1;
 		}
 	}
 

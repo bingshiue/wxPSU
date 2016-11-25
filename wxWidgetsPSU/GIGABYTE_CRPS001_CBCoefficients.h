@@ -92,5 +92,9 @@ int GB_CRPS_Coefficients_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int
 int GB_CRPS_Coefficients_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Coefficients_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Coefficients_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Coefficients_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Coefficients_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Coefficients_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Coefficients_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 #endif

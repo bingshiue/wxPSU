@@ -235,6 +235,7 @@
     <ClInclude Include="PMBUSCBRaw.h" />
     <ClInclude Include="PMBUSCMD.h" />
     <ClInclude Include="PMBUSCMDCB.h" />
+    <ClInclude Include="PMBUSCMDDefault.h" />
     <ClInclude Include="PMBUSCMDReadPages.h" />
     <ClInclude Include="PMBUSCMDWritePages.h" />
     <ClInclude Include="PMBUSCommand.h" />

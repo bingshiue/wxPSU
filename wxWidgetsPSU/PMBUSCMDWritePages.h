@@ -216,7 +216,6 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
-
 /* 1BH SMBALERT_MASK */
 class WritePage1BH : public BaseWritePage {
 public:
@@ -378,6 +377,8 @@ public:
 	*/
 	~WritePage46H();
 
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
 	wxStaticText *m_hintName;
 
 	wxStaticText *m_scale;
@@ -415,6 +416,8 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePage4AH();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
 protected:
 
@@ -454,6 +457,8 @@ public:
 	*/
 	~WritePage51H();
 
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
 protected:
 
 	wxStaticText *m_hintName;
@@ -491,6 +496,8 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePage5DH();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
 protected:
 
@@ -530,6 +537,8 @@ public:
 	*/
 	~WritePage6AH();
 
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
 protected:
 
 	wxStaticText *m_hintName;
@@ -567,6 +576,8 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePage6BH();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
 protected:
 
@@ -798,7 +809,6 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
-
 /* C0H MFR_MAX_TEMP_1 */
 class WritePageC0H : public BaseWritePage {
 public:
@@ -810,6 +820,8 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePageC0H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
 protected:
 
@@ -849,6 +861,8 @@ public:
 	*/
 	~WritePageC1H();
 
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
 protected:
 
 	wxStaticText *m_hintName;
@@ -886,6 +900,8 @@ public:
 	* @brief Deconstructor.
 	*/
 	~WritePageC2H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
 protected:
 

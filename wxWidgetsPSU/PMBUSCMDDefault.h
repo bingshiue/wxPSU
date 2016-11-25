@@ -1,0 +1,13 @@
+#ifndef _PMBUSCMDDEFAULT_H_
+#define _PMBUSCMDDEFAULT_H_
+
+// 30H COEFFICIENTS
+// INDEX
+#define DEF_30H_READ_CMD_INDEX      1
+#define DEF_30H_READ_RW_INDEX       2
+
+// WRITE
+#define DEF_30H_READ_CMD_BYTE    0x86
+#define DEF_30H_READ_RW_BYTE     0x01
+
+#endif

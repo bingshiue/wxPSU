@@ -709,6 +709,9 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
 		}
 	}
+	else{
+		previous_status = 0x00;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -795,6 +798,9 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
 		}
 	}
+	else{
+		previous_status = 0x0000;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -864,6 +870,9 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
 		}
+	}
+	else{
+		previous_status = 0x00;
 	}
 
 	return EXIT_SUCCESS;
@@ -937,6 +946,9 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
 		}
 	}
+	else{
+		previous_status = 0x00;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -1008,6 +1020,9 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
 		}
 	}
+	else{
+		previous_status = 0x00;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -1077,6 +1092,9 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
 		}
+	}
+	else{
+		previous_status = 0x00;
 	}
 
 	return EXIT_SUCCESS;
@@ -1148,6 +1166,9 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
 		}
 	}
+	else{
+		previous_status = 0x00;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -1218,6 +1239,9 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
 		}
+	}
+	else{
+		previous_status = 0x00;
 	}
 
 	return EXIT_SUCCESS;
@@ -1306,6 +1330,9 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
 		}
+	}
+	else{
+		previous_status = 0x00;
 	}
 
 
@@ -3031,10 +3058,29 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	short m, b;
 	char R;
-
 	const wchar_t* tmp_wchar;
 
+	int RW;
+	RW = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX];
+
 	wxString wxstr("");
+
+	switch (RW){
+
+	case rw_write_coefficients:
+		wxstr += wxString::Format("(W)");
+		break;
+
+	case rw_read_coefficients:
+		wxstr += wxString::Format("(R)");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
+
+	wxstr += wxString::Format(" ");
 	wxstr += wxString::Format("CMD:%02xH,", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
 
 	/*
@@ -3074,7 +3120,7 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
 	// Get Query CMD
 	int queryCMD;
-	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX];
 
 	// Get Index of Query CMD 
 	int queryCMDIndex = -1;
@@ -3094,12 +3140,38 @@ int GB_CRPS_Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	pmbuscmd_t* target;
 	target = PMBUSHelper::getPMBUSCMDData();
 
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M = m;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B = b;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R = R;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R);
+	switch (RW){
+
+	case rw_write_coefficients :
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Write Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R);
+
+		break;
+
+	case rw_read_coefficients :
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Read Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Direct Data Format in CMD");
 	
@@ -3365,6 +3437,170 @@ int GB_CRPS_Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[1], pmbuscmd->m_recvBuff.m_dataBuff[2]);
 
 	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SavePFC1(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC1_Max, PMBUSHelper::GetPMBusStatus()->m_PFC1_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SavePFC2(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC2_Max, PMBUSHelper::GetPMBusStatus()->m_PFC2_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SaveSR1(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR1_Max, PMBUSHelper::GetPMBusStatus()->m_SR1_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SaveSR2(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR2_Max, PMBUSHelper::GetPMBusStatus()->m_SR2_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

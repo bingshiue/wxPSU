@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "CommonDef.h"
+#include "PMBUSCMDDefault.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
 #include "BaseReadPage.h"

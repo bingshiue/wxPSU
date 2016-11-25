@@ -64,6 +64,11 @@ enum {
 	cmd_query_done
 };
 
+enum {
+	rw_write_coefficients = 0,
+	rw_read_coefficients = 1,
+};
+
 //#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
 
 #define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
@@ -83,19 +88,26 @@ typedef struct recvbuff_t {
 /**
  * @brief Direct Data Format
  */
-typedef struct directDataFormat_t {
+typedef struct directFormatCoefficients_t {
 	short m_M;/**< M */
 	short m_B;/**< B */
 	char  m_R;/**< R */
 
-}DirectDataFormat_t;
+	directFormatCoefficients_t(){
+		m_M = 0;
+		m_B = 0;
+		m_R = 0;
+	}
+
+}DirectFormatCoefficients_t;
 
 /**
  * @brief Struct for CMD Data Format.
  */
 typedef struct dataFormat_t {
 	unsigned char m_formatType;/**< Data Format Type */
-	DirectDataFormat_t m_directDataFormat;/**< Direct Data Format */
+	DirectFormatCoefficients_t m_ReadCoefficients;/**< Direct Data Format Read Coefficients */
+	DirectFormatCoefficients_t m_WriteCoefficients;/**< Direct Data Format Write Coefficients */
 
 }DataFormat_t;
 

@@ -441,10 +441,25 @@ int I2CInterfaceDialog::OpenIODevice(void){
 					this->m_appSettings->m_usbAdaptorI2CSetting.m_busTimeout
 					);
 
+				//
+				while (TaskEx::GetCount(task_ID_SendUSBAdaptorBitRateTask) != 0){
+
+					wxMilliSleep(200);
+				}
+
 				// Update I2C Clock Speed Field
 				this->UpdateStatusBarIOSettingFiled(this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed);
 
 			}
+
+#if 0 // Don't Work Due To Main Frame Instance Not be Created 
+			/*** Send Query Start Event To Handler Function ***/
+			wxThreadEvent *threadQueryStart_evt;
+
+			threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
+			threadQueryStart_evt->SetString(wxT("Query All Commands"));
+			wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
+#endif
 
 		}
 	}

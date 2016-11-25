@@ -16,6 +16,7 @@
 #include "Preprocessor.h"
 #include "CustomEvent.h"
 #include "PMBUSCMD.h"
+#include "PMBUSCMDDefault.h"
 #include "PMBUSLog.h"
 
 #define DEFAULT_WINDOW_WIDTH   864 /**< Default Window Width */

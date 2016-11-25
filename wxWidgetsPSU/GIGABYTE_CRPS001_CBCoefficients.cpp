@@ -87,6 +87,10 @@ int GB_CRPS_Coefficients_c0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int
 int GB_CRPS_Coefficients_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Coefficients_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Coefficients_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Coefficients_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Coefficients_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Coefficients_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Coefficients_Common(pmbuscmd, string, sizeOfstr); }
 
 int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
@@ -94,9 +98,28 @@ int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned 
 	char R;
 
 	const wchar_t* tmp_wchar;
+	int RW;
+	RW = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX];
 
 	wxString wxstr("");
 	//wxstr += wxString::Format("CMD:%02xH,", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+
+	switch (RW){
+
+	case rw_write_coefficients:
+		wxstr += L"(W)";
+		break;
+
+	case rw_read_coefficients:
+		wxstr += L"(R)";
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
+
+	wxstr += L" ";
 
 	/*
 	[1]	Lower byte of m
@@ -135,11 +158,10 @@ int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
 	// Get Query CMD
 	int queryCMD;
-	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX];
 
 	// Get Index of Query CMD 
 	int queryCMDIndex = -1;
-
 	                                                     // CMD's Page
 	queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, sizeOfstr);
 
@@ -164,12 +186,38 @@ int GB_CRPS_Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned 
 	pmbuscmd_t* target;
 	target = PMBUSHelper::getPMBUSCMDData();
 
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M = m;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_M);
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B = b;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_B);
-	target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R = R;
-	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", target[queryCMDIndex].m_dataFormat.m_directDataFormat.m_R);
+	switch (RW){
+
+	case rw_write_coefficients:
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Write Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R);
+
+		break;
+
+	case rw_read_coefficients:
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Read Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Direct Data Format in CMD");
 

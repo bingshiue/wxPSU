@@ -51,6 +51,8 @@ WritePageC1H::WritePageC1H(wxWindow* parent, wxString& label, bool* monitor_runn
 
 #endif
 
+	this->m_scaleValue->SetValidator(this->m_numberValidator);
+
 	// Save Member
 	this->m_monitor_running = monitor_running;
 	this->m_sendCMDVector = sendCMDVector;
@@ -64,6 +66,78 @@ WritePageC1H::~WritePageC1H(){
 
 }
 
+void WritePageC1H::changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd){
+	wxString default_scale;
+	wxString CoefficientsSTR = wxT("Coefficients : ");
+	wxString PageLabel;
+
+	this->m_dataFormat = dataFormat;
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Inherit Class, Data Format = %d", dataFormat);
+
+
+	PageLabel = wxString::Format("%02x", pmbuscmd->m_register);
+	PageLabel.UpperCase();
+	PageLabel += wxString::Format("h - %s", pmbuscmd->m_name);
+
+	switch (this->m_dataFormat){
+
+	case cmd_data_format_LinearData_Format:
+		PageLabel += wxString::Format("( %s )", wxT("Format : Linear"));
+
+		// Enable 'Exponent Text Ctrl'
+		this->m_scaleValue->Enable(true);
+
+		default_scale = wxString::Format("%1.1f", DEFAULT_SCALE_VALUE);
+		m_scaleValue->SetValue(default_scale);
+
+		if (m_coefficientsST != NULL){
+			m_coefficientsST->SetLabel(wxT(""));
+		}
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+		PageLabel += wxString::Format("( %s )", wxT("Format : Direct"));
+
+		// Disable 'Exponent Text Ctrl'
+		this->m_scaleValue->Enable(false);
+
+		m_scaleValue->SetValue(wxT("Not Use"));
+
+		if (m_coefficientsST == NULL){
+
+			m_coefficientsST = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxDefaultSize);
+
+			CoefficientsSTR += wxString::Format(" m=%d,  b=%d,  R=%d", pmbuscmd->m_dataFormat.m_WriteCoefficients.m_M, pmbuscmd->m_dataFormat.m_WriteCoefficients.m_B, pmbuscmd->m_dataFormat.m_WriteCoefficients.m_R);
+
+			m_coefficientsST->SetLabel(CoefficientsSTR);
+
+			if (m_stPadding_6 == NULL){
+				m_stPadding_6 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
+			}
+
+			this->m_staticBoxlSizer->Add(m_stPadding_6);
+
+			this->m_staticBoxlSizer->Add(this->m_coefficientsST, wxSizerFlags().Align(wxALIGN_LEFT));
+		}
+		else{
+
+			CoefficientsSTR += wxString::Format(" m=%d,  b=%d,  R=%d", pmbuscmd->m_dataFormat.m_WriteCoefficients.m_M, pmbuscmd->m_dataFormat.m_WriteCoefficients.m_B, pmbuscmd->m_dataFormat.m_WriteCoefficients.m_R);
+
+			m_coefficientsST->SetLabel(CoefficientsSTR);
+		}
+
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, data format = %d", this->m_dataFormat);
+		break;
+	}
+
+	this->m_staticBox->SetLabelText(PageLabel);
+}
 
 void WritePageC1H::OnRadioButtonCook(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
@@ -78,9 +152,9 @@ void WritePageC1H::OnRadioButtonCook(wxCommandEvent& event){
 
 	/* --------------------------- */
 
-	this->m_scaleValue->SetValidator(this->m_numberValidator);
+	//this->m_scaleValue->SetValidator(this->m_numberValidator);
 
-	if (this->m_scaleValue->GetValue() == wxEmptyString) return;
+	//if (this->m_scaleValue->GetValue() == wxEmptyString) return;
 
 	//long decimal2 = PMBUSHelper::HexToDecimal(this->m_scaleValue->GetValue().c_str());
 
@@ -103,9 +177,9 @@ void WritePageC1H::OnRadioButtonRaw(wxCommandEvent& event){
 
 	/* --------------------------- */
 
-	this->m_scaleValue->SetValidator(this->m_hexValidator);
+	//this->m_scaleValue->SetValidator(this->m_hexValidator);
 
-	if (this->m_scaleValue->GetValue() == wxEmptyString) return;
+	//if (this->m_scaleValue->GetValue() == wxEmptyString) return;
 
 	//wxString hexString2 = wxString::Format("%02lx", wxAtoi(this->m_scaleValue->GetValue()));
 	//this->m_scaleValue->SetValue(hexString2);
@@ -119,8 +193,6 @@ void WritePageC1H::OnButtonWrite(wxCommandEvent& event){
 	double mfrMaxTemp = 0;
 	double scale;
 
-	this->m_scaleValue->GetValue().ToDouble(&scale);
-
 	if (this->m_rawRadioButton->GetValue() == true){
 		mfrMaxTemp = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %f", mfrMaxTemp);
@@ -128,6 +200,11 @@ void WritePageC1H::OnButtonWrite(wxCommandEvent& event){
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_inputValue->GetValue().ToDouble(&mfrMaxTemp);
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %f", mfrMaxTemp);
+	}
+
+	// Get Scale Value
+	if (this->m_dataFormat == cmd_data_format_LinearData_Format){
+		this->m_scaleValue->GetValue().ToDouble(&scale);
 	}
 
 #if 0
@@ -146,7 +223,28 @@ void WritePageC1H::OnButtonWrite(wxCommandEvent& event){
 #endif
 
 	unsigned char mfrMaxTempArray[2];
-	PMBUSHelper::ProductLinearData(mfrMaxTempArray, (double)mfrMaxTemp, scale);
+	//PMBUSHelper::ProductLinearData(mfrMaxTempArray, (double)mfrMaxTemp, scale);
+
+	switch (this->m_dataFormat){
+
+	case cmd_data_format_LinearData_Format:
+		PMBUSHelper::ProductLinearData(mfrMaxTempArray, (double)mfrMaxTemp, scale);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+		PMBUSHelper::ProductDirectData(mfrMaxTempArray, (double)mfrMaxTemp,
+			&(PMBUSHelper::getPMBUSCMDData()[PMBUSHelper::getIndexOfCMD(PMBUSCMD_C1H_MFR_MAX_TEMP_2)])
+			);
+
+		//PSU_DEBUG_PRINT(MSG_DETAIL, "%02xH", PMBUSHelper::getPMBUSCMDData()[PMBUSHelper::getIndexOfCMD(PMBUSCMD_46H_IOUT_OC_FAULT_LIMIT)].m_register);
+
+		break;
+
+	default:
+
+		break;
+	}
 
 	unsigned char SendBuffer[64];
 	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(

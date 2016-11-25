@@ -12,6 +12,9 @@ BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent
 	// Set Label
 	this->m_Label = label;
 
+	// Data Format
+	this->m_dataFormat = cmd_data_format_LinearData_Format;
+
 	// Base LayOut
 	this->BaseLayOut();
 
@@ -25,7 +28,7 @@ BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent
 
 
 BaseWritePage::~BaseWritePage(){
-
+	
 }
 
 void BaseWritePage::BaseLayOut(void){
@@ -70,6 +73,10 @@ void BaseWritePage::BaseLayOut(void){
 	m_staticBoxlSizer->Add(m_stPadding_2);
 
 	SetSizer(m_staticBoxlSizer);
+}
+
+void BaseWritePage::changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd) {
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Base Class")
 }
 
 void BaseWritePage::SetupValidator(void){

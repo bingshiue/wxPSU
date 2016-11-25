@@ -47,6 +47,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 	int CoefficientsCMDIndex = 0;
 	int PreviousQueryAdditionalCMD = 0;
 	int PreviousCoefficientsAdditionalCMD = 0;
+	int PreviousCoefficientsAdditionalRW = 0;
 	bool sendRetryStillFailed = false;
 	wchar_t QueryStr[STR_LENGTH];
 	wchar_t CoefficientsStr[STR_LENGTH];
@@ -251,8 +252,12 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 											if (CoefficientsCMDIndex >= 0){
 												// Prepare Send Buffer
-												PreviousCoefficientsAdditionalCMD = PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
-												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = PMBUSHelper::getPMBUSCMDData()[idx].m_register;
+												PreviousCoefficientsAdditionalCMD = PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX];
+												PreviousCoefficientsAdditionalRW = PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX];
+
+												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX] = PMBUSHelper::getPMBUSCMDData()[idx].m_register;
+												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX] = rw_read_coefficients;
+
 												PMBUSHelper::ProductReadCMDBuffer(PMBUSHelper::getPMBUSCMDData(), this->m_sendBuffer, this->m_currentIO, CoefficientsCMDIndex, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_register, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength);
 												//this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
@@ -429,7 +434,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 												}
 
-												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousCoefficientsAdditionalCMD;
+												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX] = PreviousCoefficientsAdditionalCMD;
+												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX] = PreviousCoefficientsAdditionalRW;
 
 											}
 
@@ -464,13 +470,16 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 			// Emit 'wxEVT_COMMAND_QUERY_SEQUENCE_UPDATE' Event
 			wxThreadEvent* threadUpdateDialog_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_UPDATE);
 			threadUpdateDialog_evt->SetInt(idx);
-			//threadUpdateDialog_evt->SetString(PaddingStr);
 			wxQueueEvent(this->m_evtHandler, threadUpdateDialog_evt);
 
 
 		}// for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize() && m_running == true; idx++)
 
 		m_running = false;
+
+		// Emit 'wxEVT_COMMAND_QUERY_SEQUENCE_END' Event
+		wxThreadEvent* threadEndDialog_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_END);
+		wxQueueEvent(this->m_evtHandler, threadEndDialog_evt);
 	};
 
 	return (wxThread::ExitCode)1;

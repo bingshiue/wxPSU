@@ -3,8 +3,8 @@
  */
 #include "PMBUSCMDReadPages.h"
 
-#define DEFAULT_CMD   0x86/**< Default CMD */
-#define DEFAULT_RW    0x00/**< Default RW */
+#define DEFAULT_CMD   DEF_30H_READ_CMD_BYTE/**< Default CMD */
+#define DEFAULT_RW    DEF_30H_READ_RW_BYTE/**< Default RW */
 
 ReadPage30H::ReadPage30H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseReadPage(parent, label){
 	// Initial Input Fields
