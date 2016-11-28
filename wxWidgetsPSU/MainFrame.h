@@ -49,83 +49,78 @@
 #include "PMBUSQUERYProgressDialog.h"
 #include "QUERYSequenceThread.h"
 
-#define DEFAULT_WINDOW_WIDTH   864
-#define DEFAULT_WINDOW_HEIGHT  660
-
-#define SERIALPORT_RECV_BUFF_SIZE  256
-
-enum {
-	CID_SEND_BUTTON = 101,
-};
-
-enum
-{
-	MENU_ID_Primary_Firmware = 1011,
-	MENU_ID_Secondary_Firmware,
-	MENU_ID_Monitor,
-
-	MENU_ID_Update_Primary_Firmware,
-	MENU_ID_Update_Secondary_Firmware,
-	MENU_ID_Stop_Programming,
-	MENU_ID_Query_All_Commands,
-	MENU_ID_I2C_Fault_Test,
-	MENU_ID_Enable_Checksum,
-	MENU_ID_Clear_Error_Log,
-	MENU_ID_Reset_MaxMin_Value,
-	MENU_ID_Reset_Run_Time,
-
-	MENU_ID_EnableCalibration,
-	MENU_ID_DisableCalibration,
-	MENU_ID_Calibration,
-
-	MENU_ID_Administrant,
-	MENU_ID_I2C_Interface,
-
-	MENU_ID_I2C_SlaveAddress,
-
-	MENU_ID_Enable_ALL,
-	MENU_ID_Disable_ALL,
-
-	MENU_ID_Continually,
-	MENU_ID_Iterations,
-	MENU_ID_Stop_An_Error,
-
-	MENU_ID_ErrorLog_ALL,
-	MENU_ID_ErrorLog_ErrorOnly ,
-	MENU_ID_Log_To_File,
-
-	MENU_ID_PMBUS_1_1,
-	MENU_ID_PMBUS_1_2,
-
-	MENU_ID_ABOUT,
-	MENU_ID_ACBEL_WEBSITE,
-
-	MENU_ID_POPUP_FONT,
-	MENU_ID_POPUP_PRINT_SCREEN,
-
-	TOOLBAR_ID_RESET_RUN_TIME,
-	TOOLBAR_ID_REFRESH_MAXMIN,
-
-	CID_CMDLIST_DVC = 51,
-
-	ID_TOOLBAR = 500,
-	CID_SLAVE_ADDRESS_SET_BUTTON,
-	CID_CHECKBOX_A2,
-	CID_CHECKBOX_A1,
-	CID_CHECKBOX_A0,
-
-	ID_POLLING_TIME_COMBO = 1000,
-
-	SplitterWindowID,
-	SplitterWindowTopLevelID,
-
-	ID_LOG_TEXTCTRL
-
-};
+#define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
+#define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */
 
 class MainFrame : public wxFrame, private wxLog
 {
 public:
+
+	enum
+	{
+		MENU_ID_Primary_Firmware = 1011,
+		MENU_ID_Secondary_Firmware,
+		MENU_ID_Monitor,
+
+		MENU_ID_Update_Primary_Firmware,
+		MENU_ID_Update_Secondary_Firmware,
+		MENU_ID_Stop_Programming,
+		MENU_ID_Query_All_Commands,
+		MENU_ID_I2C_Fault_Test,
+		MENU_ID_Enable_Checksum,
+		MENU_ID_Clear_Error_Log,
+		MENU_ID_Reset_MaxMin_Value,
+		MENU_ID_Reset_Run_Time,
+
+		MENU_ID_EnableCalibration,
+		MENU_ID_DisableCalibration,
+		MENU_ID_Calibration,
+
+		MENU_ID_Administrant,
+		MENU_ID_I2C_Interface,
+
+		MENU_ID_I2C_SlaveAddress,
+
+		MENU_ID_Enable_ALL,
+		MENU_ID_Disable_ALL,
+
+		MENU_ID_Continually,
+		MENU_ID_Iterations,
+		MENU_ID_Stop_An_Error,
+
+		MENU_ID_ErrorLog_ALL,
+		MENU_ID_ErrorLog_ErrorOnly,
+		MENU_ID_Log_To_File,
+
+		MENU_ID_PMBUS_1_1,
+		MENU_ID_PMBUS_1_2,
+
+		MENU_ID_ABOUT,
+		MENU_ID_ACBEL_WEBSITE,
+
+		MENU_ID_POPUP_FONT,
+		MENU_ID_POPUP_PRINT_SCREEN,
+
+		TOOLBAR_ID_RESET_RUN_TIME,
+		TOOLBAR_ID_REFRESH_MAXMIN,
+
+		CID_CMDLIST_DVC = 51,
+
+		ID_TOOLBAR = 500,
+		CID_SLAVE_ADDRESS_SET_BUTTON,
+		CID_CHECKBOX_A2,
+		CID_CHECKBOX_A1,
+		CID_CHECKBOX_A0,
+
+		ID_POLLING_TIME_COMBO = 1000,
+
+		SplitterWindowID,
+		SplitterWindowTopLevelID,
+
+		ID_LOG_TEXTCTRL
+
+	};
+
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList);
 	virtual ~MainFrame();
 

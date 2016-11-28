@@ -76,7 +76,7 @@ DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 };
 
-CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(600, 400))
+CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(CALIBRATION_DIALOG_WIDTH, CALIBRATION_DIALOG_HEIGHT))
 {
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(CALIBRATION_16));
@@ -97,7 +97,10 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 
 	m_btnApply = new wxButton(this, CID_BTN_APPLY, wxT("Apply"));
 	m_btnDone = new wxButton(this, CID_BTN_DONE, wxT("Done"));
+
 	m_btnRead = new wxButton(this, CID_BTN_READ, wxT("Read"));
+	m_btnRead->Enable(false);// Don't Support Read Currently
+	
 	m_btnExit = new wxButton(this, wxID_CLOSE, wxT("&Exit"));
 
 	m_settingControlSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Setting/Control"));

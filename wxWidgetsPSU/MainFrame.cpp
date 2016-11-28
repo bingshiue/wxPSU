@@ -500,7 +500,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
 
-#ifdef DONT_SUPPORT_ISP
+#if DEFAULT_DONT_ENABLE_ISP == TRUE
 	this->m_AdministrantMenuItem->Enable(false);
 #endif
 
@@ -2953,7 +2953,7 @@ void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
 }
 
 void MainFrame::OnSendThreadUpdateQuery(wxThreadEvent& event){
-	PSU_DEBUG_PRINT(MSG_DETAIL, "Update Query Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Update Query Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
 	wxVariant variantRaw;
 	variantRaw = event.GetString();
 
@@ -2962,7 +2962,7 @@ void MainFrame::OnSendThreadUpdateQuery(wxThreadEvent& event){
 }
 
 void MainFrame::OnSendThreadUpdateCoefficients(wxThreadEvent& event){
-	PSU_DEBUG_PRINT(MSG_DETAIL, "Update Coefficients Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Update Coefficients Event! Int = %d, string = %s", event.GetInt(), event.GetString().c_str());
 	wxVariant variantRaw;
 	variantRaw = event.GetString();
 

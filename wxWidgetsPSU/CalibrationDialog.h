@@ -22,6 +22,9 @@
 #include "PMBUSLogTextCtrl.h"
 #include "Task.h"
 
+#define CALIBRATION_DIALOG_WIDTH   800 /**< Calibration Dialog Width */
+#define CALIBRATION_DIALOG_HEIGHT  400 /**< Calibration Dialog Height */
+
 typedef struct data_resolution_t {
 
 	double m_data1;/**< Data 1 */

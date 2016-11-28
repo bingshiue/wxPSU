@@ -114,7 +114,8 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 		res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
 		if (res < 0)
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read manufacturer string");
-		PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer String: %ls", wstr);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer String: %ls", wstr);
+		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Manufacturer : %ls", wstr);
 
 		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_vendor_name, wstr, 255);
 
@@ -123,7 +124,8 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 		res = hid_get_product_string(handle, wstr, MAX_STR);
 		if (res < 0)
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read product string");
-		PSU_DEBUG_PRINT(MSG_ALERT, "Product String: %ls", wstr);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Product String: %ls", wstr);
+		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Product Name : %ls", wstr);
 
 		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_product_name, wstr, 255);
 
@@ -132,14 +134,15 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 		res = hid_get_serial_number_string(handle, wstr, MAX_STR);
 		if (res < 0)
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read serial number string");
-		PSU_DEBUG_PRINT(MSG_ALERT, "Serial Number String: (%d) %ls", wstr[0], wstr);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Serial Number String: (%d) %ls", wstr[0], wstr);
+		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Serial Number : (%d) %ls", wstr[0], wstr);
 
 		// Read Indexed String 1
 		wstr[0] = 0x0000;
 		res = hid_get_indexed_string(handle, 1, wstr, MAX_STR);
 		if (res < 0)
 			PSU_DEBUG_PRINT(MSG_ALERT, "Unable to read indexed string 1");
-		PSU_DEBUG_PRINT(MSG_ALERT, "Indexed String 1: %ls", wstr);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "HID Device Indexed String 1: %ls", wstr);
 
 #ifdef READ_OPERATION_BLOCKING
 		// Set the hid_read() function to be blocking.

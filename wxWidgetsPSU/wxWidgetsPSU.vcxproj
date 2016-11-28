@@ -219,6 +219,8 @@
     <ClInclude Include="I2CSlaveAddressDialog.h" />
     <ClInclude Include="IncreaseCPUOverHeadThread.h" />
     <ClInclude Include="IOAccess.h" />
+    <ClInclude Include="IOPortDefine.h" />
+    <ClInclude Include="ISPDefine.h" />
     <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />

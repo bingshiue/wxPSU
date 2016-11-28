@@ -16,8 +16,7 @@
 #define FILED_MONITORING_COMMAND_WIDTH     150
 #define FILED_GAUGE_WIDTH                  100
 #define FILED_MONITOR_TIME                 100
-#define FILED_MONITOR_SUMMARY              (DEFAULT_WINDOW_WIDTH - (FILED_IO_SETTING_WIDTH + FILED_I2C_CLOCK_WIDTH + FILED_RUN_MODE_WIDTH \
- + FILED_MONITORING_COMMAND_WIDTH + FILED_GAUGE_WIDTH + FILED_MONITOR_TIME))
+#define FILED_MONITOR_SUMMARY               -1 // -1 means growable
 
 
 PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(parent, wxID_ANY, style, "PSUStatusBar")
@@ -35,7 +34,7 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 	widths[Field_Monitoring_Command] = FILED_MONITORING_COMMAND_WIDTH;
 	widths[Field_Gauge] = FILED_GAUGE_WIDTH;
 	widths[Field_Monitoring_Time] = FILED_MONITOR_TIME; 
-	widths[Field_Monitoring_Summary] = -1;//FILED_MONITOR_SUMMARY;// -1; // growable
+	widths[Field_Monitoring_Summary] = FILED_MONITOR_SUMMARY;
 
 	SetFieldsCount(Field_Max);
 	SetStatusWidths(Field_Max, widths);

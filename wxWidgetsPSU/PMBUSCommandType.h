@@ -13,6 +13,8 @@
 #include <wx/wx.h>
 #endif
 
+#include "IOPortDefine.h"
+
 enum {
 	cmd_access_read = 0,
 	cmd_access_br,// = cmd_access_read,
@@ -68,11 +70,6 @@ enum {
 	rw_write_coefficients = 0,
 	rw_read_coefficients = 1,
 };
-
-//#define PMBUSCOMMAND_SIZE  62/**< Count for total PMBus command */
-
-#define SEND_BUFFER_MAX_SIZE  64/**< Send Buffer Maximum Size */
-#define SERIALPORT_RECV_BUFF_SIZE  256 /**< Seroal Port Receive Buufer Maximum Size */
 
 typedef struct pmbuscmd_t;
 

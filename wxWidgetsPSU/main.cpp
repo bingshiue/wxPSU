@@ -38,7 +38,7 @@ bool WXPSU::OnInit()
 		return false;
 
 	wxSize size = wxGetDisplaySize();
-	size.Scale(0.75, 0.75);
+	size.Scale(DEFAULT_WINDOW_WIDTH_SCALE, DEFAULT_WINDOW_HEIGHT_SCALE);
 
 	// Model Selection
 

@@ -75,6 +75,13 @@ void PMBUSQUERYProgressDialog::OnQUERYSequenceInterrupt(wxThreadEvent& event){
 
 void PMBUSQUERYProgressDialog::OnQUERYSequenceEnd(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnQUERYSequenceEnd");
+
+	int HasError = event.GetInt();
+
+	if (HasError == 1){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Query Commands Occurs Error ! Please Check Device Status And Run Query All Commands Again !");
+	}
+
 	// Close Dialog
 	this->EndModal(wxID_OK);
 }

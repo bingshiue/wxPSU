@@ -20,4 +20,7 @@
 // Read Pages Input Parameter Default Format (Decimal or Hex)
 #define READ_PAGES_DEFAULT_FORMAT_HEX      (TRUE)//(FALSE)
 
+// Don't Enable ISP Function (Disable Administratot Menu Item)
+#define DEFAULT_DONT_ENABLE_ISP            (FALSE)
+
 #endif

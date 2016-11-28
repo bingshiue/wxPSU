@@ -24,9 +24,10 @@ QUERYSequenceThread::QUERYSequenceThread(
 
 	this->m_rxTxSemaphore = new wxSemaphore(0, 0);
 
-	// Reset Query Field
+	// Reset Query Status
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_queried = cmd_query_not_yet;
+		PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_status = cmd_status_not_run;
 	}
 
 }
@@ -49,6 +50,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 	int PreviousCoefficientsAdditionalCMD = 0;
 	int PreviousCoefficientsAdditionalRW = 0;
 	bool sendRetryStillFailed = false;
+	bool receiveFailed = false;
+	bool i2cNotFound = false;
 	wchar_t QueryStr[STR_LENGTH];
 	wchar_t CoefficientsStr[STR_LENGTH];
 
@@ -158,6 +161,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 							PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff.m_length, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_register);
 							PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
 							//timeout++;
+							receiveFailed = true;
 						}
 						else{
 							// Get Expect Data Length
@@ -195,6 +199,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 								unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_currentIO, this->m_recvBuff.m_recvBuff, this->m_recvBuff.m_length);
 								if (i2cBusAck == PMBUSHelper::response_ng){
 									PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+									i2cNotFound = true;
 								}
 
 								if (PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
@@ -338,6 +343,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 														PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff.m_length, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_register);
 														PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
 														//timeout++;
+														receiveFailed = true;
 													}
 													else{
 														// Get Expect Data Length
@@ -375,6 +381,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 															unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_currentIO, this->m_recvBuff.m_recvBuff, this->m_recvBuff.m_length);
 															if (i2cBusAck == PMBUSHelper::response_ng){
 																PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+																i2cNotFound = true;
 															}
 
 															if (PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
@@ -425,7 +432,6 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 																}
 
 																
-
 															}
 
 														}
@@ -479,6 +485,9 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 		// Emit 'wxEVT_COMMAND_QUERY_SEQUENCE_END' Event
 		wxThreadEvent* threadEndDialog_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_END);
+		if (sendRetryStillFailed == true || receiveFailed == true || i2cNotFound == true){
+			threadEndDialog_evt->SetInt(1);
+		}
 		wxQueueEvent(this->m_evtHandler, threadEndDialog_evt);
 	};
 
