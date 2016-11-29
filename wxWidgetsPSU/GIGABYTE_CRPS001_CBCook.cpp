@@ -1652,7 +1652,7 @@ int GB_CRPS_Cook_8aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	
 	PMBUSHelper::GetPMBusStatus()->SaveVCAP(voltage);
 
-	wxstr += wxString::Format("%.0fV (Max:%.1f, Min:%.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VCAP_Max, PMBUSHelper::GetPMBusStatus()->m_VCAP_Min);
+	wxstr += wxString::Format("%.2fV (Max:%.2f, Min:%.2f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VCAP_Max, PMBUSHelper::GetPMBusStatus()->m_VCAP_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -3291,9 +3291,9 @@ int GB_CRPS_Cook_91H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 	}
 	
-	PMBUSHelper::GetPMBusStatus()->SaveFAN1(rpm);
+	PMBUSHelper::GetPMBusStatus()->SaveFAN2(rpm);
 
-	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN1_Max, PMBUSHelper::GetPMBusStatus()->m_FAN1_Min);
+	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN2_Max, PMBUSHelper::GetPMBusStatus()->m_FAN2_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

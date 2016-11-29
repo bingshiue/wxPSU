@@ -1546,6 +1546,10 @@ void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
 	}
 
 	// FAN2
+	if (index == this->findPMBUSCMDIndex(0x91)){
+		wxString fan2 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN2);
+		this->m_stdPage->m_tcFAN2->SetValue(fan2);
+	}
 
 	// FAN3
 

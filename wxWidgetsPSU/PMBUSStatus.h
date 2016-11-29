@@ -620,6 +620,10 @@ typedef struct pmbusStatus_t {
 	double m_FAN1_Min;
 	char   m_FAN1_Set;
 
+	double m_FAN2_Max;
+	double m_FAN2_Min;
+	char   m_FAN2_Set;
+
 	double m_POUT_Max;
 	double m_POUT_Min;
 	char   m_POUT_Set;
@@ -688,6 +692,10 @@ typedef struct pmbusStatus_t {
 		this->m_FAN1_Max = 0;
 		this->m_FAN1_Min = 0;
 		this->m_FAN1_Set = 0;
+
+		this->m_FAN2_Max = 0;
+		this->m_FAN2_Min = 0;
+		this->m_FAN2_Set = 0;
 
 		this->m_POUT_Max = 0;
 		this->m_POUT_Min = 0;
@@ -870,6 +878,19 @@ typedef struct pmbusStatus_t {
 		if (this->m_FAN1 < this->m_FAN1_Min || m_FAN1_Set == 0){
 			this->m_FAN1_Min = this->m_FAN1;
 			m_FAN1_Set = 1;
+		}
+	}
+
+	void SaveFAN2(double fan2){
+		this->m_FAN2 = fan2;
+		// Maximun
+		if (this->m_FAN2 > this->m_FAN2_Max){
+			this->m_FAN2_Max = this->m_FAN2;
+		}
+		// Mininum
+		if (this->m_FAN2 < this->m_FAN2_Min || m_FAN2_Set == 0){
+			this->m_FAN2_Min = this->m_FAN2;
+			m_FAN2_Set = 1;
 		}
 	}
 

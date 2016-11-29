@@ -35,7 +35,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.14       |     Implement Query Function                                   |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.15       |     Supply Direct Format Data Read/Write                       |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.14" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.15" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif

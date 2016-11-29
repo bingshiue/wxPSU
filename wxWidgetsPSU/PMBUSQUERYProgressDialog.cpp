@@ -79,7 +79,7 @@ void PMBUSQUERYProgressDialog::OnQUERYSequenceEnd(wxThreadEvent& event){
 	int HasError = event.GetInt();
 
 	if (HasError == 1){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Query Commands Occurs Error ! Please Check Device Status And Run Query All Commands Again !");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Query Commands Failed ! Please Check PSU Device Status !");
 	}
 
 	// Close Dialog

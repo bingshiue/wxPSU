@@ -67,81 +67,83 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	{ true, "88H", 0x88, "READ_VIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 89h [26]       
 	{ true, "89H", 0x89, "READ_IIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 8Bh (00h) [27]   
+	// 8Ah [27]        
+	{ true, "8AH", 0x8a, "READ_VCAP", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	// 8Bh (00h) [28]   
 	{ true, "8Bh (00h)", 0x8b, "READ_VOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
-	// 8Ch (00h) [28]  
+	// 8Ch (00h) [29]  
 	{ true, "8Ch (00h)", 0x8c, "READ_IOUT(12V)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 0, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
-	// 8Bh (01h) [29]  
+	// 8Bh (01h) [30]  
 	{ true, "8Bh (01h)", 0x8b, "READ_VOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
-	// 8Ch (01h) [30]  
+	// 8Ch (01h) [31]  
 	{ true, "8Ch (01h)", 0x8c, "READ_IOUT(12V_SBY)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0, 0, 0, 0, { 0, 0 }, cmd_need_change_page, 1, cmd_query_not_yet }, { 0 }, NULL, NULL, { 0 } },
-	// 8Dh [31]        
+	// 8Dh [32]        
 	{ true, "8DH", 0x8d, "READ_TEMPERATURE_1(Ambient)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 8Eh [32]        
+	// 8Eh [33]        
 	{ true, "8EH", 0x8e, "READ_TEMPERATURE_2(Second)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 8Fh [33]        
+	// 8Fh [34]        
 	{ true, "8FH", 0x8f, "READ_TEMPERATURE_3(Primary)", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 90h [34]        
+	// 90h [35]        
 	{ true, "90H", 0x90, "READ_FAN_SPEED_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 91h [35]        
+	// 91h [36]        
 	{ true, "91H", 0x91, "READ_FAN_SPEED_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 96h [36]        
+	// 96h [37]        
 	{ true, "96H", 0x96, "READ_POUT", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 97h [37]        
+	// 97h [38]        
 	{ true, "97H", 0x97, "READ_PIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 98h [38]        
+	// 98h [39]        
 	{ true, "98H", 0x98, "PMBUS_REVISION", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 9Ah [39]        
+	// 9Ah [40]        
 	{ true, "9AH", 0x9a, "MFR_MODEL", cmd_access_brbw, 0, 0, { 0 }, 0x0d, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 9Bh [40]       
+	// 9Bh [41]       
 	{ true, "9BH", 0x9b, "MFR_REVISION", cmd_access_brbw, 0, 0, { 0 }, 0x04, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// 9Eh [41]       
+	// 9Eh [42]       
 	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x1c, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A0h [42]       
+	// A0h [43]       
 	{ true, "A0H", 0xa0, "MFR_VIN_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A1h [43]        
+	// A1h [44]        
 	{ true, "A1H", 0xa1, "MFR_VIN_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A2h [44]        
+	// A2h [45]        
 	{ true, "A2H", 0xa2, "MFR_IIN_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A3h [45]       
+	// A3h [46]       
 	{ true, "A3H", 0xa3, "MFR_PIN_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A4h [46]        
+	// A4h [47]        
 	{ true, "A4H", 0xa4, "MFR_VOUT_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A5h [47]        
+	// A5h [48]        
 	{ true, "A5H", 0xa5, "MFR_VOUT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A6h [48]        
+	// A6h [49]        
 	{ true, "A6H", 0xa6, "MFR_IOUT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A7h [49]        
+	// A7h [50]        
 	{ true, "A7H", 0xa7, "MFR_POUT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A8h [50]      
+	// A8h [51]      
 	{ true, "A8H", 0xa8, "MFR_TAMBIENT_MAX", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// A9h [51]        
+	// A9h [52]        
 	{ true, "A9H", 0xa9, "MFR_TAMBIENT_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// AAh [52]        
+	// AAh [53]        
 	{ true, "AAH", 0xaa, "MFR_EFFICIENCY_LL", cmd_access_br, 0, 0, { 0 }, 0x10, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// ABh [53]        
+	// ABh [54]        
 	{ true, "ABH", 0xab, "MFR_EFFICIENCY_HL", cmd_access_br, 0, 0, { 0 }, 0x10, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// C0h [54]
+	// C0h [55]
 	{ true, "C0H", 0xc0, "MFR_MAX_TEMP_1", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// C1h [55]
+	// C1h [56]
 	{ true, "C1H", 0xc1, "MFR_MAX_TEMP_2", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// C2h [56]
+	// C2h [57]
 	{ true, "C2H", 0xc2, "MFR_MAX_TEMP_3", cmd_access_readwrite, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// D9h [57]
+	// D9h [58]
 	{ true, "D9H", 0xd9, "F.W.Revision", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// DCh [58]       
+	// DCh [59]       
 	{ true, "DCH", 0xdc, "Read_BoxSTATUS", cmd_access_br, 0, 0, { 0 }, 0x0C, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// E0h [59]        
+	// E0h [60]        
 	{ true, "E0H", 0xe0, "PFC_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// E1h [60]        
+	// E1h [61]        
 	{ true, "E1H", 0xe1, "PFC_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// E2h [61]        
+	// E2h [62]        
 	{ true, "E2H", 0xe2, "SR_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
-	// E3h [62]        
+	// E3h [63]        
 	{ true, "E3H", 0xe3, "SR_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 
 };
 
-#define GIGABYTE_CRPS001_CMD_TABLE_SIZE  sizeof(g_GIGABYTE_CRPS001_CMDTable)/sizeof(PMBUSCOMMAND_t) // 55 + 4 + 4
+#define GIGABYTE_CRPS001_CMD_TABLE_SIZE  sizeof(g_GIGABYTE_CRPS001_CMDTable)/sizeof(PMBUSCOMMAND_t) // 55 + 4 + 4 + 1
 
 #endif
