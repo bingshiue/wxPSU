@@ -444,7 +444,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		separate_pec = 0;
 
-		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 8);
+		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 8);
 		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
 
 		buffer[INDEX_PEC_HID] = separate_pec;

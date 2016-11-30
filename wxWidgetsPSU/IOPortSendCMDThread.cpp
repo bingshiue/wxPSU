@@ -1299,27 +1299,27 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// Send Data
 							sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(sendCMDVector_Iterator->m_sendData, sendCMDVector_Iterator->m_sendDataLength);
 							if (sendResult <= 0){
-								PSU_DEBUG_PRINT(MSG_ERROR, "IO Send Separate Write CMD Failed, sendResult=%d", sendResult);
+								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Separate Write CMD Failed, sendResult=%d", sendResult);
 								// Retry 
 								retry++;
 								if (retry >= 3){
-									PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Separate Write CMD Failed, Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Separate Write CMD Failed, Retry Times = %d", retry);
 									sendRetryStillFailed = true;
 									break;
 								}
 								else{
-									PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Retry Times = %d", retry);
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Send Separate Write CMD Retry Times = %d", retry);
 								}
 
 							}
 							else{
-								PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Separate Write CMD Success");
+								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
 							}
 
 						} while (sendResult <= 0);
 
 						if (sendRetryStillFailed == true){
-							PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Retry Send Still Failed, Exit Send Thread");
+							PSU_DEBUG_PRINT(MSG_ERROR, "Send Separate Write CMD Retry Send Still Failed, Exit Send Thread");
 							m_running = false;
 							break;
 						}
@@ -1337,23 +1337,33 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						}
 
 						// Semaphore Wait for Read Thread Complete
-						PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore WaitTimeout (Separate)");
+						PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout (Separate)");
 						ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 						if (ret != wxSEMA_NO_ERROR){
-							PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d(Separate)", ret);
-						}
-						else{
-							PSU_DEBUG_PRINT(MSG_ALERT, "Response Length of Separate Write CMD is %d", this->m_recvBuff->m_length);
-							wxString writePageRes("");
-							for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
-								writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
-							}
-							PSU_DEBUG_PRINT(MSG_ALERT, "Send Separate Write CMD Response : %s", writePageRes.c_str());
+							PSU_DEBUG_PRINT(MSG_ERROR, "Semaphore wait timout occurs : error = %d(Separate)", ret);
 
 							if (this->m_appSettings->m_runMode == RunMode_StopAnError){
 								m_running = false;
 								break;
 							}
+
+						}
+						else{
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Separate Write CMD is %d", this->m_recvBuff->m_length);
+							wxString writePageRes("");
+							for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
+								writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
+							}
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Send Separate Write CMD Response : %s", writePageRes.c_str());
+
+							// Verify Receive Data
+							if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, 256) == PMBUSHelper::response_ok){
+								PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
+							}
+							else {
+								PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+							}
+
 						}
 
 					}// for (sendCMDVector_Iterator = this->m_sendCMDVector->begin(); sendCMDVector_Iterator != this->m_sendCMDVector->end(); sendCMDVector_Iterator++)
