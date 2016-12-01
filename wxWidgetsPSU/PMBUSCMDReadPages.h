@@ -32,8 +32,11 @@ public:
 
 protected:
 
-	wxBoxSizer   *m_blockSizeSizer;
-	wxBoxSizer   *m_data1Sizer;
+
+	wxGridSizer  *m_fieldGridSizer;
+	
+	//wxBoxSizer   *m_blockSizeSizer;
+	//wxBoxSizer   *m_data1Sizer;
 
 	wxStaticText *m_blockSizeST;
 	wxStaticText *m_blockSizePaddingST;
@@ -48,9 +51,9 @@ protected:
 	wxStaticText *m_data1ST;
 	wxTextCtrl *m_data1InputValue;
 
-	wxStaticText *m_padding;
-	wxStaticText *m_padding2;
-	wxStaticText *m_padding3;
+	//wxStaticText *m_padding;
+	//wxStaticText *m_padding2;
+	//wxStaticText *m_padding3;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;

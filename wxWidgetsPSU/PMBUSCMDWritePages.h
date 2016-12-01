@@ -167,6 +167,7 @@ public:
 	~WritePage05H();
 
 protected:
+	wxGridSizer *m_fieldGridSizer;
 
 	wxBoxSizer* m_pageSizer;
 	wxBoxSizer* m_cmdSizer;

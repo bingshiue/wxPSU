@@ -56,9 +56,9 @@ void BaseWritePage::BaseLayOut(void){
 	m_staticLine_1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(280, -1));
 
 	// Add Component To Sizer
-	m_horizonSizer1->Add(this->m_cookRadioButton, 0, wxALIGN_CENTER_VERTICAL);
+	m_horizonSizer1->Add(this->m_cookRadioButton, wxSizerFlags(0).Border());//0, wxALIGN_CENTER_VERTICAL);
 
-	m_horizonSizer1->Add(this->m_rawRadioButton, 0, wxALIGN_CENTER_VERTICAL);
+	m_horizonSizer1->Add(this->m_rawRadioButton, wxSizerFlags(0).Border());//0, wxALIGN_CENTER_VERTICAL);
 
 	m_horizonSizer1->Add(this->m_stPadding_WriteButton, wxSizerFlags(0).Expand().Border());
 

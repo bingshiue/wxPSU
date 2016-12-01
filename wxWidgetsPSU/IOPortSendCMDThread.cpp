@@ -1313,7 +1313,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							}
 							else{
-								PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
+								//PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
+								int sendCMDIndex = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : 5;
+								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %x H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
 							}
 
 						} while (sendResult <= 0);

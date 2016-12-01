@@ -131,7 +131,7 @@ void WritePage03H::OnButtonWrite(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(CMD03H);
-			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
 		}
 	}
 	else{

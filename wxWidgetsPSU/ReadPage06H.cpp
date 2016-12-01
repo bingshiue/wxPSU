@@ -10,8 +10,8 @@
 ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseReadPage(parent, label){
 	// Initial Input Fields
 	m_blockSizeST = new wxStaticText(this, wxID_ANY, wxString(L"Block Size"), wxDefaultPosition, wxSize(-1, -1));
-	m_blockSizePaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(55, -1));
-	m_blockSizeCB = new wxComboBox(this, CID_BLOCK_SIZE_COMBOBOX);
+	//m_blockSizePaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(55, -1));
+	m_blockSizeCB = new wxComboBox(this, CID_BLOCK_SIZE_COMBOBOX, wxEmptyString, wxDefaultPosition, wxSize(-1,-1));
 	m_blockSizeCB->Append(wxT("2")); // Block Count 2
 	m_blockSizeCB->Append(wxT("3")); // Block Count 3
 	m_blockSizeCB->Select(1);
@@ -29,20 +29,37 @@ ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_runnin
 		m_data1InputValue->Enable(false);
 	}
 
+	// Initial Sizer
+	this->m_fieldGridSizer = new wxGridSizer(4, 2, 10, 10);
+
+#if 0
 	m_padding = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 	m_padding2 = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 	m_padding3 = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 
-	// Initial Sizer
 	this->m_blockSizeSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->m_horizonSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_horizonSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_data1Sizer = new wxBoxSizer(wxHORIZONTAL);
+#endif
 
 	// Add Components To Sizer
-	this->m_blockSizeSizer->Add(m_blockSizeST, 0, wxALIGN_CENTER_VERTICAL);
-	this->m_blockSizeSizer->Add(m_blockSizePaddingST, 0, wxALIGN_CENTER_VERTICAL);
-	this->m_blockSizeSizer->Add(m_blockSizeCB, 0, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_blockSizeST, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL));
+	this->m_fieldGridSizer->Add(m_blockSizeCB, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL));
+
+	this->m_fieldGridSizer->Add(m_page, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_pageInputValue, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_cmd, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_cmdInputValue, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_data1ST, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_data1InputValue, 1, wxALIGN_CENTER_VERTICAL);
+
+#if 0
+	this->m_blockSizeSizer->Add(m_blockSizeST, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxRIGHT));
+	//this->m_blockSizeSizer->Add(m_blockSizePaddingST, 0, wxALIGN_CENTER_VERTICAL);
+	this->m_blockSizeSizer->Add(m_blockSizeCB, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL));
 
 	this->m_horizonSizer2->Add(m_page, 1, wxALIGN_CENTER_VERTICAL);
 	this->m_horizonSizer2->Add(m_pageInputValue, 1, wxALIGN_CENTER_VERTICAL);
@@ -60,6 +77,11 @@ ReadPage06H::ReadPage06H(wxWindow* parent, wxString& label, bool* monitor_runnin
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer3);
 	this->m_staticBoxlSizer->Add(this->m_padding3);
 	this->m_staticBoxlSizer->Add(this->m_data1Sizer);
+
+#endif
+
+	this->m_staticBoxlSizer->Add(this->m_fieldGridSizer);
+
 
 #if READ_PAGES_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons

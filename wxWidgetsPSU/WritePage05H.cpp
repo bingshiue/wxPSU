@@ -5,15 +5,15 @@
 #include "PMBUSCMDWritePages.h"
 
 #define DEFAULT_PAGE  0x00/**< Default PAGE */
-#define DEFAULT_CMD   0x7A/**< Default CMD */
-#define DEFAULT_DATA1 0x01/**< Default DATA 1 */
-#define DEFAULT_DATA2 0x00/**< Default DATA 2 */
+#define DEFAULT_CMD   0x1b/**< Default CMD */
+#define DEFAULT_DATA1 0x7a/**< Default DATA 1 */
+#define DEFAULT_DATA2 0x90/**< Default DATA 2 */
 
 WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_pageST = new wxStaticText(this, wxID_ANY, wxString(L"PAGE"), wxDefaultPosition, wxSize(-1, -1));
 	//m_pageTC = new wxTextCtrl(this, wxID_ANY);
-	m_pagePaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80, -1));
+	//m_pagePaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80, -1));
 	m_pageCB = new wxComboBox(this, CID_PAGE_COMBOBOX);
 
 	wxString pageSTR = wxString::Format("%d", DEFAULT_PAGE);
@@ -26,11 +26,11 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_cmdTC = new wxTextCtrl(this, wxID_ANY);
 	
 	m_dataCountST = new wxStaticText(this, wxID_ANY, wxString(L"DATA BYTES"), wxDefaultPosition, wxSize(-1, -1));
-	m_dataCountPaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(41, -1));
+	//m_dataCountPaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(41, -1));
 	m_dataCountCB = new wxComboBox(this, CID_DATA_COUNT_COMBOBOX);
 	m_dataCountCB->Append(wxT("1"));
 	m_dataCountCB->Append(wxT("2"));
-	m_dataCountCB->Select(0);
+	m_dataCountCB->Select(1);
 
 	m_data1 = new wxStaticText(this, wxID_ANY, wxString(L"DATA 1"), wxDefaultPosition, wxSize(-1, -1));
 	m_data1InputValue = new wxTextCtrl(this, wxID_ANY);
@@ -42,21 +42,46 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 		m_data2InputValue->Enable(false);
 	}
 
+#if 0
 	m_padding = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 	m_padding2 = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 	m_padding3 = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
 	m_padding4 = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
+#endif
 
 	// Initial Sizer
+	this->m_fieldGridSizer = new wxGridSizer(5, 2, 10, 10);
+
+#if 0
 	this->m_pageSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->m_cmdSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->m_dataCountSZ = new wxBoxSizer(wxHORIZONTAL);
 	this->m_horizonSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	this->m_horizonSizer3 = new wxBoxSizer(wxHORIZONTAL);
+#endif
 
 	// Add Components To Sizer
+	this->m_fieldGridSizer->Add(m_pageST, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_pageCB, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_cmdST, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_cmdTC, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_dataCountST, 0, wxALIGN_CENTER_VERTICAL);
+	//this->m_fieldGridSizer->Add(m_dataCountPaddingST, 0, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_dataCountCB, 0, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_data1, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_data1InputValue, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_fieldGridSizer->Add(m_data2, 1, wxALIGN_CENTER_VERTICAL);
+	this->m_fieldGridSizer->Add(m_data2InputValue, 1, wxALIGN_CENTER_VERTICAL);
+
+	this->m_staticBoxlSizer->Add(this->m_fieldGridSizer);
+
+#if 0
 	this->m_pageSizer->Add(m_pageST, 0, wxALIGN_CENTER_VERTICAL);
-	this->m_pageSizer->Add(m_pagePaddingST, 0, wxALIGN_CENTER_VERTICAL);
+	//this->m_pageSizer->Add(m_pagePaddingST, 0, wxALIGN_CENTER_VERTICAL);
 	this->m_pageSizer->Add(m_pageCB, 0, wxALIGN_CENTER_VERTICAL);
 
 	this->m_cmdSizer->Add(m_cmdST, 1, wxALIGN_CENTER_VERTICAL);
@@ -81,6 +106,7 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer2);
 	this->m_staticBoxlSizer->Add(this->m_padding);
 	this->m_staticBoxlSizer->Add(this->m_horizonSizer3);
+#endif
 
 #if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
@@ -327,7 +353,7 @@ void WritePage05H::OnButtonWrite(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(CMD05H);
-			PSU_DEBUG_PRINT(MSG_ALERT, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
 		}
 	}
 	else{
