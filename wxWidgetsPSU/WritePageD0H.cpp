@@ -85,17 +85,17 @@ void WritePageD0H::OnRadioButtonRaw(wxCommandEvent& event){
 
 #define CMD_D0H_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePageD0H::OnButtonWrite(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
 	unsigned char sendValue;
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		sendValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", sendValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, Value = %d", sendValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		sendValue = wxAtoi(this->m_inputValue->GetValue());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", sendValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %d", sendValue);
 	}
 
 #if 0
@@ -138,7 +138,7 @@ void WritePageD0H::OnButtonWrite(wxCommandEvent& event){
 	else{
 		// If monitor is not running
 		int cnt = Task::GetCount();
-		PSU_DEBUG_PRINT(MSG_ALERT, "Task Count = %d", cnt);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Task Count = %d", cnt);
 		if (cnt != 0) return;
 
 		new(TP_SendWriteCMDTask)SendWriteCMDTask(m_ioaccess, m_currentIO, CMDD0H);
