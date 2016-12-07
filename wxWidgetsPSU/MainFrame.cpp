@@ -3077,6 +3077,39 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 		break;
 	}
 
+
+	/*** Setup FW Upload Mode & FW Upload & FW Upload Status CMD ***/
+	switch (this->m_appSettings.m_currentUseCustomer){
+
+	// Use Gigabyte's FW Upload Command Set
+	case Customer_GIGABYTE:
+		
+		// Gigabyte FW Upload Mode Command
+		PMBUSHelper::getFWUploadModeCMD() = GIGABYTE_FW_UPLOAD_MODE_CMD;
+		// Gigabyte FW Upload Command
+		PMBUSHelper::getFWUploadCMD() = GIGABYTE_FW_UPLOAD_CMD;
+		// Gigabyte FW Upload Status Command
+		PMBUSHelper::getFWUploadStatusCMD() = GIGABYTE_FW_UPLOAD_STATUS_CMD;
+
+		break;
+
+	// Default Use Acbel Defined F0 F1 F3
+	default:
+		
+		// Default FW Upload Mode Command
+		PMBUSHelper::getFWUploadModeCMD() = DEFAULT_FW_UPLOAD_MODE_CMD;
+		// Default FW Upload Command
+		PMBUSHelper::getFWUploadCMD() = DEFAULT_FW_UPLOAD_CMD;
+		// Default FW Upload Status Command
+		PMBUSHelper::getFWUploadStatusCMD() = DEFAULT_FW_UPLOAD_STATUS_CMD;
+
+		break;
+	}
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "FW Upload Mode Command : %02xH", PMBUSHelper::getFWUploadModeCMD());
+	PSU_DEBUG_PRINT(MSG_ALERT, "FW Upload Command : %02xH", PMBUSHelper::getFWUploadCMD());
+	PSU_DEBUG_PRINT(MSG_ALERT, "FW Upload Status Command : %02xH", PMBUSHelper::getFWUploadStatusCMD());
+
 	/*** Start ISP Sequence Thread ***/
 	m_ispSequenceThread = new ISPSequenceThread(wxString(wxT("FilePath")), hexFileParser, this->m_IOAccess, &this->m_CurrentUseIOInterface, target, this->m_appSettings.m_developerMode, this->GetEventHandler(), m_pmbusProgressDialog->GetEventHandler(), &this->m_ispStatus, NULL);
 	// If Create Thread Success

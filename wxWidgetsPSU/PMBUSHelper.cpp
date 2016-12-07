@@ -19,6 +19,9 @@ wxString PMBUSHelper::m_winTitleBase;
 PMBUSCOMMAND_t* PMBUSHelper::m_PMBusCMDData;
 unsigned int PMBUSHelper::runInMode;
 int PMBUSHelper::runInTimes;
+unsigned char PMBUSHelper::m_FWUploadModeCMD;
+unsigned char PMBUSHelper::m_FWUploadCMD;
+unsigned char PMBUSHelper::m_FWUploadStatusCMD;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -1066,4 +1069,16 @@ int PMBUSHelper::getIndexOfCMD(int cmd, int page){
 	}
 
 	return index;
+}
+
+unsigned char& PMBUSHelper::getFWUploadModeCMD(void){
+	return m_FWUploadModeCMD;
+}
+
+unsigned char& PMBUSHelper::getFWUploadCMD(void){
+	return m_FWUploadCMD;
+}
+
+unsigned char& PMBUSHelper::getFWUploadStatusCMD(void){
+	return m_FWUploadStatusCMD;
 }

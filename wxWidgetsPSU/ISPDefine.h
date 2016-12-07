@@ -4,6 +4,14 @@
 #ifndef _ISPDEFINE_H_
 #define _ISPDEFINE_H_
 
+#define DEFAULT_FW_UPLOAD_MODE_CMD       0xf0 /**< Default FW Upload Mode Command */
+#define DEFAULT_FW_UPLOAD_CMD            0xf1 /**< Default FW Upload Command */
+#define DEFAULT_FW_UPLOAD_STATUS_CMD     0xf3 /**< Default FW Upload Status Command */
+
+#define GIGABYTE_FW_UPLOAD_MODE_CMD      0xd6 /**< Gigabyte FW Upload Mode Command */
+#define GIGABYTE_FW_UPLOAD_CMD           0xd7 /**< Gigabyte FW Upload Mode Command */
+#define GIGABYTE_FW_UPLOAD_STATUS_CMD    0xd8 /**< Gigabyte FW Upload Mode Command */
+
 #define UPDATE_PRIMARY_FW_TARGET    0x50 /**< Primary FW Update Target code */
 #define UPDATE_SECONDARY_FW_TARGET  0x60 /**< Secondary FW Update Target code */
 

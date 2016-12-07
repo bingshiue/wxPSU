@@ -41,12 +41,12 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x54;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
-		buffer[active_index++] = 0xf1; // Command
+		buffer[active_index++] = PMBUSHelper::getFWUploadCMD(); // FW Upload Command
 
 		pec_buffer[pec_active_index++] = 0x41;
 		pec_buffer[pec_active_index++] = 0x54;
 		pec_buffer[pec_active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
-		pec_buffer[pec_active_index++] = 0xf1; // Command
+		pec_buffer[pec_active_index++] = PMBUSHelper::getFWUploadCMD(); // FW Upload Command
 
 		/* Address */
 		this->m_tiHexFileStat->startAddress(&start_address);
@@ -303,7 +303,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x54;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
-		buffer[active_index++] = 0xf1; // Command
+		buffer[active_index++] = PMBUSHelper::getFWUploadCMD(); // FW Upload Command
 
 		pec_buffer[0] = 0x05;
 		//pec_buffer[1] = 27;
@@ -311,7 +311,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		pec_buffer[pec_active_index++] = 0x41;
 		pec_buffer[pec_active_index++] = 0x54;
 		pec_buffer[pec_active_index++] = PMBUSHelper::GetSlaveAddress(); // Slave Adress
-		pec_buffer[pec_active_index++] = 0xf1; // Command
+		pec_buffer[pec_active_index++] = PMBUSHelper::getFWUploadCMD(); // FW Upload Command
 
 
 		/* Address */

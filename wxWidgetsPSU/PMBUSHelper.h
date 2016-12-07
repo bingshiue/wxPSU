@@ -92,6 +92,18 @@ public :
 	static PMBUSCOMMAND_t* getPMBUSCMDData(void);
 
 	static int getIndexOfCMD(int cmd, int page = 0);
+	/**
+	 * @brief Getter & Setter for FW Upload Mode Command.
+	 */
+	static unsigned char& getFWUploadModeCMD(void);
+	/**
+	 * @brief Getter & Setter for FW Upload Command.
+	 */
+	static unsigned char& getFWUploadCMD(void);
+	/**
+	 * @brief Getter & Setter for FW Upload Status Command.
+	 */
+	static unsigned char& getFWUploadStatusCMD(void);
 
 protected :
 
@@ -109,6 +121,12 @@ private :
 	static wxString m_winTitleBase;
 
 	static PMBUSCOMMAND_t *m_PMBusCMDData;
+
+	static unsigned char m_FWUploadModeCMD;/**< FW Upload Mode Command */
+
+	static unsigned char m_FWUploadCMD;/**< FW Upload Command */
+
+	static unsigned char m_FWUploadStatusCMD;/**< FW Upload Status Command */
 
 };
 

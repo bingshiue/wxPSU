@@ -33,7 +33,7 @@ unsigned int SendISPEndCMDTask::ProductSendBuffer(unsigned char* buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x54;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
-		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
 		buffer[active_index++] = 0x00; // End
 
 		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
@@ -50,7 +50,7 @@ unsigned int SendISPEndCMDTask::ProductSendBuffer(unsigned char* buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x54;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
-		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
 		buffer[active_index++] = 0x00; // End
 
 		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 4, 3); // PEC

@@ -34,7 +34,7 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x44;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
-		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
 		buffer[active_index++] = 0x0D;
 		buffer[active_index++] = 0x0A;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress() | 0x01; // Slave Address + 1
@@ -53,7 +53,7 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 		buffer[active_index++] = 0x41;
 		buffer[active_index++] = 0x44;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
-		buffer[active_index++] = 0xF0; // CMD
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
 		buffer[active_index++] = 0x0D;
 		buffer[active_index++] = 0x0A;
 		buffer[active_index++] = PMBUSHelper::GetSlaveAddress() | 0x01; // Slave Address + 1
