@@ -452,21 +452,21 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				/*** If toggle is enable ***/
 				if (this->m_pmBusCommand[idx].m_toggle == true){
 
-					
-					
+
+
 					/*** Query Command (0x1A) ***/
 					if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
 
 						// Find Query Command (0x1A)'s Index
 						QueryCMDIndex = -1;
-						for (unsigned int local=0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
+						for (unsigned int local = 0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
 							if (this->m_pmBusCommand[local].m_register == PMBUSCMD_1AH_QUERY){
 								QueryCMDIndex = local;
 								break;
 							}
 						}
 
-						if (QueryCMDIndex >= 0){					
+						if (QueryCMDIndex >= 0){
 							// Prepare Send Buffer
 							PreviousQueryCMDAdditionalCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
 							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
@@ -536,11 +536,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							else{
 								this->m_IOPortReadCMDThread->Run();
 							}
-						
+
 							// Semaphore Wait for Read Thread Complete
 							PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[QueryCMDIndex].m_register);
 							ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
-						
+
 							if (ret != wxSEMA_NO_ERROR){
 								PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
 							}
@@ -638,7 +638,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 													}
 												}
 
-												if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format 
+												if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format
 													/* || this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_8bit_Unsigned_Number */){
 
 													if (CoefficientsCMDIndex >= 0){
@@ -780,14 +780,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 																		queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
-																		#if 0
+#if 0
 																		for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
 																			if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
 																				queryCMDIndex = idx2;
 																				break;
 																			}
 																		}
-                                                                        #endif
+#endif
 
 																		if (queryCMDIndex < 0){
 																			PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -832,7 +832,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 												}
 
 											}// if (PreUpdateQuery == true)
-										
+
 										}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success)
 
 									}// if (this->m_recvBuff->m_length == ExpectReceiveDataLength) 
@@ -840,11 +840,11 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								}// else (if (this->m_recvBuff->m_length == 0))
 
 							} // else if (ret != wxSEMA_NO_ERROR)
-						
+
 							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousQueryCMDAdditionalCMD;
 
 						}// if (QueryCMDIndex >= 0)
-		
+
 						// Just Doing Once in Every Send Thread Start 
 						this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
 
@@ -853,6 +853,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 					/*** If Own Read Access (No Need To Polling If CMD Don't Have Read Access) ***/
 					if (PMBUSHelper::isOwnReadAccess(this->m_pmBusCommand[idx].m_access) == true){//this->m_pmBusCommand[idx].m_access != cmd_access_write) { // If CMD's Attribute not equal cmd_access_write
+
+
+						// If Only Polling Support CMD Setting Enable
+						if (this->m_appSettings->m_onlyPollingSupportCMD == Generic_Enable){
+
+							// If CMD don't support, skip 
+							if (this->m_pmBusCommand[idx].m_cmdStatus.m_support == cmd_unsupport){
+								continue;
+							}
+						}
+
 
 						/*-------------------- Check If Need Change Page --------------------*/
 						if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == cmd_need_change_page){
@@ -901,8 +912,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									}
 									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", PageSentData.c_str());
 #endif
-									
-									
+
+
 									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Write Page CMD Success");
 								}
 
@@ -1148,7 +1159,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 										// If this is Query Command(0x1A), Update Query Filed
 										if (this->m_pmBusCommand[idx].m_register == 0x1A){
-											
+
 											// Get Query CMD
 											int queryCMD;
 											queryCMD = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];
@@ -1161,24 +1172,24 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 											*/
 											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
-                                            #if 0
+#if 0
 											for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
 												if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
 													queryCMDIndex = idx2;
 													break;
 												}
 											}
-                                            #endif
+#endif
 
 											if (queryCMDIndex < 0){
 												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
 												updateQuery = false;
 											}
-											
+
 											if (updateQuery == true){
 												// Call Query Data CB Function
 												memset(QueryStr, 0, STR_LENGTH);
-												                                                                                                      // CMD's Page
+												// CMD's Page
 												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[idx]), QueryStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 												wxString QueryMsg(QueryStr);
@@ -1205,17 +1216,17 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 											/* In Polling Each Command Section, The Secondary Parameter of getIndexOfCMD function should be
 											   "The Page of Query CMD not 'this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage' due to 'idx' is 0x1A's idx"
-											*/
+											   */
 											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
-                                            #if 0
+#if 0
 											for (int idx3 = 0; idx3 < (signed)PMBUSHelper::CurrentCMDTableSize; idx3++){
 												if (PMBUSHelper::getPMBUSCMDData()[idx3].m_register == queryCMD){
 													queryCMDIndex = idx3;
 													break;
 												}
 											}
-                                            #endif
+#endif
 
 											if (queryCMDIndex < 0){
 												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
@@ -1225,7 +1236,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 											if (updateCoefficients == true){
 												// Call Query Data CB Function
 												memset(CoefficientsStr, 0, STR_LENGTH);
-												                                                                                                                    // CMD's Page
+												// CMD's Page
 												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[idx]), CoefficientsStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 												wxString CoefficientsMsg(CoefficientsStr);
@@ -1246,7 +1257,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								else{
 									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d(ExpectReceiveDataLength=%d)", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length, ExpectReceiveDataLength);
 									// 0d  0a  4e  47  0d  0a : May Receive Response as left when I2C Slave Address was wrong
-									
+
 									wxString receive("");
 									for (unsigned int index = 0; index < this->m_recvBuff->m_length; index++){
 										receive += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[index]);
@@ -1280,6 +1291,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						//Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
 					} // if (this->m_pmBusCommand[idx].m_access != cmd_access_write)
+
 				}// if (this->m_pmBusCommand[idx].m_toggle == true)
 				else{
 					// Don't Do Polling So fast

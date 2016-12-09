@@ -58,6 +58,7 @@ int GB_CRPS_Query_9bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOf
 int GB_CRPS_Query_9cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_9dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Query_9fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_a0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_a1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Query_a2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);

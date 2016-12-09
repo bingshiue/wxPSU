@@ -2148,10 +2148,19 @@ int GB_CRPS_Cook_99H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_ID
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr("ID: ");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2217,10 +2226,19 @@ int GB_CRPS_Cook_9cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_LOCATION
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr("LOCATION: ");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2234,10 +2252,19 @@ int GB_CRPS_Cook_9dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
-	// Don't Show Anything
+	// MFR_DATE
 	const wchar_t* tmp_wchar;
 
-	wxString wxstr("----------");
+	wxString wxstr("DATE: ");
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	for (int idx = 0; idx < pmbuscmd->m_recvBuff.m_dataBuff[0]; idx++){
+		// If ASCII Character ?
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] >= 0 && pmbuscmd->m_recvBuff.m_dataBuff[1 + idx] <= 127){
+			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
+		}
+	}
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2264,6 +2291,23 @@ int GB_CRPS_Cook_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			wxstr += wxString::Format("%c", pmbuscmd->m_recvBuff.m_dataBuff[1 + idx]);
 		}
 	}
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_9fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// MFR_SERIAL
+	const wchar_t* tmp_wchar;
+
+	wxString wxstr("APP Profile : ");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

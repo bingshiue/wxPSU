@@ -67,6 +67,8 @@ enum {
 
 #define DEFAULT_RUNIN_TIMES  10
 
+#define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Enable
+
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600
 #define DEFAULT_COMPORT_BYTESIZE      8
@@ -283,6 +285,7 @@ typedef struct appSettings_t {
 	unsigned long m_acsSetPointMin;/**< ACE Set Point Minimum Value */
 	unsigned long m_acsSetPointMax;/**< ACE Set Point Maximum Value */
 	unsigned long m_ispF3CMDDelayTime;/**< ISP F3 CMD Delay Time */
+	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -314,6 +317,7 @@ typedef struct appSettings_t {
 		this->m_acsSetPointMin = DEFAULT_ACS_SETPOINT_INPUT_MIN;
 
 		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
+		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

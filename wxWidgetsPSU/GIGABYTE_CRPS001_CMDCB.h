@@ -21,6 +21,8 @@ CMDQueryCBFunc g_GIGABYTE_CRPS001_CMDQueryCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE
 	GB_CRPS_Query_20H,
 	GB_CRPS_Query_30H, // New
   //GB_CRPS_Query_31H, // New
+    GB_CRPS_Query_3aH, // New
+	GB_CRPS_Query_3bH, // New
 	GB_CRPS_Query_46H, // New
 	GB_CRPS_Query_4aH, // New
 	GB_CRPS_Query_51H,
@@ -28,6 +30,7 @@ CMDQueryCBFunc g_GIGABYTE_CRPS001_CMDQueryCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE
 	GB_CRPS_Query_6aH,
 	GB_CRPS_Query_6bH,
 	GB_CRPS_Query_70H, // New
+	GB_CRPS_Query_78H, // New
 	GB_CRPS_Query_79H,
 	GB_CRPS_Query_7aH,
 	GB_CRPS_Query_7bH,
@@ -48,13 +51,16 @@ CMDQueryCBFunc g_GIGABYTE_CRPS001_CMDQueryCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE
 	GB_CRPS_Query_8eH,
 	GB_CRPS_Query_8fH,
 	GB_CRPS_Query_90H,
-	GB_CRPS_Query_91H, // New
 	GB_CRPS_Query_96H,
 	GB_CRPS_Query_97H,
 	GB_CRPS_Query_98H,
+	GB_CRPS_Query_99H,
 	GB_CRPS_Query_9aH,
 	GB_CRPS_Query_9bH,
+	GB_CRPS_Query_9cH,
+	GB_CRPS_Query_9dH,
 	GB_CRPS_Query_9eH,
+	GB_CRPS_Query_9fH,
 	GB_CRPS_Query_a0H,
 	GB_CRPS_Query_a1H,
 	GB_CRPS_Query_a2H,
@@ -91,6 +97,8 @@ CMDCoefficientsCBFunc g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc[GIGABYTE_CRPS001_
 	GB_CRPS_Coefficients_20H,
 	GB_CRPS_Coefficients_30H, // New
   //GB_CRPS_Coefficients_31H, // New
+    GB_CRPS_Coefficients_3aH, // New
+	GB_CRPS_Coefficients_3bH, // New
     GB_CRPS_Coefficients_46H, // New
 	GB_CRPS_Coefficients_4aH, // New
 	GB_CRPS_Coefficients_51H,
@@ -98,6 +106,7 @@ CMDCoefficientsCBFunc g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc[GIGABYTE_CRPS001_
 	GB_CRPS_Coefficients_6aH,
 	GB_CRPS_Coefficients_6bH,
 	GB_CRPS_Coefficients_70H, // New
+	GB_CRPS_Coefficients_78H, // New
 	GB_CRPS_Coefficients_79H,
 	GB_CRPS_Coefficients_7aH,
 	GB_CRPS_Coefficients_7bH,
@@ -118,13 +127,16 @@ CMDCoefficientsCBFunc g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc[GIGABYTE_CRPS001_
 	GB_CRPS_Coefficients_8eH,
 	GB_CRPS_Coefficients_8fH,
 	GB_CRPS_Coefficients_90H,
-	GB_CRPS_Coefficients_91H, // New
 	GB_CRPS_Coefficients_96H,
 	GB_CRPS_Coefficients_97H,
 	GB_CRPS_Coefficients_98H,
+	GB_CRPS_Coefficients_99H,
 	GB_CRPS_Coefficients_9aH,
 	GB_CRPS_Coefficients_9bH,
+	GB_CRPS_Coefficients_9cH,
+	GB_CRPS_Coefficients_9dH,
 	GB_CRPS_Coefficients_9eH,
+	GB_CRPS_Coefficients_9fH,
 	GB_CRPS_Coefficients_a0H,
 	GB_CRPS_Coefficients_a1H,
 	GB_CRPS_Coefficients_a2H,
@@ -161,6 +173,8 @@ CMDCookCBFunc g_GIGABYTE_CRPS001_CMDCookCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] 
 	GB_CRPS_Cook_20H,
 	GB_CRPS_Cook_30H, // New
   //GB_CRPS_Cook_31H, // New
+    GB_CRPS_Cook_3aH, // New
+	GB_CRPS_Cook_3bH, // New
     GB_CRPS_Cook_46H, // New
     GB_CRPS_Cook_4aH, // New
 	GB_CRPS_Cook_51H,
@@ -168,6 +182,7 @@ CMDCookCBFunc g_GIGABYTE_CRPS001_CMDCookCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] 
 	GB_CRPS_Cook_6aH,
 	GB_CRPS_Cook_6bH,
 	GB_CRPS_Cook_70H, // New
+	GB_CRPS_Cook_78H, // New
 	GB_CRPS_Cook_79H,
 	GB_CRPS_Cook_7aH,
 	GB_CRPS_Cook_7bH,
@@ -188,13 +203,16 @@ CMDCookCBFunc g_GIGABYTE_CRPS001_CMDCookCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] 
 	GB_CRPS_Cook_8eH,
 	GB_CRPS_Cook_8fH,
 	GB_CRPS_Cook_90H,
-	GB_CRPS_Cook_91H, // New
 	GB_CRPS_Cook_96H,
 	GB_CRPS_Cook_97H,
 	GB_CRPS_Cook_98H,
+	GB_CRPS_Cook_99H,
 	GB_CRPS_Cook_9aH,
 	GB_CRPS_Cook_9bH,
+	GB_CRPS_Cook_9cH,
+	GB_CRPS_Cook_9dH,
 	GB_CRPS_Cook_9eH,
+	GB_CRPS_Cook_9fH,
 	GB_CRPS_Cook_a0H,
 	GB_CRPS_Cook_a1H,
 	GB_CRPS_Cook_a2H,
@@ -231,6 +249,8 @@ CMDRawCBFunc g_GIGABYTE_CRPS001_CMDRawCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] = 
 	GB_CRPS_Raw_20H,
 	GB_CRPS_Raw_30H, // New
   //GB_CRPS_Raw_31H, // New
+    GB_CRPS_Raw_3aH, // New
+	GB_CRPS_Raw_3bH, // New
     GB_CRPS_Raw_46H, // New
 	GB_CRPS_Raw_4aH, // New
 	GB_CRPS_Raw_51H,
@@ -238,6 +258,7 @@ CMDRawCBFunc g_GIGABYTE_CRPS001_CMDRawCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] = 
 	GB_CRPS_Raw_6aH,
 	GB_CRPS_Raw_6bH,
 	GB_CRPS_Raw_70H, // New
+	GB_CRPS_Raw_78H, // New
 	GB_CRPS_Raw_79H,
 	GB_CRPS_Raw_7aH,
 	GB_CRPS_Raw_7bH,
@@ -258,13 +279,16 @@ CMDRawCBFunc g_GIGABYTE_CRPS001_CMDRawCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] = 
 	GB_CRPS_Raw_8eH,
 	GB_CRPS_Raw_8fH,
 	GB_CRPS_Raw_90H,
-	GB_CRPS_Raw_91H, // New
 	GB_CRPS_Raw_96H,
 	GB_CRPS_Raw_97H,
 	GB_CRPS_Raw_98H,
+	GB_CRPS_Raw_99H,
 	GB_CRPS_Raw_9aH,
 	GB_CRPS_Raw_9bH,
+	GB_CRPS_Raw_9cH,
+	GB_CRPS_Raw_9dH,
 	GB_CRPS_Raw_9eH,
+	GB_CRPS_Raw_9fH,
 	GB_CRPS_Raw_a0H,
 	GB_CRPS_Raw_a1H,
 	GB_CRPS_Raw_a2H,

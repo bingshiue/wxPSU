@@ -96,7 +96,7 @@ PMBUSCOMMAND_t g_FSG003_000G_CMDTable[] = { //[FSG003_000G_CMD_TABLE_SIZE] = {
 	// 9Dh         
 	{ true, "9DH", 0x9d, "MFR_DATE", cmd_access_brbw, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// 9Eh         
-	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x13, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
+	{ true, "9FH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x13, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// A0h         
 	{ true, "A0H", 0xa0, "MFR_VIN_MIN", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { 0 } },
 	// A1h         

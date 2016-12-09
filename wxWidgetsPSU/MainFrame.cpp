@@ -360,6 +360,7 @@ void MainFrame::SetupMenuBar(void){
 	|------------------------------------
 	|- I2C Fault Test
 	|- [V] Enable Checksum
+	|- Only Polling Support Command
 	|------------------------------------
 	|- Clear Error Log
 	|- Reset Max./Min. Value
@@ -417,8 +418,15 @@ void MainFrame::SetupMenuBar(void){
 		this->m_EnableChecksumMenuItem->Check(true);
 	}
 
+	this->m_onlyPollingSupportCMDMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Only_Polling_Support_Command, wxT("Only Polling Support Command"), wxT("Only Polling Support Command"), wxITEM_CHECK);
+
+	if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
+		this->m_onlyPollingSupportCMDMenuItem->Check(true);
+	}
+
 	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
+	this->m_runMenu->Append(m_onlyPollingSupportCMDMenuItem);
 	this->m_runMenu->AppendSeparator();
 
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
@@ -1916,6 +1924,20 @@ void MainFrame::OnEnableChecksum(wxCommandEvent& event){
 	}
 }
 
+void MainFrame::OnOnlyPollingSupportCommand(wxCommandEvent& event){
+	
+	if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
+		this->m_appSettings.m_onlyPollingSupportCMD = Generic_Disable;
+
+		this->m_onlyPollingSupportCMDMenuItem->Check(false);
+	}
+	else if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Disable){
+		this->m_appSettings.m_onlyPollingSupportCMD = Generic_Enable;
+
+		this->m_onlyPollingSupportCMDMenuItem->Check(true);
+	}
+}
+
 void MainFrame::OnClearErrorLog(wxCommandEvent& event){
 	this->m_debugLogTC->Clear();
 }
@@ -3389,6 +3411,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_EnableChecksum = enableChecksum;
 	}
 
+	// Only Polling Support CMD
+	long onlyPollingSupportCMD;
+	if (pConfig->Read(wxT("OnlyPollingSupportCMD"), &onlyPollingSupportCMD) == false){
+		pConfig->Write(wxT("OnlyPollingSupportCMD"), DEFAULT_ONLY_POLLING_SUPPORT_CMD);
+		this->m_appSettings.m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
+	}
+	else{
+		this->m_appSettings.m_onlyPollingSupportCMD = onlyPollingSupportCMD;
+	}
+
 	// ACS Set Point Minimum
 	long acsSetPointMin;
 	if (pConfig->Read(wxT("AcsSetPointMin"), &acsSetPointMin) == false){
@@ -3717,6 +3749,9 @@ void MainFrame::SaveConfig(void){
 
 	// Enable Checksum
 	pConfig->Write(wxT("EnableChecksum"), this->m_appSettings.m_EnableChecksum);
+
+	// Only Polling Support CMD
+	pConfig->Write(wxT("OnlyPollingSupportCMD"), this->m_appSettings.m_onlyPollingSupportCMD);
 
 	pConfig->SetPath(wxT("/LOG"));
 
@@ -4203,6 +4238,7 @@ EVT_MENU(MENU_ID_Update_Secondary_Firmware, MainFrame::OnUpdateSecondaryFirmware
 EVT_MENU(MENU_ID_Query_All_Commands, MainFrame::OnQueryAllCommands)
 EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
 EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
+EVT_MENU(MENU_ID_Only_Polling_Support_Command, MainFrame::OnOnlyPollingSupportCommand)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
 EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
 EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)

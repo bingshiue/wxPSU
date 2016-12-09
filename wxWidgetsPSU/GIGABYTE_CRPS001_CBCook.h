@@ -52,6 +52,7 @@ int GB_CRPS_Cook_9bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 int GB_CRPS_Cook_9cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Cook_9dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Cook_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int GB_CRPS_Cook_9fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Cook_a0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Cook_a1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int GB_CRPS_Cook_a2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
