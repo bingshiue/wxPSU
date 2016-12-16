@@ -10,6 +10,7 @@
 #include "Customers.h"
 #include "Models.h"
 #include "PMBUSCommandType.h"
+#include "ISPDefine.h"
 
 enum {
 	RunMode_Iterations = 0,
@@ -286,6 +287,8 @@ typedef struct appSettings_t {
 	unsigned long m_acsSetPointMax;/**< ACE Set Point Maximum Value */
 	unsigned long m_ispF3CMDDelayTime;/**< ISP F3 CMD Delay Time */
 	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
+	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
+	unsigned long m_ISPDDWaitRootTime; /**< ISP DD Wait Reboot Time */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -318,6 +321,8 @@ typedef struct appSettings_t {
 
 		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
+		this->m_ISPPFCWaitRootTime = WAIT_PFC_REBOOT_TIME;
+		this->m_ISPDDWaitRootTime = WAIT_DD_REBOOT_TIME;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

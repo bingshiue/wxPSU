@@ -37,7 +37,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.15       |     Supply Direct Format Data Read/Write                       |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.16       |     Load FW Upload Command Set On RunTime                      |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.15" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.16" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif

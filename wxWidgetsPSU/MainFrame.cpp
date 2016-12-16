@@ -3702,6 +3702,25 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_ispF3CMDDelayTime = f3CMDDelayTime;
 	}
 
+	long pfcWaitRebootTime;
+	if (pConfig->Read(wxT("PFCWaitRebootTime"), &pfcWaitRebootTime) == false){
+		pConfig->Write(wxT("PFCWaitRebootTime"), WAIT_PFC_REBOOT_TIME);
+		this->m_appSettings.m_ISPPFCWaitRootTime = WAIT_PFC_REBOOT_TIME;
+	}
+	else{
+		this->m_appSettings.m_ISPPFCWaitRootTime = pfcWaitRebootTime;
+	}
+	
+
+	long ddWaitRebootTime;
+	if (pConfig->Read(wxT("DDWaitRebootTime"), &ddWaitRebootTime) == false){
+		pConfig->Write(wxT("DDWaitRebootTime"), WAIT_DD_REBOOT_TIME);
+		this->m_appSettings.m_ISPDDWaitRootTime = WAIT_DD_REBOOT_TIME;
+	}
+	else{
+		this->m_appSettings.m_ISPDDWaitRootTime = ddWaitRebootTime;
+	}
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;
@@ -3791,6 +3810,10 @@ void MainFrame::SaveConfig(void){
 
 	// F3 CMD Delay Time
 	pConfig->Write(wxT("F3CMDDelayTime"), this->m_appSettings.m_ispF3CMDDelayTime);
+
+	pConfig->Write(wxT("PFCWaitRebootTime"), this->m_appSettings.m_ISPPFCWaitRootTime);
+
+	pConfig->Write(wxT("DDWaitRebootTime"), this->m_appSettings.m_ISPDDWaitRootTime);
 
 	// Delete wxConfig Object
 	delete wxConfigBase::Set((wxConfigBase *)NULL);
