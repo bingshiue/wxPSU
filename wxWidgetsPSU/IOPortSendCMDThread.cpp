@@ -591,6 +591,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
 											this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_success;
 											//success++;
+											
+											this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
 										}
 
 										bool PreUpdateQuery = true;
@@ -846,7 +848,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						}// if (QueryCMDIndex >= 0)
 
 						// Just Doing Once in Every Send Thread Start 
-						this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
+						//this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
 
 					}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet)
 
@@ -860,6 +862,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 							// If CMD don't support, skip 
 							if (this->m_pmBusCommand[idx].m_cmdStatus.m_support == cmd_unsupport){
+								// Sleep 100 milliseconds for prevent Application No Reply If No Command Support
+								wxMilliSleep(100);
 								continue;
 							}
 						}
@@ -1290,11 +1294,15 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						//Sleep(this->m_pollingTime - 20);////this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
-					} // if (this->m_pmBusCommand[idx].m_access != cmd_access_write)
+					} // if (PMBUSHelper::isOwnReadAccess(this->m_pmBusCommand[idx].m_access) == true) //if (this->m_pmBusCommand[idx].m_access != cmd_access_write)
+					else{
+						continue;
+					}
 
 				}// if (this->m_pmBusCommand[idx].m_toggle == true)
 				else{
 					// Don't Do Polling So fast
+					//wxMilliSleep(100);
 					//continue;
 				}
 

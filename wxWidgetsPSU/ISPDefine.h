@@ -46,7 +46,8 @@
 #define ISP_F3_CMD_FAILED_RETRY_SLEEP_TIME 50 /**< Sleep Time before F3 Command Check Failed Retry (MilliSecond) */
 #endif
 
-#define WAIT_DSP_REBOOT_TIME  7000 /**< Wait for DSP Reboot Time (MilliSecond) */
+#define WAIT_PFC_REBOOT_TIME  7000 /**< Wait for PFC DSP Reboot Time (MilliSecond) */
+#define WAIT_DD_REBOOT_TIME  10000 /**< Wait for DD DSP Reboot Time (MilliSecond) */
 
 #define UserCancelISP_POST_DELAY_TIME 7000 /**< User Cancel ISP Post Delay Time */
 

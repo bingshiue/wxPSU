@@ -67,7 +67,7 @@ enum {
 
 #define DEFAULT_RUNIN_TIMES  10
 
-#define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Enable
+#define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Disable
 
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600

@@ -473,7 +473,7 @@ int GB_CRPS_Cook_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -511,7 +511,7 @@ int GB_CRPS_Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -551,7 +551,7 @@ int GB_CRPS_Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -589,7 +589,7 @@ int GB_CRPS_Cook_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -628,7 +628,7 @@ int GB_CRPS_Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -1377,7 +1377,7 @@ int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -1477,7 +1477,7 @@ int GB_CRPS_Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 }
 
@@ -1564,7 +1564,7 @@ int GB_CRPS_Cook_88H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1605,7 +1605,7 @@ int GB_CRPS_Cook_89H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1646,7 +1646,7 @@ int GB_CRPS_Cook_8aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1686,7 +1686,7 @@ int GB_CRPS_Cook_8b00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -1728,7 +1728,7 @@ int GB_CRPS_Cook_8c00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1768,7 +1768,7 @@ int GB_CRPS_Cook_8b01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -1811,7 +1811,7 @@ int GB_CRPS_Cook_8c01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeO
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1852,7 +1852,7 @@ int GB_CRPS_Cook_8dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1893,7 +1893,7 @@ int GB_CRPS_Cook_8eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1934,7 +1934,7 @@ int GB_CRPS_Cook_8fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -1975,7 +1975,7 @@ int GB_CRPS_Cook_90H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -2015,7 +2015,7 @@ int GB_CRPS_Cook_96H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}	
 	
@@ -2055,7 +2055,7 @@ int GB_CRPS_Cook_97H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -2307,7 +2307,55 @@ int GB_CRPS_Cook_9fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// MFR_SERIAL
 	const wchar_t* tmp_wchar;
 
+	// APP_PROFILE_SUPPORT First Data Byte Contents
+	// 00h No Application Profiles Are Supported
+	// 01h Server AC-DC Power Supply [A06]
+	// 02h DC-DC Converters For Microprocessor Power And Other Computer Applications[A07]
+	// 03h DC-DC Converters For General Purpose Use [A08]
+
+	// The second data byte, indicating revision shall be formatted as two four bit nibbles.
+	// Bits[7:4] shall indicate the major revision and bits[3:0] shall indicate the minor
+	// revision.The value 00h shall be used only when the first byte is also 00h, indicating
+	// that the device does not support any application profiles.For example, revision 1.2
+	// would be reported as 0102h.
+	// If a device supports multiple Application Profiles, the device may report these in any order.
+
 	wxString wxstr("APP Profile : ");
+	
+	// APP_PROFILE_SUPPORT
+	switch (pmbuscmd->m_recvBuff.m_dataBuff[1]){
+
+	case 0:
+		wxstr += wxT("NONE");
+		break;
+
+	case 1:
+		wxstr += wxT("Server AC-DC Power Supply");
+		break;
+
+	case 2:
+		wxstr += wxT("DC-DC Converters For Microprocessor Power And Other Computer Applications");
+		break;
+
+	case 3:
+		wxstr += wxT("DC-DC Converters For General Purpose Use");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Unknown APP PROFILE SUPPORT Type !");
+		break;
+	}
+
+	wxstr += wxT(" ");
+	
+	// Revision
+    #define APP_PROFILE_REVISON_MAJOR 0xf0
+    #define APP_PROFILE_REVISON_MINOR 0x0f
+
+	char major = (pmbuscmd->m_recvBuff.m_dataBuff[2] & APP_PROFILE_REVISON_MAJOR) >> 4;
+	char minor = pmbuscmd->m_recvBuff.m_dataBuff[2] & APP_PROFILE_REVISON_MINOR;
+
+	wxstr += wxString::Format("Rev: %d.%d", major, minor);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -2341,7 +2389,7 @@ int GB_CRPS_Cook_a0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2379,7 +2427,7 @@ int GB_CRPS_Cook_a1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2417,7 +2465,7 @@ int GB_CRPS_Cook_a2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2457,7 +2505,7 @@ int GB_CRPS_Cook_a3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2495,7 +2543,7 @@ int GB_CRPS_Cook_a4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2535,7 +2583,7 @@ int GB_CRPS_Cook_a5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2575,7 +2623,7 @@ int GB_CRPS_Cook_a6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2615,7 +2663,7 @@ int GB_CRPS_Cook_a7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2653,7 +2701,7 @@ int GB_CRPS_Cook_a8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -2693,7 +2741,7 @@ int GB_CRPS_Cook_a9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3268,7 +3316,7 @@ int GB_CRPS_Cook_4aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3331,7 +3379,7 @@ int GB_CRPS_Cook_91H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 	
@@ -3371,7 +3419,7 @@ int GB_CRPS_Cook_c0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3411,7 +3459,7 @@ int GB_CRPS_Cook_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3451,7 +3499,7 @@ int GB_CRPS_Cook_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3515,7 +3563,7 @@ int GB_CRPS_Cook_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3556,7 +3604,7 @@ int GB_CRPS_Cook_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3597,7 +3645,7 @@ int GB_CRPS_Cook_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 
@@ -3638,7 +3686,7 @@ int GB_CRPS_Cook_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: 02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_dataFormat.m_formatType, pmbuscmd->m_register);
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
 		break;
 	}
 

@@ -58,8 +58,22 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 		
 		PSU_DEBUG_PRINT(MSG_ALERT, "ISP End Command Response OK");
 
-		PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DSP Reboot, Wait %d Milliseconds", WAIT_DSP_REBOOT_TIME);
-		wxMilliSleep(WAIT_DSP_REBOOT_TIME);
+		switch (PMBUSHelper::getCurrentISPTarget()){
+
+		case UPDATE_PRIMARY_FW_TARGET:// PFC
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait PFC Reboot, Wait %d Milliseconds", WAIT_PFC_REBOOT_TIME);
+			wxMilliSleep(WAIT_PFC_REBOOT_TIME);
+			break;
+	
+		case UPDATE_SECONDARY_FW_TARGET:// DD
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DD Reboot, Wait %d Milliseconds", WAIT_DD_REBOOT_TIME);
+			wxMilliSleep(WAIT_DD_REBOOT_TIME);
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Wrong ISP TARGET");
+			break;
+		}
 
 		new(TP_SendRebootCheckTask) SendRebootCheckTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 		

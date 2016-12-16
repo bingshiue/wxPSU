@@ -125,7 +125,7 @@ int SendISPCheckStatusTask::Main(double elapsedTime){
 	} while (sendResult <= 0);
 
 	if (sendRetryStillFailed == true){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send ISP Check Status CMD Still Failed, Forgive to send !");
+		PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send ISP Check Status CMD Still Failed, Give up send !");
 		*this->m_ispStatus = ISP_Status_SendDataFailed;
 		delete this;
 		return -1;

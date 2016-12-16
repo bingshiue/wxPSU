@@ -654,6 +654,8 @@ public:
 
 protected:
 
+	wxTextValidator m_textValidator;
+
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
 

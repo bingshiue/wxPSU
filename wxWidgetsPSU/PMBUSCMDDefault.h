@@ -10,4 +10,8 @@
 #define DEF_30H_READ_CMD_BYTE    0x86
 #define DEF_30H_READ_RW_BYTE     0x01
 
+// 9A MFR_MODEL
+#define MFR_MODEL_LENGTH         0x0b
+#define DEF_MFR_MODEL            "FSG003-000G"
+
 #endif
