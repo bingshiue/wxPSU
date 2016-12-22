@@ -4,9 +4,11 @@
 
 #include "TIHexMMAPModel.h"
 
-TIHexMMAPModel::TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat) : wxDataViewVirtualListModel(initSize)
+TIHexMMAPModel::TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat, TIHexFileParser* compareTiHexFileStat) : wxDataViewVirtualListModel(initSize)
 {
 	this->m_tiHexFileStat = tiHexFileStat;
+
+	this->m_compareTiHexFileStat = compareTiHexFileStat;
 
 	tiHexFileStat->begin();
 	m_startAddress = tiHexFileStat->currentAddress();
@@ -131,6 +133,11 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 
 bool TIHexMMAPModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataViewItemAttr &attr) const {
 
+	unsigned short data;
+	unsigned short data_compare;
+	unsigned long address;
+	bool diff = false;
+
 	switch (col){
 
 	case Col_ADDRESS:
@@ -153,10 +160,45 @@ bool TIHexMMAPModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataView
 	case Col_0DH:
 	case Col_0EH:
 	case Col_0FH:
+
+		address = this->m_startAddress + ((row * 0x10) + (col - 1));
+
+		if (address <= this->m_endAddress){
+
+			this->m_tiHexFileStat->getData(&data, this->m_startAddress + (row * 0x10) + (col - 1));
+
+			this->m_compareTiHexFileStat->getData(&data_compare, this->m_startAddress + (row * 0x10) + (col - 1));
+
+			if (data != data_compare){
+				attr.SetBackgroundColour(wxColour(255,183,76));
+			}
+		}
+
 		attr.SetBold(true);
 		break;
 
 	case Col_ASCII:
+
+		for (unsigned int idx = 1; idx < 17; idx++){
+
+			address = this->m_startAddress + ((row * 0x10) + (idx - 1));
+
+			if (address <= this->m_endAddress && diff == false){
+
+				this->m_tiHexFileStat->getData(&data, this->m_startAddress + ((row * 0x10) + (idx - 1)));
+
+				this->m_compareTiHexFileStat->getData(&data_compare, this->m_startAddress + ((row * 0x10) + (idx - 1)));
+
+				if (data != data_compare){
+					attr.SetBackgroundColour(wxColour(255, 183, 76));
+					diff = true;
+				}
+
+			}
+			else{
+				break;
+			}
+		}
 
 		break;
 

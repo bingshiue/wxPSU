@@ -33,4 +33,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_INTERRUPT, wxThreadEvent); /**< Dec
 wxDECLARE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_END, wxThreadEvent); /**< Declare QUERY SEQUENCE END Event */
 
 
+wxDECLARE_EVENT(wxEVT_COMMAND_RELOAD_HEX_FILE, wxThreadEvent); /**< Declare Reload HEX File Event */
+
+
 #endif

@@ -28,6 +28,8 @@
 
 #include "Task.h"
 
+//#define HAVE_RELOAD_BUTTON
+
 enum {
 	ID_HEXMMAP_DVC = 8100,
 
@@ -35,6 +37,7 @@ enum {
 
 	CID_WRITE_BUTTON,
 	CID_CLOSE_BUTTON,
+	CID_RELOAD_BUTTON,
 
 	CID_RUN_IN_CHECKBOX,
 };
@@ -42,7 +45,7 @@ enum {
 class PMBUSFWUpdatePanel : public wxPanel, private wxLog {
 public:
 	
-	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode);
+	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode);
 
 	~PMBUSFWUpdatePanel();
 
@@ -53,6 +56,8 @@ public:
 	unsigned int ProductSendBuffer(unsigned char* buffer);
 
 	bool isCloseButtonPressed(void);
+
+	void ReloadHexFile(void);
 
 protected :
 
@@ -66,7 +71,9 @@ private:
 
 	wxObjectDataPtr<TIHexMMAPModel> m_tiHexMMAPModel;
 
-	TIHexFileParser m_tiHexFileStat;
+	TIHexFileParser *m_tiHexFileStat;
+	TIHexFileParser m_ReloadTiHexFileStat;
+	TIHexFileParser m_CompareTiHexFileStat;
 
 	IOACCESS *m_ioaccess;
 	
@@ -107,6 +114,10 @@ private:
 	wxButton *m_writeButton;
 	wxButton *m_closeButton;
 
+#ifdef HAVE_RELOAD_BUTTON
+	wxButton *m_reloadButton;
+#endif
+
 	wxFlexGridSizer *m_fileStatFGS;
 	wxBoxSizer *m_buttonSizer;
 
@@ -131,6 +142,8 @@ private:
 
 	//PMBUSFWProgressDialog *m_progressDialog;
 
+	wxFileSystemWatcher* m_watcher;   // file system watcher
+
 	unsigned long m_startAddress;
 	unsigned long m_endAddress;
 	unsigned long m_addressRange;
@@ -142,8 +155,11 @@ private:
 
 	unsigned int m_writeCount;
 
+	void CheckHexAddressRange(void);
+
 	void OnWriteButton(wxCommandEvent& event);
 	void OnCloseButton(wxCommandEvent& event);
+	void OnReloadButton(wxCommandEvent& event);
 
 	void OnPopUpMenu(wxDataViewEvent &event);
 	void OnSaveHex(wxCommandEvent& event);
@@ -151,6 +167,9 @@ private:
 	void OnRunInCheckBox(wxCommandEvent& event);
 
 	void OnProgressUpdate(wxThreadEvent& event);
+	void OnReloadHexFile(wxThreadEvent& event);
+
+	void OnFileSystemEvent(wxFileSystemWatcherEvent& event);
 
 	void DoLogLine(
 		wxLogLevel level,

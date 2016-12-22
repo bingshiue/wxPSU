@@ -5,14 +5,17 @@
 #include "PMBUSFWUpdatePanel.h"
 
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_RELOAD_HEX_FILE, wxThreadEvent);
 
-PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
+PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
 
 	this->m_parent = parent;
 
 	this->m_hexFilePath = hexFilePath;
 	
 	this->m_tiHexFileStat = tiHexFileStat;
+
+	this->m_CompareTiHexFileStat = *this->m_tiHexFileStat;
 
 	this->m_ioaccess = ioaccess;
 
@@ -28,15 +31,15 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_writeCount = 0;
 
-	tiHexFileStat.begin();
-    this->m_startAddress = tiHexFileStat.currentAddress();
+	tiHexFileStat->begin();
+    this->m_startAddress = tiHexFileStat->currentAddress();
 
-	tiHexFileStat.end();
-	this->m_endAddress = tiHexFileStat.currentAddress();
+	tiHexFileStat->end();
+	this->m_endAddress = tiHexFileStat->currentAddress();
 
 	this->m_addressRange = (this->m_endAddress - this->m_startAddress) + 1UL;
 
-	this->m_dataBytes = tiHexFileStat.size() * 2;
+	this->m_dataBytes = tiHexFileStat->size() * 2;
 
 	this->m_dvlRowCount = (this->m_addressRange % 16 == 0) ? this->m_addressRange / 16 : (this->m_addressRange / 16) + 1;
 
@@ -102,8 +105,16 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_closeButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_CLOSE_BUTTON, wxT("CLOSE"));
 	this->m_closeButton->SetBitmap(wxBITMAP_PNG(CLOSE_32));
 
+#ifdef HAVE_RELOAD_BUTTON
+	this->m_reloadButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_RELOAD_BUTTON, wxT("RELOAD"));
+#endif
+
 	this->m_buttonSizer->Add(this->m_writeButton, wxSizerFlags(0).Border(wxALL));
 	this->m_buttonSizer->Add(this->m_closeButton, wxSizerFlags(0).Border(wxALL));
+
+#ifdef HAVE_RELOAD_BUTTON
+	this->m_buttonSizer->Add(this->m_reloadButton, wxSizerFlags(0).Border(wxALL));
+#endif
 
 	this->m_statisticSBS->Add(this->m_fileNameST, wxSizerFlags(0).Align(wxALIGN_CENTER).Border());
 
@@ -193,10 +204,28 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	}
 
 	this->SetSizerAndFit(this->m_topLevelSizer);
+
+	// Initialize File System Watcher
+	m_watcher = new wxFileSystemWatcher();
+	m_watcher->SetOwner(this);
+
+	Connect(wxEVT_FSWATCHER,
+		wxFileSystemWatcherEventHandler(PMBUSFWUpdatePanel::OnFileSystemEvent));
+
+	// Set HEX File Root Directory To FSWatcher
+	wxFileName hexFileFullPath(this->m_hexFilePath);
+	
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Add %s To FSWatcher", hexFileFullPath.GetPathWithSep().c_str());
+	m_watcher->Add(hexFileFullPath.GetPathWithSep());
 }
 
 PMBUSFWUpdatePanel::~PMBUSFWUpdatePanel(){
+	// Free File System Watcher
+	wxFileName hexFileFullPath(this->m_hexFilePath);
 
+	m_watcher->Remove(hexFileFullPath.GetPathWithSep());
+
+	wxDELETE(m_watcher);
 }
 
 void PMBUSFWUpdatePanel::SetupHexMMAPDVL(void){
@@ -206,7 +235,7 @@ void PMBUSFWUpdatePanel::SetupHexMMAPDVL(void){
 	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	this->m_tiHexMMAPDVC->SetFont(font);
 
-	this->m_tiHexMMAPModel = new TIHexMMAPModel(this->m_dvlRowCount, &this->m_tiHexFileStat);
+	this->m_tiHexMMAPModel = new TIHexMMAPModel(this->m_dvlRowCount, this->m_tiHexFileStat, &this->m_CompareTiHexFileStat);
 	this->m_tiHexMMAPDVC->AssociateModel(this->m_tiHexMMAPModel.get());
 
 	this->m_tiHexMMAPDVC->AppendTextColumn("ADDRESS", TIHexMMAPModel::Col_ADDRESS, wxDATAVIEW_CELL_ACTIVATABLE, 200, wxALIGN_CENTER);
@@ -655,6 +684,78 @@ void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){
 
 }
 
+void PMBUSFWUpdatePanel::OnReloadButton(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnReloadButton:");
+
+	this->ReloadHexFile();
+}
+
+void PMBUSFWUpdatePanel::ReloadHexFile(void){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	// Reload HEX File Start
+	// Create an input stream
+	ifstream TIHexInput;
+
+	// Create a variable for the intel hex data
+	TIHexInput.open(this->m_hexFilePath.c_str().AsChar(), ifstream::in);
+
+	if (!TIHexInput.good())
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Error: couldn't open file %s", this->m_hexFilePath.c_str());
+		return;
+	}
+
+	/* Decode file (Load To m_ReloadTiHexFileStat) */
+	this->m_ReloadTiHexFileStat.ClearALL();
+	TIHexInput >> this->m_ReloadTiHexFileStat; //
+
+	// Check Errors
+	if (this->m_ReloadTiHexFileStat.getNoErrors() != 0){
+
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Errors :");
+
+		while (this->m_ReloadTiHexFileStat.getNoErrors() != 0){
+			string error_str;
+			this->m_ReloadTiHexFileStat.popNextError(error_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_str.c_str());
+		}
+
+
+		wxMessageBox(wxT("Load Hex File Has Error"),
+			wxT("Error !"),
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+	// Check Warnings
+	if (this->m_ReloadTiHexFileStat.getNoWarnings() != 0)
+	{
+		PSU_DEBUG_PRINT(MSG_ERROR, "Read HEX File Contains Warnings :");
+
+		while (this->m_ReloadTiHexFileStat.getNoWarnings() != 0){
+			string warning_str;
+			this->m_ReloadTiHexFileStat.popNextWarning(warning_str);
+			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warning_str.c_str());
+		}
+
+		wxMessageBox(wxT("Load Hex File Has Warning"),
+			wxT("Warning !"),
+			wxOK | wxICON_WARNING);
+	}
+
+	/* Fill Blank Address                                                     */
+	this->m_ReloadTiHexFileStat.fillBlankAddr(0xffff);
+
+	// Copy New Hex File Content
+	this->m_CompareTiHexFileStat = *this->m_tiHexFileStat;
+
+	this->m_tiHexFileStat->ClearALL();
+
+	*this->m_tiHexFileStat = this->m_ReloadTiHexFileStat;
+}
+
 void PMBUSFWUpdatePanel::OnPopUpMenu(wxDataViewEvent &event){
 	// Show Pop Up Menu
 	this->m_tiHexMMAPDVC->PopupMenu(this->m_popupMenu);
@@ -691,15 +792,15 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 
 	TIHexOutput << this->m_tiHexFileStat;
 
-	if (this->m_tiHexFileStat.getNoWarnings() > 0 || this->m_tiHexFileStat.getNoErrors() > 0)
+	if (this->m_tiHexFileStat->getNoWarnings() > 0 || this->m_tiHexFileStat->getNoErrors() > 0)
 	{
 		PSU_DEBUG_PRINT(MSG_ERROR, "Error or Warnings generated during decoding:");
 		// Check Warnings
-		while (this->m_tiHexFileStat.getNoErrors() > 0)
+		while (this->m_tiHexFileStat->getNoErrors() > 0)
 		{
 			string error_message;
 
-			this->m_tiHexFileStat.popNextError(error_message);
+			this->m_tiHexFileStat->popNextError(error_message);
 
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", error_message.c_str());
 
@@ -709,11 +810,11 @@ void PMBUSFWUpdatePanel::OnSaveHex(wxCommandEvent& event){
 
 		}
 		// Check Errors
-		while (this->m_tiHexFileStat.getNoWarnings() > 0)
+		while (this->m_tiHexFileStat->getNoWarnings() > 0)
 		{
 			string warn_message;
 
-			this->m_tiHexFileStat.popNextWarning(warn_message);
+			this->m_tiHexFileStat->popNextWarning(warn_message);
 
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", warn_message.c_str());
 
@@ -844,7 +945,6 @@ void PMBUSFWUpdatePanel::DoLogRecord(wxLogLevel level, const wxString& msg, cons
 
 }
 
-
 void PMBUSFWUpdatePanel::OnProgressUpdate(wxThreadEvent& event){
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", event.GetString());
@@ -856,11 +956,135 @@ void PMBUSFWUpdatePanel::OnProgressUpdate(wxThreadEvent& event){
 
 }
 
+void PMBUSFWUpdatePanel::OnReloadHexFile(wxThreadEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	wxString message = event.GetString();
+
+	// Popup Dialog For Let User Comfirm
+	int confirm;
+	wxMessageDialog* confirmDialog = new wxMessageDialog(this, message, wxT("Content Of Hex File Has Been Changed !"), wxYES_NO | wxICON_INFORMATION);
+	confirmDialog->CenterOnScreen();
+	confirm = confirmDialog->ShowModal();
+
+	if (confirm == wxID_YES) {
+		PSU_DEBUG_PRINT(MSG_ALERT, "Reload Hex File");
+		ReloadHexFile();
+	}
+	else{
+		return;
+	}
+
+	wxDELETE(confirmDialog);
+
+	// Compute Address
+	this->CheckHexAddressRange();
+
+	// If Develop Mode Enable
+	if (this->m_developerMode == Generic_Enable){
+		
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Refresh DataViewCtrl");
+		
+		// Reset Model Size
+		this->m_tiHexMMAPModel->Reset(this->m_dvlRowCount);
+		
+		// Refresh DVC 
+		this->m_tiHexMMAPDVC->Refresh();
+	}
+
+	// Update UI
+	if (this->m_developerMode == Generic_Enable){
+		wxString StartAddress = wxString::Format("0x%08x", this->m_startAddress);
+		this->m_startAddressTC->SetValue(StartAddress);
+
+		wxString EndAddress = wxString::Format("0x%08x", this->m_endAddress);
+		this->m_endAddressTC->SetValue(EndAddress);
+
+		wxString AddressRange = wxString::Format("%d", this->m_addressRange);
+		this->m_addressRangeTC->SetValue(AddressRange);
+	}
+
+	wxString DataBytes = wxString::Format("%d", this->m_dataBytes);
+	this->m_dataBytesTC->SetValue(DataBytes);
+
+	// Popup Dialog For Notify User Reload Operation Success
+	wxMessageDialog* successDialog = new wxMessageDialog(this, wxT("Reload Hex File Success !"), wxT("Reload File"), wxOK | wxICON_INFORMATION);
+	successDialog->CenterOnScreen();
+	(void)successDialog->ShowModal();
+
+	wxDELETE(successDialog);
+}
+
+void PMBUSFWUpdatePanel::CheckHexAddressRange(void){
+	
+	this->m_tiHexFileStat->begin();
+	this->m_startAddress = this->m_tiHexFileStat->currentAddress();
+
+	this->m_tiHexFileStat->end();
+	this->m_endAddress = this->m_tiHexFileStat->currentAddress();
+
+	this->m_addressRange = (this->m_endAddress - this->m_startAddress) + 1UL;
+
+	this->m_dataBytes = this->m_tiHexFileStat->size() * 2;
+
+	this->m_dvlRowCount = (this->m_addressRange % 16 == 0) ? this->m_addressRange / 16 : (this->m_addressRange / 16) + 1;
+}
+
+#define INTERVAL_TICKS  20000 // Unit : Milliseconds
+void PMBUSFWUpdatePanel::OnFileSystemEvent(wxFileSystemWatcherEvent& event){
+
+	static DWORD previous_ticks = 0;
+	static DWORD now_ticks = 0;
+
+	// Get Now Ticks
+	now_ticks = GetTickCount();
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnFileSystemEvent: Ticks = %d", now_ticks);
+	// Get Event Type
+	int type = event.GetChangeType();
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnFileSystemEvent Type is %d", type);
+
+	// Get The Full Path
+	wxString eventpath = event.GetPath().GetFullPath();
+	PSU_DEBUG_PRINT(MSG_DEBUG, "eventpath = %s", eventpath);
+
+	// If Interval Time Large Then INTERVAL_TICKS
+	if ((now_ticks - previous_ticks) > INTERVAL_TICKS){
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "now_ticks = %d, previous_ticks = %d", now_ticks, previous_ticks);
+		
+		// If event is wxFSW_EVENT_MODIFY
+		if (type == wxFSW_EVENT_MODIFY){
+
+			// If our watch file has been changed
+			if (eventpath == this->m_hexFilePath){
+				PSU_DEBUG_PRINT(MSG_ALERT, "Content of HEX File Has Been Changed !");
+
+				// Get Now Ticks
+				now_ticks = GetTickCount();
+
+				// Emit Thread Event
+				wxThreadEvent* threadReloadHexFileEvt;
+				threadReloadHexFileEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_RELOAD_HEX_FILE);
+				wxString message = wxString::Format("%s \n\nContent of %s Has Been Changed, Do you want to reload Hex file ? ", eventpath, eventpath);
+				threadReloadHexFileEvt->SetString(message);
+				wxQueueEvent(this->m_eventHandler, threadReloadHexFileEvt);
+
+				// For Prevent Event Emitted Twice in Short Time
+				previous_ticks = now_ticks;
+			}
+		}
+	}
+}
+
 wxBEGIN_EVENT_TABLE(PMBUSFWUpdatePanel, wxPanel)
 EVT_BUTTON(CID_WRITE_BUTTON, PMBUSFWUpdatePanel::OnWriteButton)
 EVT_BUTTON(CID_CLOSE_BUTTON, PMBUSFWUpdatePanel::OnCloseButton)
+EVT_BUTTON(CID_RELOAD_BUTTON, PMBUSFWUpdatePanel::OnReloadButton)
 EVT_MENU(MENU_ID_POPUP_SAVEHEX, PMBUSFWUpdatePanel::OnSaveHex)
 EVT_CHECKBOX(CID_RUN_IN_CHECKBOX, PMBUSFWUpdatePanel::OnRunInCheckBox)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(ID_HEXMMAP_DVC, PMBUSFWUpdatePanel::OnPopUpMenu)
 EVT_THREAD(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, PMBUSFWUpdatePanel::OnProgressUpdate)
+EVT_THREAD(wxEVT_COMMAND_RELOAD_HEX_FILE, PMBUSFWUpdatePanel::OnReloadHexFile)
 wxEND_EVENT_TABLE()

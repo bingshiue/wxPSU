@@ -34,7 +34,7 @@ public:
 		Col_Max
 	};
 
-	TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat);
+	TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat, TIHexFileParser* compareTiHexFileStat);
 
 	/* Implementation of base class virtuals methods to define model */
 	/**
@@ -74,6 +74,8 @@ protected:
 private:
 	
 	TIHexFileParser *m_tiHexFileStat;/**<  TI Hex File Parser */
+
+	TIHexFileParser *m_compareTiHexFileStat;/**< Compare TI Hex File Parser */
 
 	unsigned long m_startAddress;
 

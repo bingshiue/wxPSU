@@ -37,6 +37,7 @@
 #include "wx/config.h"
 #include "wx/fileconf.h"
 #include "wx/infobar.h"
+#include "wx/fswatcher.h"
 #include <wx/stdpaths.h>
 #include <wx/richtext/richtextctrl.h>
 #include <wx/busyinfo.h>

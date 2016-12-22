@@ -1731,7 +1731,7 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 		this->PMBusPrimaryFWUpdatePanel = new PMBUSFWUpdatePanel(
 			m_notebook, 
 			path, 
-			m_PrimaryTIHexFileStat, 
+			&m_PrimaryTIHexFileStat, 
 			this->m_IOAccess, 
 			&this->m_CurrentUseIOInterface, 
 			&this->m_monitor_running,
@@ -1865,7 +1865,7 @@ void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 		this->PMBusSecondaryFWUpdatePanel = new PMBUSFWUpdatePanel(
 			m_notebook, 
 			path, 
-			m_SecondaryTIHexFileStat, 
+			&m_SecondaryTIHexFileStat, 
 			this->m_IOAccess, 
 			&this->m_CurrentUseIOInterface, 
 			&this->m_monitor_running,
