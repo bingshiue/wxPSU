@@ -92,6 +92,178 @@ int Cook_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	return EXIT_SUCCESS; 
 }
 
+#define CMD_SUPPORT_MASK         (0x80)
+#define CMD_ACCSSS_WRITE_MASK    (0x40)
+#define CMD_ACCSSS_READ_MASK     (0x20)
+#define CMD_ACCSSS_FORMAT_MASK   (0x1C)
+#define CMD_ACCSSS_RESERVED_MASK (0x03)
+int Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// Bits     Value                 Meaning
+	//  7         1           Command is supported
+	//	          0           Command is not supported
+	//  6         1           Command is supported for write
+	//            0           Command is not supported for write
+	//  5         1           Command is supported for read
+	//	          0           Command is not supported for read
+	// 4:2       000          Linear Data Format used
+	//           001          16 bit signed number
+	//           010          Reserved
+	//           011          Direct Mode Format used
+	//           100          8 bit unsigned number
+	//           101          VID Mode Format used
+	//           110          Manufacturer specific format used
+	//           111          Command does not return numeric data.This is also used for commands that return blocks of data.
+	// 1:0       XXX          Reserved for future use
+	unsigned char support = 0;
+	unsigned char write = 0;
+	unsigned char read = 0;
+	unsigned char format = 0;
+
+	const wchar_t* tmp_wchar;
+
+	wxString wxstr("");
+
+	wxstr += wxString::Format("CMD:%02xH ", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+	wxstr.UpperCase();
+
+	// Support
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_SUPPORT_MASK){
+		wxstr += wxString::Format("Support, ");
+	}
+	else{
+		wxstr += wxString::Format("Not Support ");
+
+		tmp_wchar = wxstr.wc_str();
+		lstrcpyn(string, tmp_wchar, 256);
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+		return EXIT_SUCCESS;
+	}
+
+	// Write 
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_READ_MASK){
+		wxstr += wxString::Format("Read");
+	}
+	else{
+		wxstr += wxString::Format("");
+	}
+
+	// for "/"
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_READ_MASK){
+		if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+			wxstr += wxString::Format("/");
+		}
+	}
+
+	// Read 
+	if (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_WRITE_MASK){
+		wxstr += wxString::Format("Write ");
+	}
+	else{
+		wxstr += wxString::Format("");
+	}
+
+	wxstr += wxString::Format(",");
+
+	// Data Format
+	/* Update Data Format in CMD */
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Data Format in CMD");
+	// Get Query CMD
+	int queryCMD;
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[1];
+
+	// Get Index of Query CMD 
+	int queryCMDIndex = -1;
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+			queryCMDIndex = idx;
+			break;
+		}
+	}
+
+	if (queryCMDIndex < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		return EXIT_FAILURE;
+	}
+
+	// Set Direct Data Fomat Coefficient
+	pmbuscmd_t* target;
+	target = PMBUSHelper::getPMBUSCMDData();
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "format=%02x", (pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2);
+	switch ((pmbuscmd->m_recvBuff.m_dataBuff[1] & CMD_ACCSSS_FORMAT_MASK) >> 2){
+
+	case 0:
+		wxstr += wxString::Format("Linear");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_LinearData_Format;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 1:
+		wxstr += wxString::Format("16 bit signed");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_16bit_Signed_Number;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 2:
+		wxstr += wxString::Format("Reserved");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Reserved;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 3:
+		wxstr += wxString::Format("Direct");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_DirectData_Format;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 4:
+		wxstr += wxString::Format("8 bit unsigned");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_8bit_Unsigned_Number;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 5:
+		wxstr += wxString::Format("VID Mode");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_VID_Mode;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 6:
+		wxstr += wxString::Format("Manufacturer specific format");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Manufacturer_Specific;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	case 7:
+		wxstr += wxString::Format("Return block datas or Don't return numeric data");
+		target[queryCMDIndex].m_dataFormat.m_formatType = cmd_data_format_Don_t_Return_Numeric_Data;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Data Format=%d", target[queryCMDIndex].m_dataFormat.m_formatType);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+		break;
+	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Data Format in CMD");
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	// Call Query Command's Query CB Function
+	//wchar_t QueryStr[256];
+	//target->m_cmdCBFunc.m_queryCBFunc(&target->m_recvBuff, QueryStr, sizeOfstr);
+
+	return EXIT_SUCCESS;
+}
+
 int Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -159,6 +331,132 @@ int Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	lstrcpyn(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS; 
+}
+
+int Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	short m, b;
+	char R;
+	const wchar_t* tmp_wchar;
+
+	int RW;
+	RW = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX];
+
+	wxString wxstr("");
+
+	switch (RW){
+
+	case rw_write_coefficients:
+		wxstr += wxString::Format("(W)");
+		break;
+
+	case rw_read_coefficients:
+		wxstr += wxString::Format("(R)");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
+
+	wxstr += wxString::Format(" ");
+	wxstr += wxString::Format("CMD:%02xH,", pmbuscmd->m_cmdStatus.m_AddtionalData[1]);
+
+	/*
+	[1]	Lower byte of m
+	[2]	Upper byte of m
+	[3]	Lower byte of b
+	[4]	Upper byte of b
+	[5]	Single byte of R
+	*/
+	wxstr += L"m:";
+
+	m = (pmbuscmd->m_recvBuff.m_dataBuff[2] << 8) | pmbuscmd->m_recvBuff.m_dataBuff[1];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "m=%d", m);
+	wxstr += wxString::Format("%d", m);
+
+	wxstr += L",";
+	wxstr += L" b:";
+
+	b = (pmbuscmd->m_recvBuff.m_dataBuff[4] << 8) | pmbuscmd->m_recvBuff.m_dataBuff[3];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "b=%d", b);
+	wxstr += wxString::Format("%d", b);
+
+	wxstr += L",";
+	wxstr += L" R:";
+
+	R = pmbuscmd->m_recvBuff.m_dataBuff[5];
+	PSU_DEBUG_PRINT(MSG_DEBUG, "R=%d", R);
+	wxstr += wxString::Format("%d", R);
+
+	//
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	/* Update Direct Data Format in CMD */
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Update Direct Data Format in CMD");
+	// Get Query CMD
+	int queryCMD;
+	queryCMD = pmbuscmd->m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX];
+
+	// Get Index of Query CMD 
+	int queryCMDIndex = -1;
+	for (int idx = 0; idx < (signed)PMBUSHelper::CurrentCMDTableSize; idx++){
+		if (PMBUSHelper::getPMBUSCMDData()[idx].m_register == queryCMD){
+			queryCMDIndex = idx;
+			break;
+		}
+	}
+
+	if (queryCMDIndex < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+		return EXIT_FAILURE;
+	}
+
+	// Set Direct Data Fomat Coefficient
+	pmbuscmd_t* target;
+	target = PMBUSHelper::getPMBUSCMDData();
+
+	switch (RW){
+
+	case rw_write_coefficients:
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Write Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Write Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_WriteCoefficients.m_R);
+
+		break;
+
+	case rw_read_coefficients:
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Get Read Coefficients");
+
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M = m;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients m=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_M);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B = b;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients b=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_B);
+		target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R = R;
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Read Coefficients R=%d", target[queryCMDIndex].m_dataFormat.m_ReadCoefficients.m_R);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, RW = %d", RW);
+		break;
+	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Direct Data Format in CMD");
+
+	return EXIT_SUCCESS;
 }
 
 #define FAN1_INSTALL_MASK (0x80)
@@ -1946,6 +2244,29 @@ int Cook_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("");
 
 	wxstr += wxString::Format("%02xh", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// Show FW Version
+	const wchar_t* tmp_wchar;
+
+	//B6 - F1 - 04 - [1] [2] [3] [4] [pec] : PRI : [1].[2], SEC : [3].[4]
+	wxString wxstr("FW Ver. PRI : ");
+
+	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[1], pmbuscmd->m_recvBuff.m_dataBuff[2]);
+
+	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);

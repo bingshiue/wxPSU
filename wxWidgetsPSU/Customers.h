@@ -9,8 +9,10 @@
 enum {
 	
 	Customer_GIGABYTE = 0,
-	
+
+#if 0
 	Customer_NEC,
+#endif
 
 #if (HAVE_GENERIC_CUSTOMER == TRUE)
 	Customer_Generic,

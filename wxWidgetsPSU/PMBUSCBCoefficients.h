@@ -18,8 +18,10 @@ int Coefficients_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByt
 int Coefficients_01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_02H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int Coefficients_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int Coefficients_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
@@ -70,6 +72,7 @@ int Coefficients_a9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByt
 int Coefficients_aaH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_abH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
+int Coefficients_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 int Coefficients_ddH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);

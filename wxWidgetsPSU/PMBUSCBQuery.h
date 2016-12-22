@@ -5,14 +5,18 @@
 #define _PMBUSCBQUERY_H_
 
 #include "PMBUSCommandType.h"
+#include "PMBUSHelper.h"
+#include "pec.h"
 
 // Declare Query CB Functions
 int Query_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_02H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int Query_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int Query_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
@@ -63,6 +67,7 @@ int Query_a9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_aaH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_abH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int Query_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int Query_ddH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
