@@ -6,7 +6,7 @@
 #include "acbel_large.xpm"
 
 
-ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(375, 140)){
+ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(450, 160)){
 
 	this->m_customerList = customerList;
 	this->m_customerListSize = customerListSize;
@@ -38,7 +38,7 @@ ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customer
 	m_customerComboBox = new wxComboBox(this, CID_CBBOX_CUSTOMER, wxEmptyString, wxDefaultPosition, wxSize(110, -1), wxArrayString(), wxCB_READONLY);
 
 	m_modelNameST = new wxStaticText(this, wxID_ANY, wxT("Model Name :"));
-	m_modelNameComboBox = new wxComboBox(this, CID_CBBOX_MODELNAME, wxEmptyString, wxDefaultPosition, wxSize(155, -1), wxArrayString(), wxCB_READONLY);
+	m_modelNameComboBox = new wxComboBox(this, CID_CBBOX_MODELNAME, wxEmptyString, wxDefaultPosition, wxSize(270, -1), wxArrayString(), wxCB_READONLY);
 
 	SetupCustomerComboBox();
 	SetupModelNameComboBox();

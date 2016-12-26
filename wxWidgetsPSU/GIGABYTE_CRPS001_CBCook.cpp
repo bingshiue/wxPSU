@@ -28,6 +28,8 @@ static bool Check_Have_CheckSum_Error(pmbuscmd_t* pmbuscmd, wchar_t* string, uns
 	return result;
 }
 
+int GB_CRPS_Cook_Not_Implement(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+
 int GB_CRPS_Cook_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -91,6 +93,27 @@ int GB_CRPS_Cook_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_04H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_07H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_08H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_09H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_0fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_10H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_11H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_12H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_13H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_14H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_15H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_16H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_17H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_18H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 #define CMD_SUPPORT_MASK         (0x80)
 #define CMD_ACCSSS_WRITE_MASK    (0x40)
@@ -293,6 +316,11 @@ int GB_CRPS_Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_1cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_1dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_1eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_1fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
 #define MODE_MASK (0xE0)// 11100000b
 #define EXPONENT_MASK (0x1F)// 00011111b
 #define SIGN_BIT (0x10) // 00010000b
@@ -343,6 +371,30 @@ int GB_CRPS_Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_21H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_22H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_23H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_24H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_25H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_26H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_27H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_28H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_29H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2AH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2BH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2CH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2DH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2EH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_2FH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_32H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_33H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_34H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_35H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_36H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_37H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_38H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_39H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 #define FAN1_INSTALL_MASK (0x80)
 #define FAN1_COMMANDED (0x40)
@@ -449,6 +501,16 @@ int GB_CRPS_Cook_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_3cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_3dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_3eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_3fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_40H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_41H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_42H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_43H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_44H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_45H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -486,7 +548,15 @@ int GB_CRPS_Cook_46H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
-
+int GB_CRPS_Cook_47H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_48H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_49H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_4bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_4cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_4dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_4eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_4fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_50H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -526,7 +596,17 @@ int GB_CRPS_Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
-
+int GB_CRPS_Cook_52H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_53H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_54H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_55H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_56H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_57H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_58H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_59H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_5aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_5bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_5cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -564,7 +644,18 @@ int GB_CRPS_Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
-
+int GB_CRPS_Cook_5eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_5fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_60H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_61H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_62H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_63H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_64H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_65H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_66H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_67H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_68H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_69H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -641,7 +732,18 @@ int GB_CRPS_Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+int GB_CRPS_Cook_6cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_6dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_6eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_6fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
+int GB_CRPS_Cook_71H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_72H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_73H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_74H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_75H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_76H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_77H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	static unsigned char previous_status = 0x00;
 
@@ -1247,6 +1349,8 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+
+int GB_CRPS_Cook_80H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	static unsigned char previous_status = 0x00;
 
@@ -1338,6 +1442,11 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_82H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_83H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_84H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_85H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 //#define GB_CRPS_Cook_86H_FOLLOW_SPEC
 int GB_CRPS_Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
@@ -1990,6 +2099,11 @@ int GB_CRPS_Cook_90H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_92H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_93H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_94H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_95H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 int GB_CRPS_Cook_96H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
@@ -2856,6 +2970,162 @@ int GB_CRPS_Cook_abH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_acH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_adH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_aeH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_afH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_b0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_b9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_baH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_bbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_bcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_bdH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_beH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_bfH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_c0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	wxstr += wxString::Format("%.1fC", temperature);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	wxstr += wxString::Format("%.1fC", temperature);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	wxstr += wxString::Format("%.1fC", temperature);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_c3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_caH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_cbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_ccH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_cdH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_ceH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_cfH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
 int GB_CRPS_Cook_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -2872,6 +3142,40 @@ int GB_CRPS_Cook_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_d1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// Show FW Version
+	const wchar_t* tmp_wchar;
+
+	//B6 - F1 - 04 - [1] [2] [3] [4] [pec] : PRI : [1].[2], SEC : [3].[4]
+	wxString wxstr("FW Ver. PRI : ");
+
+	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[1], pmbuscmd->m_recvBuff.m_dataBuff[2]);
+
+	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_daH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 #define DBH_DATA_LENGTH  4
 int GB_CRPS_Cook_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
@@ -2964,6 +3268,191 @@ int GB_CRPS_Cook_ddH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_deH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_dfH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SavePFC1(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC1_Max, PMBUSHelper::GetPMBusStatus()->m_PFC1_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SavePFC2(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC2_Max, PMBUSHelper::GetPMBusStatus()->m_PFC2_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SaveSR1(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR1_Max, PMBUSHelper::GetPMBusStatus()->m_SR1_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// 26.0C (Max:26.0, Min : 26.0)
+	const wchar_t* tmp_wchar;
+	double temperature = 0;
+
+	wxString wxstr("");
+
+	switch (pmbuscmd->m_dataFormat.m_formatType){
+
+	case cmd_data_format_LinearData_Format:
+
+		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
+
+		break;
+
+	case cmd_data_format_DirectData_Format:
+
+		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
+		break;
+	}
+
+	PMBUSHelper::GetPMBusStatus()->SaveSR2(temperature);
+
+	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR2_Max, PMBUSHelper::GetPMBusStatus()->m_SR2_Min);
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
+int GB_CRPS_Cook_e4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_e5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_e6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_e7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_e8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_e9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_eaH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_ebH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_ecH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_edH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_eeH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_efH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
+int GB_CRPS_Cook_f0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_f5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -2986,6 +3475,11 @@ int GB_CRPS_Cook_f5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_f6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_f9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
 int GB_CRPS_Cook_faH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -3003,6 +3497,8 @@ int GB_CRPS_Cook_faH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
+int GB_CRPS_Cook_fbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
 int GB_CRPS_Cook_fcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -3019,6 +3515,10 @@ int GB_CRPS_Cook_fcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	return EXIT_SUCCESS;
 }
+
+int GB_CRPS_Cook_fdH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_feH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_ffH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 
 int GB_CRPS_Cook_05H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	
@@ -3395,140 +3895,15 @@ int GB_CRPS_Cook_91H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-int GB_CRPS_Cook_c0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+int GB_CRPS_Cook_Not_Implement(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
-	double temperature = 0;
 
 	wxString wxstr("");
 
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	wxstr += wxString::Format("%.1fC", temperature);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_c1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	wxstr += wxString::Format("%.1fC", temperature);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	wxstr += wxString::Format("%.1fC", temperature);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	// Show FW Version
-	const wchar_t* tmp_wchar;
-
-	//B6 - F1 - 04 - [1] [2] [3] [4] [pec] : PRI : [1].[2], SEC : [3].[4]
-	wxString wxstr("FW Ver. PRI : ");
-
-	wxstr += wxString::Format("%d.%d, ", pmbuscmd->m_recvBuff.m_dataBuff[1], pmbuscmd->m_recvBuff.m_dataBuff[2]);
-
-	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
+	wxstr += wxT("");
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
@@ -3538,166 +3913,3 @@ int GB_CRPS_Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-int GB_CRPS_Cook_e0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	// 26.0C (Max:26.0, Min : 26.0)
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	PMBUSHelper::GetPMBusStatus()->SavePFC1(temperature);
-
-	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC1_Max, PMBUSHelper::GetPMBusStatus()->m_PFC1_Min);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_e1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	// 26.0C (Max:26.0, Min : 26.0)
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	PMBUSHelper::GetPMBusStatus()->SavePFC2(temperature);
-
-	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PFC2_Max, PMBUSHelper::GetPMBusStatus()->m_PFC2_Min);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_e2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	// 26.0C (Max:26.0, Min : 26.0)
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	PMBUSHelper::GetPMBusStatus()->SaveSR1(temperature);
-
-	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR1_Max, PMBUSHelper::GetPMBusStatus()->m_SR1_Min);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}
-
-int GB_CRPS_Cook_e3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	// Check have checksum error ?
-	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
-
-	// 26.0C (Max:26.0, Min : 26.0)
-	const wchar_t* tmp_wchar;
-	double temperature = 0;
-
-	wxString wxstr("");
-
-	switch (pmbuscmd->m_dataFormat.m_formatType){
-
-	case cmd_data_format_LinearData_Format:
-
-		temperature = PMBUSHelper::ParseLinearDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2);
-
-		break;
-
-	case cmd_data_format_DirectData_Format:
-
-		temperature = PMBUSHelper::ParseDirectDataFormat(pmbuscmd->m_recvBuff.m_dataBuff, 2, pmbuscmd);
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "CMD: %02x, pmbuscmd->m_dataFormat.m_formatType = %d", pmbuscmd->m_register, pmbuscmd->m_dataFormat.m_formatType);
-		break;
-	}
-
-	PMBUSHelper::GetPMBusStatus()->SaveSR2(temperature);
-
-	wxstr += wxString::Format("%.2fC (Max:%.2f, Min:%.2f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SR2_Max, PMBUSHelper::GetPMBusStatus()->m_SR2_Min);
-
-	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
-
-	return EXIT_SUCCESS;
-}

@@ -214,6 +214,8 @@
     <ClInclude Include="GIGABYTE_CRPS001_CBRaw.h" />
     <ClInclude Include="GIGABYTE_CRPS001.h" />
     <ClInclude Include="GIGABYTE_CRPS001_CMDCB.h" />
+    <ClInclude Include="GIGABYTE_CRPS_ALL_PMBUS_CMDS.h" />
+    <ClInclude Include="GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDCB.h" />
     <ClInclude Include="HID.h" />
     <ClInclude Include="I2CInterfaceDialog.h" />
     <ClInclude Include="I2CSlaveAddressDialog.h" />

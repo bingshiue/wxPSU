@@ -110,6 +110,12 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x44;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[baseIndex++] = command;
+
+			// May Have 0x0d Command
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
+
 			this->m_sendBuff[baseIndex++] = 0x0d;
 			this->m_sendBuff[baseIndex++] = 0x0a;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
@@ -128,12 +134,23 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x44;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
 			this->m_sendBuff[baseIndex++] = command;
+
+			// May Have 0x0d Command
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
 			
 			//this->m_sendBuff[4] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
 			//this->m_sendBuff[5] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
 
 			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
 				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
+
+				// Addidtional Data May Have Data 0x0d 
+				if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+					this->m_sendBuff[baseIndex++] = 0x0d;
+				}
+				//
 			}
 
 			this->m_sendBuff[baseIndex++] = 0x0d;
@@ -179,7 +196,13 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x41;
 			this->m_sendBuff[baseIndex++] = 0x44;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[baseIndex++] = command;        // Command is 0x3a
+			this->m_sendBuff[baseIndex++] = command;        // Command
+
+			// May Have 0x0d Command
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
+
 			this->m_sendBuff[baseIndex++] = 0x0d;
 			this->m_sendBuff[baseIndex++] = 0x0a;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
@@ -264,7 +287,12 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x41;
 			this->m_sendBuff[baseIndex++] = 0x44;
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
-			this->m_sendBuff[baseIndex++] = command;        // Command is 0x3a
+			this->m_sendBuff[baseIndex++] = command;        // Command
+
+			// May Have 0x0d Command
+			if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+				this->m_sendBuff[baseIndex++] = 0x0d;
+			}
 			
 			//this->m_sendBuff[6] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[0];// Addtional Data [0]
 			//this->m_sendBuff[7] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[1];// Addtional Data [1]
@@ -272,6 +300,12 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
 				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];// Addtional Data [len]
 				PSU_DEBUG_PRINT(MSG_DEBUG, "idx=%d, AddtionalData[%d]=%xH", idx, len, this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len]);
+
+				// Addidtional Data May Have Data 0x0d 
+				if (this->m_sendBuff[baseIndex - 1] == 0x0d){
+					this->m_sendBuff[baseIndex++] = 0x0d;
+				}
+				//
 			}
 
 			this->m_sendBuff[baseIndex++] = 0x0d;
@@ -863,7 +897,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							// If CMD don't support, skip 
 							if (this->m_pmBusCommand[idx].m_cmdStatus.m_support == cmd_unsupport){
 								// Sleep 100 milliseconds for prevent Application No Reply If No Command Support
-								wxMilliSleep(100);
+								//wxMilliSleep(100);
 								continue;
 							}
 						}
@@ -1303,7 +1337,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				else{
 					// Don't Do Polling So fast
 					//wxMilliSleep(100);
-					//continue;
+					continue;
 				}
 
 				/*-------------------- Send if user issue send CMD on write page when monitor is running  --------------------*/

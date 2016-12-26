@@ -63,6 +63,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 		for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize() && m_running == true; idx++){
 
+			PSU_DEBUG_PRINT(MSG_DEBUG, "QUERY Command %02xH Start", PMBUSHelper::getPMBUSCMDData()[idx].m_register);
+
 			/*** Query Command (0x1A) ***/
 			if (PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
 
@@ -478,6 +480,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 			threadUpdateDialog_evt->SetInt(idx);
 			wxQueueEvent(this->m_evtHandler, threadUpdateDialog_evt);
 
+			PSU_DEBUG_PRINT(MSG_DEBUG, "QUERY Command %02xH End", PMBUSHelper::getPMBUSCMDData()[idx].m_register);
 
 		}// for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize() && m_running == true; idx++)
 
@@ -490,6 +493,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 		}
 		wxQueueEvent(this->m_evtHandler, threadEndDialog_evt);
 	};
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "QUERYSequenceThread Exit");
 
 	return (wxThread::ExitCode)1;
 }
