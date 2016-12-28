@@ -321,6 +321,12 @@
     <ClCompile Include="QUERYSequenceThread.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="TotalPhase.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="Aardvark\aardvark.c">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -569,10 +575,19 @@
     <ClInclude Include="GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDCB.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="TotalPhase.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Aardvark\aardvark.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
       <Filter>資源檔</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Aardvark\aardvark.dll" />
   </ItemGroup>
 </Project>

@@ -82,9 +82,11 @@ public:
 
 	void productDataBuff(unsigned int cmdIndex, unsigned int responseDataLength);
 
+#if 0
 	void UpdateSTDPage(unsigned int index);
 
 	void UpdateSTATUSPanel(unsigned int index);
+#endif
 
 	unsigned int findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage = 0);
 

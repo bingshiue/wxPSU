@@ -17,6 +17,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_STDPAGE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE, wxThreadEvent);
 
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
@@ -2236,15 +2238,29 @@ void MainFrame::StartMonitor(void){
 	int enabledCount = 0;
 	for (unsigned int idx = 0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_toggle == true){
-			enabledCount++;
+			if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
+				// If support
+				if (this->m_PMBusData[idx].m_cmdStatus.m_support != cmd_unsupport){
+					// If Own Read Access
+					if (PMBUSHelper::isOwnReadAccess(this->m_PMBusData[idx].m_access) == true){
+						enabledCount++;
+					}
+				}
+			}
+			else{
+				// If Own Read Access
+				if (PMBUSHelper::isOwnReadAccess(this->m_PMBusData[idx].m_access) == true){
+					enabledCount++;
+				}
+			}
 		}
 	}
 
 	if (enabledCount == 0){
 
-		PSU_DEBUG_PRINT(MSG_ALERT, "No Enabled CMD");
+		PSU_DEBUG_PRINT(MSG_ALERT, "No Enabled/Support CMD Selected");
 
-		wxMessageBox(wxT("No Enabled CMD ! \n\n Please Enable CMD Then Try Again"),
+		wxMessageBox(wxT("No Enabled/Support CMD ! \n\n Please Select CMD Then Try Again"),
 			wxT("Warning !"),  // caption
 			wxOK | wxICON_WARNING);
 
@@ -2654,12 +2670,20 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_HID].m_DeviceSendData = HIDSendData;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceReadData = HIDReadData;
 
+	// TOTAL PHASE I2C Host Adaptor
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice = EnumerateAvailableTotalPhaseDevice;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_GetDeviceStatus = GetTotalPhaseDeviceStatus;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_GetOpenDeviceName = GetTotalPhaseOpenDeviceName;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_OpenDevice = OpenTotalPhaseDevice;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_CloseDevice = CloseTotalPhaseDevice;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceSendData = TotalPhaseSendData;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceReadData = TotalPhaseReadData;
+
 	// Current Use IO
 	switch (this->m_appSettings.m_I2CAdaptorModuleBoard){
 
 	case I2C_AdaptorModuleBoard_API2CS12_000:
 	case I2C_AdaptorModuleBoard_R90000_95611:
-	case I2C_AdaptorModuleBoard_TOTALPHASE:
 
 		this->m_CurrentUseIOInterface = IOACCESS_SERIALPORT;
 		
@@ -2668,7 +2692,13 @@ void MainFrame::DoSetupIOAccess(void){
 	case I2C_AdaptorModuleBoard_R90000_9271_USB:
 		
 		this->m_CurrentUseIOInterface = IOACCESS_HID;
-		
+
+		break;
+
+	case I2C_AdaptorModuleBoard_TOTALPHASE:
+
+		this->m_CurrentUseIOInterface = IOACCESS_TOTALPHASE;
+
 		break;
 
 	default:
@@ -2862,6 +2892,12 @@ int MainFrame::OpenIODevice(void){
 					this->UpdateStatusBarIOSettingFiled(this->m_appSettings.m_usbAdaptorI2CSetting.m_bitRateSpeed);
 
 				}
+				else if (this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE){
+					
+					wxString totalPhaseDeviceName(wxT("TOTAL PHASE"));
+
+					this->UpdateStatusBarIOSettingFiled(totalPhaseDeviceName);
+				}
 		
 				//
 				while (TaskEx::GetCount(task_ID_SendUSBAdaptorBitRateTask) != 0){
@@ -2906,6 +2942,7 @@ int MainFrame::CloseIODevice(void){
 	return ret;
 }
 
+#if 0
 int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 
 	int index = -1;
@@ -2915,6 +2952,24 @@ int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register){
 			PSU_DEBUG_PRINT(MSG_DEBUG, "this->m_PMBusData[idx].m_register=%d, cmd_register = %d", this->m_PMBusData[idx].m_register, cmd_register);
 			index = idx;
 			break;
+		}
+	}
+
+	return index;
+}
+#endif
+
+unsigned int MainFrame::findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage){
+
+	unsigned int index = 0;
+
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		if (this->m_PMBusData[idx].m_register == cmd_register)
+		{
+			if (this->m_PMBusData[idx].m_cmdStatus.m_NeedChangePage == need_changePage){
+				index = idx;
+				break;
+			}
 		}
 	}
 
@@ -3016,6 +3071,16 @@ void MainFrame::OnSendThreadUpdateSummary(wxThreadEvent& event){
 
 	this->m_status_bar->setMonitoringSummary(summary); 
 
+}
+
+void MainFrame::OnSendThreadUpdateSTDPage(wxThreadEvent& event){
+	int indexOfCmd = event.GetInt();
+	this->UpdateSTDPage(indexOfCmd);
+}
+
+void MainFrame::OnSendThreadUpdateSTATUSPage(wxThreadEvent& event){
+	int indexOfCmd = event.GetInt();
+	this->UpdateSTATUSPanel(indexOfCmd);
 }
 
 void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
@@ -4251,6 +4316,143 @@ void MainFrame::StopInCreaseCPUOverHeadThread(void){
 	}
 }
 
+void MainFrame::UpdateSTDPage(unsigned int index){
+	// PIN
+	if (index == this->findPMBUSCMDIndex(0x97)){
+		wxString pin = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PIN);
+		this->m_stdPage->m_tcPIN->SetValue(pin);
+	}
+
+	// POUT
+	if (index == this->findPMBUSCMDIndex(0x96)){
+		wxString pout = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_POUT);
+		this->m_stdPage->m_tcPOUT->SetValue(pout);
+	}
+
+	// VIN
+	if (index == this->findPMBUSCMDIndex(0x88)){
+		wxString vin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VIN);
+		this->m_stdPage->m_tcVIN->SetValue(vin);
+	}
+
+	// IIN
+	if (index == this->findPMBUSCMDIndex(0x89)){
+		wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
+		this->m_stdPage->m_tcIIN->SetValue(iin);
+	}
+
+	// VOUT
+	if (index == this->findPMBUSCMDIndex(0x8b, 0)){
+		wxString vout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VOUT);
+		this->m_stdPage->m_tcVOUT->SetValue(vout);
+	}
+
+	// IOUT
+	if (index == this->findPMBUSCMDIndex(0x8c, 0)){
+		wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
+		this->m_stdPage->m_tcIOUT->SetValue(iout);
+	}
+
+	// VoSBY
+	if (index == this->findPMBUSCMDIndex(0x8b, 1)){
+		wxString vosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VoSBY);
+		this->m_stdPage->m_tcVoSBY->SetValue(vosby);
+	}
+
+	// IoSBY
+	if (index == this->findPMBUSCMDIndex(0x8c, 1)){
+		wxString iosby = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IoSBY);
+		this->m_stdPage->m_tcIoSBY->SetValue(iosby);
+	}
+
+	// VCAP
+	if (index == this->findPMBUSCMDIndex(0x8a)){
+		wxString vcap = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_VCAP);
+		this->m_stdPage->m_tcVCAP->SetValue(vcap);
+	}
+
+	// AMD(8D)
+	if (index == this->findPMBUSCMDIndex(0x8d)){
+		wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
+		this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
+	}
+
+	// SEC(8E)
+	if (index == this->findPMBUSCMDIndex(0x8e)){
+		wxString sec_8e = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_SEC_8E);
+		this->m_stdPage->m_tcSEC8E->SetValue(sec_8e);
+	}
+
+	// PRI(8F)
+	if (index == this->findPMBUSCMDIndex(0x8f)){
+		wxString pri_8f = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_PRI_8F);
+		this->m_stdPage->m_tcPRI8F->SetValue(pri_8f);
+	}
+
+	// FAN1
+	if (index == this->findPMBUSCMDIndex(0x90)){
+		wxString fan1 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
+		this->m_stdPage->m_tcFAN1->SetValue(fan1);
+	}
+
+	// FAN2
+	if (index == this->findPMBUSCMDIndex(0x91)){
+		wxString fan2 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN2);
+		this->m_stdPage->m_tcFAN2->SetValue(fan2);
+	}
+
+	// FAN3
+
+	// FAN4
+}
+
+void MainFrame::UpdateSTATUSPanel(unsigned int index){
+	if (index == this->findPMBUSCMDIndex(0x79)){
+		// Update WORD Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusWORD();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7a)){
+		// Update VOUT Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusVOUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7b)){
+		// Update IOUT Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusIOUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7c)){
+		// Update INPUT Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusINPUT();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7d)){
+		// Update Temperature Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusTemperature();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7e)){
+		// Update CML Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusCML();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x7f)){
+		// Update OTHER Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusOTHER();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x81)){
+		// Update OTHER Filed of PMBUSStatus Panel
+		this->PMBusStatusPanel->Update_StatusFAN12();
+	}
+
+	if (index == this->findPMBUSCMDIndex(0xdc)){
+		// Update Total PMBUSStatusDCH Panel
+		this->PMBusStatusDCHPanel->UpdatePanel();
+	}
+}
+
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
 EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmware)
@@ -4305,6 +4507,8 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_COMPLETED, MainFrame::OnSendThreadCompletion
 
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, MainFrame::OnSendThreadUpdateCMDName)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdateSummary)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_STDPAGE, MainFrame::OnSendThreadUpdateSTDPage)
+EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE, MainFrame::OnSendThreadUpdateSTATUSPage)
 
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 //EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)

@@ -82,7 +82,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 					PreviousQueryAdditionalCMD = PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
 					PSU_DEBUG_PRINT(MSG_DEBUG, "PreviousAdditionalCMD=%xH", PreviousQueryAdditionalCMD);
 					PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = PMBUSHelper::getPMBUSCMDData()[idx].m_register;
-					PMBUSHelper::ProductReadCMDBuffer(PMBUSHelper::getPMBUSCMDData(), this->m_sendBuffer, this->m_currentIO, QueryCMDIndex, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_register, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength);
+					sendDataLength = PMBUSHelper::ProductReadCMDBuffer(PMBUSHelper::getPMBUSCMDData(), this->m_sendBuffer, this->m_currentIO, QueryCMDIndex, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_register, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength);
 					//this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
 					// Send Query Command
@@ -91,10 +91,10 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 						// Decide Send Data Length
 						if (*this->m_currentIO == IOACCESS_SERIALPORT){
 							if (PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-								sendDataLength = SERIAL_SEND_DATA_SIZE;
+								//sendDataLength = SERIAL_SEND_DATA_SIZE;
 							}
 							else if (PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-								sendDataLength = SERIAL_SEND_DATA_SIZE + PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+								//sendDataLength = SERIAL_SEND_DATA_SIZE + PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
 							}
 						}
 						else{// HID
@@ -265,7 +265,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_CMD_INDEX] = PMBUSHelper::getPMBUSCMDData()[idx].m_register;
 												PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[DEF_30H_READ_RW_INDEX] = rw_read_coefficients;
 
-												PMBUSHelper::ProductReadCMDBuffer(PMBUSHelper::getPMBUSCMDData(), this->m_sendBuffer, this->m_currentIO, CoefficientsCMDIndex, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_register, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength);
+												sendDataLength = PMBUSHelper::ProductReadCMDBuffer(PMBUSHelper::getPMBUSCMDData(), this->m_sendBuffer, this->m_currentIO, CoefficientsCMDIndex, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_register, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength);
 												//this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
 												// Send Query Command
@@ -274,10 +274,10 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 													// Decide Send Data Length
 													if (*this->m_currentIO == IOACCESS_SERIALPORT){
 														if (PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-															sendDataLength = SERIAL_SEND_DATA_SIZE;
+															//sendDataLength = SERIAL_SEND_DATA_SIZE;
 														}
 														else if (PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-															sendDataLength = SERIAL_SEND_DATA_SIZE + PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+															//sendDataLength = SERIAL_SEND_DATA_SIZE + PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
 														}
 													}
 													else{// HID

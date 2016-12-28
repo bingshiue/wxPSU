@@ -15,22 +15,23 @@
 #define SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT  1000/**< Timeout of Serial Port Send Semaphore */
 #define SERIAL_PORT_SEND_POLLING_INTERVAL  20/**< Interval of Serial Port Send Polling (Milliseconds) */
 
-#define IO_SIZE  2/**< Current 2 Kind : Serial Port & HID */
+#define IO_SIZE  3/**< Current 3 Kinds : 1.Serial Port 2.USBHID 3.Total Phase I2C Host Adaptor */
 
 /**
-* @brief IO Port Kind.
-*/
+ * @brief IO Port Kind.
+ */
 enum {
-	IOACCESS_SERIALPORT = 0,
-	IOACCESS_HID
+	IOACCESS_SERIALPORT = 0,/**< I/O is Serial Port */
+	IOACCESS_HID,/**< I/O is USB HID */
+	IOACCESS_TOTALPHASE/**< I/O is Total Phase I2C Host Adaptor */
 };
 
 /**
-* @brief IO Port Status.
-*/
+ * @brief IO Port Status.
+ */
 enum {
-	IODEVICE_CLOSE = 0,
-	IODEVICE_OPEN
+	IODEVICE_CLOSE = 0,/**< Indicates I/O is close */
+	IODEVICE_OPEN/**< Indicates I/O is open */
 };
 
 #endif

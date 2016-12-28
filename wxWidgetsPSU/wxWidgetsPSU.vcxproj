@@ -65,6 +65,9 @@
       <AdditionalLibraryDirectories>$(WXWIDGETS_HOME)\lib\vc_lib;$(SolutionDir)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;wxbase31ud.lib;wxbase31ud_net.lib;wxbase31ud_xml.lib;wxexpatd.lib;wxjpegd.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxmsw31ud_core.lib;wxmsw31ud_gl.lib;wxmsw31ud_html.lib;wxmsw31ud_media.lib;wxmsw31ud_propgrid.lib;wxmsw31ud_qa.lib;wxmsw31ud_ribbon.lib;wxmsw31ud_richtext.lib;wxmsw31ud_stc.lib;wxmsw31ud_webview.lib;wxmsw31ud_xrc.lib;wxpngd.lib;wxregexud.lib;wxscintillad.lib;wxtiffd.lib;wxzlibd.lib;hidapi.lib;TaskSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(ProjectDir)Aardvark\aardvark.dll"  "$(OutDir)\aardvark.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -88,8 +91,12 @@
       <AdditionalLibraryDirectories>$(WXWIDGETS_HOME)\lib\vc_lib;$(SolutionDir)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wsock32.lib;hidapi.lib;TaskSystem.lib;wxbase31u.lib;wxbase31u_net.lib;wxbase31u_xml.lib;wxexpat.lib;wxjpeg.lib;wxmsw31u_adv.lib;wxmsw31u_aui.lib;wxmsw31u_core.lib;wxmsw31u_gl.lib;wxmsw31u_html.lib;wxmsw31u_media.lib;wxmsw31u_propgrid.lib;wxmsw31u_qa.lib;wxmsw31u_ribbon.lib;wxmsw31u_richtext.lib;wxmsw31u_stc.lib;wxmsw31u_webview.lib;wxmsw31u_xrc.lib;wxpng.lib;wxregexu.lib;wxscintilla.lib;wxtiff.lib;wxzlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(ProjectDir)Aardvark\aardvark.dll"  "$(OutDir)\aardvark.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Aardvark\aardvark.c" />
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="BaseReadPage.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
@@ -157,6 +164,7 @@
     <ClCompile Include="TaskSystemThread.cpp" />
     <ClCompile Include="TIHexFileParser.cpp" />
     <ClCompile Include="TIHexMMAPModel.cpp" />
+    <ClCompile Include="TotalPhase.cpp" />
     <ClCompile Include="USBGPIOPanel.cpp" />
     <ClCompile Include="USBI2CRS232Panel.cpp" />
     <ClCompile Include="USBInfoPanel.cpp" />
@@ -194,6 +202,7 @@
     <ClCompile Include="WritePageFAH.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Aardvark\aardvark.h" />
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="BaseReadPage.h" />
@@ -268,6 +277,7 @@
     <ClInclude Include="TaskSystemThread.h" />
     <ClInclude Include="TIHexFileParser.h" />
     <ClInclude Include="TIHexMMAPModel.h" />
+    <ClInclude Include="TotalPhase.h" />
     <ClInclude Include="USBAdaptorSetting.h" />
     <ClInclude Include="USBGPIOPanel.h" />
     <ClInclude Include="USBI2CRS232Panel.h" />
@@ -279,6 +289,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Aardvark\aardvark.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

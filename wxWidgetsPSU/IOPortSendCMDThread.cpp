@@ -405,6 +405,13 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+		this->m_sendBuff[baseIndex++] = command;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
@@ -490,6 +497,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 					/*** Query Command (0x1A) ***/
 					if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
+
+						PSU_DEBUG_PRINT(MSG_DEBUG, "QUERY Command %02xH Start", this->m_pmBusCommand[idx].m_register);
 
 						// Find Query Command (0x1A)'s Index
 						QueryCMDIndex = -1;
@@ -1447,12 +1456,21 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				threadSummary_evt->SetString(summary);
 				wxQueueEvent(m_pHandler->GetEventHandler(), threadSummary_evt);
 
+				// Send Update STD Page Event
+				wxThreadEvent* threadSTDPage_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_STDPAGE);
+				threadSTDPage_evt->SetInt(idx);
+				wxQueueEvent(m_pHandler->GetEventHandler(), threadSTDPage_evt);
+
+				// Send Update Status Page Event
+				wxThreadEvent* threadSTATUSPage_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE);
+				threadSTATUSPage_evt->SetInt(idx);
+				wxQueueEvent(m_pHandler->GetEventHandler(), threadSTATUSPage_evt);
+
 #if 0
 				if (idx == (PMBUSHelper::GetCurrentCMDTableSize() - 1)){
 					// Update StdPage
 					this->UpdateSTDPage();
 				}
-#endif
 
 				// Update STD Page
 				this->UpdateSTDPage(idx);
@@ -1460,6 +1478,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				// Update Status Panel
 				this->UpdateSTATUSPanel(idx);
 
+#endif
 
 				if (this->m_appSettings->m_runMode == RunMode_Iterations){
 
@@ -1531,6 +1550,7 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 	}
 }
 
+#if 0
 void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
 	
 	// PIN
@@ -1623,23 +1643,6 @@ void IOPortSendCMDThread::UpdateSTDPage(unsigned int index){
 
 }
 
-unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage){
-
-	unsigned int index = 0;
-
-	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
-		if (this->m_pmBusCommand[idx].m_register == cmd_register)
-		{
-			if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == need_changePage){
-				index = idx;
-				break;
-			}
-		}
-	}
-
-	return index;
-}
-
 void IOPortSendCMDThread::UpdateSTATUSPanel(unsigned int index){
 	
 	if (index == this->findPMBUSCMDIndex(0x79)){
@@ -1687,4 +1690,22 @@ void IOPortSendCMDThread::UpdateSTATUSPanel(unsigned int index){
 		this->m_pmbusStatusDCHPanel->UpdatePanel();
 	}
 
+}
+#endif
+
+unsigned int IOPortSendCMDThread::findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage){
+
+	unsigned int index = 0;
+
+	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		if (this->m_pmBusCommand[idx].m_register == cmd_register)
+		{
+			if (this->m_pmBusCommand[idx].m_cmdStatus.m_NeedChangePage == need_changePage){
+				index = idx;
+				break;
+			}
+		}
+	}
+
+	return index;
 }

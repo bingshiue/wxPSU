@@ -225,7 +225,6 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 
 	case I2C_AdaptorModuleBoard_API2CS12_000:
 	case I2C_AdaptorModuleBoard_R90000_95611:
-	case I2C_AdaptorModuleBoard_TOTALPHASE:
 
 		*this->m_currentUseIO = IOACCESS_SERIALPORT;
 
@@ -234,6 +233,12 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	case I2C_AdaptorModuleBoard_R90000_9271_USB:
 
 		*this->m_currentUseIO = IOACCESS_HID;
+
+		break;
+
+	case I2C_AdaptorModuleBoard_TOTALPHASE:
+
+		*this->m_currentUseIO = IOACCESS_TOTALPHASE;
 
 		break;
 
@@ -449,6 +454,13 @@ int I2CInterfaceDialog::OpenIODevice(void){
 
 				// Update I2C Clock Speed Field
 				this->UpdateStatusBarIOSettingFiled(this->m_appSettings->m_usbAdaptorI2CSetting.m_bitRateSpeed);
+
+			}
+			else if (*this->m_currentUseIO == IOACCESS_TOTALPHASE){
+
+				wxString totalPhaseDeviceName(wxT("TOTAL PHASE"));
+
+				this->UpdateStatusBarIOSettingFiled(totalPhaseDeviceName);
 
 			}
 

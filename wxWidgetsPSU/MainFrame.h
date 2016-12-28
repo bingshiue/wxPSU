@@ -21,6 +21,7 @@
 #include "TaskSystemThread.h"
 #include "SerialPort.h"
 #include "HID.h"
+#include "TotalPhase.h"
 #include "IOAccess.h"
 #include "PMBUSCMDListModel.h"
 #include "PMBUSStatusBar.h"
@@ -333,7 +334,9 @@ public:
 	HDEVNOTIFY NotificationHandle;
 
 	unsigned int getCurrentUseIOInterface(void);
-	int findPMBUSCMDIndex(unsigned int cmd_register);
+
+	//int findPMBUSCMDIndex(unsigned int cmd_register);
+	unsigned int findPMBUSCMDIndex(unsigned int cmd_register, unsigned char need_changePage = 0);
 
 	TASKINITFUNCTION m_taskInitFunc;
 	void TaskInit(void);
@@ -433,6 +436,8 @@ private:
 
 	void OnSendThreadUpdateCMDName(wxThreadEvent& event);
 	void OnSendThreadUpdateSummary(wxThreadEvent& event);
+	void OnSendThreadUpdateSTDPage(wxThreadEvent& event);
+	void OnSendThreadUpdateSTATUSPage(wxThreadEvent& event);
 
 	void OnISPSequenceStart(wxThreadEvent& event);
 	//void OnISPSequenceInterrupt(wxThreadEvent& event);
@@ -479,6 +484,9 @@ private:
 
 	BaseWritePage* getNewWritePage(int index, int register_number);
 	BaseReadPage*  getNewReadPage(int index, int register_number);
+
+	void UpdateSTDPage(unsigned int index);
+	void UpdateSTATUSPanel(unsigned int index);
 
 	wxDECLARE_EVENT_TABLE();
 

@@ -365,9 +365,10 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 	return 0;
 }
 
-void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer, unsigned int* currentIO, unsigned int idx, unsigned int command, unsigned int responseDataLength){
+int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer, unsigned int* currentIO, unsigned int idx, unsigned int command, unsigned int responseDataLength){
 
 	unsigned int baseIndex = 0;
+	int buffer_len = 0;
 
 	switch (*currentIO){
 
@@ -395,6 +396,8 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 
 			sendBuffer[baseIndex++] = 0x0d;
 			sendBuffer[baseIndex++] = 0x0a;
+
+			buffer_len = baseIndex;
 		}
 		else if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
 
@@ -430,6 +433,8 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 			sendBuffer[baseIndex++] = 0x0d;
 			sendBuffer[baseIndex++] = 0x0a;
 
+			buffer_len = baseIndex;
+
 		}
 		break;
 
@@ -461,6 +466,7 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 			sendBuffer[baseIndex++] = 0x0a;
 
 			sendBuffer[1] = (baseIndex - 2);
+			buffer_len = baseIndex;
 
 			sendBuffer[baseIndex++] = 0x01;
 			sendBuffer[baseIndex++] = 0x00;
@@ -563,6 +569,7 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 			sendBuffer[baseIndex++] = 0x0a;
 
 			sendBuffer[1] = (baseIndex - 2);
+			buffer_len = baseIndex;
 
 			sendBuffer[baseIndex++] = 0x00;
 
@@ -620,6 +627,7 @@ void PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned ch
 		break;
 	}
 
+	return buffer_len;
 }
 
 int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer){

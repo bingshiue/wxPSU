@@ -19,6 +19,8 @@ wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_COOK, wxThreadEvent); /**< Decla
 
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_CMDNAME, wxThreadEvent); /**< Declare Thread Update CMD Name Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, wxThreadEvent); /**< Declare Thread Update Summary Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_STDPAGE, wxThreadEvent); /**< Declare Thread Update STD Page Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE, wxThreadEvent); /**< Declare Thread Update Status Page Event */
 
 wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent); /**< Declare ISP SEQUENCE START Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent); /**< Declare ISP SEQUENCE UPDATE Event */
