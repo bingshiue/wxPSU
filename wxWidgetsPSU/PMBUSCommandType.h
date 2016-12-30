@@ -193,4 +193,12 @@ typedef struct pmbusSendcmd_t {
 
 } PMBUSSendCOMMAND_t;
 
+typedef struct pmbusReadCMD_t {
+
+	unsigned char m_slaveAddr;/**< Slave Address */
+	unsigned char m_cmd;/**< Command */
+	unsigned char m_numOfReadBytes;/**< Number Of Read Bytes */
+
+} PMBUSReadCMD_t;
+
 #endif

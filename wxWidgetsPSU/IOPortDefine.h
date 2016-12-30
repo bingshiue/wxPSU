@@ -17,6 +17,8 @@
 
 #define IO_SIZE  3/**< Current 3 Kinds : 1.Serial Port 2.USBHID 3.Total Phase I2C Host Adaptor */
 
+#define BASE_RESPONSE_DATA_LENGTH 6
+
 /**
  * @brief IO Port Kind.
  */

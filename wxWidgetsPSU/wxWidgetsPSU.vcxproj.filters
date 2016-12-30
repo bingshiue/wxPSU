@@ -327,6 +327,12 @@
     <ClCompile Include="Aardvark\aardvark.c">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="ReadTestDialog.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="PMBUSReadTestTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -579,6 +585,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="Aardvark\aardvark.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadTestDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

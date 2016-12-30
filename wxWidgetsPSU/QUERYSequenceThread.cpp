@@ -138,7 +138,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 						break;
 					}
 
-					// Read Quert Result
+					// Read Query Result
 					unsigned int bytesToRead = PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
 					this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_ioaccess, this->m_currentIO, this->m_rxTxSemaphore, &PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex], &this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 

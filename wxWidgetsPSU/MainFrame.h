@@ -49,6 +49,7 @@
 #include "ModelSelectDialog.h"
 #include "PMBUSQUERYProgressDialog.h"
 #include "QUERYSequenceThread.h"
+#include "ReadTestDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
 #define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */
@@ -96,6 +97,10 @@ public:
 
 		MENU_ID_PMBUS_1_1,
 		MENU_ID_PMBUS_1_2,
+
+		MENU_ID_READ_TEST,
+		MENU_ID_WRITE_TEST,
+		MENU_ID_BLOCK_WR_TEST,
 
 		MENU_ID_ABOUT,
 		MENU_ID_ACBEL_WEBSITE,
@@ -286,6 +291,12 @@ public:
 	wxMenuItem  *m_pmBus11MenuItem;
 	wxMenuItem  *m_pmBus12MenuItem;
 
+	wxMenu      *m_testMenu;
+
+	wxMenuItem  *m_readTestMenuItem;
+	wxMenuItem  *m_writeMenuItem;
+	wxMenuItem  *m_blockWRMenuItem;
+
 	wxMenu      *m_helpMenu;
 
 	wxMenuItem  *m_aboutMenuItem;
@@ -414,11 +425,16 @@ private:
 	void OnExit(wxCommandEvent& event);
 	void OnWindowClose(wxCloseEvent& event);
 
+	void OnReadTest(wxCommandEvent& event);
+	void OnWriteTest(wxCommandEvent& event);
+	void OnBlockWRTest(wxCommandEvent& event);
+
 	void OnAbout(wxCommandEvent& event);
 	void OnAcbelWebSite(wxCommandEvent& event);
 
 	void OnValueChanged(wxDataViewEvent &event);
 	void OnDVSelectionChanged(wxDataViewEvent &event);
+	void OnDVItemActivated(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
 	void OnSlaveAddressSetButton(wxCommandEvent& event);

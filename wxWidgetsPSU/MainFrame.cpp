@@ -637,6 +637,25 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_optionMenu->AppendSubMenu(this->m_pmbusReadMethodMenu, wxT("PMBus Read Method"), wxT("PMBus Read Method"));
 
+	// Test Menu
+	/*
+	Test
+	| - Read Test 
+	| - Write Test
+	| - Block W/R Test
+	*/
+	this->m_testMenu = new wxMenu();
+
+	this->m_readTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_READ_TEST, wxT("Read Test"), wxT("Read Test"), wxITEM_NORMAL);
+
+	this->m_writeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_WRITE_TEST, wxT("Write Test"), wxT("Write Test"), wxITEM_NORMAL);
+
+	this->m_blockWRMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_BLOCK_WR_TEST, wxT("Block WR Test"), wxT("Block WR Test"), wxITEM_NORMAL);
+
+	this->m_testMenu->Append(this->m_readTestMenuItem);
+	this->m_testMenu->Append(this->m_writeMenuItem);
+	this->m_testMenu->Append(this->m_blockWRMenuItem);
+
 	// Help Menu
 	/*
 	Help
@@ -663,6 +682,7 @@ void MainFrame::SetupMenuBar(void){
 	this->m_menuBar->Append(this->m_runMenu, wxT("Run"));
 	this->m_menuBar->Append(this->m_psuMenu, wxT("PSU"));
 	this->m_menuBar->Append(this->m_optionMenu, wxT("Option"));
+	this->m_menuBar->Append(this->m_testMenu, wxT("Test"));
 	this->m_menuBar->Append(this->m_helpMenu, wxT("Help"));
 
 	SetMenuBar(this->m_menuBar);
@@ -1591,6 +1611,24 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	event.Skip();
 }
 
+void MainFrame::OnReadTest(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	ReadTestDialog* readTestDialog = new ReadTestDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	readTestDialog->Centre();
+	readTestDialog->ShowModal();
+
+	wxDELETE(readTestDialog);
+}
+
+void MainFrame::OnWriteTest(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+}
+
+void MainFrame::OnBlockWRTest(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+}
+
 void MainFrame::OnAbout(wxCommandEvent& event)
 {
 	//wxMessageBox("Acbel PSU Tool",
@@ -2478,6 +2516,16 @@ void MainFrame::OnContextMenu(wxDataViewEvent &event){
 
 unsigned int MainFrame::getCurrentUseIOInterface(void){
 	return this->m_CurrentUseIOInterface;
+}
+
+void MainFrame::OnDVItemActivated(wxDataViewEvent &event){
+
+	/* This event is triggered by double clicking an item or pressing some special key (usually "Enter") when it is focused. */
+	// Get the row position
+	wxDataViewItem item = event.GetItem();
+	int row = m_cmdListModel->GetRow(item);
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s : Select Row is %d", __FUNCTIONW__, row);
+
 }
 
 void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
@@ -4485,10 +4533,14 @@ EVT_MENU(MENU_ID_PMBUS_1_1, MainFrame::OnPMBus1_1)
 EVT_MENU(MENU_ID_PMBUS_1_2, MainFrame::OnPMBus1_2)
 EVT_MENU(MENU_ID_POPUP_FONT, MainFrame::OnPopupFont)
 EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
+EVT_MENU(MENU_ID_READ_TEST, MainFrame::OnReadTest)
+EVT_MENU(MENU_ID_WRITE_TEST, MainFrame::OnWriteTest)
+EVT_MENU(MENU_ID_BLOCK_WR_TEST, MainFrame::OnBlockWRTest)
 EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(MENU_ID_ACBEL_WEBSITE, MainFrame::OnAcbelWebSite)
 
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+EVT_DATAVIEW_ITEM_ACTIVATED(CID_CMDLIST_DVC, MainFrame::OnDVItemActivated)
 EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(CID_CMDLIST_DVC, MainFrame::OnContextMenu)
 //EVT_DATAVIEW_ITEM_VALUE_CHANGED(CID_CMDLIST_DVC, MainFrame::OnValueChanged)
