@@ -438,6 +438,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 	int PreviousQueryCMDAdditionalCMD = 0;
 	int PreviousCoefficientsCMDAdditionalCMD = 0;
 	bool sendRetryStillFailed = false;
+	int enableCMDs = 0;
 	DWORD iteration = 0;
 	DWORD success = 0;
 	DWORD timeout = 0;
@@ -481,7 +482,6 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				if (this->TestDestroy() == true){
 					break;
 				}
-
 #if 1
 				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
 				thread_evt->SetInt(idx);
@@ -1345,7 +1345,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				}// if (this->m_pmBusCommand[idx].m_toggle == true)
 				else{
 					// Don't Do Polling So fast
-					//wxMilliSleep(100);
+					//wxMicroSleep(100);
 					continue;
 				}
 

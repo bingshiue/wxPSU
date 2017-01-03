@@ -648,13 +648,13 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_readTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_READ_TEST, wxT("Read Test"), wxT("Read Test"), wxITEM_NORMAL);
 
-	this->m_writeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_WRITE_TEST, wxT("Write Test"), wxT("Write Test"), wxITEM_NORMAL);
+	this->m_writeTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_WRITE_TEST, wxT("Write Test"), wxT("Write Test"), wxITEM_NORMAL);
 
-	this->m_blockWRMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_BLOCK_WR_TEST, wxT("Block WR Test"), wxT("Block WR Test"), wxITEM_NORMAL);
+	this->m_blockWRTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_BLOCK_WR_TEST, wxT("Block WR Test"), wxT("Block WR Test"), wxITEM_NORMAL);
 
 	this->m_testMenu->Append(this->m_readTestMenuItem);
-	this->m_testMenu->Append(this->m_writeMenuItem);
-	this->m_testMenu->Append(this->m_blockWRMenuItem);
+	this->m_testMenu->Append(this->m_writeTestMenuItem);
+	this->m_testMenu->Append(this->m_blockWRTestMenuItem);
 
 	// Help Menu
 	/*
@@ -1623,10 +1623,23 @@ void MainFrame::OnReadTest(wxCommandEvent& event){
 
 void MainFrame::OnWriteTest(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	WriteTestDialog* writeTestDialog = new WriteTestDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	writeTestDialog->Centre();
+	writeTestDialog->ShowModal();
+
+	wxDELETE(writeTestDialog);
 }
 
 void MainFrame::OnBlockWRTest(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	BlockWRTestDialog* blockWRTestDialog = new BlockWRTestDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	blockWRTestDialog->Centre();
+	blockWRTestDialog->ShowModal();
+
+	wxDELETE(blockWRTestDialog);
+
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)
@@ -2310,6 +2323,10 @@ void MainFrame::StartMonitor(void){
 	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
 	this->m_monitorMenuItem->SetBitmap(*m_pause16Bitmap);
 	this->m_toolbar->Realize();
+
+	this->m_readTestMenuItem->Enable(false);
+	this->m_writeTestMenuItem->Enable(false);
+	this->m_blockWRTestMenuItem->Enable(false);
 
 	(this->m_status_bar->getTimer())->Start();
 	this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
@@ -3052,6 +3069,10 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
 	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
 	this->m_toolbar->Realize();
+
+	this->m_readTestMenuItem->Enable(true);
+	this->m_writeTestMenuItem->Enable(true);
+	this->m_blockWRTestMenuItem->Enable(true);
 
 	// (Work-Around) Set Gauge To Determinate Mode, Seems If the value of gauge is the same as previous the 'SetValue' method don't work
 	this->m_status_bar->getGauge()->SetValue(1);

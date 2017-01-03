@@ -52,7 +52,9 @@
 #define TP_SendUSBAdaptorParameterTask (0.5f)
 #define TP_ReceiveUSBAdaptorSettingCMDTask (0.5f)
 #define TP_ClearIOReadBufferTask (0.5f)
-#define TP_PMBUSReadTestTask (0.5f) 
+#define TP_PMBUSReadTestTask (0.5f)
+#define TP_PMBUSWriteTestTask (0.5f)
+#define TP_PMBUSBlockWRTestTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -78,6 +80,8 @@ enum {
 	task_ID_ReceiveUSBAdaptorSettingCMDTask,
 	task_ID_ClearIOReadBufferTask,
 	task_ID_PMBUSReadTestTask,
+	task_ID_PMBUSWriteTestTask,
+	task_ID_PMBUSBlockWRTestTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -970,6 +974,106 @@ public:
 	 */
 	int ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned char* sendBuffer, unsigned int* currentIO);
 
+};
+
+class PMBUSWriteTestTask :public TaskEx {
+	
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	PMBUSWriteCMD_t* m_pmbusWriteCMDArray;/**< Write CMD Array */
+	int m_setsToRun;
+
+	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+
+	DWORD startTick;
+	DWORD stopTick;
+
+public:
+
+	bool m_running;
+	bool* m_outputLog;
+	int runningIndex;
+
+	/**
+	* @brief Constructor.
+	*/
+	PMBUSWriteTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSWriteCMD_t* pmbusWriteCMD, int setsToRun, bool* outputLog);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~PMBUSWriteTestTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+
+	/**
+	* @brief Product Write CMD Buffer.
+	*/
+	int ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+};
+
+class PMBUSBlockWRTestTask :public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	PMBUSBlockWRCMD_t* m_pmbusBlockWRCMDArray;/**< Block WR CMD Array */
+	int m_setsToRun;
+
+	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+
+	DWORD startTick;
+	DWORD stopTick;
+
+public:
+
+	bool m_running;
+	bool* m_outputLog;
+	int runningIndex;
+
+	/**
+	* @brief Constructor.
+	*/
+	PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~PMBUSBlockWRTestTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+
+	/**
+	* @brief Product Block Write Read CMD Buffer.
+	*/
+	int ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockWRCMD, unsigned char* sendBuffer, unsigned int* currentIO);
 };
 
 #endif

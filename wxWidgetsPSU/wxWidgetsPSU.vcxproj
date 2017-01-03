@@ -99,6 +99,7 @@
     <ClCompile Include="Aardvark\aardvark.c" />
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="BaseReadPage.cpp" />
+    <ClCompile Include="BlockWRTestDialog.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="ClearIOReadBufferTask.cpp" />
     <ClCompile Include="ComportDialog.cpp" />
@@ -117,6 +118,7 @@
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
+    <ClCompile Include="PMBUSBlockWRTestTask.cpp" />
     <ClCompile Include="PMBUSCBCoefficients.cpp" />
     <ClCompile Include="PMBUSCBCook.cpp" />
     <ClCompile Include="PMBUSCBQuery.cpp" />
@@ -133,6 +135,7 @@
     <ClCompile Include="PMBUSStatusPanel.cpp" />
     <ClCompile Include="PMBUSStatusBar.cpp" />
     <ClCompile Include="PMBUSVerificationPanel.cpp" />
+    <ClCompile Include="PMBUSWriteTestTask.cpp" />
     <ClCompile Include="QUERYSequenceThread.cpp" />
     <ClCompile Include="ReadPage06H.cpp" />
     <ClCompile Include="ReadPage1AH.cpp" />
@@ -202,12 +205,14 @@
     <ClCompile Include="WritePageDCH.cpp" />
     <ClCompile Include="WritePageDDH.cpp" />
     <ClCompile Include="WritePageFAH.cpp" />
+    <ClCompile Include="WriteTestDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aardvark\aardvark.h" />
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="BaseReadPage.h" />
+    <ClInclude Include="BlockWRTestDialog.h" />
     <ClInclude Include="CalibrationDialog.h" />
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="ComportDialog.h" />
@@ -289,6 +294,7 @@
     <ClInclude Include="USBSettingsDialog.h" />
     <ClInclude Include="USBSPICANPanel.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="WriteTestDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

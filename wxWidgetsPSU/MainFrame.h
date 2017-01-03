@@ -50,6 +50,8 @@
 #include "PMBUSQUERYProgressDialog.h"
 #include "QUERYSequenceThread.h"
 #include "ReadTestDialog.h"
+#include "WriteTestDialog.h"
+#include "BlockWRTestDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
 #define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */
@@ -294,8 +296,8 @@ public:
 	wxMenu      *m_testMenu;
 
 	wxMenuItem  *m_readTestMenuItem;
-	wxMenuItem  *m_writeMenuItem;
-	wxMenuItem  *m_blockWRMenuItem;
+	wxMenuItem  *m_writeTestMenuItem;
+	wxMenuItem  *m_blockWRTestMenuItem;
 
 	wxMenu      *m_helpMenu;
 

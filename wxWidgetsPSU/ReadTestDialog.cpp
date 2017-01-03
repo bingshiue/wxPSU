@@ -410,6 +410,25 @@ void ReadTestDialog::SetupReadCMDArray(void){
 	this->m_pmbusReadCMDArray[3].m_numOfReadBytes += 1;
 }
 
+void ReadTestDialog::OnDialogClose(wxCloseEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnDialogClose");
+
+	PMBUSReadTestTask* pmbusReadTestTask = NULL;
+	pmbusReadTestTask = (PMBUSReadTestTask*)TaskEx::GetTask(task_ID_PMBUSReadTestTask, 0);
+
+	if (pmbusReadTestTask != NULL){
+		pmbusReadTestTask->m_running = false;
+	}
+
+	while (TaskEx::GetCount(task_ID_PMBUSReadTestTask) != 0){
+		wxMilliSleep(100);
+	}
+
+	this->EndModal(wxID_CANCEL);
+
+}
+
 void ReadTestDialog::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
 {
 
@@ -499,4 +518,5 @@ EVT_BUTTON(CID_BTN_START, ReadTestDialog::OnBtnSTART)
 EVT_BUTTON(CID_BTN_STOP, ReadTestDialog::OnBtnSTOP)
 EVT_COMBOBOX(CID_SET_COUNT_SELECT_COMBOBOX, ReadTestDialog::OnSetCountSelectCB)
 EVT_CHECKBOX(CID_OUTPUT_LOG_CHECKBOX, ReadTestDialog::OnOutputLogCheckBox)
+EVT_CLOSE(ReadTestDialog::OnDialogClose)
 wxEND_EVENT_TABLE()
