@@ -24,7 +24,7 @@
 #define DEF_SET_4_CMD         wxT("AA")
 #define DEF_SET_4_READ_BYTES  wxT("0F")
 
-ReadTestDialog::ReadTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Read Test")), wxDefaultPosition, wxSize(READ_TEST_DIALOG_WIDTH, READ_TEST_DIALOG_HEIGHT)){
+ReadTestDialog::ReadTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Customize PMBUS Read CMD Test")), wxDefaultPosition, wxSize(READ_TEST_DIALOG_WIDTH, READ_TEST_DIALOG_HEIGHT)){
 
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);

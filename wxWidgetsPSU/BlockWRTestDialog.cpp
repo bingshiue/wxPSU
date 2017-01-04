@@ -46,7 +46,7 @@
 #define DEF_SET_4_WRITE_BYTE_3  wxT("7a")
 #define DEF_SET_4_READ_BYTES    wxT("02")
 
-BlockWRTestDialog::BlockWRTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Write Test")), wxDefaultPosition, wxSize(BLOCK_WR_TEST_DIALOG_WIDTH, BLOCK_WR_TEST_DIALOG_HEIGHT)){
+BlockWRTestDialog::BlockWRTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Customize PMBUS Block WR CMD Test")), wxDefaultPosition, wxSize(BLOCK_WR_TEST_DIALOG_WIDTH, BLOCK_WR_TEST_DIALOG_HEIGHT)){
 
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);

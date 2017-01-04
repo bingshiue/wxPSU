@@ -483,9 +483,14 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 					break;
 				}
 #if 1
-				wxThreadEvent* thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
-				thread_evt->SetInt(idx);
-				wxQueueEvent(m_pHandler->GetEventHandler(), thread_evt);
+				wxThreadEvent* thread_evt;
+				// Send SendThread Update Event In Every For Loop Start
+				if (idx == 0){
+					thread_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE);
+					thread_evt->SetInt(idx);
+					wxQueueEvent(m_pHandler->GetEventHandler(), thread_evt);
+				}
+
 #else
 				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE));
 #endif

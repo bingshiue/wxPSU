@@ -646,11 +646,11 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_testMenu = new wxMenu();
 
-	this->m_readTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_READ_TEST, wxT("Read Test"), wxT("Read Test"), wxITEM_NORMAL);
+	this->m_readTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_READ_TEST, wxT("Customize PMBUS Read CMD Test"), wxT("Customize PMBUS Read CMD Test"), wxITEM_NORMAL);
 
-	this->m_writeTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_WRITE_TEST, wxT("Write Test"), wxT("Write Test"), wxITEM_NORMAL);
+	this->m_writeTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_WRITE_TEST, wxT("Customize PMBUS Write CMD Test"), wxT("Customize PMBUS Write CMD Test"), wxITEM_NORMAL);
 
-	this->m_blockWRTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_BLOCK_WR_TEST, wxT("Block WR Test"), wxT("Block WR Test"), wxITEM_NORMAL);
+	this->m_blockWRTestMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_BLOCK_WR_TEST, wxT("Customize PMBUS Block WR CMD Test"), wxT("Customize PMBUS Block WR CMD Test"), wxITEM_NORMAL);
 
 	this->m_testMenu->Append(this->m_readTestMenuItem);
 	this->m_testMenu->Append(this->m_writeTestMenuItem);
@@ -2477,14 +2477,6 @@ void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRe
 
 }
 
-void MainFrame::OnValueChanged(wxDataViewEvent &event)
-{
-	/*wxString title*/ 
-	unsigned int row = m_cmdListModel->GetRow(event.GetItem());//GetTitle(event.GetItem());
-	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
-	//title, event.GetColumn());
-}
-
 void MainFrame::OnPollingTimeCombo(wxCommandEvent& event){
 	this->m_polling_time = wxAtoi(m_polling_time_combobox->GetValue());
 	this->m_appSettings.m_pollingInterval = this->m_polling_time;
@@ -2541,7 +2533,7 @@ void MainFrame::OnDVItemActivated(wxDataViewEvent &event){
 	// Get the row position
 	wxDataViewItem item = event.GetItem();
 	int row = m_cmdListModel->GetRow(item);
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s : Select Row is %d", __FUNCTIONW__, row);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s : Select Row is %d", __FUNCTIONW__, row);
 
 }
 
@@ -2681,6 +2673,44 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	}
 
 #endif
+}
+
+void MainFrame::OnDVValueChanged(wxDataViewEvent &event){
+
+#if 0
+	/*wxString title*/
+	unsigned int row = m_cmdListModel->GetRow(event.GetItem());//GetTitle(event.GetItem());
+	PSU_DEBUG_PRINT(MSG_DETAIL, "wxEVT_DATAVIEW_ITEM_VALUE_CHANGED");// , Item Id : %s;  Column: %d",
+	//title, event.GetColumn());
+#endif
+
+	int enabledCMDCount = 0;
+
+	if (this->m_monitor_running == true){
+		//
+		for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+
+			if (PMBUSHelper::isOwnReadAccess(this->m_PMBusData[idx].m_access) == true){
+
+				if (this->m_PMBusData[idx].m_toggle == true){
+					enabledCMDCount++;
+
+					if (enabledCMDCount > 0){
+						PSU_DEBUG_PRINT(MSG_ALERT, "CMD %02xH is Enable", this->m_PMBusData[idx].m_register);
+						break;
+					}
+				}
+
+			}
+		}
+
+		if (enabledCMDCount == 0){
+			PSU_DEBUG_PRINT(MSG_ALERT, "No CMD(Read Access) Enabled !");
+			this->StopMonitor();
+		}
+	}
+
+
 }
 
 void MainFrame::OnDisableAll(wxCommandEvent& event){
@@ -3085,8 +3115,36 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 {
 	//PSU_DEBUG_PRINT(MSG_ALERT, "MYFRAME: MyThread update! Int = %d", event.GetInt());
-	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
+	//this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
 	
+	PSU_DEBUG_PRINT(MSG_DETAIL, "%s : GetInt = %d", __FUNCTIONW__, event.GetInt());
+
+	int enabledCMDCount = 0;
+
+	if (this->m_monitor_running == true){
+		//
+		for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+
+			if (PMBUSHelper::isOwnReadAccess(this->m_PMBusData[idx].m_access) == true){
+
+				if (this->m_PMBusData[idx].m_toggle == true){
+					enabledCMDCount++;
+
+					if (enabledCMDCount > 0){
+						PSU_DEBUG_PRINT(MSG_DETAIL, "CMD %02xH is Enable", this->m_PMBusData[idx].m_register);
+						break;
+					}
+				}
+
+			}
+		}
+
+		if (enabledCMDCount == 0){
+			PSU_DEBUG_PRINT(MSG_ALERT, "No CMD(Read Access) Enabled !");
+			this->StopMonitor();
+		}
+	}
+
 }
 
 void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
@@ -4561,10 +4619,10 @@ EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(MENU_ID_ACBEL_WEBSITE, MainFrame::OnAcbelWebSite)
 
 EVT_MENU(wxID_EXIT, MainFrame::OnExit)
-EVT_DATAVIEW_ITEM_ACTIVATED(CID_CMDLIST_DVC, MainFrame::OnDVItemActivated)
+//EVT_DATAVIEW_ITEM_ACTIVATED(CID_CMDLIST_DVC, MainFrame::OnDVItemActivated)
 EVT_DATAVIEW_SELECTION_CHANGED(CID_CMDLIST_DVC, MainFrame::OnDVSelectionChanged)
+//EVT_DATAVIEW_ITEM_EDITING_DONE(CID_CMDLIST_DVC, MainFrame::OnDVValueChanged)
 EVT_DATAVIEW_ITEM_CONTEXT_MENU(CID_CMDLIST_DVC, MainFrame::OnContextMenu)
-//EVT_DATAVIEW_ITEM_VALUE_CHANGED(CID_CMDLIST_DVC, MainFrame::OnValueChanged)
 EVT_COMBOBOX(ID_POLLING_TIME_COMBO, MainFrame::OnPollingTimeCombo)
 EVT_BUTTON(CID_SLAVE_ADDRESS_SET_BUTTON, MainFrame::OnSlaveAddressSetButton)
 

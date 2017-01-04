@@ -172,7 +172,8 @@ int HIDSendData(unsigned char* buff, unsigned int size){
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	unsigned int retry = 0;
 	unsigned int readSize = 0;
-	unsigned int retryTimeArray[RETRY_TIMES] = { 3, 20, 50, 100, 200 };
+	//                                         { 3, 20, 50, 100, 200 };
+	unsigned int retryTimeArray[RETRY_TIMES] = { 1, 3, 5, 10, 100 };
 
 	while (retry < RETRY_TIMES && readSize <= 0){
 

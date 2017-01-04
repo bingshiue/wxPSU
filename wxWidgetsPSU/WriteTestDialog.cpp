@@ -46,7 +46,7 @@
 #define DEF_SET_4_WRITE_BYTE_4  wxT("7a")
 #define DEF_SET_4_WRITE_BYTE_5  wxT("90")
 
-WriteTestDialog::WriteTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Write Test")), wxDefaultPosition, wxSize(WRITE_TEST_DIALOG_WIDTH, WRITE_TEST_DIALOG_HEIGHT)){
+WriteTestDialog::WriteTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("Customize PMBUS Write CMD Test")), wxDefaultPosition, wxSize(WRITE_TEST_DIALOG_WIDTH, WRITE_TEST_DIALOG_HEIGHT)){
 
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);

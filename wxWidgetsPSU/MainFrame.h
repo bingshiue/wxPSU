@@ -434,8 +434,8 @@ private:
 	void OnAbout(wxCommandEvent& event);
 	void OnAcbelWebSite(wxCommandEvent& event);
 
-	void OnValueChanged(wxDataViewEvent &event);
 	void OnDVSelectionChanged(wxDataViewEvent &event);
+	void OnDVValueChanged(wxDataViewEvent &event);
 	void OnDVItemActivated(wxDataViewEvent &event);
 
 	void OnPollingTimeCombo(wxCommandEvent& event);
