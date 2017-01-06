@@ -124,6 +124,13 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 		break;
 
 	case IOACCESS_TOTALPHASE:
+		
+		sendBuffer[baseIndex++] = 1;// write bytes
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;// read bytes
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;
+
+		buffer_len = baseIndex;
 
 		break;
 

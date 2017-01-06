@@ -60,6 +60,20 @@ unsigned int SendISPEndCMDTask::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		buffer[active_index++] = 2; // Write Bytes
+		buffer[active_index++] = 0; // Read Bytes
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
+		buffer[active_index++] = 0x00; // End
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
+
+		// Update Write Bytes For Write CMD
+		buffer[0] = active_index - 3;
+
+		break;
+
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");

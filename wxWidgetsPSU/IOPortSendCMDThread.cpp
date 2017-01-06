@@ -85,7 +85,40 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 		m_writePageSendBuff[8] = 0x0D;
 		m_writePageSendBuff[9] = 0x0A;
 
+		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		m_writePageSendBuff[0] = 1;// pmBusWriteCMD->m_numOfSendBytes; // Write Bytes
+		m_writePageSendBuff[1] = 0; // Read Bytes
+		m_writePageSendBuff[2] = PMBUSHelper::GetSlaveAddress();//pmBusWriteCMD->m_slaveAddr; // Slave Address
+		m_writePageSendBuff[3] = 0x00;//pmBusWriteCMD->m_cmd;// Command
+		m_writePageSendBuff[4] = cmdPageValue;;
+
+		pec = PMBusSlave_Crc8MakeBitwise(0, 7, m_writePageSendBuff + 2, 3);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "pec = %02xh", pec);
+
+		m_writePageSendBuff[5] = pec; // PEC
+
+		// Update Write Bytes For Write CMD
+		m_writePageSendBuff[0] = 3;
+#if 0
+		// Data start from index 4
+		for (unsigned int idx = 0; idx < pmBusWriteCMD->m_numOfSendBytes; idx++){
+			m_writePageSendBuff[4 + idx] = pmBusWriteCMD->m_sendBytes[idx];
+			pec_start_index = (4 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		m_writePageSendBuff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, m_writePageSendBuff + 2, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", m_writePageSendBuff[pec_start_index]);
+
+		pec_start_index++;
+
+		// Update Write Bytes For Write CMD
+		m_writePageSendBuff[0] = pec_start_index - 3;
+#endif
 
 		break;
 
@@ -407,8 +440,40 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 
 	case IOACCESS_TOTALPHASE:
 
-		this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
-		this->m_sendBuff[baseIndex++] = command;
+		if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+
+			this->m_sendBuff[baseIndex++] = 1;// write bytes
+			this->m_sendBuff[baseIndex++] = responseDataLength;// Read bytes Length
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+			this->m_sendBuff[baseIndex++] = command;// Command
+
+			//buffer_len = baseIndex;
+		}
+		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			this->m_sendBuff[0] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; // Write Bytes
+			//PSU_DEBUG_PRINT(MSG_ALERT, "%s:pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength=%d", __FUNCTIONW__, pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength);
+			this->m_sendBuff[1] = responseDataLength;// Read bytes Length
+			this->m_sendBuff[2] = PMBUSHelper::GetSlaveAddress();// Slave Address
+			this->m_sendBuff[3] = command;// Command
+			//this->m_sendBuff[4] = this->m_sendBuff[0];
+
+			// Data start from index 4
+			for (unsigned int len = 0; len < this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				this->m_sendBuff[4 + len] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+				baseIndex = (4 + len);
+			}
+
+			baseIndex++;
+
+			//PSU_DEBUG_PRINT(MSG_ALERT, "%s:baseIndex=%d", __FUNCTIONW__, baseIndex);
+
+			//Update Write Data Bytes Length For Block Wrire - Block Read Commands
+			this->m_sendBuff[0] = baseIndex - 3;
+
+			//buffer_len = baseIndex;
+
+		}
 
 		break;
 
@@ -601,7 +666,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								}
 								else{
 									// Get Expect Data Length
-									ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+									//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+									ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
 									PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
 									//
@@ -777,7 +843,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 															}
 															else{
 																// Get Expect Data Length
-																ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+																//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+																ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
 																PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
 																//
@@ -1004,7 +1071,25 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							else{
 								// If Receive Data Length is 0
 								if (this->m_recvBuff->m_length == 0){
-									PSU_DEBUG_PRINT(MSG_ERROR, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
+									
+									switch (*this->m_CurrentIO){
+									
+									case IOACCESS_SERIALPORT:
+									case IOACCESS_HID:
+										PSU_DEBUG_PRINT(MSG_ERROR, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
+										break;
+
+									case IOACCESS_TOTALPHASE:
+										if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+											PSU_DEBUG_PRINT(MSG_ERROR, "I2C WriteRead Failed, Error=%d", PMBUSHelper::getTotalPhaseWriteReadLastError());
+										}
+										break;
+
+									default:
+										PSU_DEBUG_PRINT(MSG_ERROR, "%s : Something Error Occurs", __FUNCTIONW__);
+										break;
+									};
+
 								}
 								else{
 									PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
@@ -1114,7 +1199,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							}
 							else{
 								// Get Expect Data Length
-								ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+								//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+								ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[idx].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
 								PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
 								//
@@ -1545,6 +1631,14 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
 			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx+6];
+		}
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
 		}
 
 		break;

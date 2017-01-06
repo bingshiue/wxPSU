@@ -167,7 +167,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 						}
 						else{
 							// Get Expect Data Length
-							ExpectReceiveDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+							//ExpectReceiveDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+							ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_currentIO, PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
 							PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
 							//
@@ -349,7 +350,8 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 													}
 													else{
 														// Get Expect Data Length
-														ExpectReceiveDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+														//ExpectReceiveDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+														ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_currentIO, PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
 														PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
 														//

@@ -290,6 +290,21 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 				delete i2cIFDialog;
 
 			}
+			else if(this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
+				
+				// Hint User Can Use TotalPhase I2C Host Adaptor Device
+				wxMessageBox(wxT("Found TotalPhase I2C Host Adaptor Device \n\nCurrent I/O Setting is Serial Port, You Can Setup I/O to Use TotalPhase I2C Host Adaptor Device in Next Popup Setting Window"),
+					wxT("Found TotalPhase I2C Host Adaptor Device !"),  // caption
+					wxOK | wxICON_INFORMATION);
+
+				// Popup I2C Interface Dialog 
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar);
+				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
+				i2cIFDialog->ShowModal();
+
+				delete i2cIFDialog;
+
+			}
 			else{
 
 				// Popup Comport Setting Dialog
@@ -3003,10 +3018,11 @@ int MainFrame::OpenIODevice(void){
 				/*** Send Query Start Event To Handler Function ***/
 				wxThreadEvent *threadQueryStart_evt;
 
+#if AUTO_QUERY_ALL_CMDS_WHEN_IO_OPEN == TRUE
 				threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
 				threadQueryStart_evt->SetString(wxT("Query All Commands"));
 				wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
-
+#endif
 			}
 		}
 	//}
@@ -4308,6 +4324,12 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
 				}
 			}
+			else if (this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE){
+				if(pid == TOTAL_PHASE_USB_PID && vid == TOTAL_PHASE_USB_VID){
+					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+				}
+			}
+
 #if 0	
 			switch (wParam){
 

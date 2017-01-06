@@ -22,6 +22,7 @@ int PMBUSHelper::runInTimes;
 unsigned char PMBUSHelper::m_FWUploadModeCMD;
 unsigned char PMBUSHelper::m_FWUploadCMD;
 unsigned char PMBUSHelper::m_FWUploadStatusCMD;
+int PMBUSHelper::TotalPhaseWriteReadLastError;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -622,6 +623,45 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+			
+			sendBuffer[baseIndex++] = 1;// write bytes
+			sendBuffer[baseIndex++] = responseDataLength;// Read bytes Length
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+			sendBuffer[baseIndex++] = command;// Command
+
+			buffer_len = baseIndex;
+		}
+		else if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			sendBuffer[0] = pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; // Write Bytes
+			//PSU_DEBUG_PRINT(MSG_ALERT, "%s:pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength=%d", __FUNCTIONW__, pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength);
+			sendBuffer[1] = responseDataLength;// Read bytes Length
+			sendBuffer[2] = PMBUSHelper::GetSlaveAddress();// Slave Address
+			sendBuffer[3] = command;// Command
+			//sendBuffer[4] = sendBuffer[0];
+
+			// Data start from index 4
+			for (unsigned char len = 0; len < pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength; len++){
+				sendBuffer[4 + len] = pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+				baseIndex = (4 + len);
+			}
+
+			baseIndex++;
+
+			//PSU_DEBUG_PRINT(MSG_ALERT, "%s:baseIndex=%d", __FUNCTIONW__, baseIndex);
+
+			//Update Write Data Bytes Length For Block Wrire - Block Read Commands
+			sendBuffer[0] = baseIndex - 3;
+
+			buffer_len = baseIndex;
+
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
@@ -700,6 +740,31 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		buff[0] = sizeOfDataBuffer; // Write Bytes
+		buff[1] = 0; // Read Bytes
+		buff[2] = PMBUSHelper::GetSlaveAddress();
+		buff[3] = cmd;
+
+		// Data start from index 4
+		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
+			buff[4 + idx] = dataBuffer[idx];
+			pec_start_index = (4 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 2, 2 + sizeOfDataBuffer);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+
+		pec_start_index++;
+
+		// Update Write Bytes For Write CMD
+		buff[0] = pec_start_index - 3;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;
@@ -724,6 +789,14 @@ void PMBUSHelper::ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* 
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
 			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx + 6];
+		}
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
 		}
 
 		break;
@@ -843,6 +916,15 @@ unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		if (buffer[0] != REBOOT_OK){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch, Return Code = %02xh", buffer[0]);
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Something Error");
 		break;
@@ -883,6 +965,15 @@ unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		if (buffer[0] != target){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[0]);
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Something Error");
 		break;
@@ -918,6 +1009,15 @@ unsigned char PMBUSHelper::IsISPCheckStatusResponseOK(unsigned int *currentIO, u
 		if (buffer[6] != 0x30){
 			result = response_ng;
 			PrintISPCheckStatusError(buffer[6]);
+		}
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		if (buffer[0] != 0x30){
+			result = response_ng;
+			PrintISPCheckStatusError(buffer[0]);
 		}
 
 		break;
@@ -975,6 +1075,12 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 		}
 
 		break;
+
+	case IOACCESS_TOTALPHASE:
+		if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+			result = response_ng;
+		}
+		break;
 	
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
@@ -1014,6 +1120,10 @@ unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsign
 			result = response_ng;
 		}
 
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		// Do Handle When I/O is Serial Port
 		break;
 
 	default:
@@ -1092,6 +1202,10 @@ unsigned int& PMBUSHelper::getCurrentISPTarget(void){
 	return CurrentISPTarget;
 }
 
+int& PMBUSHelper::getTotalPhaseWriteReadLastError(void){
+	return TotalPhaseWriteReadLastError;
+}
+
 bool PMBUSHelper::isOwnReadAccess(unsigned int access){
 	bool ret = false;
 
@@ -1157,4 +1271,30 @@ unsigned char& PMBUSHelper::getFWUploadCMD(void){
 
 unsigned char& PMBUSHelper::getFWUploadStatusCMD(void){
 	return m_FWUploadStatusCMD;
+}
+
+int PMBUSHelper::getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned int CMDResponseDataLength, unsigned char BaseDataLength){
+
+	int length;
+
+	switch (CurrentUseIO){
+
+	case IOACCESS_SERIALPORT:
+		length = CMDResponseDataLength + BaseDataLength;
+		break;
+
+	case IOACCESS_HID:
+		length = CMDResponseDataLength + BaseDataLength + 2;
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		length = CMDResponseDataLength;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+		break;
+	}
+   
+	return length;
 }

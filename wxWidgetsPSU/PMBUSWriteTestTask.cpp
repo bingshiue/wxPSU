@@ -90,6 +90,31 @@ int PMBUSWriteTestTask::ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, un
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		sendBuffer[0] = pmBusWriteCMD->m_numOfSendBytes; // Write Bytes
+		sendBuffer[1] = 0; // Read Bytes
+		sendBuffer[2] = pmBusWriteCMD->m_slaveAddr;
+		sendBuffer[3] = pmBusWriteCMD->m_cmd;
+
+		// Data start from index 4
+		for (unsigned int idx = 0; idx < pmBusWriteCMD->m_numOfSendBytes; idx++){
+			sendBuffer[4 + idx] = pmBusWriteCMD->m_sendBytes[idx];
+			pec_start_index = (4 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		sendBuffer[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 2, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", sendBuffer[pec_start_index]);
+
+		pec_start_index++;
+
+		// Update Write Bytes For Write CMD
+		sendBuffer[0] = pec_start_index - 3;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;

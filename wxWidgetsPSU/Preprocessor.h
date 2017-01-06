@@ -23,4 +23,7 @@
 // Don't Enable ISP Function (Disable Administratot Menu Item)
 #define DEFAULT_DONT_ENABLE_ISP            (FALSE)
 
+// Auto Query All Commands When I/O Open
+#define AUTO_QUERY_ALL_CMDS_WHEN_IO_OPEN   (TRUE)
+
 #endif

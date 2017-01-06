@@ -53,7 +53,7 @@ ReadTestDialog::ReadTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned in
 	m_setCountSelectCB->Select(0);
 
 	m_outputLogCheckBox = new wxCheckBox(m_optionsSBS->GetStaticBox(), CID_OUTPUT_LOG_CHECKBOX, wxT("Output Log"));
-	this->m_outputLog = true;
+	this->m_outputLog = false;
 	m_outputLogCheckBox->SetValue(this->m_outputLog);
 
 	m_optionsSBS->Add(m_setCountSelectST, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
@@ -235,14 +235,13 @@ void ReadTestDialog::OnBtnSTOP(wxCommandEvent& event){
 
 	if (pmbusReadTestTask != NULL){
 		pmbusReadTestTask->m_running = false;
-
-		this->m_btnSTART->Enable(true);
-		this->m_btnSTOP->Enable(false);
-		this->m_setCountSelectCB->Enable(true);
-		this->m_outputLogCheckBox->Enable(true);
-		this->EnableTextCtrlBySelect(this->m_setCountSelectCB->GetSelection());
 	}
 	
+	this->m_btnSTART->Enable(true);
+	this->m_btnSTOP->Enable(false);
+	this->m_setCountSelectCB->Enable(true);
+	this->m_outputLogCheckBox->Enable(true);
+	this->EnableTextCtrlBySelect(this->m_setCountSelectCB->GetSelection());
 }
 
 void ReadTestDialog::OnSetCountSelectCB(wxCommandEvent& event){

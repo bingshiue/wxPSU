@@ -92,11 +92,11 @@ void WritePage00H::OnButtonWrite(wxCommandEvent& event){
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		cmdPageValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", cmdPageValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, Value = %d", cmdPageValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		cmdPageValue = wxAtoi(this->m_inputValue->GetValue());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", cmdPageValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %d", cmdPageValue);
 	}
 
 #if 0

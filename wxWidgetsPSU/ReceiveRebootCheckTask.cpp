@@ -27,6 +27,8 @@ void ReceiveRebootCheckTask::Draw(void){
 #define ISP_ENDDATA_BYTES_TO_READ  8
 int ReceiveRebootCheckTask::Main(double elapsedTime){
 
+	bool isp_response_error = false;
+
 	// Receive Data 
 	unsigned int ispEndDataBytesToRead = ISP_ENDDATA_BYTES_TO_READ;//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 2;
 
@@ -37,12 +39,32 @@ int ReceiveRebootCheckTask::Main(double elapsedTime){
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispEndDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+		
+		switch (*this->m_CurrentIO){
+
+		case IOACCESS_SERIALPORT:
+		case IOACCESS_HID:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+			isp_response_error = true;
+			break;
+
+		case IOACCESS_TOTALPHASE:
+			if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+				PSU_DEBUG_PRINT(MSG_ERROR, "I2C WriteRead Failed, Error=%d", PMBUSHelper::getTotalPhaseWriteReadLastError());
+			}
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
-		*this->m_ispStatus = ISP_Status_ResponseDataError;
-		delete this;
-		return -1;
+		if (isp_response_error == true){
+			*this->m_ispStatus = ISP_Status_ResponseDataError;
+			delete this;
+			return -1;
+		}
 #endif
 	}
 

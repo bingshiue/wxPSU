@@ -65,6 +65,15 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		buffer[active_index++] = 1;// write bytes
+		buffer[active_index++] = 0x02;// read bytes
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD();
+
+		break;
+
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");

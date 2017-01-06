@@ -9,7 +9,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_INTERRUPT, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_END, wxThreadEvent);
 
 PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString title, IOACCESS* ioaccess, unsigned int* currentIO) : 
-	wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(200,130)){
+	wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(200,80)){
 
 	// Setup Icon
 	wxIcon icon;
@@ -28,15 +28,16 @@ PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString ti
 
 	// Initialize GUI Component
 	m_infoST = new wxStaticText(this->m_statisticsSB->GetStaticBox(), wxID_ANY, wxT("00000/00000"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL | wxST_NO_AUTORESIZE);
-	m_okButton = new wxButton(this, CID_BTN_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize);
+	//m_okButton = new wxButton(this, CID_BTN_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize);
+	//m_okButton->Enable(false);
 
 	// Add GUI Component To Static Box
-	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(0).Align(wxALIGN_CENTRE_HORIZONTAL));
+	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(1).Align(wxALIGN_CENTRE_HORIZONTAL).Expand());
 
 	// Add Sizer To Top Level Sizer
-	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(0).Border().Expand());
+	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(1).Border().Expand());
 
-	this->m_topLevelSizer->Add(m_okButton, wxSizerFlags(0).Border().Align(wxALIGN_CENTRE_HORIZONTAL));
+	//this->m_topLevelSizer->Add(m_okButton, wxSizerFlags(0).Border().Align(wxALIGN_CENTRE_HORIZONTAL));
 
 	// Set Sizer
 	SetSizer(m_topLevelSizer);

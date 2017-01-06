@@ -174,6 +174,25 @@ int PMBUSBlockWRTestTask::ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockW
 
 	case IOACCESS_TOTALPHASE:
 
+		sendBuffer[0] = pmBusBlockWRCMD->m_numOfWriteBytes; // Write Bytes
+		sendBuffer[1] = pmBusBlockWRCMD->m_numOfReadBytes; // Read Bytes
+		sendBuffer[2] = pmBusBlockWRCMD->m_slaveAddr;
+		sendBuffer[3] = pmBusBlockWRCMD->m_cmd;
+		sendBuffer[4] = sendBuffer[0];
+
+		// Data start from index 5
+		for (unsigned int idx = 0; idx < pmBusBlockWRCMD->m_numOfWriteBytes; idx++){
+			sendBuffer[5 + idx] = pmBusBlockWRCMD->m_writeBytes[idx];
+			baseIndex = (5 + idx);
+		}
+
+		baseIndex++;
+
+		//Update Write Data Bytes Length For Block Wrire - Block Read Commands
+		sendBuffer[0] = baseIndex - 3;
+
+		buffer_len = baseIndex;
+
 		break;
 
 	default:

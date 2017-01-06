@@ -30,7 +30,33 @@ int ReceiveWriteCMDTask::Main(double elapsedTime){
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, this->m_pmbusSendCommand.m_bytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+		
+		switch (*this->m_CurrentIO){
+		
+		case IOACCESS_SERIALPORT:
+		case IOACCESS_HID:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+			break;
+
+		case IOACCESS_TOTALPHASE:
+			if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+				PSU_DEBUG_PRINT(MSG_ERROR, "I2C WriteRead Failed, Error=%d", PMBUSHelper::getTotalPhaseWriteReadLastError());
+			}
+			else{
+				// Verify Receive Data
+				if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff.m_recvBuff, 256) == PMBUSHelper::response_ok){
+					PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
+				}
+				else {
+					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+				}
+			}
+			break;
+
+		default:
+
+			break;
+		}
 
 		//new(TP_SendWriteCMDTask) SendWriteCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_pmbusSendCommand);
 

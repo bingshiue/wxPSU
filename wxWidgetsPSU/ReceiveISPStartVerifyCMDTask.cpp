@@ -61,6 +61,20 @@ unsigned int ReceiveISPStartVerifyCMDTask::ProductISPStartCMDSendBuffer(unsigned
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		buffer[active_index++] = 2; // Write Bytes
+		buffer[active_index++] = 0; // Read Bytes
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
+		buffer[active_index++] = this->m_target; // Target;
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 3); // PEC
+
+		// Update Write Bytes For Write CMD
+		buffer[0] = active_index - 3;
+
+		break;
+
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");
@@ -73,7 +87,9 @@ unsigned int ReceiveISPStartVerifyCMDTask::ProductISPStartCMDSendBuffer(unsigned
 #define ISP_ENDDATA_BYTES_TO_READ  8
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
-		
+	
+	bool isp_response_error = false;
+
 	// Receive Data 
 	unsigned int ispEndDataBytesToRead = ISP_ENDDATA_BYTES_TO_READ;//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 2;
 
@@ -84,12 +100,32 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispEndDataBytesToRead);
 
 	if (this->m_recvBuff.m_length == 0){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+
+		switch (*this->m_CurrentIO){
+
+		case IOACCESS_SERIALPORT:
+		case IOACCESS_HID:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
+			isp_response_error = true;
+			break;
+
+		case IOACCESS_TOTALPHASE:
+			if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+				PSU_DEBUG_PRINT(MSG_ERROR, "I2C WriteRead Failed, Error=%d", PMBUSHelper::getTotalPhaseWriteReadLastError());
+			}
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
-		*this->m_ispStatus = ISP_Status_ResponseDataError;
-		delete this;
-		return -1;
+		if (isp_response_error == true){
+			*this->m_ispStatus = ISP_Status_ResponseDataError;
+			delete this;
+			return -1;
+		}
 #endif
 	}
 

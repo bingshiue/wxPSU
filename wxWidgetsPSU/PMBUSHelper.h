@@ -77,6 +77,8 @@ public :
 
 	static unsigned int GetCurrentCMDTableSize(void);
 
+	static int& getTotalPhaseWriteReadLastError(void);
+
 	static void setWinTitleBase(wxString base);
 
 	static wxString& getWinTitleBase(void);
@@ -104,6 +106,10 @@ public :
 	 * @brief Getter & Setter for FW Upload Status Command.
 	 */
 	static unsigned char& getFWUploadStatusCMD(void);
+	/**
+	 * @brief Get Expected Response Data Length by I/O.
+	 */
+	static int getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned int CMDResponseDataLength, unsigned char BaseDataLength);
 
 protected :
 
@@ -113,6 +119,8 @@ private :
 	static PMBUSSTATUS_t m_pmbusStatus;
 
 	static AppSettings_t* m_appSettings;
+
+	static int TotalPhaseWriteReadLastError;
 
 	static USBINFO m_USBInfo;
 

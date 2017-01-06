@@ -75,7 +75,7 @@ WriteTestDialog::WriteTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 	m_setCountSelectCB->Select(0);
 
 	m_outputLogCheckBox = new wxCheckBox(m_optionsSBS->GetStaticBox(), CID_OUTPUT_LOG_CHECKBOX, wxT("Output Log"));
-	this->m_outputLog = true;
+	this->m_outputLog = false;
 	m_outputLogCheckBox->SetValue(this->m_outputLog);
 
 	m_optionsSBS->Add(m_setCountSelectST, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());

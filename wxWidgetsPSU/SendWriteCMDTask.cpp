@@ -42,6 +42,12 @@ int SendWriteCMDTask::Main(double elapsedTime){
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		writeCMD = this->m_pmbusSendCommand.m_sendData[3];
+
+		break;
+
 	default:
 
 		break;

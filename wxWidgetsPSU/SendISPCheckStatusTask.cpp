@@ -65,6 +65,14 @@ unsigned int SendISPCheckStatusTask::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		buffer[active_index++] = 1;// write bytes
+		buffer[active_index++] = 0x02;// read bytes
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();
+		buffer[active_index++] = PMBUSHelper::getFWUploadStatusCMD();
+
+		break;
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
