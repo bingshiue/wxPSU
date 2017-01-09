@@ -294,6 +294,11 @@ wxEND_EVENT_TABLE()
 #define INDEX_DATA_2_START_HID       8+2
 #define INDEX_PEC_HID               10+2
 
+#define INDEX_CALIBRATION_ITEM_TOTALPHASE   4
+#define INDEX_POINTER_TOTALPHASE            5
+#define INDEX_DATA_1_START_TOTALPHASE       6
+#define INDEX_DATA_2_START_TOTALPHASE       8
+#define INDEX_PEC_TOTALPHASE               10 
 
 int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done){
 	
@@ -424,7 +429,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
 
 #ifdef USE_LINEAR_DATA_FORMAT
-		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START, value1, resolution1);
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START_HID, value1, resolution1);
 #else
 		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START_HID, value1, resolution1);
 #endif
@@ -437,7 +442,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
 
 #ifdef USE_LINEAR_DATA_FORMAT
-		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START, value2, resolution2);
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START_HID, value2, resolution2);
 #else
 		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START_HID, value2, resolution2);
 #endif
@@ -482,6 +487,60 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		buffer[1] = active_index - 2;
 
 #endif
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		buffer[0] = 0; // Write Bytes
+		buffer[1] = 0; // Read Bytes
+		buffer[2] = PMBUSHelper::GetSlaveAddress();
+		buffer[3] = 0xCB;
+
+		// Get Calibration Item Command
+		buffer[INDEX_CALIBRATION_ITEM_TOTALPHASE] = calibrationItemCommand[this->m_calibrationItemCB->GetSelection()];
+
+		// Get Pointer
+		buffer[INDEX_POINTER_TOTALPHASE] =
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+
+		// Data 1
+		value1 = 0;
+		this->m_data1TC->GetValue().ToDouble(&value1);
+
+		resolution1 = 0;
+		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START_TOTALPHASE, value1, resolution1);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START_TOTALPHASE, value1, resolution1);
+#endif
+
+		// Data 2
+		value2 = 0;
+		this->m_data2TC->GetValue().ToDouble(&value2);
+
+		resolution2 = 0;
+		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START_TOTALPHASE, value2, resolution2);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START_TOTALPHASE, value2, resolution2);
+#endif
+
+		separate_pec = 0;
+
+		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 2, 8);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+		buffer[INDEX_PEC_TOTALPHASE] = separate_pec;
+
+		active_index = INDEX_PEC_TOTALPHASE + 1;
+
+		//Update Write Bytes For Write CMD
+		buffer[0] = active_index - 3;
 
 		break;
 
@@ -537,6 +596,18 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
 			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
 			SendBuffer[INDEX_POINTER_HID],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_TOTALPHASE],
 			value1,
 			value2);
 
@@ -647,7 +718,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 	wxString msg(wxT(""));
 
-	switch(*this->m_currentIO){
+	switch (*this->m_currentIO){
 
 	case IOACCESS_SERIALPORT:
 
@@ -673,10 +744,22 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 		break;
 
+	case IOACCESS_TOTALPHASE:
+
+		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_TOTALPHASE],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
 	default:
 
 		break;
-}
+	}
 
 #if 0	
 	// Send Buffer
@@ -733,7 +816,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
-	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
 	calibrationItem.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < SendLength; idx++){
 		calibrationItem.m_sendData[idx] = SendBuffer[idx];

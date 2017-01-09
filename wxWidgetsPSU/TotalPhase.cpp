@@ -76,6 +76,8 @@ wchar_t* GetTotalPhaseOpenDeviceName(void){
 
 int OpenTotalPhaseDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting){
 
+	int bitrate;
+
 	// Open the device
 	handle = aa_open(port);
 	if (handle <= 0) {
@@ -99,6 +101,10 @@ int OpenTotalPhaseDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* 
 	// This command is only effective on v2.0 hardware or greater.
 	// The power pins on the v1.02 hardware are not enabled by default.
 	aa_target_power(handle, AA_TARGET_POWER_BOTH);
+
+	// Setup the bitrate
+	bitrate = aa_i2c_bitrate(handle, PMBUSHelper::GetAppSettings()->m_totalPhase_I2C_Bitrate);
+	PSU_DEBUG_PRINT(MSG_ALERT, "TOTAL PHASE Set Bitrate to %d kHz", bitrate);
 
 	return EXIT_SUCCESS;
 }

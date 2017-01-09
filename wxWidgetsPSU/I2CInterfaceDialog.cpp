@@ -4,8 +4,10 @@
 
 #include "I2CInterfaceDialog.h"
 
-I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
-	
+I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar, bool defaultAdaptor, int defaultAdaptorSelect) : wxDialog(parent, wxID_ANY, wxString(wxT("I2C Interface"))) {
+	bool defAdaptor = defaultAdaptor;
+	int defAdaptorSelect = defaultAdaptorSelect;
+
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
 
@@ -49,6 +51,12 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	}
 	m_moduleNameCB->SetSelection(module_select);
 	m_previousModuleBoardSelectIndex = module_select;
+
+	if (defaultAdaptor == true){
+		if (defaultAdaptorSelect != module_select){
+			m_moduleNameCB->SetSelection(defaultAdaptorSelect);
+		}
+	}
 
 	m_i2cIFModuleSBS->Add(m_moduleNameST, wxSizerFlags().Align(wxCENTER).Border());
 	m_i2cIFModuleSBS->Add(m_moduleNameCB, wxSizerFlags().Align(wxCENTER).Border());
@@ -170,7 +178,6 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 I2CInterfaceDialog::~I2CInterfaceDialog(){
 
 }
-
 
 void I2CInterfaceDialog::OnModuleBoardCombo(wxCommandEvent& event){
 	//PSU_DEBUG_PRINT(MSG_ALERT, "OnModuleBoardCombo");
@@ -461,6 +468,9 @@ int I2CInterfaceDialog::OpenIODevice(void){
 				wxString totalPhaseDeviceName(wxT("TOTAL PHASE"));
 
 				this->UpdateStatusBarIOSettingFiled(totalPhaseDeviceName);
+
+				// Update I2C Clock Speed Field
+				this->UpdateStatusBarIOSettingFiled(this->m_appSettings->m_totalPhase_I2C_Bitrate);
 
 			}
 

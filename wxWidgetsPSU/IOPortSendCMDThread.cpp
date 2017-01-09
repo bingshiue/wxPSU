@@ -589,7 +589,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							retry = 0;
 							do {
 								// Decide Send Data Length
-								if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+								if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
 									if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 										sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE;
 									}
@@ -767,7 +767,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 														retry = 0;
 														do {
 															// Decide Send Data Length
-															if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+															if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
 																if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 																	sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
 																}
@@ -1122,7 +1122,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						retry = 0;
 						do {
 							// Decide Send Data Length
-							if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
+							if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
 								if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 									sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
 								}

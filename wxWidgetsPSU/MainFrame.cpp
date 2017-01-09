@@ -269,10 +269,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	wxArtProvider::Push(new PMBUSArtProvider);
 
 	// Open IO Device
+	wxThreadEvent *threadQueryStart_evt;
 	int retval;
 	retval = this->OpenIODevice();
 	if (retval == EXIT_FAILURE){
-		if (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) {
+		//if (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) {
 			
 			// If Find Acbel USB I2C Adaptor
 			if (this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
@@ -283,7 +284,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 					wxOK | wxICON_INFORMATION);
 
 				// Popup I2C Interface Dialog 
-				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar);
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar, true, I2C_AdaptorModuleBoard_R90000_9271_USB);
 				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
 				i2cIFDialog->ShowModal();
 
@@ -298,7 +299,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 					wxOK | wxICON_INFORMATION);
 
 				// Popup I2C Interface Dialog 
-				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar);
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar, true, I2C_AdaptorModuleBoard_TOTALPHASE);
 				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
 				i2cIFDialog->ShowModal();
 
@@ -314,7 +315,18 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 				delete comportDialog;
 			}
-		}
+
+			// If I/O Device Opened Success
+			if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
+				/*** Send Query Start Event To Handler Function ***/
+				if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+					threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
+					threadQueryStart_evt->SetString(wxT("Query All Commands"));
+					wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
+				}
+			}
+
+		//}
 	}
 	
 	// Put Window in Center
@@ -378,6 +390,7 @@ void MainFrame::SetupMenuBar(void){
 	|- I2C Fault Test
 	|- [V] Enable Checksum
 	|- Only Polling Support Command
+	|- Auto Query Command On I/O Open
 	|------------------------------------
 	|- Clear Error Log
 	|- Reset Max./Min. Value
@@ -441,9 +454,15 @@ void MainFrame::SetupMenuBar(void){
 		this->m_onlyPollingSupportCMDMenuItem->Check(true);
 	}
 
+	this->m_autoQueryCMDOnIOOpenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Auto_Query_CMD_On_IO_Open, wxT("Auto Query Command On I/O Open"), wxT("Auto Query Command On I/O Open"), wxITEM_CHECK);
+	if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
+	}
+
 	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
 	this->m_runMenu->Append(m_onlyPollingSupportCMDMenuItem);
+	this->m_runMenu->Append(m_autoQueryCMDOnIOOpenMenuItem);
 	this->m_runMenu->AppendSeparator();
 
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
@@ -2006,6 +2025,20 @@ void MainFrame::OnOnlyPollingSupportCommand(wxCommandEvent& event){
 	}
 }
 
+void MainFrame::OnAutoQueryCMDOnIOOpen(wxCommandEvent& event){
+
+	if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+		this->m_appSettings.m_autoQueryCMDOnIOOpen = Generic_Disable;
+
+		this->m_autoQueryCMDOnIOOpenMenuItem->Check(false);
+	}
+	else if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Disable){
+		this->m_appSettings.m_autoQueryCMDOnIOOpen = Generic_Enable;
+
+		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
+	}
+}
+
 void MainFrame::OnClearErrorLog(wxCommandEvent& event){
 	this->m_debugLogTC->Clear();
 }
@@ -2841,6 +2874,7 @@ int MainFrame::SetIODeviceOption(void){
 
 int MainFrame::OpenIODevice(void){
 	
+	wxThreadEvent *threadQueryStart_evt;
 	int ret = EXIT_FAILURE;
 
 	//PSU_DEBUG_PRINT(MSG_DEBUG, "m_ioDeviceOpen = %d", m_ioDeviceOpen);
@@ -3007,6 +3041,9 @@ int MainFrame::OpenIODevice(void){
 					wxString totalPhaseDeviceName(wxT("TOTAL PHASE"));
 
 					this->UpdateStatusBarIOSettingFiled(totalPhaseDeviceName);
+
+					// Update I2C Clock Speed Field
+					this->UpdateStatusBarIOSettingFiled(this->m_appSettings.m_totalPhase_I2C_Bitrate);
 				}
 		
 				//
@@ -3016,15 +3053,15 @@ int MainFrame::OpenIODevice(void){
 				}
 
 				/*** Send Query Start Event To Handler Function ***/
-				wxThreadEvent *threadQueryStart_evt;
+				if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+					threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
+					threadQueryStart_evt->SetString(wxT("Query All Commands"));
+					wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
+				}
 
-#if AUTO_QUERY_ALL_CMDS_WHEN_IO_OPEN == TRUE
-				threadQueryStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_QUERY_SEQUENCE_START);
-				threadQueryStart_evt->SetString(wxT("Query All Commands"));
-				wxQueueEvent(this->GetEventHandler(), threadQueryStart_evt);
-#endif
 			}
-		}
+		}//if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_CLOSE)
+
 	//}
 
 	return ret;
@@ -3629,6 +3666,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_onlyPollingSupportCMD = onlyPollingSupportCMD;
 	}
 
+	// Auto Query CMD on I/O Open
+	long autoQueryCMDOnIOOpen;
+	if (pConfig->Read(wxT("AutoQueryCMDOnIOOpen"), &autoQueryCMDOnIOOpen) == false){
+		pConfig->Write(wxT("AutoQueryCMDOnIOOpen"), DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN);
+		this->m_appSettings.m_autoQueryCMDOnIOOpen = DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN;
+	}
+	else{
+		this->m_appSettings.m_autoQueryCMDOnIOOpen = autoQueryCMDOnIOOpen;
+	}
+
 	// ACS Set Point Minimum
 	long acsSetPointMin;
 	if (pConfig->Read(wxT("AcsSetPointMin"), &acsSetPointMin) == false){
@@ -3899,6 +3946,17 @@ void MainFrame::CheckAndLoadConfig(void){
 
 #endif
 
+	pConfig->SetPath(wxT("/TOTALPHASE"));
+	long totalPhaseI2CBitrate;
+	if (pConfig->Read(wxT("TotalPhaseI2CBitrate"), &totalPhaseI2CBitrate) == false){
+		pConfig->Write(wxT("TotalPhaseI2CBitrate"), DEFAULT_TOTALPHASE_I2C_BITRATE);
+		this->m_appSettings.m_totalPhase_I2C_Bitrate = DEFAULT_TOTALPHASE_I2C_BITRATE;
+	}
+	else{
+		this->m_appSettings.m_totalPhase_I2C_Bitrate = totalPhaseI2CBitrate;
+	}
+
+
 	pConfig->SetPath(wxT("/ISP"));
 	
 	long f3CMDDelayTime;
@@ -3980,6 +4038,9 @@ void MainFrame::SaveConfig(void){
 	// Only Polling Support CMD
 	pConfig->Write(wxT("OnlyPollingSupportCMD"), this->m_appSettings.m_onlyPollingSupportCMD);
 
+	// Auto Query CMD On I/O Open
+	pConfig->Write(wxT("AutoQueryCMDOnIOOpen"), this->m_appSettings.m_autoQueryCMDOnIOOpen);
+
 	pConfig->SetPath(wxT("/LOG"));
 
 	// Log Mode
@@ -4012,6 +4073,12 @@ void MainFrame::SaveConfig(void){
 
 	// Parity Check
 	pConfig->Write(wxT("PARITYCHECK"), this->m_appSettings.m_comportSetting.m_parityCheck);
+
+
+	pConfig->SetPath(wxT("/TOTALPHASE"));
+
+	// Total Phase I2C Bit Rate
+	pConfig->Write(wxT("TotalPhaseI2CBitrate"), this->m_appSettings.m_totalPhase_I2C_Bitrate);
 
 
 	pConfig->SetPath(wxT("/ISP"));
@@ -4211,7 +4278,7 @@ void MainFrame::RegisterDeviceChangeNotify(void){
 	//DEV_BROADCAST_DEVICEINTERFACE dbch;
 	dbch.dbcc_size = sizeof(dbch);
 	dbch.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-	for (int i = 0; i < sizeof(GuidInterfaceList); i++)
+	for (int i = 0; i < sizeof(GuidInterfaceList) / sizeof(GuidInterfaceList[0]); i++)
 	{
 		//dbch.dbcc_classguid = FTDI_D2XX_GUID;//FTDI_VCP_GUID;
 		dbch.dbcc_classguid = GuidInterfaceList[i];
@@ -4613,6 +4680,7 @@ EVT_MENU(MENU_ID_Query_All_Commands, MainFrame::OnQueryAllCommands)
 EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
 EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
 EVT_MENU(MENU_ID_Only_Polling_Support_Command, MainFrame::OnOnlyPollingSupportCommand)
+EVT_MENU(MENU_ID_Auto_Query_CMD_On_IO_Open, MainFrame::OnAutoQueryCMDOnIOOpen)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
 EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
 EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)

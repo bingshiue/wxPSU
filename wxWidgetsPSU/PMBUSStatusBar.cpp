@@ -49,6 +49,7 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 	m_gauge->SetValue(0);
 
 	this->SetStatusText(wxT("Disconnect"), Field_IO_Setting);//Com3-9600-N81
+	
 	this->SetStatusText(wxT("100kHz"), Field_I2C_Clock);
 
 	unsigned long runMode = PMBUSHelper::GetAppSettings()->m_runMode;

@@ -89,7 +89,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 					retry = 0;
 					do {
 						// Decide Send Data Length
-						if (*this->m_currentIO == IOACCESS_SERIALPORT){
+						if (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE){
 							if (PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 								//sendDataLength = SERIAL_SEND_DATA_SIZE;
 							}
@@ -273,7 +273,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 												retry = 0;
 												do {
 													// Decide Send Data Length
-													if (*this->m_currentIO == IOACCESS_SERIALPORT){
+													if (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE){
 														if (PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
 															//sendDataLength = SERIAL_SEND_DATA_SIZE;
 														}

@@ -45,6 +45,11 @@ enum {
 	I2C_AdaptorModuleBoard_TOTALPHASE,
 };
 
+enum {
+	TOTALPHASE_I2C_BITRATE_100KHZ = 100,
+	TOTALPHASE_I2C_BITRATE_400KHZ = 400
+};
+
 #define DEFAULT_CUSTOMER            (unsigned long)Customer_GIGABYTE//Customer_NEC
 #define DEFAULT_MODEL               (unsigned long)GIGABYTE_Model_CRPS001//NEC_Model_FSG003_000G
 
@@ -69,12 +74,15 @@ enum {
 #define DEFAULT_RUNIN_TIMES  10
 
 #define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Disable
+#define DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN (unsigned long)Generic_Disable
 
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600
 #define DEFAULT_COMPORT_BYTESIZE      8
 #define DEFAULT_COMPORT_STOPBITS      ONESTOPBIT
 #define DEFAULT_COMPORT_PARITYCHECK   NOPARITY
+
+#define DEFAULT_TOTALPHASE_I2C_BITRATE (unsigned long)TOTALPHASE_I2C_BITRATE_100KHZ
 
 /* --- USB ADAPTOR Setting ---- */
 #define DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED            100
@@ -288,7 +296,9 @@ typedef struct appSettings_t {
 	unsigned long m_ispF3CMDDelayTime;/**< ISP F3 CMD Delay Time */
 	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
 	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
-	unsigned long m_ISPDDWaitRootTime; /**< ISP DD Wait Reboot Time */
+	unsigned long m_ISPDDWaitRootTime;/**< ISP DD Wait Reboot Time */
+	unsigned long m_autoQueryCMDOnIOOpen;/**< Auto Query Command On I/O Open */
+	unsigned long m_totalPhase_I2C_Bitrate;/**< Total Phase I2C Bitrate */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -321,8 +331,11 @@ typedef struct appSettings_t {
 
 		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
+		this->m_autoQueryCMDOnIOOpen = DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN;
 		this->m_ISPPFCWaitRootTime = WAIT_PFC_REBOOT_TIME;
 		this->m_ISPDDWaitRootTime = WAIT_DD_REBOOT_TIME;
+
+		this->m_totalPhase_I2C_Bitrate = DEFAULT_TOTALPHASE_I2C_BITRATE;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

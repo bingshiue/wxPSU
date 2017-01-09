@@ -256,7 +256,7 @@ void WritePage46H::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMD46H;
 
-	CMD46H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD46H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
 	CMD46H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_46H_BYTES_TO_READ : CMD_46H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD46H.m_sendData[idx] = SendBuffer[idx];

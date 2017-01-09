@@ -257,7 +257,7 @@ void WritePage4AH::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMD4AH;
 
-	CMD4AH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMD4AH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
 	CMD4AH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_4AH_BYTES_TO_READ : CMD_4AH_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD4AH.m_sendData[idx] = SendBuffer[idx];

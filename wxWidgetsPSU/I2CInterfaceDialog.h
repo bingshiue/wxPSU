@@ -33,7 +33,7 @@ public:
 		CID_USB_SETTINGS_BUTTON
 	};
 
-	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar);
+	I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar, bool defaultAdaptor = false, int defaultAdaptorSelect = I2C_AdaptorModuleBoard_R90000_95611);
 
 	~I2CInterfaceDialog();
 

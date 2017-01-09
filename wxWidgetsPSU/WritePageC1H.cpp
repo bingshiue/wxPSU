@@ -258,7 +258,7 @@ void WritePageC1H::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMDC1H;
 
-	CMDC1H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;// sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	CMDC1H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;// sizeof(SendBuffer) / sizeof(SendBuffer[0]);
 	CMDC1H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_C1H_BYTES_TO_READ : CMD_C1H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMDC1H.m_sendData[idx] = SendBuffer[idx];
