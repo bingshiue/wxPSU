@@ -177,7 +177,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 
 		// Show Processed Bytes
 		unsigned long processed_bytes = ((currentAddress - this->m_startAddress) + 1UL) * 2;
-		information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+		information += wxString::Format("Current Processed Bytes : (%d/%d)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
 
 		// Compute Percentage (Percentage = processed bytes / total bytes)
 		percentage = ((double)processed_bytes / this->m_dataBytes);
@@ -219,7 +219,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 						information += wxT("\n");
 					}
 
-					information += wxString::Format("Current Processed Bytes : (%d/%d)", processed_bytes, this->m_dataBytes);
+					information += wxString::Format("Current Processed Bytes : (%d/%d)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
 				}
 			}
 			else{

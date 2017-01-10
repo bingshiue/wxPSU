@@ -199,7 +199,7 @@ void PMBUSFWProgressDialog::OnISPSequenceUpdate(wxThreadEvent& event){
 
 #ifndef _DEBUG
 	if (previous_percentage != percentage){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Percentage = %d%%", percentage);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Percentage = %d%%", percentage);
 		previous_percentage = percentage;
 	}
 #endif
@@ -295,15 +295,17 @@ void PMBUSFWProgressDialog::OnISPSequenceEnd(wxThreadEvent& event){
 void PMBUSFWProgressDialog::OnDialogClose(wxCloseEvent& event){
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnDialogClose");
-	
+
 	*this->m_ispStatus = ISP_Status_UserRequestCancel;
 
 	//new(0.1f) UserCancelISPTask(this->m_ispStatus); // This sometimes cause GUI thread reply slowly
 
 	#if (INCREASE_CPU_OVERHEAD == TRUE)
+	if (PMBUSHelper::GetAppSettings()->m_increaseCPUOverhead == Generic_Disable){
 		if (m_increaseCPUOverHeadThread != NULL){
 			m_increaseCPUOverHeadThread->Delete();
 		}
+	}
 	#endif
 
 	while (Task::GetCount() > 0){
@@ -325,8 +327,10 @@ void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 	//new(0.1f) UserCancelISPTask(this->m_ispStatus); // This sometimes cause GUI thread reply slowly
 
 	#if (INCREASE_CPU_OVERHEAD == TRUE)
-	if (m_increaseCPUOverHeadThread != NULL){
-		m_increaseCPUOverHeadThread->Delete();
+	if (PMBUSHelper::GetAppSettings()->m_increaseCPUOverhead == Generic_Disable){
+		if (m_increaseCPUOverHeadThread != NULL){
+			m_increaseCPUOverHeadThread->Delete();
+		}
 	}
 	#endif
 

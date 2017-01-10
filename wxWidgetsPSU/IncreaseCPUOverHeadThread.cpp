@@ -15,8 +15,8 @@ IncreaseCPUOverHeadThread::~IncreaseCPUOverHeadThread(){
 	*this->m_increaseCPUOverHeadThreadStopFlag = true;
 }
 
-#define NUM_THREADS   4 // Number Of Threads
-#define THREAD_SLEEP  0 // ms
+#define NUM_THREADS    4 // Number Of Threads
+#define THREAD_SLEEP  10 // micro seconds
 wxThread::ExitCode IncreaseCPUOverHeadThread::Entry() {
 
 	int value=0;
@@ -31,7 +31,7 @@ wxThread::ExitCode IncreaseCPUOverHeadThread::Entry() {
 			value ^= 0x01;
 		}
 
-		wxMilliSleep(THREAD_SLEEP);
+		wxMicroSleep(THREAD_SLEEP);
 
 	};
 

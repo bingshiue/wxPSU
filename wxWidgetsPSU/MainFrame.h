@@ -90,6 +90,8 @@ public:
 		MENU_ID_Enable_ALL,
 		MENU_ID_Disable_ALL,
 
+		MENU_ID_Increase_CPU_Overhead,
+
 		MENU_ID_Continually,
 		MENU_ID_Iterations,
 		MENU_ID_Stop_An_Error,
@@ -277,6 +279,7 @@ public:
 	wxMenuItem  *m_AdministrantMenuItem;
 	wxMenuItem  *m_I2CInterfaceMenuItem;
 	wxMenuItem  *m_I2CSlaveAddressMenuItem;
+	wxMenuItem  *m_IncreaseCPUOverheadMenuItem;
 
 	wxMenu      *m_runModeMenu;
 
@@ -412,6 +415,8 @@ private:
 
 	void OnDisableAll(wxCommandEvent& event);
 	void OnEnableAll(wxCommandEvent& event);
+
+	void OnIncreaseCPUOverhead(wxCommandEvent& event);
 
 	void OnContinually(wxCommandEvent& event);
 	void OnIterations(wxCommandEvent& event);

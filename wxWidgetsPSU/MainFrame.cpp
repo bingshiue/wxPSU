@@ -329,6 +329,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		//}
 	}
 	
+	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
+		this->StartInCreaseCPUOverHeadThread();
+	}
+
 	// Put Window in Center
 	Centre();
 
@@ -455,6 +459,7 @@ void MainFrame::SetupMenuBar(void){
 	}
 
 	this->m_autoQueryCMDOnIOOpenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Auto_Query_CMD_On_IO_Open, wxT("Auto Query Command On I/O Open"), wxT("Auto Query Command On I/O Open"), wxITEM_CHECK);
+	
 	if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
 		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
 	}
@@ -523,6 +528,9 @@ void MainFrame::SetupMenuBar(void){
 	|- Disable All (Accelerator CTRL+D)
 	|- Enable All (Accelerator CTRL+E)
 	|------------------------------------
+	|- Increase CPU Overhead
+	|------------------------------------
+	|
 	|- Run Mode          -> [V] Continually
 	|                       [V] Interations
 	|                       [V] Stop An Error
@@ -567,6 +575,16 @@ void MainFrame::SetupMenuBar(void){
 	this->m_optionMenu->Append(MENU_ID_Disable_ALL, wxT("Disable ALL...\tCTRL+D"), wxT("Disable All Commands"));
 
 	this->m_optionMenu->Append(MENU_ID_Enable_ALL,  wxT("Enable  ALL...\tCTRL+E"), wxT("Enable All Commands"));
+
+	this->m_optionMenu->AppendSeparator();
+
+	this->m_IncreaseCPUOverheadMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Increase_CPU_Overhead, wxT("Increase CPU Overhead"), wxT("Increase CPU Overhead"), wxITEM_CHECK);
+	
+	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
+		this->m_IncreaseCPUOverheadMenuItem->Check(true);
+	}
+	
+	this->m_optionMenu->Append(this->m_IncreaseCPUOverheadMenuItem);
 
 	this->m_optionMenu->AppendSeparator();
 
@@ -1615,13 +1633,22 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 		}
 	}
 
-    #if (INCREASE_CPU_OVERHEAD == TRUE)
+
+	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
+		if (this->m_increaseCPUOverHeadThread != NULL){
+			if (this->m_increaseCPUOverHeadThread->m_running == true){
+				this->m_increaseCPUOverHeadThread->m_running = false;
+			}
+		}
+	}
+
+#if (INCREASE_CPU_OVERHEAD == TRUE)
 	if (this->m_increaseCPUOverHeadThread != NULL){
 		if (this->m_increaseCPUOverHeadThread->m_running == true){
 			this->m_increaseCPUOverHeadThread->m_running = false;
 		}
 	}
-    #endif
+#endif
 
 	// Release Task List
 	TaskEx::ReleaseTaskList();
@@ -2793,6 +2820,24 @@ void MainFrame::OnEnableAll(wxCommandEvent& event){
 	}
 }
 
+void MainFrame::OnIncreaseCPUOverhead(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnIncreaseCPUOverhead");
+	
+	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Disable){
+		this->m_appSettings.m_increaseCPUOverhead = Generic_Enable;
+		this->m_IncreaseCPUOverheadMenuItem->Check(true);
+
+		this->StartInCreaseCPUOverHeadThread();
+
+	}
+	else if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
+		this->m_appSettings.m_increaseCPUOverhead = Generic_Disable;
+		this->m_IncreaseCPUOverheadMenuItem->Check(false);
+
+		this->StopInCreaseCPUOverHeadThread();
+	}
+}
+
 void MainFrame::DoSetupIOAccess(void){
 	// Setup IOAccess Sturct Member
 	// Serial Port
@@ -3389,7 +3434,9 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 
         #if (INCREASE_CPU_OVERHEAD == TRUE)
 		if (this->m_CurrentUseIOInterface == IOACCESS_HID){
-			this->StartInCreaseCPUOverHeadThread();
+			if (this->m_appSettings.m_increaseCPUOverhead == Generic_Disable){
+				this->StartInCreaseCPUOverHeadThread();
+			}
 		}
 		#endif
 	}
@@ -3411,7 +3458,9 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 
 	#if (INCREASE_CPU_OVERHEAD == TRUE)
 	if (this->m_CurrentUseIOInterface == IOACCESS_HID){
-		this->StopInCreaseCPUOverHeadThread();
+		if (this->m_appSettings.m_increaseCPUOverhead == Generic_Disable){
+			this->StopInCreaseCPUOverHeadThread();
+		}
 	}
 	#endif
 }
@@ -3674,6 +3723,16 @@ void MainFrame::CheckAndLoadConfig(void){
 	}
 	else{
 		this->m_appSettings.m_autoQueryCMDOnIOOpen = autoQueryCMDOnIOOpen;
+	}
+
+	// Increase CPU Overhead
+	long increaseCPUOverhead;
+	if (pConfig->Read(wxT("IncreaseCPUOverhead"), &increaseCPUOverhead) == false){
+		pConfig->Write(wxT("IncreaseCPUOverhead"), DEFAULT_INCREASE_CPU_OVERHEAD);
+		this->m_appSettings.m_increaseCPUOverhead = DEFAULT_INCREASE_CPU_OVERHEAD;
+	}
+	else{
+		this->m_appSettings.m_increaseCPUOverhead = increaseCPUOverhead;
 	}
 
 	// ACS Set Point Minimum
@@ -4040,6 +4099,10 @@ void MainFrame::SaveConfig(void){
 
 	// Auto Query CMD On I/O Open
 	pConfig->Write(wxT("AutoQueryCMDOnIOOpen"), this->m_appSettings.m_autoQueryCMDOnIOOpen);
+
+	// Increase CPU Overhead
+	pConfig->Write(wxT("IncreaseCPUOverhead"), this->m_appSettings.m_increaseCPUOverhead);
+
 
 	pConfig->SetPath(wxT("/LOG"));
 
@@ -4503,7 +4566,7 @@ void MainFrame::StartInCreaseCPUOverHeadThread(void){
 			PSU_DEBUG_PRINT(MSG_ERROR, "Can't Create IncreaseCPUOverHeadThread");
 		}
 		else{
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Start Task System Thread");
+			PSU_DEBUG_PRINT(MSG_ALERT, "Start Increase CPU Over Head Thread");
 			this->m_increaseCPUOverHeadThread->SetPriority(WXTHREAD_DEFAULT_PRIORITY);
 			this->m_increaseCPUOverHeadThread->Run();
 		}
@@ -4692,6 +4755,7 @@ EVT_MENU(MENU_ID_I2C_Interface, MainFrame::OnI2CInterface)
 EVT_MENU(MENU_ID_I2C_SlaveAddress, MainFrame::OnI2CSlaveAddress)
 EVT_MENU(MENU_ID_Enable_ALL, MainFrame::OnEnableAll)
 EVT_MENU(MENU_ID_Disable_ALL, MainFrame::OnDisableAll)
+EVT_MENU(MENU_ID_Increase_CPU_Overhead, MainFrame::OnIncreaseCPUOverhead)
 EVT_MENU(MENU_ID_Continually, MainFrame::OnContinually)
 EVT_MENU(MENU_ID_Iterations, MainFrame::OnIterations)
 EVT_MENU(MENU_ID_Stop_An_Error, MainFrame::OnStopAnError)
