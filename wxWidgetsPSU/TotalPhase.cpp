@@ -11,6 +11,9 @@ int port;
 u32 unique_ids[16];
 int nelem = 16;
 
+#define USE_WRITE_READ_FUNC
+#define RESET_I2C_BUS_WHEN_FAIL
+
 #define TOTALPHASE_I2C_SLAVEADDR_TRAN(SLAVE_ADDR) (SLAVE_ADDR >> 1)
 
 #define BUFFER_SIZE  256
@@ -26,6 +29,17 @@ unsigned char TotalPhaseRecvBuffer[BUFFER_SIZE];
 
 #define STR_MAX_LEN  255
 wchar_t deviceName[STR_MAX_LEN] = L"TotalPhase";
+
+const char* I2CStatusString[8] = {
+	"AA_I2C_STATUS_OK",// = 0,
+	"AA_I2C_STATUS_BUS_ERROR", //= 1,
+	"AA_I2C_STATUS_SLA_ACK",// = 2,
+	"AA_I2C_STATUS_SLA_NACK",// = 3,
+	"AA_I2C_STATUS_DATA_NACK",// = 4,
+	"AA_I2C_STATUS_ARB_LOST",// = 5,
+	"AA_I2C_STATUS_BUS_LOCKED",// = 6,
+	"AA_I2C_STATUS_LAST_DATA_ACK"// = 7
+};
 
 int EnumerateAvailableTotalPhaseDevice(BOOL *array, unsigned int sizeofArray){
 
@@ -106,6 +120,11 @@ int OpenTotalPhaseDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* 
 	bitrate = aa_i2c_bitrate(handle, PMBUSHelper::GetAppSettings()->m_totalPhase_I2C_Bitrate);
 	PSU_DEBUG_PRINT(MSG_ALERT, "TOTAL PHASE Set Bitrate to %d kHz", bitrate);
 
+	int busTimeout;
+	busTimeout = aa_i2c_bus_timeout(handle, 0);
+	PSU_DEBUG_PRINT(MSG_ALERT, "TOTAL PHASE Bus Timeout is %d Millisecond", busTimeout);
+
+
 	return EXIT_SUCCESS;
 }
 
@@ -127,6 +146,7 @@ int TotalPhaseSendData(unsigned char* buff, unsigned int size){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[4]=%02x", buff[4]);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[5]=%02x", buff[5]);
 
+#ifdef USE_WRITE_READ_FUNC
 	PMBUSHelper::getTotalPhaseWriteReadLastError() = aa_i2c_write_read(
 		handle,// handle
 		TOTALPHASE_I2C_SLAVEADDR_TRAN(buff[2]),// slave address
@@ -143,17 +163,24 @@ int TotalPhaseSendData(unsigned char* buff, unsigned int size){
 		PSU_DEBUG_PRINT(MSG_ERROR, "%s : aa_i2c_write_read failed, Last Error = %d, Num_Write is %d, Num_Read is %d", __FUNCTIONW__, PMBUSHelper::getTotalPhaseWriteReadLastError(), num_write, num_read);
 	}
 
-#if 0
-	ret = aa_i2c_write_ext(
-		handle,
-		i2cReadCMDBuffer[0],
-		AA_I2C_NO_FLAGS,
-		1,
-		&buff[1],
-		&num_write
+#else
+	PMBUSHelper::getTotalPhaseWriteReadLastError() = aa_i2c_write_ext(
+		handle,// handle
+		TOTALPHASE_I2C_SLAVEADDR_TRAN(buff[2]),// slave address
+		AA_I2C_NO_FLAGS,// flags
+		buff[0],// out_num_bytes
+		&buff[3],// out_data
+		&num_write //num_written
 		);
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "ret = %d, Num_Write of aa_i2c_write_ext is %d", ret, num_write);
+	if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+		PSU_DEBUG_PRINT(MSG_ERROR, "ret = %s, Num_Write of aa_i2c_write_ext is %d", I2CStatusString[PMBUSHelper::getTotalPhaseWriteReadLastError()], num_write);
+
+#ifdef RESET_I2C_BUS_WHEN_FAIL
+
+#endif
+	
+	}
 #endif
 
 	return num_write;
@@ -161,27 +188,31 @@ int TotalPhaseSendData(unsigned char* buff, unsigned int size){
 
 int TotalPhaseReadData(unsigned char* buff, unsigned int sizeOfBuff){
 
+#ifdef USE_WRITE_READ_FUNC
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Num_Read of is %d:", num_read);
 	for (int idx = 0; idx < num_read; idx++){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "TotalPhaseRecvBuffer[%d] = %02x", idx, TotalPhaseRecvBuffer[idx]);
 		buff[idx] = TotalPhaseRecvBuffer[idx];
 	}
 
-#if 0
+#else
 	u16 num_read;
 
-	aa_i2c_read_ext(
-		handle,
-		i2cReadCMDBuffer[0],
-		AA_I2C_NO_FLAGS,
-		2,
-		buff,
-		&num_read
+	PMBUSHelper::getTotalPhaseWriteReadLastError() = aa_i2c_read_ext(
+		handle,// handle
+		i2cReadCMDBuffer[2], // slave address
+		AA_I2C_NO_FLAGS,// flags
+		i2cReadCMDBuffer[1],// in_num_bytes
+		buff,// in_data
+		&num_read//num_read
 	);
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Num_Read of aa_i2c_read_ext is %d:", num_read);
-	for (int idx = 0; idx < num_read; idx++){
-		PSU_DEBUG_PRINT(MSG_DEBUG, "buff[%d] = %02x", idx, buff[idx]);
+	if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0 || num_read==0 ){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ret = %s, Num_Read of aa_i2c_read_ext is %d:", I2CStatusString[PMBUSHelper::getTotalPhaseWriteReadLastError()], num_read);
+		//for (int idx = 0; idx < num_read; idx++){
+			//PSU_DEBUG_PRINT(MSG_DEBUG, "buff[%d] = %02x", idx, buff[idx]);
+		//}
 	}
 #endif
 

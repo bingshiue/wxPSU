@@ -321,16 +321,19 @@ typedef  struct status_byte_t {
 	status_byte_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
 
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 		//status_dch |= _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -348,15 +351,19 @@ typedef  struct status_word_t {
 	status_word_t(){ this->Clear(); }
 
 	unsigned short status;
-
 	unsigned short status_dch;
 
+	unsigned short previous_status;
+	unsigned short previous_status_dch;
+
 	void Save(unsigned short _status){
+		previous_status = status;
 		status = _status;
 		//status_dch |= _status;
 	}
 
 	void SaveDCH(unsigned short _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -373,15 +380,19 @@ typedef  struct status_vout_t {
 	status_vout_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 		//status_dch |= _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -398,15 +409,19 @@ typedef  struct status_iout_t {
 	status_iout_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 		//status_dch |= _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -423,15 +438,19 @@ typedef  struct status_input_t {
 	status_input_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 		//status_dch |= _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -448,14 +467,18 @@ typedef  struct status_temperature_t {
 	status_temperature_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -472,14 +495,18 @@ typedef  struct status_cml_t {
 	status_cml_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -496,14 +523,18 @@ typedef  struct status_other_t {
 	status_other_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 
@@ -520,14 +551,18 @@ typedef  struct status_fan_1_2_t {
 	status_fan_1_2_t(){ this->Clear(); }
 
 	unsigned char status;
-
 	unsigned char status_dch;
 
+	unsigned char previous_status;
+	unsigned char previous_status_dch;
+
 	void Save(unsigned char _status){
+		previous_status = status;
 		status = _status;
 	}
 
 	void SaveDCH(unsigned char _status){
+		previous_status_dch = status_dch;
 		status_dch = _status;
 	}
 

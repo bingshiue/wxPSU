@@ -718,6 +718,8 @@ void PMBUSStatusPanel::Update_StatusWORD(void){
 		this->m_stbNONE_OF_THE_ABOVE_Word,
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status == PMBUSHelper::GetPMBusStatus()->m_status_word.previous_status) { return; }
+
 	for (unsigned int idx = 0; idx < 16; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -752,6 +754,8 @@ void PMBUSStatusPanel::Update_StatusINPUT(void){
 		m_stbPIN_OP_WARNING_Input
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status == PMBUSHelper::GetPMBusStatus()->m_status_input.previous_status) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_input.status & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -784,6 +788,8 @@ void PMBUSStatusPanel::Update_StatusVOUT(void){
 		m_stbTOFF_MAX_WARNING_Vout,
 		m_stbVOUT_TRACKING_ERROR_Vout
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status == PMBUSHelper::GetPMBusStatus()->m_status_vout.previous_status) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status & status[idx]) == status[idx]) {
@@ -818,6 +824,8 @@ void PMBUSStatusPanel::Update_StatusIOUT(void){
 		m_stbPOUT_OP_WARNING_Iout
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status == PMBUSHelper::GetPMBusStatus()->m_status_iout.previous_status) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -850,6 +858,8 @@ void PMBUSStatusPanel::Update_StatusTemperature(void){
 		m_stbRESERVED1_Temperature,
 		m_stbRESERVED0_Temperature
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status == PMBUSHelper::GetPMBusStatus()->m_status_temperature.previous_status) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status & status[idx]) == status[idx]) {
@@ -884,6 +894,8 @@ void PMBUSStatusPanel::Update_StatusCML(void){
 		m_stbOTHER_MEMORY_CML
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status == PMBUSHelper::GetPMBusStatus()->m_status_cml.previous_status) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -917,6 +929,8 @@ void PMBUSStatusPanel::Update_StatusOTHER(void){
 		m_stbRESERVED_OTHER
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status == PMBUSHelper::GetPMBusStatus()->m_status_other.previous_status) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_other.status & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -949,6 +963,8 @@ void PMBUSStatusPanel::Update_StatusFAN12(void){
 		m_stbAIRFLOW_FAULT_FAN12,
 		m_stbAIRFLOW_WARNING_OTHER
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status == PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.previous_status) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[idx]) == status[idx]) {

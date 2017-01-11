@@ -864,6 +864,8 @@ void PMBUSStatusDCHPanel::Update_StatusWORD(void){
 		this->m_stbNONE_OF_THE_ABOVE_Word,
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_word.previous_status_dch) { return; }
+
 	for (unsigned int idx = 0; idx < 16; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_word.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -896,6 +898,8 @@ void PMBUSStatusDCHPanel::Update_StatusINPUT(void){
 		m_stbIIN_OC_WARNING_Input,
 		m_stbPIN_OP_WARNING_Input
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_input.previous_status_dch) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_input.status_dch & status[idx]) == status[idx]) {
@@ -930,6 +934,8 @@ void PMBUSStatusDCHPanel::Update_StatusVOUT(void){
 		m_stbVOUT_TRACKING_ERROR_Vout1
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_vout.previous_status_dch) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -962,6 +968,8 @@ void PMBUSStatusDCHPanel::Update_StatusVOUT2(void){
 		m_stbTOFF_MAX_WARNING_Vout2,
 		m_stbVOUT_TRACKING_ERROR_Vout2
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout2.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_vout2.previous_status_dch) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_vout2.status_dch & status[idx]) == status[idx]) {
@@ -996,6 +1004,8 @@ void PMBUSStatusDCHPanel::Update_StatusIOUT(void){
 		m_stbPOUT_OP_WARNING_Iout1
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_iout.previous_status_dch) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -1028,6 +1038,8 @@ void PMBUSStatusDCHPanel::Update_StatusIOUT2(void){
 		m_stbPOUT_OC_FAULT_Iout2,
 		m_stbPOUT_OP_WARNING_Iout2
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout2.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_iout2.previous_status_dch) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_iout2.status_dch & status[idx]) == status[idx]) {
@@ -1062,6 +1074,8 @@ void PMBUSStatusDCHPanel::Update_StatusTemperature(void){
 		m_stbRESERVED0_Temperature
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_temperature.previous_status_dch) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -1094,6 +1108,8 @@ void PMBUSStatusDCHPanel::Update_StatusCML(void){
 		m_stbCOMMUNICATION_CML,
 		m_stbOTHER_MEMORY_CML
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_cml.previous_status_dch) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status_dch & status[idx]) == status[idx]) {
@@ -1128,6 +1144,8 @@ void PMBUSStatusDCHPanel::Update_StatusOTHER(void){
 		m_stbRESERVED_OTHER
 	};
 
+	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_other.previous_status_dch) { return; }
+
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_other.status_dch & status[idx]) == status[idx]) {
 			sbArray[idx]->SetBitmap(*m_red);
@@ -1160,6 +1178,8 @@ void PMBUSStatusDCHPanel::Update_StatusFAN12(void){
 		m_stbAIRFLOW_FAULT_FAN12,
 		m_stbAIRFLOW_WARNING_OTHER
 	};
+
+	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status_dch == PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.previous_status_dch) { return; }
 
 	for (unsigned int idx = 0; idx < 8; idx++){
 		if ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status_dch & status[idx]) == status[idx]) {
