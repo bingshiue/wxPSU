@@ -4,13 +4,14 @@
 
 #include "Task.h"
 
-PMBUSReadTestTask::PMBUSReadTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSReadCMD_t* pmbusReadCMD, int setsToRun, bool* outputLog){
+PMBUSReadTestTask::PMBUSReadTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSReadCMD_t* pmbusReadCMD, int setsToRun, bool* outputLog, int intervalTime){
 	this->m_id = task_ID_PMBUSReadTestTask;
 	this->m_IOAccess = ioaccess;
 	this->m_CurrentIO = currentIO;
 	this->m_pmbusReadCMDArray = pmbusReadCMD;
 	this->m_setsToRun = setsToRun;
 	this->m_outputLog = outputLog;
+	this->m_intervalTime = intervalTime;
 
 	this->m_running = true;
 	this->runningIndex = 0;
@@ -231,7 +232,9 @@ int PMBUSReadTestTask::Main(double elapsedTime){
 			PSU_DEBUG_PRINT(MSG_ALERT, "%s", RecvData.c_str());
 		}
 
-		//wxMilliSleep(1);
+		if (m_intervalTime > 0){
+			wxMilliSleep(m_intervalTime);
+		}
 	
 	}// if (*this->m_running)
 	else{

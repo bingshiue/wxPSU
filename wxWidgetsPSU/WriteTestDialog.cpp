@@ -55,9 +55,13 @@ WriteTestDialog::WriteTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 	this->m_currentIO = currentIO;
 
 	// Setup Text Validator
+	DecCharIncludes = wxT("0123456789");
 	HexCharIncludes = wxT("0123456789abcdefABCDEF");
 	m_hexValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
 	m_hexValidator.SetCharIncludes(HexCharIncludes);
+
+	m_decValidator.SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+	m_decValidator.SetCharIncludes(DecCharIncludes);
 
 	m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	m_optionsSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Options"));
@@ -78,9 +82,19 @@ WriteTestDialog::WriteTestDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 	this->m_outputLog = false;
 	m_outputLogCheckBox->SetValue(this->m_outputLog);
 
+	m_intervalTimeST = new wxStaticText(m_optionsSBS->GetStaticBox(), wxID_ANY, wxT("Interval Time"), wxDefaultPosition, wxDefaultSize);
+	m_intervalTimeTC = new wxTextCtrl(m_optionsSBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(50, -1));
+	m_intervalTimeTC->SetMaxLength(4);
+	m_intervalTimeTC->SetValidator(m_decValidator);
+
+	m_intervalTimeUnitST = new wxStaticText(m_optionsSBS->GetStaticBox(), wxID_ANY, wxT("Millisecond"), wxDefaultPosition, wxDefaultSize);
+
 	m_optionsSBS->Add(m_setCountSelectST, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
 	m_optionsSBS->Add(m_setCountSelectCB, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
 	m_optionsSBS->Add(m_outputLogCheckBox, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
+	m_optionsSBS->Add(m_intervalTimeST, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
+	m_optionsSBS->Add(m_intervalTimeTC, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
+	m_optionsSBS->Add(m_intervalTimeUnitST, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Border());
 
 	// Set 1 Components Initialize
 	m_Set1SlaveAddrST = new wxStaticText(m_set1SBS->GetStaticBox(), wxID_ANY, wxT("Slave Address"), wxDefaultPosition, wxDefaultSize);
@@ -412,11 +426,14 @@ WriteTestDialog::~WriteTestDialog(){
 void WriteTestDialog::OnBtnSTART(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
+	int intervalTime = wxAtoi(this->m_intervalTimeTC->GetValue());
+	if (intervalTime <= 0) intervalTime = 0;
+
 	this->SetupWriteCMDArray();
 
 	if (TaskEx::GetCount(task_ID_PMBUSWriteTestTask) == 0){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Create PMBUSWriteTestTask Task");
-		new(TP_PMBUSWriteTestTask)PMBUSWriteTestTask(this->m_ioaccess, this->m_currentIO, this->m_pmbusWriteCMDArray, this->m_setCountSelectCB->GetSelection(), &this->m_outputLog);
+		new(TP_PMBUSWriteTestTask)PMBUSWriteTestTask(this->m_ioaccess, this->m_currentIO, this->m_pmbusWriteCMDArray, this->m_setCountSelectCB->GetSelection(), &this->m_outputLog, intervalTime);
 		this->m_btnSTART->Enable(false);
 		this->m_btnSTOP->Enable(true);
 		this->m_setCountSelectCB->Enable(false);
@@ -425,6 +442,7 @@ void WriteTestDialog::OnBtnSTART(wxCommandEvent& event){
 
 		this->m_logTC->Clear();
 		PSU_DEBUG_PRINT(MSG_ALERT, "Start To Send Write CMD");
+		PSU_DEBUG_PRINT(MSG_ALERT, "Interval Time is %d Millisecond", intervalTime);
 
 	}
 	else{

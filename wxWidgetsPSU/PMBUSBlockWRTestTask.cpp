@@ -4,13 +4,14 @@
 
 #include "Task.h"
 
-PMBUSBlockWRTestTask::PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog){
+PMBUSBlockWRTestTask::PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog, int intervalTime){
 	this->m_id = task_ID_PMBUSBlockWRTestTask;
 	this->m_IOAccess = ioaccess;
 	this->m_CurrentIO = currentIO;
 	this->m_pmbusBlockWRCMDArray = pmbusBlockWRCMD;
 	this->m_setsToRun = setsToRun;
 	this->m_outputLog = outputLog;
+	this->m_intervalTime = intervalTime;
 
 	this->m_running = true;
 	this->runningIndex = 0;
@@ -292,7 +293,9 @@ int PMBUSBlockWRTestTask::Main(double elapsedTime){
 			PSU_DEBUG_PRINT(MSG_ALERT, "%s", RecvData.c_str());
 		}
 
-		//wxMilliSleep(1);
+		if (m_intervalTime > 0){
+			wxMilliSleep(m_intervalTime);
+		}
 
 	}// if (*this->m_running)
 	else{

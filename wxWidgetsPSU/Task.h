@@ -945,11 +945,12 @@ public:
 	bool m_running;
 	bool* m_outputLog;
 	int runningIndex;
+	int m_intervalTime;
 
 	/**
 	 * @brief Constructor.
 	 */
-	PMBUSReadTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSReadCMD_t* pmbusReadCMD, int setsToRun, bool* outputLog);
+	PMBUSReadTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSReadCMD_t* pmbusReadCMD, int setsToRun, bool* outputLog, int intervalTime);
 
 	/**
 	 * @brief Deconstructor.
@@ -996,11 +997,12 @@ public:
 	bool m_running;
 	bool* m_outputLog;
 	int runningIndex;
+	int m_intervalTime;
 
 	/**
 	* @brief Constructor.
 	*/
-	PMBUSWriteTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSWriteCMD_t* pmbusWriteCMD, int setsToRun, bool* outputLog);
+	PMBUSWriteTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSWriteCMD_t* pmbusWriteCMD, int setsToRun, bool* outputLog, int intervalTime);
 
 	/**
 	* @brief Deconstructor.
@@ -1046,11 +1048,12 @@ public:
 	bool m_running;
 	bool* m_outputLog;
 	int runningIndex;
+	int m_intervalTime;
 
 	/**
 	* @brief Constructor.
 	*/
-	PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog);
+	PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog, int intervalTime);
 
 	/**
 	* @brief Deconstructor.

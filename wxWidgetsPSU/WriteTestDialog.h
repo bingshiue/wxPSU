@@ -75,6 +75,10 @@ private:
 
 	wxCheckBox* m_outputLogCheckBox;
 
+	wxStaticText* m_intervalTimeST;
+	wxTextCtrl* m_intervalTimeTC;
+	wxStaticText* m_intervalTimeUnitST;
+
 	// Set 1
 	wxStaticText *m_Set1SlaveAddrST;
 	wxStaticText *m_Set1CMDST;
@@ -169,8 +173,10 @@ private:
 	wxButton *m_btnSTOP;
 
 	// TextValidator
+	wxString DecCharIncludes;
 	wxString HexCharIncludes;
 	wxTextValidator m_hexValidator;
+	wxTextValidator m_decValidator;
 
 	void EnableTextCtrlBySelect(int select);
 	void DisableAllTextCtrl(void);
