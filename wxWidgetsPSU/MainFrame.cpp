@@ -291,6 +291,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 				delete i2cIFDialog;
 
 			}
+			// If Find Total Phase I2C Host Adaptor
 			else if(this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
 				
 				// Hint User Can Use TotalPhase I2C Host Adaptor Device
@@ -306,7 +307,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 				delete i2cIFDialog;
 
 			}
-			else{
+			// If Find USB To Serial Adaptor
+			else if (this->m_IOAccess[IOACCESS_SERIALPORT].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
 
 				// Popup Comport Setting Dialog
 				ComportDialog* comportDialog = new ComportDialog(this, this->m_IOAccess, &this->m_appSettings, this->m_status_bar);
@@ -316,7 +318,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 				delete comportDialog;
 			}
 
-			// If I/O Device Opened Success
+			// If I/O Device Opened Success in Previous Operation
 			if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
 				/*** Send Query Start Event To Handler Function ***/
 				if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
@@ -329,6 +331,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		//}
 	}
 	
+	// Start InCreaseCPUOverHeadThread if option is enable
 	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
 		this->StartInCreaseCPUOverHeadThread();
 	}

@@ -39,7 +39,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.16       |     Load FW Upload Command Set On RunTime                      |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.17       |     Support TotalPhase I2C Host Adaptor                        |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.16" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.17" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif
