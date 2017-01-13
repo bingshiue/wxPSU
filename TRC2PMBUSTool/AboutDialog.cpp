@@ -2,6 +2,7 @@
  * @file AboutDialog.cpp
  */
 
+#include "main.h"
 #include "AboutDialog.h"
 #include "acbel_large.xpm"
 
@@ -16,7 +17,7 @@ AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString
 
 	m_acbelLogoSB = new wxStaticBitmap(this, wxID_ANY, wxBitmap(Acbel_large_xpm));
 
-	m_line1ST = new wxStaticText(this, wxID_ANY, wxT("PSU Monitor"), wxDefaultPosition, wxDefaultSize);
+	m_line1ST = new wxStaticText(this, wxID_ANY, wxT(APP_NAME), wxDefaultPosition, wxDefaultSize);
 
 	wxString version(wxT("Version : ")); 
 	version += wxString::Format("%s", VERSION_STRING);

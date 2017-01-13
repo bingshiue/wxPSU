@@ -54,7 +54,8 @@ bool WXPSU::OnInit()
 	delete modelSelectDialog;
 
 	/* Window Title */
-	wxString winTitle(wxT("PSU Tool "));
+	wxString winTitle(APP_NAME);
+	winTitle += wxT(" ");
 	winTitle += wxT(VERSION_STRING);
 
 	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size, g_CustomerList);

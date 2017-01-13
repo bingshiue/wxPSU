@@ -314,7 +314,7 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 		if (scale == map[idx][1]){
 			save_idx = idx;
 			exponent = map[idx][0];
-			PSU_DEBUG_PRINT(MSG_DETAIL, "exponent=%d", exponent);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "exponent=%d", exponent);
 			break;
 		}
 	}
@@ -332,30 +332,30 @@ int PMBUSHelper::ProductLinearData(unsigned char *dest, double value, double sca
 		}
 	}
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "save_idx = %d", save_idx);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "save_idx = %d", save_idx);
 
 	tempN = exponent;
 	scale_sign = (tempN & (0x8000)) >> 15;
-	PSU_DEBUG_PRINT(MSG_DETAIL, "scale_sign=%d", scale_sign);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "scale_sign=%d", scale_sign);
 	tempN &= 0x0f;
 	tempN |= (scale_sign << 4);
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "tempN=%xH", tempN);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "tempN=%xH", tempN);
 
 	// Product Y
 	tempY = value /= map[save_idx][1];
-	PSU_DEBUG_PRINT(MSG_DETAIL, "tempY=%d", tempY);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "tempY=%d", tempY);
 
 	value_sign = (tempY & (0x8000)) >> 15;
-	PSU_DEBUG_PRINT(MSG_DETAIL, "value_sign=%d", value_sign);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "value_sign=%d", value_sign);
 	tempY &= (0x03ff);//Y_VALUE_MASK;
 	tempY |= (value_sign << 10);
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "tempY=%xH(%d)", tempY, tempY);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "tempY=%xH(%d)", tempY, tempY);
 
 	result = ((tempN << 11) | tempY);
 
-	PSU_DEBUG_PRINT(MSG_DETAIL, "result=%04xH", result);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "result=%04xH", result);
 
 	// Copy Result To Destination Buffer
 	// low byte
@@ -705,6 +705,11 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 
 		// Fill Last 2 
 		pec_start_index++;
+
+		if (buff[pec_start_index - 1] == 0x0d){
+			buff[pec_start_index++] = 0x0d;
+		}
+
 		buff[pec_start_index++] = 0x0D;
 		buff[pec_start_index++] = 0x0A;
 
@@ -732,6 +737,11 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 
 		// Fill Last 2 
 		pec_start_index++;
+
+		if (buff[pec_start_index-1]==0x0d){
+			buff[pec_start_index++] = 0x0d;
+		}
+
 		buff[pec_start_index++] = 0x0D;
 		buff[pec_start_index++] = 0x0A;
 

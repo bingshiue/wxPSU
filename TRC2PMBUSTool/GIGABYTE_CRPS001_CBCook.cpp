@@ -340,7 +340,7 @@ int GB_CRPS_Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Mode: Linear, Exponent: -4 
 	/*
 	Mode     Bits [7:5]    Bits [4:0] (Parameter)
-	Linear   000b          Five bit two¡¦s complement exponent for the mantissa
+	Linear   000b          Five bit twoï¿½ï¿½s complement exponent for the mantissa
 	delivered as the data bytes for an output voltage related command.
 
 	VID      001b          Five bit VID code identifier per

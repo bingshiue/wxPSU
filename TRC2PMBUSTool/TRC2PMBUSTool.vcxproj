@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -13,7 +13,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4DDAE652-4EC5-4BE2-AB54-7AD3B65402BD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>wxWidgetsPSU</RootNamespace>
+    <RootNamespace>TRC2PMBUSTool</RootNamespace>
+    <ProjectName>TRC2PMBUSTool</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -56,8 +57,8 @@
       <AdditionalIncludeDirectories>$(WXWIDGETS_HOME)\include;$(WXWIDGETS_HOME)\lib\vc_lib\mswud;$(SolutionDir)\TaskSystem\;$(SolutionDir)\hidapi-0.7.0\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OpenMPSupport>false</OpenMPSupport>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

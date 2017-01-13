@@ -244,7 +244,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 										PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
 
-										/*** If Data Format is Direct Data Format Type, Call Coefficients CMD¡@(0x30) To Get Coefficients ***/
+										/*** If Data Format is Direct Data Format Type, Call Coefficients CMDï¿½@(0x30) To Get Coefficients ***/
 
 										// Find Coefficients Command (0x1A)'s Index
 										CoefficientsCMDIndex = -1;
