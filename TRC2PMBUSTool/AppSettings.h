@@ -75,6 +75,7 @@ enum {
 
 #define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Disable
 #define DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN (unsigned long)Generic_Disable
+#define DEFAULT_QUERY_CMD_BEFORE_POLLING  (unsigned long)Generic_Enable
 
 #define DEFAULT_INCREASE_CPU_OVERHEAD     (unsigned long)Generic_Disable
 
@@ -300,6 +301,7 @@ typedef struct appSettings_t {
 	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
 	unsigned long m_ISPDDWaitRootTime;/**< ISP DD Wait Reboot Time */
 	unsigned long m_autoQueryCMDOnIOOpen;/**< Auto Query Command On I/O Open */
+	unsigned long m_queryCMDBeforePolling;/**< Query CMD Before Polling */
 	unsigned long m_increaseCPUOverhead;/**< Increase CPU Overhead */
 	unsigned long m_totalPhase_I2C_Bitrate;/**< Total Phase I2C Bitrate */
 
@@ -335,6 +337,7 @@ typedef struct appSettings_t {
 		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
 		this->m_autoQueryCMDOnIOOpen = DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN;
+		this->m_queryCMDBeforePolling = DEFAULT_QUERY_CMD_BEFORE_POLLING;
 		this->m_increaseCPUOverhead = DEFAULT_INCREASE_CPU_OVERHEAD;
 		this->m_ISPPFCWaitRootTime = WAIT_PFC_REBOOT_TIME;
 		this->m_ISPDDWaitRootTime = WAIT_DD_REBOOT_TIME;

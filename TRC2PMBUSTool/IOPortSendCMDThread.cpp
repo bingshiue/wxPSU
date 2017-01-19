@@ -564,366 +564,368 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				if (this->m_pmBusCommand[idx].m_toggle == true){
 
 
-
 					/*** Query Command (0x1A) ***/
-					if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
+					if (this->m_appSettings->m_queryCMDBeforePolling == Generic_Enable){
+						if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet){
 
-						PSU_DEBUG_PRINT(MSG_DEBUG, "QUERY Command %02xH Start", this->m_pmBusCommand[idx].m_register);
+							PSU_DEBUG_PRINT(MSG_DEBUG, "QUERY Command %02xH Start", this->m_pmBusCommand[idx].m_register);
 
-						// Find Query Command (0x1A)'s Index
-						QueryCMDIndex = -1;
-						for (unsigned int local = 0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
-							if (this->m_pmBusCommand[local].m_register == PMBUSCMD_1AH_QUERY){
-								QueryCMDIndex = local;
-								break;
+							// Find Query Command (0x1A)'s Index
+							QueryCMDIndex = -1;
+							for (unsigned int local = 0; local < PMBUSHelper::GetCurrentCMDTableSize(); local++){
+								if (this->m_pmBusCommand[local].m_register == PMBUSCMD_1AH_QUERY){
+									QueryCMDIndex = local;
+									break;
+								}
 							}
-						}
 
-						if (QueryCMDIndex >= 0){
-							// Prepare Send Buffer
-							PreviousQueryCMDAdditionalCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
-							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
-							uartSendDataLength = this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+							if (QueryCMDIndex >= 0){
+								// Prepare Send Buffer
+								PreviousQueryCMDAdditionalCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
+								this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+								uartSendDataLength = this->productSendBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
-							// Send Query Command
-							retry = 0;
-							do {
-								// Decide Send Data Length
-								if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
-									if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-										sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE;
+								// Send Query Command
+								retry = 0;
+								do {
+									// Decide Send Data Length
+									if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
+										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+											sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE;
+										}
+										else if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+											sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+										}
 									}
-									else if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-										sendDataLength = uartSendDataLength;//SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+									else{// HID
+										sendDataLength = HID_SEND_DATA_SIZE;
 									}
-								}
-								else{// HID
-									sendDataLength = HID_SEND_DATA_SIZE;
-								}
 
-								PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
 
-								// Send Data
-								sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
-								if (sendResult <= 0){
-									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
-									// Retry 
-									retry++;
-									if (retry >= 3){
-										PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
-										sendRetryStillFailed = true;
-										break;
+									// Send Data
+									sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
+									if (sendResult <= 0){
+										PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
+										// Retry 
+										retry++;
+										if (retry >= 3){
+											PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
+											sendRetryStillFailed = true;
+											break;
+										}
+										else{
+											PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
+										}
+
 									}
 									else{
-										PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
-									}
-
-								}
-								else{
 #ifdef OUTPUT_SEND_DATA
-									wxString sentData(wxT("Sent Data : "));
-									for (int idx = 0; idx < sendDataLength; idx++){
-										sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
-									}
-									PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
+										wxString sentData(wxT("Sent Data : "));
+										for (int idx = 0; idx < sendDataLength; idx++){
+											sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+										}
+										PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
 #endif
-									PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+										PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+									}
+
+								} while (sendResult <= 0);
+
+								if (sendRetryStillFailed == true){
+									PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
+									m_running = false;
+									break;
 								}
 
-							} while (sendResult <= 0);
+								// Read Query Result
+								unsigned int bytesToRead = this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+								this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[QueryCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 
-							if (sendRetryStillFailed == true){
-								PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
-								m_running = false;
-								break;
-							}
-
-							// Read Query Result
-							unsigned int bytesToRead = this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
-							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[QueryCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
-
-							// If Create Thread Success
-							if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-								PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
-							}
-							else{
-								this->m_IOPortReadCMDThread->Run();
-							}
-
-							// Semaphore Wait for Read Thread Complete
-							PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[QueryCMDIndex].m_register);
-							ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
-
-							if (ret != wxSEMA_NO_ERROR){
-								PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
-							}
-							else{
-
-								if (this->m_recvBuff->m_length == 0){
-									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[QueryCMDIndex].m_register);
-									this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
-									//timeout++;
+								// If Create Thread Success
+								if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+									PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
 								}
 								else{
-									// Get Expect Data Length
-									//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
-									ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
-									PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
+									this->m_IOPortReadCMDThread->Run();
+								}
 
-									//
-									if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
+								// Semaphore Wait for Read Thread Complete
+								PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[QueryCMDIndex].m_register);
+								ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
-										PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_recvBuff->m_length);
-										//success++;
+								if (ret != wxSEMA_NO_ERROR){
+									PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+								}
+								else{
 
-										// copy data to PMBus Command Structure
-										this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
-										for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
-											this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
-											PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
-										}
+									if (this->m_recvBuff->m_length == 0){
+										PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[QueryCMDIndex].m_register);
+										this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
+										//timeout++;
+									}
+									else{
+										// Get Expect Data Length
+										//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+										ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
+										PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
-										// Prepare Data Buffer
-										this->productDataBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
+										//
+										if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
+
+											PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[QueryCMDIndex].m_register, this->m_recvBuff->m_length);
+											//success++;
+
+											// copy data to PMBus Command Structure
+											this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
+											for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
+												this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
+												PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
+											}
+
+											// Prepare Data Buffer
+											this->productDataBuff(QueryCMDIndex, this->m_pmBusCommand[QueryCMDIndex].m_responseDataLength);
 
 #ifdef OUTPUT_RECEIVE_DATA
-										wxString recvBytes("");
-										for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
-											recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
-										}
+											wxString recvBytes("");
+											for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+												recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+											}
 
-										PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
+											PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
 
 #endif
 
-										// Check I2C BUS Not Acknowledge
-										unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
-										if (i2cBusAck == PMBUSHelper::response_ng){
-											this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
-										}
-
-										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
-											this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_success;
-											//success++;
-											
-											this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
-										}
-
-										bool PreUpdateQuery = true;
-
-										if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status == cmd_status_success){
-
-											// Get Query CMD
-											int queryCMD;
-											queryCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
-
-											// Get Index of Query CMD 
-											int queryCMDIndex = -1;
-											queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
-
-											if (queryCMDIndex < 0){
-												PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
-												PreUpdateQuery = false;
-											}
-											else{
-												PSU_DEBUG_PRINT(MSG_DEBUG, "Find Index of Query CMD %02x is %d", queryCMD, queryCMDIndex);
+											// Check I2C BUS Not Acknowledge
+											unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
+											if (i2cBusAck == PMBUSHelper::response_ng){
+												this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
 											}
 
-											if (PreUpdateQuery == true){
-												// Call Query Data CB Function
-												memset(QueryStr, 0, STR_LENGTH * sizeof(wchar_t));                                                              // CMD's Page
-												this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[QueryCMDIndex]), QueryStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+											if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
+												this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status = cmd_status_success;
+												//success++;
 
-												wxString QueryMsg(QueryStr);
+												this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
+											}
 
-												wxThreadEvent* threadquery_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY);
-												threadquery_evt->SetInt(queryCMDIndex);
-												threadquery_evt->SetString(QueryMsg);
-												wxQueueEvent(m_pHandler->GetEventHandler(), threadquery_evt);
+											bool PreUpdateQuery = true;
 
-												PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
+											if (this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_status == cmd_status_success){
 
-												/*** If Data Format is Direct Data Format Type, Call Coefficients CMD�@(0x30) To Get Coefficients ***/
+												// Get Query CMD
+												int queryCMD;
+												queryCMD = this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1];
 
-												// Find Coefficients Command (0x1A)'s Index
-												CoefficientsCMDIndex = -1;
-												for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
-													if (this->m_pmBusCommand[local2].m_register == PMBUSCMD_30H_COEFFICIENTS){
-														CoefficientsCMDIndex = local2;
-														break;
-													}
+												// Get Index of Query CMD 
+												int queryCMDIndex = -1;
+												queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+
+												if (queryCMDIndex < 0){
+													PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+													PreUpdateQuery = false;
+												}
+												else{
+													PSU_DEBUG_PRINT(MSG_DEBUG, "Find Index of Query CMD %02x is %d", queryCMD, queryCMDIndex);
 												}
 
-												if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format
-													/* || this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_8bit_Unsigned_Number */){
+												if (PreUpdateQuery == true){
+													// Call Query Data CB Function
+													memset(QueryStr, 0, STR_LENGTH * sizeof(wchar_t));                                                              // CMD's Page
+													this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_queryCBFunc(&(this->m_pmBusCommand[QueryCMDIndex]), QueryStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
-													if (CoefficientsCMDIndex >= 0){
-														// Prepare Send Buffer
-														PreviousCoefficientsCMDAdditionalCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
-														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
-														uartSendDataLength = this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+													wxString QueryMsg(QueryStr);
 
-														// Send Query Command
-														retry = 0;
-														do {
-															// Decide Send Data Length
-															if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
-																if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
-																	sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
-																}
-																else if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
-																	sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
-																}
-															}
-															else{// HID
-																sendDataLength = HID_SEND_DATA_SIZE;
-															}
+													wxThreadEvent* threadquery_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_QUERY);
+													threadquery_evt->SetInt(queryCMDIndex);
+													threadquery_evt->SetString(QueryMsg);
+													wxQueueEvent(m_pHandler->GetEventHandler(), threadquery_evt);
 
-															PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
+													PSU_DEBUG_PRINT(MSG_DEBUG, "%s", QueryMsg.c_str());
 
-															// Send Data
-															sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
-															if (sendResult <= 0){
-																PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
-																// Retry 
-																retry++;
-																if (retry >= 3){
-																	PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
-																	sendRetryStillFailed = true;
-																	break;
-																}
-																else{
-																	PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
-																}
+													/*** If Data Format is Direct Data Format Type, Call Coefficients CMD�@(0x30) To Get Coefficients ***/
 
-															}
-															else{
-#ifdef OUTPUT_SEND_DATA
-																wxString sentData(wxT("Sent Data : "));
-																for (int idx = 0; idx < sendDataLength; idx++){
-																	sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
-																}
-																PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
-#endif
-																PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
-															}
-
-														} while (sendResult <= 0);
-
-														if (sendRetryStillFailed == true){
-															PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
-															m_running = false;
+													// Find Coefficients Command (0x1A)'s Index
+													CoefficientsCMDIndex = -1;
+													for (unsigned int local2 = 0; local2 < PMBUSHelper::GetCurrentCMDTableSize(); local2++){
+														if (this->m_pmBusCommand[local2].m_register == PMBUSCMD_30H_COEFFICIENTS){
+															CoefficientsCMDIndex = local2;
 															break;
 														}
+													}
 
-														// Read Quert Result
-														unsigned int bytesToRead = this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
-														this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[CoefficientsCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+													if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format
+														/* || this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_8bit_Unsigned_Number */){
 
-														// If Create Thread Success
-														if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
-															PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
-														}
-														else{
-															this->m_IOPortReadCMDThread->Run();
-														}
+														if (CoefficientsCMDIndex >= 0){
+															// Prepare Send Buffer
+															PreviousCoefficientsCMDAdditionalCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
+															this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = this->m_pmBusCommand[idx].m_register;
+															uartSendDataLength = this->productSendBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
-														// Semaphore Wait for Read Thread Complete
-														PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
-														ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+															// Send Query Command
+															retry = 0;
+															do {
+																// Decide Send Data Length
+																if (*this->m_CurrentIO == IOACCESS_SERIALPORT || *this->m_CurrentIO == IOACCESS_TOTALPHASE){
+																	if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+																		sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE;
+																	}
+																	else if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+																		sendDataLength = uartSendDataLength;// SERIAL_SEND_DATA_SIZE + this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalDataLength;
+																	}
+																}
+																else{// HID
+																	sendDataLength = HID_SEND_DATA_SIZE;
+																}
 
-														if (ret != wxSEMA_NO_ERROR){
-															PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
-														}
-														else{
-															if (this->m_recvBuff->m_length == 0){
-																PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
-																this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
-																//timeout++;
+																PSU_DEBUG_PRINT(MSG_DEBUG, "Send Data Length =%d", sendDataLength);
+
+																// Send Data
+																sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(this->m_sendBuff, sendDataLength);
+																if (sendResult <= 0){
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
+																	// Retry 
+																	retry++;
+																	if (retry >= 3){
+																		PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
+																		sendRetryStillFailed = true;
+																		break;
+																	}
+																	else{
+																		PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
+																	}
+
+																}
+																else{
+#ifdef OUTPUT_SEND_DATA
+																	wxString sentData(wxT("Sent Data : "));
+																	for (int idx = 0; idx < sendDataLength; idx++){
+																		sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+																	}
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
+#endif
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+																}
+
+															} while (sendResult <= 0);
+
+															if (sendRetryStillFailed == true){
+																PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Send Still Failed, Exit Send Thread");
+																m_running = false;
+																break;
+															}
+
+															// Read Quert Result
+															unsigned int bytesToRead = this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+															this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[CoefficientsCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+
+															// If Create Thread Success
+															if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
+																PSU_DEBUG_PRINT(MSG_ERROR, "Can't create read thread!");
 															}
 															else{
-																// Get Expect Data Length
-																//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
-																ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
-																PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
+																this->m_IOPortReadCMDThread->Run();
+															}
 
-																//
-																if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
+															// Semaphore Wait for Read Thread Complete
+															PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
+															ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
-																	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_recvBuff->m_length);
-																	//success++;
+															if (ret != wxSEMA_NO_ERROR){
+																PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+															}
+															else{
+																if (this->m_recvBuff->m_length == 0){
+																	PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length = %d, CMD = %02xH", this->m_recvBuff->m_length, this->m_pmBusCommand[CoefficientsCMDIndex].m_register);
+																	this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_failure;
+																	//timeout++;
+																}
+																else{
+																	// Get Expect Data Length
+																	//ExpectReceiveDataLength = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH : this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH + 2;
+																	ExpectReceiveDataLength = PMBUSHelper::getExpectedDataLengthByIO(*this->m_CurrentIO, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength, BASE_RESPONSE_DATA_LENGTH);
+																	PSU_DEBUG_PRINT(MSG_DEBUG, "ExpectReceiveDataLength=%d", ExpectReceiveDataLength);
 
-																	// copy data to PMBus Command Structure
-																	this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
-																	for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
-																		this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
-																		PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
-																	}
+																	//
+																	if (this->m_recvBuff->m_length == ExpectReceiveDataLength){
 
-																	// Prepare Data Buffer
-																	this->productDataBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
+																		PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data of CMD %2x, Length = %d", this->m_pmBusCommand[CoefficientsCMDIndex].m_register, this->m_recvBuff->m_length);
+																		//success++;
+
+																		// copy data to PMBus Command Structure
+																		this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_length = this->m_recvBuff->m_length;
+																		for (unsigned int idx2 = 0; idx2 < this->m_recvBuff->m_length; idx2++){
+																			this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff->m_recvBuff[idx2];
+																			PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", this->m_pmBusCommand[CoefficientsCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff->m_recvBuff[idx2]);
+																		}
+
+																		// Prepare Data Buffer
+																		this->productDataBuff(CoefficientsCMDIndex, this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength);
 
 #ifdef OUTPUT_RECEIVE_DATA
-																	wxString recvBytes("");
-																	for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
-																		recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
-																	}
+																		wxString recvBytes("");
+																		for (unsigned int idx3 = 0; idx3 < this->m_recvBuff->m_length; idx3++){
+																			recvBytes += wxString::Format(" %02x ", this->m_recvBuff->m_recvBuff[idx3]);
+																		}
 
-																	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
+																		PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Bytes : %s", recvBytes.c_str());
 
 #endif
 
-																	// Check I2C BUS Not Acknowledge
-																	unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
-																	if (i2cBusAck == PMBUSHelper::response_ng){
-																		this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
-																	}
+																		// Check I2C BUS Not Acknowledge
+																		unsigned char i2cBusAck = PMBUSHelper::IsI2CBusNotAcknowlwdge(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, this->m_recvBuff->m_length);
+																		if (i2cBusAck == PMBUSHelper::response_ng){
+																			this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_i2c_bus_not_acknowledge;
+																		}
 
-																	if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
-																		this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_success;
-																		//success++;
-																	}
+																		if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_checksum_error && this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status != cmd_status_i2c_bus_not_acknowledge){
+																			this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status = cmd_status_success;
+																			//success++;
+																		}
 
-																	bool PreUpdateCoefficients = true;
+																		bool PreUpdateCoefficients = true;
 
-																	if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status == cmd_status_success){
+																		if (this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_status == cmd_status_success){
 
-																		// Get Query CMD
-																		int queryCMD;
-																		queryCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
+																			// Get Query CMD
+																			int queryCMD;
+																			queryCMD = this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1];
 
-																		// Get Index of Query CMD 
-																		int queryCMDIndex = -1;
+																			// Get Index of Query CMD 
+																			int queryCMDIndex = -1;
 
-																		queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+																			queryCMDIndex = PMBUSHelper::getIndexOfCMD(queryCMD, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
 #if 0
-																		for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
-																			if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
-																				queryCMDIndex = idx2;
-																				break;
+																			for (int idx2 = 0; idx2 < (signed)PMBUSHelper::CurrentCMDTableSize; idx2++){
+																				if (PMBUSHelper::getPMBUSCMDData()[idx2].m_register == queryCMD){
+																					queryCMDIndex = idx2;
+																					break;
+																				}
 																			}
-																		}
 #endif
 
-																		if (queryCMDIndex < 0){
-																			PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
-																			PreUpdateCoefficients = false;
-																		}
+																			if (queryCMDIndex < 0){
+																				PSU_DEBUG_PRINT(MSG_DEBUG, "Can't Find Index of Query CMD");
+																				PreUpdateCoefficients = false;
+																			}
 
-																		if (PreUpdateCoefficients == true){
-																			// Call Coefficients Data CB Function
-																			memset(CoefficientsStr, 0, STR_LENGTH * sizeof(wchar_t));																			 // CMD's Page
-																			this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[CoefficientsCMDIndex]), CoefficientsStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
+																			if (PreUpdateCoefficients == true){
+																				// Call Coefficients Data CB Function
+																				memset(CoefficientsStr, 0, STR_LENGTH * sizeof(wchar_t));																			 // CMD's Page
+																				this->m_pmBusCommand[queryCMDIndex].m_cmdCBFunc.m_coefficientsCBFunc(&(this->m_pmBusCommand[CoefficientsCMDIndex]), CoefficientsStr, this->m_pmBusCommand[idx].m_cmdStatus.m_cmdPage);
 
-																			wxString CoefficientsMsg(CoefficientsStr);
+																				wxString CoefficientsMsg(CoefficientsStr);
 
-																			wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
-																			threadcoefficients_evt->SetInt(queryCMDIndex);
-																			threadcoefficients_evt->SetString(CoefficientsMsg);
-																			wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
+																				wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
+																				threadcoefficients_evt->SetInt(queryCMDIndex);
+																				threadcoefficients_evt->SetString(CoefficientsMsg);
+																				wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
 
-																			PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CoefficientsMsg.c_str());
+																				PSU_DEBUG_PRINT(MSG_DEBUG, "%s", CoefficientsMsg.c_str());
+																			}
+
 																		}
 
 																	}
@@ -932,40 +934,39 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 															}
 
+															this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousCoefficientsCMDAdditionalCMD;
+
 														}
 
-														this->m_pmBusCommand[CoefficientsCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousCoefficientsCMDAdditionalCMD;
+													}// if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format)
+													else{
+														wxString PaddingStr(wxT("---"));
 
+														wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
+														threadcoefficients_evt->SetInt(queryCMDIndex);
+														threadcoefficients_evt->SetString(PaddingStr);
+														wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
 													}
 
-												}// if (this->m_pmBusCommand[idx].m_dataFormat.m_formatType == cmd_data_format_DirectData_Format)
-												else{
-													wxString PaddingStr(wxT("---"));
+												}// if (PreUpdateQuery == true)
 
-													wxThreadEvent* threadcoefficients_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_COEFFICIENTS);
-													threadcoefficients_evt->SetInt(queryCMDIndex);
-													threadcoefficients_evt->SetString(PaddingStr);
-													wxQueueEvent(m_pHandler->GetEventHandler(), threadcoefficients_evt);
-												}
+											}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success)
 
-											}// if (PreUpdateQuery == true)
+										}// if (this->m_recvBuff->m_length == ExpectReceiveDataLength) 
 
-										}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_status == cmd_status_success)
+									}// else (if (this->m_recvBuff->m_length == 0))
 
-									}// if (this->m_recvBuff->m_length == ExpectReceiveDataLength) 
+								} // else if (ret != wxSEMA_NO_ERROR)
 
-								}// else (if (this->m_recvBuff->m_length == 0))
+								this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousQueryCMDAdditionalCMD;
 
-							} // else if (ret != wxSEMA_NO_ERROR)
+							}// if (QueryCMDIndex >= 0)
 
-							this->m_pmBusCommand[QueryCMDIndex].m_cmdStatus.m_AddtionalData[1] = PreviousQueryCMDAdditionalCMD;
+							// Just Doing Once in Every Send Thread Start 
+							//this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
 
-						}// if (QueryCMDIndex >= 0)
-
-						// Just Doing Once in Every Send Thread Start 
-						//this->m_pmBusCommand[idx].m_cmdStatus.m_queried = cmd_query_done;
-
-					}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet)
+						}// if (this->m_pmBusCommand[idx].m_cmdStatus.m_queried == cmd_query_not_yet)
+					}// if (this->m_appSettings->m_queryCMDBeforePolling == Generic_Enable)
 
 
 					/*** If Own Read Access (No Need To Polling If CMD Don't Have Read Access) ***/

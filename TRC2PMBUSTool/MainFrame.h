@@ -74,6 +74,7 @@ public:
 		MENU_ID_Enable_Checksum,
 		MENU_ID_Only_Polling_Support_Command,
 		MENU_ID_Auto_Query_CMD_On_IO_Open,
+		MENU_ID_Query_CMD_Before_Polling,
 		MENU_ID_Clear_Error_Log,
 		MENU_ID_Reset_MaxMin_Value,
 		MENU_ID_Reset_Run_Time,
@@ -264,6 +265,7 @@ public:
 	wxMenuItem  *m_EnableChecksumMenuItem;
 	wxMenuItem  *m_onlyPollingSupportCMDMenuItem;
 	wxMenuItem  *m_autoQueryCMDOnIOOpenMenuItem;
+	wxMenuItem  *m_queryCMDBeforePollingMenuItem;
 	wxMenuItem  *m_ClearErrorLogMenuItem;
 	wxMenuItem  *m_ResetMaxMinValueMenuItem;
 	wxMenuItem  *m_ResetRunTimeMenuItem;
@@ -402,6 +404,7 @@ private:
 	void OnEnableChecksum(wxCommandEvent& event);
 	void OnOnlyPollingSupportCommand(wxCommandEvent& event);
 	void OnAutoQueryCMDOnIOOpen(wxCommandEvent& event);
+	void OnQueryCMDBeforePolling(wxCommandEvent& event);
 	void OnClearErrorLog(wxCommandEvent& event);
 	void OnResetMaxMinValue(wxCommandEvent& event);
 	void OnResetRunTime(wxCommandEvent& event);

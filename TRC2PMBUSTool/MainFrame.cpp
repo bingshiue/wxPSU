@@ -398,6 +398,7 @@ void MainFrame::SetupMenuBar(void){
 	|- [V] Enable Checksum
 	|- Only Polling Support Command
 	|- Auto Query Command On I/O Open
+	|- Query Command Before Polling 
 	|------------------------------------
 	|- Clear Error Log
 	|- Reset Max./Min. Value
@@ -467,10 +468,17 @@ void MainFrame::SetupMenuBar(void){
 		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
 	}
 
+	this->m_queryCMDBeforePollingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Query_CMD_Before_Polling, wxT("Query Command Before Polling"), wxT("Query Command Before Polling"), wxITEM_CHECK);
+
+	if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Enable){
+		this->m_queryCMDBeforePollingMenuItem->Check(true);
+	}
+
 	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
 	this->m_runMenu->Append(m_onlyPollingSupportCMDMenuItem);
 	this->m_runMenu->Append(m_autoQueryCMDOnIOOpenMenuItem);
+	this->m_runMenu->Append(m_queryCMDBeforePollingMenuItem);
 	this->m_runMenu->AppendSeparator();
 
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
@@ -2066,6 +2074,20 @@ void MainFrame::OnAutoQueryCMDOnIOOpen(wxCommandEvent& event){
 		this->m_appSettings.m_autoQueryCMDOnIOOpen = Generic_Enable;
 
 		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
+	}
+}
+
+void MainFrame::OnQueryCMDBeforePolling(wxCommandEvent& event){
+	
+	if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Enable){
+		this->m_appSettings.m_queryCMDBeforePolling = Generic_Disable;
+
+		this->m_queryCMDBeforePollingMenuItem->Check(false);
+	}
+	else if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Disable){
+		this->m_appSettings.m_queryCMDBeforePolling = Generic_Enable;
+
+		this->m_queryCMDBeforePollingMenuItem->Check(true);
 	}
 }
 
@@ -3728,6 +3750,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_autoQueryCMDOnIOOpen = autoQueryCMDOnIOOpen;
 	}
 
+	// Query CMD Before Polling
+	long queryCMDBeforePolling;
+	if (pConfig->Read(wxT("QueryCMDBeforePolling"), &queryCMDBeforePolling) == false){
+		pConfig->Write(wxT("QueryCMDBeforePolling"), DEFAULT_QUERY_CMD_BEFORE_POLLING);
+		this->m_appSettings.m_queryCMDBeforePolling = DEFAULT_QUERY_CMD_BEFORE_POLLING;
+	}
+	else{
+		this->m_appSettings.m_queryCMDBeforePolling = queryCMDBeforePolling;
+	}
+
 	// Increase CPU Overhead
 	long increaseCPUOverhead;
 	if (pConfig->Read(wxT("IncreaseCPUOverhead"), &increaseCPUOverhead) == false){
@@ -4102,6 +4134,9 @@ void MainFrame::SaveConfig(void){
 
 	// Auto Query CMD On I/O Open
 	pConfig->Write(wxT("AutoQueryCMDOnIOOpen"), this->m_appSettings.m_autoQueryCMDOnIOOpen);
+
+	// Query CMD Before Polling
+	pConfig->Write(wxT("QueryCMDBeforePolling"), this->m_appSettings.m_queryCMDBeforePolling);
 
 	// Increase CPU Overhead
 	pConfig->Write(wxT("IncreaseCPUOverhead"), this->m_appSettings.m_increaseCPUOverhead);
@@ -4747,6 +4782,7 @@ EVT_MENU(MENU_ID_I2C_Fault_Test, MainFrame::OnI2CFaultTest)
 EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
 EVT_MENU(MENU_ID_Only_Polling_Support_Command, MainFrame::OnOnlyPollingSupportCommand)
 EVT_MENU(MENU_ID_Auto_Query_CMD_On_IO_Open, MainFrame::OnAutoQueryCMDOnIOOpen)
+EVT_MENU(MENU_ID_Query_CMD_Before_Polling, MainFrame::OnQueryCMDBeforePolling)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
 EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
 EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)

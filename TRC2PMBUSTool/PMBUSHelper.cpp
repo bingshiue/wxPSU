@@ -889,7 +889,7 @@ void PMBUSHelper::PrintISPCheckStatusError(unsigned char error){
 		break;
 
 	default:
-		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status (F3H) Something Error");
+		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Check Status (F3H) Something Error, error = %d", error);
 		break;
 	}
 
