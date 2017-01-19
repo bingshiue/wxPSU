@@ -80,6 +80,19 @@ typedef struct recvbuff_t {
 	unsigned int m_length;/**< Receive Data length */
 	unsigned char m_recvBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Receive Data Buff */
 	unsigned char m_dataBuff[SERIALPORT_RECV_BUFF_SIZE];/**< Data Buff (Only contain the data bytes) */
+
+	recvbuff_t(){
+		m_length = 0;
+		memset(m_recvBuff, 0, SERIALPORT_RECV_BUFF_SIZE);
+		memset(m_dataBuff, 0, SERIALPORT_RECV_BUFF_SIZE);
+	}
+
+	recvbuff_t(int init){
+		m_length = 0;
+		memset(m_recvBuff, 0, SERIALPORT_RECV_BUFF_SIZE);
+		memset(m_dataBuff, 0, SERIALPORT_RECV_BUFF_SIZE);
+	}
+
 }RECVBUFF_t;
 
 /**
@@ -105,6 +118,18 @@ typedef struct dataFormat_t {
 	unsigned char m_formatType;/**< Data Format Type */
 	DirectFormatCoefficients_t m_ReadCoefficients;/**< Direct Data Format Read Coefficients */
 	DirectFormatCoefficients_t m_WriteCoefficients;/**< Direct Data Format Write Coefficients */
+
+	dataFormat_t(){
+		this->m_formatType = 0;// 0 is the linear data format
+		this->m_ReadCoefficients = {};
+		this->m_WriteCoefficients = {};
+	}
+
+	dataFormat_t(int init){
+		this->m_formatType = 0;// 0 is the linear data format
+		this->m_ReadCoefficients = {};
+		this->m_WriteCoefficients = {};
+	}
 
 }DataFormat_t;
 
@@ -151,6 +176,20 @@ typedef struct cmdcbfunc_t {
 	CMDCoefficientsCBFunc m_coefficientsCBFunc;/**< Coefficients CB Function */
 	CMDCookCBFunc         m_cookCBFunc;/**< Query Cook Function */
 	CMDRawCBFunc          m_rawCBFunc;/**< Query Raw Function */
+
+	cmdcbfunc_t(){
+		m_queryCBFunc = NULL;
+		m_coefficientsCBFunc = NULL;
+		m_cookCBFunc = NULL;
+		m_rawCBFunc = NULL;
+	}
+
+	cmdcbfunc_t(int init){
+		m_queryCBFunc = NULL;
+		m_coefficientsCBFunc = NULL;
+		m_cookCBFunc = NULL;
+		m_rawCBFunc = NULL;
+	}
 
 }CMDCBFUNC_t;
 
