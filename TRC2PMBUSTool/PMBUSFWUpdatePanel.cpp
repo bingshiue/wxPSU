@@ -676,6 +676,10 @@ void PMBUSFWUpdatePanel::OnCloseButton(wxCommandEvent& event){
 
 	selected_index = this->m_parent->GetSelection();
 
+	wxFileName hexFileFullPath(this->m_hexFilePath);
+
+	m_watcher->Remove(hexFileFullPath.GetPathWithSep());
+
 	this->m_pressedCloseButton = true;
 
 	this->m_parent->SetSelection(0);
