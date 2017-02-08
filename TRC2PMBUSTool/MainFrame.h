@@ -22,6 +22,7 @@
 #include "SerialPort.h"
 #include "HID.h"
 #include "TotalPhase.h"
+#include "Pickit.h"
 #include "IOAccess.h"
 #include "PMBUSCMDListModel.h"
 #include "PMBUSStatusBar.h"

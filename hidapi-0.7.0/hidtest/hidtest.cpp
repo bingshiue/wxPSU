@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
 	////handle = hid_open(0x4d8, 0x3f, L"12345");
-	handle = hid_open(0x4d8, 0x3f, NULL);
+	handle = hid_open(0x4d8, 0x36, NULL);
 	if (!handle) {
 		printf("unable to open device\n");
 		return 1;
@@ -116,12 +116,36 @@ int main(int argc, char* argv[])
 	res = hid_read(handle, buf, 17);
 
 	// Send a Feature Report to the device
-	buf[0] = 0x2;
-	buf[1] = 0xa0;
-	buf[2] = 0x0a;
+	buf[0] = 0x01;
+	buf[1] = 0x00;
+	buf[2] = 0x00;
 	buf[3] = 0x00;
-	buf[4] = 0x00;
-	res = hid_send_feature_report(handle, buf, 17);
+	buf[4] = 0x0a;
+	buf[5] = 0xff;
+	buf[6] = 0x00;
+	buf[7] = 0x00;
+	buf[8] = 0x00;
+	buf[9] = 0x01;
+	buf[10] = 0x31;
+	buf[11] = 0x20;
+	buf[12] = 0x00;
+	buf[13] = 0x00;
+	buf[14] = 0x00;
+	buf[15] = 0x00;
+	buf[16] = 0x00;
+	buf[17] = 0x03;
+	buf[18] = 0x06;
+	buf[19] = 0x00;
+	buf[20] = 0x00;
+	buf[21] = 0x00;
+	buf[22] = 0x00;
+	buf[23] = 0x00;
+	buf[24] = 0x31;
+
+	for (unsigned int idx = 25; idx<64; idx++){
+		buf[idx] = 0;
+	}
+	res = hid_send_feature_report(handle, buf, 64);
 	if (res < 0) {
 		printf("Unable to send a feature report.\n");
 	}

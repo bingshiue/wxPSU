@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -117,6 +117,7 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="ModelSelectDialog.cpp" />
     <ClCompile Include="PEC.cpp" />
+    <ClCompile Include="Pickit.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
     <ClCompile Include="PMBUSBlockWRTestTask.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="ModelSelectDialog.h" />
     <ClInclude Include="ModelType.h" />
     <ClInclude Include="PEC.h" />
+    <ClInclude Include="Pickit.h" />
     <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSBitmapButton.h" />
     <ClInclude Include="PMBUSCBCoefficients.h" />

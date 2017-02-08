@@ -36,6 +36,9 @@
 #define TOTAL_PHASE_USB_PID   0xE0D0/**< Total Phase USB PID */
 #define TOTAL_PHASE_USB_VID   0x0403/**< Total Phase USB VID */
 
+#define PICKIT_SERIAL_USB_PID  0x0036 /**< PICKIT Serial USB PID */
+#define PICKIT_SERIAL_USB_VID  0x04D8 /**< PICKIT Serial USB VID */
+
 #define RELOAD_USB_ADAPTOR_SETTINGS_APP_RESTART  /**< Reload USB Adaptor's Setting when APP restart */
 
 /**
