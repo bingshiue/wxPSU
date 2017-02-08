@@ -31,13 +31,13 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 
 	m_moduleNameST = new wxStaticText(m_i2cIFModuleSBS->GetStaticBox(), wxID_ANY, wxT("Module Name"));
 	m_moduleNameCB = new wxComboBox(m_i2cIFModuleSBS->GetStaticBox(), CID_MODULE_BOARD_COMBO, wxT(""));
-	m_moduleNameCB->Append("API2CS12-000");
+	m_moduleNameCB->Append("PICKIT Serial");
 	m_moduleNameCB->Append("R90000-95611");
 	m_moduleNameCB->Append("R90000-9271(USB)");
 	m_moduleNameCB->Append("TOTAL PHASE");
 
 	unsigned long adaptorArray[4] = {
-		I2C_AdaptorModuleBoard_API2CS12_000,
+		I2C_AdaptorModuleBoard_PICKIT_SERIAL,
 		I2C_AdaptorModuleBoard_R90000_95611,
 		I2C_AdaptorModuleBoard_R90000_9271_USB,
 		I2C_AdaptorModuleBoard_TOTALPHASE
@@ -206,8 +206,8 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 
 	switch (select){
 
-	case I2C_AdaptorModuleBoard_API2CS12_000:
-		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_API2CS12_000;
+	case I2C_AdaptorModuleBoard_PICKIT_SERIAL:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_PICKIT_SERIAL;
 		break;
 	
 	case I2C_AdaptorModuleBoard_R90000_95611:
@@ -230,7 +230,12 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	// Current Use IO
 	switch (this->m_appSettings->m_I2CAdaptorModuleBoard){
 
-	case I2C_AdaptorModuleBoard_API2CS12_000:
+	case I2C_AdaptorModuleBoard_PICKIT_SERIAL:
+
+		*this->m_currentUseIO = IOACCESS_PICKIT;
+
+		break;
+
 	case I2C_AdaptorModuleBoard_R90000_95611:
 
 		*this->m_currentUseIO = IOACCESS_SERIALPORT;
@@ -471,6 +476,16 @@ int I2CInterfaceDialog::OpenIODevice(void){
 
 				// Update I2C Clock Speed Field
 				this->UpdateStatusBarIOSettingFiled(this->m_appSettings->m_totalPhase_I2C_Bitrate);
+
+			}				
+			else if (*this->m_currentUseIO == IOACCESS_PICKIT){
+
+				wxString pickitSerialDeviceName(wxT("PICKIT Serial"));
+
+				this->UpdateStatusBarIOSettingFiled(pickitSerialDeviceName);
+
+				// Update I2C Clock Speed Field
+				this->UpdateStatusBarIOSettingFiled(100);
 
 			}
 

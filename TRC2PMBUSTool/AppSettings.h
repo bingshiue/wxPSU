@@ -39,7 +39,7 @@ enum {
 };
 
 enum {
-	I2C_AdaptorModuleBoard_API2CS12_000 = 0,
+	I2C_AdaptorModuleBoard_PICKIT_SERIAL = 0,
 	I2C_AdaptorModuleBoard_R90000_95611,
 	I2C_AdaptorModuleBoard_R90000_9271_USB,
 	I2C_AdaptorModuleBoard_TOTALPHASE,

@@ -124,6 +124,67 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		sendBuffer[baseIndex++] = 0x03;           // Report ID is 0x03
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = 0x41;
+		sendBuffer[baseIndex++] = 0x44;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;        // Command
+
+		// May Have 0x0d Command
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+
+		sendBuffer[1] = (baseIndex - 2);
+		buffer_len = baseIndex;
+
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01; //
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+
+		for (int local = baseIndex; local<64; local++){
+			sendBuffer[local] = 0;
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 		
 		sendBuffer[baseIndex++] = 1;// write bytes
@@ -170,6 +231,7 @@ int PMBUSReadTestTask::Main(double elapsedTime){
 	// Decide Send Data Length
 	switch (*m_CurrentIO){
 
+	case IOACCESS_PICKIT:
 	case IOACCESS_HID:
 		sendDataLength = HID_SEND_DATA_SIZE;
 		break;

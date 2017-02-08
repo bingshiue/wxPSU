@@ -2935,6 +2935,15 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_HID].m_DeviceSendDataExtra = HIDSendDataExtra;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceReadDataExtra = HIDReadDataExtra;
 
+	// Pickit
+	this->m_IOAccess[IOACCESS_PICKIT].m_EnumerateAvailableDevice = EnumerateAvailablePickitDevice;
+	this->m_IOAccess[IOACCESS_PICKIT].m_GetDeviceStatus = GetPickitDeviceStatus;
+	this->m_IOAccess[IOACCESS_PICKIT].m_GetOpenDeviceName = GetPickitOpenDeviceName;
+	this->m_IOAccess[IOACCESS_PICKIT].m_OpenDevice = OpenPickitDevice;
+	this->m_IOAccess[IOACCESS_PICKIT].m_CloseDevice = ClosePickitDevice;
+	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceSendData = PickitSendData;
+	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceReadData = PickitReadData;
+
 	// TOTAL PHASE I2C Host Adaptor
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice = EnumerateAvailableTotalPhaseDevice;
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_GetDeviceStatus = GetTotalPhaseDeviceStatus;
@@ -2949,7 +2958,12 @@ void MainFrame::DoSetupIOAccess(void){
 	// Current Use IO
 	switch (this->m_appSettings.m_I2CAdaptorModuleBoard){
 
-	case I2C_AdaptorModuleBoard_API2CS12_000:
+	case I2C_AdaptorModuleBoard_PICKIT_SERIAL:
+
+		this->m_CurrentUseIOInterface = IOACCESS_PICKIT;
+
+		break;
+
 	case I2C_AdaptorModuleBoard_R90000_95611:
 
 		this->m_CurrentUseIOInterface = IOACCESS_SERIALPORT;
@@ -3168,6 +3182,16 @@ int MainFrame::OpenIODevice(void){
 
 					// Update I2C Clock Speed Field
 					this->UpdateStatusBarIOSettingFiled(this->m_appSettings.m_totalPhase_I2C_Bitrate);
+				}
+				else if (this->m_CurrentUseIOInterface == IOACCESS_PICKIT){
+					
+					wxString pickitSerialDeviceName(wxT("PICKIT Serial"));
+
+					this->UpdateStatusBarIOSettingFiled(pickitSerialDeviceName);
+
+					// Update I2C Clock Speed Field
+					this->UpdateStatusBarIOSettingFiled(100);
+
 				}
 		
 				//
@@ -4559,6 +4583,11 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 			}
 			else if (this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE){
 				if(pid == TOTAL_PHASE_USB_PID && vid == TOTAL_PHASE_USB_VID){
+					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+				}
+			}
+			else if (this->m_CurrentUseIOInterface == IOACCESS_PICKIT){
+				if (pid == PICKIT_SERIAL_USB_PID && vid == PICKIT_SERIAL_USB_VID){
 					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
 				}
 			}

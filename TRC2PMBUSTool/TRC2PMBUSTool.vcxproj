@@ -125,6 +125,7 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="ModelSelectDialog.cpp" />
     <ClCompile Include="PEC.cpp" />
+    <ClCompile Include="Pickit.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
     <ClCompile Include="PMBUSBlockWRTestTask.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="ModelSelectDialog.h" />
     <ClInclude Include="ModelType.h" />
     <ClInclude Include="PEC.h" />
+    <ClInclude Include="Pickit.h" />
     <ClInclude Include="PMBUSArtProv.h" />
     <ClInclude Include="PMBUSBitmapButton.h" />
     <ClInclude Include="PMBUSCBCoefficients.h" />
