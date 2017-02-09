@@ -155,6 +155,27 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 		// If ISP Target is Primary, 
 		if (UPDATE_PRIMARY_FW_TARGET == PMBUSHelper::getCurrentISPTarget()){
 
+			
+			switch (*this->m_CurrentIO){
+
+			case IOACCESS_SERIALPORT:
+			case IOACCESS_HID:
+			case IOACCESS_TOTALPHASE:
+
+				if (PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime > 0){
+					// Sleep (For wait primary chip return correct reponse ) 
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+				}
+
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs !");
+				break;
+			}
+			
+#if 0
 			// If Current Use I/O is Serial Port
 			if (*this->m_CurrentIO == IOACCESS_SERIALPORT){
 
@@ -168,6 +189,8 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 					}
 				}
 			}
+#endif
+
 		}
 #endif
 
