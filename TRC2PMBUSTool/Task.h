@@ -935,7 +935,7 @@ class PMBUSReadTestTask :public TaskEx {
 	int m_setsToRun;
 
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
-	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_recvBuff[255];
 
 	DWORD startTick;
 	DWORD stopTick;
@@ -987,7 +987,7 @@ class PMBUSWriteTestTask :public TaskEx {
 	int m_setsToRun;
 
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
-	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_recvBuff[255];
 
 	DWORD startTick;
 	DWORD stopTick;
@@ -1038,7 +1038,7 @@ class PMBUSBlockWRTestTask :public TaskEx {
 	int m_setsToRun;
 
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
-	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_recvBuff[255];
 
 	DWORD startTick;
 	DWORD stopTick;
