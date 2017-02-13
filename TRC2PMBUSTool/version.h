@@ -41,7 +41,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.17       |     Support TotalPhase I2C Host Adaptor                        |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.18       |     Add Adjustable PFC ISP F3 Delay Time For All I/O Interface |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.17" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.18" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif
