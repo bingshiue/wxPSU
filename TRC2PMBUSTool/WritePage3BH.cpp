@@ -7,6 +7,8 @@
 #define DEFAULT_DIAG_VALUE  0/**< Default Diag Value */
 #define DEFAULT_SCALE_VALUE  128.0/**< Defaut Scale Value */
 
+#define WRITE_PAGES_3BH_DEFAULT_FORMAT_HEX  FALSE
+
 WritePage3BH::WritePage3BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Diag Value"), wxDefaultPosition, wxSize(80, -1));
@@ -27,7 +29,7 @@ WritePage3BH::WritePage3BH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_gridSizer_1->Add(m_scaleValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
-#if WRITE_PAGES_DEFAULT_FORMAT_HEX == TRUE
+#if WRITE_PAGES_3BH_DEFAULT_FORMAT_HEX == TRUE
 	// Set Default Value of Radio Buttons
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
