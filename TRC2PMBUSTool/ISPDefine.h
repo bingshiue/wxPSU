@@ -39,7 +39,7 @@
 
 #define ISP_CHECK_STATUS_RETRY  5 /**< ISP Check Status(F3) Command Fail Retry Times */
 
-#define ISP_F3_CMD_DELAY /**< Sleep before Send F3 Command */
+#define PFC_ISP_F3_CMD_DELAY /**< PFC ISP Sleep before Send F3 Command */
 
 #define ISP_F3_CMD_FAILED_RETRY_SLEEP /**< Sleep before F3 Command Check Failed Retry */
 #ifdef ISP_F3_CMD_FAILED_RETRY_SLEEP 

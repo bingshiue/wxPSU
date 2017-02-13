@@ -69,7 +69,8 @@ enum {
 #define DEFAULT_ACS_SETPOINT_INPUT_MAX  2400
 #define DEFAULT_ACS_SETPOINT_INPUT_MIN  2000
 
-#define DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME  0
+#define DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME                   6 //(Unit : millisecond)
+#define DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME       12 //(Unit : millisecond) 
 
 #define DEFAULT_RUNIN_TIMES  10
 
@@ -296,7 +297,8 @@ typedef struct appSettings_t {
 	unsigned long m_pmbusReadMethod;/**< PM Bus Read Method */
 	unsigned long m_acsSetPointMin;/**< ACE Set Point Minimum Value */
 	unsigned long m_acsSetPointMax;/**< ACE Set Point Maximum Value */
-	unsigned long m_ispF3CMDDelayTime;/**< ISP F3 CMD Delay Time */
+	unsigned long m_pfcIspF3CMDDelayTime;/**< PFC ISP F3 CMD Delay Time */
+	unsigned long m_pfcIspF3CMDTotalPhaseDelayTime;/**< PFC ISP F3 CMD Total Phase Delay Time */
 	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
 	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
 	unsigned long m_ISPDDWaitRootTime;/**< ISP DD Wait Reboot Time */
@@ -334,7 +336,9 @@ typedef struct appSettings_t {
 		this->m_acsSetPointMax = DEFAULT_ACS_SETPOINT_INPUT_MAX;
 		this->m_acsSetPointMin = DEFAULT_ACS_SETPOINT_INPUT_MIN;
 
-		this->m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
+		this->m_pfcIspF3CMDDelayTime = DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME;
+		this->m_pfcIspF3CMDTotalPhaseDelayTime = DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME;
+
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
 		this->m_autoQueryCMDOnIOOpen = DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN;
 		this->m_queryCMDBeforePolling = DEFAULT_QUERY_CMD_BEFORE_POLLING;

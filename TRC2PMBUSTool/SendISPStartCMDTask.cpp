@@ -18,7 +18,7 @@ SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* curre
 
 	PMBUSHelper::getCurrentISPTarget() = target;
 
-#ifdef ISP_F3_CMD_DELAY
+#ifdef PFC_ISP_F3_CMD_DELAY
 	// If ISP Target is Primary, 
 	if (UPDATE_PRIMARY_FW_TARGET == PMBUSHelper::getCurrentISPTarget()){
 
@@ -26,9 +26,14 @@ SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* curre
 
 		case IOACCESS_SERIALPORT:
 		case IOACCESS_HID:
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "PFC ISP F3 CMD Delay Time is %d ms", PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime);
+
+			break;
+
 		case IOACCESS_TOTALPHASE:
 
-			PSU_DEBUG_PRINT(MSG_ALERT, "ISP F3 CMD Delay Time is %d ms", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+			PSU_DEBUG_PRINT(MSG_ALERT, "PFC ISP F3 CMD Total Phase Delay Time is %d ms", PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDTotalPhaseDelayTime);
 			
 			break;
 

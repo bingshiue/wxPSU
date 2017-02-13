@@ -4053,13 +4053,22 @@ void MainFrame::CheckAndLoadConfig(void){
 
 	pConfig->SetPath(wxT("/ISP"));
 	
-	long f3CMDDelayTime;
-	if (pConfig->Read(wxT("F3CMDDelayTime"), &f3CMDDelayTime) == false){
-		pConfig->Write(wxT("F3CMDDelayTime"), DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME);
-		this->m_appSettings.m_ispF3CMDDelayTime = DEFAULT_ISP_F3_CMD_DELAY_SLEEP_TIME;
+	long pfcF3CMDDelayTime;
+	if (pConfig->Read(wxT("PfcF3CMDDelayTime"), &pfcF3CMDDelayTime) == false){
+		pConfig->Write(wxT("PfcF3CMDDelayTime"), DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME);
+		this->m_appSettings.m_pfcIspF3CMDDelayTime = DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME;
 	}
 	else{
-		this->m_appSettings.m_ispF3CMDDelayTime = f3CMDDelayTime;
+		this->m_appSettings.m_pfcIspF3CMDDelayTime = pfcF3CMDDelayTime;
+	}
+
+	long pfcF3CMDTotalPhaseDelayTime;
+	if (pConfig->Read(wxT("PfcF3CMDTotalPhaseDelayTime"), &pfcF3CMDTotalPhaseDelayTime) == false){
+		pConfig->Write(wxT("PfcF3CMDTotalPhaseDelayTime"), DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME);
+		this->m_appSettings.m_pfcIspF3CMDTotalPhaseDelayTime = DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME;
+	}
+	else{
+		this->m_appSettings.m_pfcIspF3CMDTotalPhaseDelayTime = pfcF3CMDTotalPhaseDelayTime;
 	}
 
 	long pfcWaitRebootTime;
@@ -4185,7 +4194,9 @@ void MainFrame::SaveConfig(void){
 	pConfig->SetPath(wxT("/ISP"));
 
 	// F3 CMD Delay Time
-	pConfig->Write(wxT("F3CMDDelayTime"), this->m_appSettings.m_ispF3CMDDelayTime);
+	pConfig->Write(wxT("PfcF3CMDDelayTime"), this->m_appSettings.m_pfcIspF3CMDDelayTime);
+
+	pConfig->Write(wxT("PfcF3CMDTotalPhaseDelayTime"), this->m_appSettings.m_pfcIspF3CMDTotalPhaseDelayTime);
 
 	pConfig->Write(wxT("PFCWaitRebootTime"), this->m_appSettings.m_ISPPFCWaitRootTime);
 

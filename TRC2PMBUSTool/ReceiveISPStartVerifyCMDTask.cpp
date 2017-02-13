@@ -151,7 +151,7 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 		}
 #endif
 
-#ifdef ISP_F3_CMD_DELAY
+#ifdef PFC_ISP_F3_CMD_DELAY
 		// If ISP Target is Primary, 
 		if (UPDATE_PRIMARY_FW_TARGET == PMBUSHelper::getCurrentISPTarget()){
 
@@ -160,12 +160,21 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 
 			case IOACCESS_SERIALPORT:
 			case IOACCESS_HID:
+
+				if (PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime > 0){
+					// Sleep (For wait primary chip return correct reponse ) 
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime);
+					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime);
+				}
+
+				break;
+
 			case IOACCESS_TOTALPHASE:
 
-				if (PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime > 0){
+				if (PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDTotalPhaseDelayTime > 0){
 					// Sleep (For wait primary chip return correct reponse ) 
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
-					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ispF3CMDDelayTime);
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d ms for Delay F3 CMD", PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDTotalPhaseDelayTime);
+					wxMilliSleep(PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDTotalPhaseDelayTime);
 				}
 
 				break;
