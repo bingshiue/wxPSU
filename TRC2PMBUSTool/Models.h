@@ -32,6 +32,19 @@ enum NEC_MODEL {
 };
 #define NEC_MODEL_LIST_SIZE  (NEC_Model_LIST_Size)
 
+// ACBEL Models
+enum ACBEL_MODEL {
+
+	ACBEL_RFWE_24_28_1200W_SCP = 0,
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+	ACBEL__Model_Generic,
+#endif
+
+	ACBEL_Model_LIST_Size
+};
+#define ACBEL_MODEL_LIST_SIZE  (ACBEL_Model_LIST_Size)
+
 // Generic Models
 enum GENERIC_MODEL {
 	GENERIC_Model_Generic = 0,

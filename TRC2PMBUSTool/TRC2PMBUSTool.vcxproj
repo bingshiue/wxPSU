@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -58,7 +58,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <OpenMPSupport>true</OpenMPSupport>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,6 +99,10 @@
   <ItemGroup>
     <ClCompile Include="Aardvark\aardvark.c" />
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="ACBEL_RFWE_24_28_1200W_SCP_CBCoefficients.cpp" />
+    <ClCompile Include="ACBEL_RFWE_24_28_1200W_SCP_CBCook.cpp" />
+    <ClCompile Include="ACBEL_RFWE_24_28_1200W_SCP_CBQuery.cpp" />
+    <ClCompile Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.cpp" />
     <ClCompile Include="BaseReadPage.cpp" />
     <ClCompile Include="BlockWRTestDialog.cpp" />
     <ClCompile Include="CalibrationDialog.cpp" />
@@ -205,12 +209,19 @@
     <ClCompile Include="WritePageD0H.cpp" />
     <ClCompile Include="WritePageDCH.cpp" />
     <ClCompile Include="WritePageDDH.cpp" />
+    <ClCompile Include="WritePageECH.cpp" />
     <ClCompile Include="WritePageFAH.cpp" />
     <ClCompile Include="WriteTestDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aardvark\aardvark.h" />
     <ClInclude Include="AboutDialog.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCoefficients.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCook.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBQuery.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.h" />
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CMDCB.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="BaseReadPage.h" />
     <ClInclude Include="BlockWRTestDialog.h" />

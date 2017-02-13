@@ -1193,6 +1193,9 @@ BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 	case 0xdd:
 		page = (BaseWritePage*)NEW_WRITEPAGE(DD);
 		break;
+	case 0xec:
+		page = (BaseWritePage*)NEW_WRITEPAGE(EC);
+		break;
 	// FAH Firmware_Update_Command
 	case 0xfa:
 		page = (BaseWritePage*)NEW_WRITEPAGE(FA);
@@ -1212,7 +1215,7 @@ BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 }
 
 void MainFrame::SetupPMBusCommandWritePage(void){
-	
+
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		if (this->m_PMBusData[idx].m_access == cmd_access_write || this->m_PMBusData[idx].m_access == cmd_access_readwrite ||
 			this->m_PMBusData[idx].m_access == cmd_access_bw || this->m_PMBusData[idx].m_access == cmd_access_brbw || 
@@ -2661,6 +2664,11 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	int row = m_cmdListModel->GetRow(item);
 
+	if (row < 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "No Row Selected");
+		return;
+	}
+
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Selected Row is : %d", row);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "CMD's RW Attribute is : %d", this->m_PMBusData[row].m_access);
 
@@ -2668,6 +2676,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	// Check Current Page Counts of Notebook
 	unsigned int page_counts = this->m_subNotebook->GetPageCount();
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Current Page Counts = %d", page_counts);
 	if(page_counts > 1){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Current Page Counts = %d", page_counts);
 		 // Remove Current Read/Write Pages
@@ -2678,6 +2687,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 
 	// Add Read Pages
 	if (this->m_PMBusData[row].m_readPage != NULL){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Add Read Page");
 		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_readPage, "Read");
 	}
 
@@ -2707,6 +2717,7 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 			break;
 		}
 		
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Add Write Page");
 		this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
 	}
 

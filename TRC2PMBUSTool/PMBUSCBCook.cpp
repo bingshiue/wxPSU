@@ -1269,7 +1269,7 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Fan 1: [ ");
 
 	PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(pmbuscmd->m_recvBuff.m_dataBuff[0]);
-	//PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(0xff); // For Test Output Meaasges
+	//PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.Save(0xff); // For Test Output Messages
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "STATUS_FAN_1_2 = %02x", PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status);
 

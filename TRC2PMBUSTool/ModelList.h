@@ -14,6 +14,10 @@
 #include "GIGABYTE_CRPS_ALL_PMBUS_CMDS.h"
 #include "GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDCB.h"
 
+// ACBEL RFWE_24_28_1200W_SCP
+#include "ACBEL_RFWE_24_28_1200W_SCP.h"
+#include "ACBEL_RFWE_24_28_1200W_SCP_CMDCB.h"
+
 // FSG003-000G
 #include "FSG003_000G.h"
 #include "FSG003_000G_CMDCB.h"
@@ -46,6 +50,33 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 
 #if (HAVE_GENERIC_MODEL == TRUE)
 	// [2] Generic Model (For Test Purpose)
+	, {
+		GENERIC_MODEL_NAME,
+		g_Generic_CMDTable,
+		GENERIC_CMD_TABLE_SIZE,
+		g_Generic_CMDQueryCBFunc,
+		g_Generic_CMDCoefficientsCBFunc,
+		g_Generic_CMDCookCBFunc,
+		g_Generic_CMDRawCBFunc
+	}
+#endif
+};
+
+
+MODEL_TYPE_t g_ACBELModelList[ACBEL_MODEL_LIST_SIZE] = {
+	// [0] RFWE_24_28_1200W_SCP
+	{
+		ACBEL_RFWE_24_28_1200W_SCP_MODEL_NAME,
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDTable,
+		ACBEL_RFWE_24_28_1200W_SCP_CMD_TABLE_SIZE,
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDQueryCBFunc,
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDCoefficientsCBFunc,
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDCookCBFunc,
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDRawCBFunc
+	}
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+	// [1] Generic Model (For Test Purpose)
 	, {
 		GENERIC_MODEL_NAME,
 		g_Generic_CMDTable,

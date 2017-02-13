@@ -1034,6 +1034,42 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
+/* ECH Set Point (For RFWE_24_28_1200W_SCP Model) */
+class WritePageECH : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePageECH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePageECH();
+
+protected:
+
+	wxStaticText *m_hintName;
+	wxTextCtrl *m_inputValue;
+
+	wxCheckBox *m_confirmCB;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
 /* FAH Firmware_Update_Command */
 class WritePageFAH : public BaseWritePage {
 public:
