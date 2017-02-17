@@ -160,7 +160,7 @@ int TotalPhaseSendData(unsigned char* buff, unsigned int size){
 		);
 
 	if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
-		PSU_DEBUG_PRINT(MSG_ERROR, "%s : aa_i2c_write_read failed, Last Error = %d, Num_Write is %d, Num_Read is %d", __FUNCTIONW__, PMBUSHelper::getTotalPhaseWriteReadLastError(), num_write, num_read);
+		PSU_DEBUG_PRINT(MSG_ERROR, "%s : aa_i2c_write_read failed, Last Error = %s(%d), Num_Write is %d, Num_Read is %d", __FUNCTIONW__, I2CStatusString[PMBUSHelper::getTotalPhaseWriteReadLastError()], PMBUSHelper::getTotalPhaseWriteReadLastError(), num_write, num_read);
 	}
 
 #else
