@@ -719,6 +719,16 @@ void MainFrame::SetupMenuBar(void){
 	this->m_testMenu->Append(this->m_writeTestMenuItem);
 	this->m_testMenu->Append(this->m_blockWRTestMenuItem);
 
+	// Utility Menu
+	/*
+	| - FRU Writer
+	*/
+	this->m_utilityMenu = new wxMenu();
+
+	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Writer"), wxT("FRU Writer"), wxITEM_NORMAL);
+
+	this->m_utilityMenu->Append(this->m_fruWriterMenuItem);
+
 	// Help Menu
 	/*
 	Help
@@ -746,6 +756,7 @@ void MainFrame::SetupMenuBar(void){
 	this->m_menuBar->Append(this->m_psuMenu, wxT("PSU"));
 	this->m_menuBar->Append(this->m_optionMenu, wxT("Option"));
 	this->m_menuBar->Append(this->m_testMenu, wxT("Test"));
+	this->m_menuBar->Append(this->m_utilityMenu, wxT("Utility"));
 	this->m_menuBar->Append(this->m_helpMenu, wxT("Help"));
 
 	SetMenuBar(this->m_menuBar);
@@ -1715,6 +1726,16 @@ void MainFrame::OnBlockWRTest(wxCommandEvent& event){
 
 	wxDELETE(blockWRTestDialog);
 
+}
+
+void MainFrame::OnFRUWriter(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	FRUWriterDialog* fruWriterDialog = new FRUWriterDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	fruWriterDialog->Centre();
+	fruWriterDialog->ShowModal();
+
+	wxDELETE(fruWriterDialog);
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)
@@ -4830,6 +4851,7 @@ EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
 EVT_MENU(MENU_ID_READ_TEST, MainFrame::OnReadTest)
 EVT_MENU(MENU_ID_WRITE_TEST, MainFrame::OnWriteTest)
 EVT_MENU(MENU_ID_BLOCK_WR_TEST, MainFrame::OnBlockWRTest)
+EVT_MENU(MENU_ID_FRU_WRITER, MainFrame::OnFRUWriter)
 EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(MENU_ID_ACBEL_WEBSITE, MainFrame::OnAcbelWebSite)
 

@@ -52,6 +52,7 @@
 #include "ReadTestDialog.h"
 #include "WriteTestDialog.h"
 #include "BlockWRTestDialog.h"
+#include "FRUWriterDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
 #define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */
@@ -107,6 +108,8 @@ public:
 		MENU_ID_READ_TEST,
 		MENU_ID_WRITE_TEST,
 		MENU_ID_BLOCK_WR_TEST,
+
+		MENU_ID_FRU_WRITER,
 
 		MENU_ID_ABOUT,
 		MENU_ID_ACBEL_WEBSITE,
@@ -306,6 +309,10 @@ public:
 	wxMenuItem  *m_writeTestMenuItem;
 	wxMenuItem  *m_blockWRTestMenuItem;
 
+	wxMenu      *m_utilityMenu;
+
+	wxMenuItem  *m_fruWriterMenuItem;
+
 	wxMenu      *m_helpMenu;
 
 	wxMenuItem  *m_aboutMenuItem;
@@ -441,6 +448,8 @@ private:
 	void OnReadTest(wxCommandEvent& event);
 	void OnWriteTest(wxCommandEvent& event);
 	void OnBlockWRTest(wxCommandEvent& event);
+
+	void OnFRUWriter(wxCommandEvent& event);
 
 	void OnAbout(wxCommandEvent& event);
 	void OnAcbelWebSite(wxCommandEvent& event);
