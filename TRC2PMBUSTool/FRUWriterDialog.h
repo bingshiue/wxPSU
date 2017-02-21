@@ -30,6 +30,7 @@ public:
 
 	enum {
 		CID_BTN_LOAD, /**< Load Button */
+		CID_BTN_READ, /**< Read Button */
 		CID_BTN_WRITE /**< Write Button */
 	};
 
@@ -46,7 +47,11 @@ private:
 
 	wxLog* m_oldLog;
 
+	unsigned int m_fruFileLength;
+
 	unsigned char m_fruReadBuffer[MAX_FRU_FILE_SIZE];
+
+	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];
 
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;
@@ -69,6 +74,7 @@ private:
 	PMBUSLogTextCtrl *m_logTC;
 
 	// Button
+	wxButton *m_btnREAD;
 	wxButton *m_btnWRITE;
 
 	// TextValidator
@@ -85,10 +91,16 @@ private:
 		const wxString& msg);
 
 	void OnBtnLOAD(wxCommandEvent& event);
+	void OnBtnREAD(wxCommandEvent& event);
 	void OnBtnWRITE(wxCommandEvent& event);
 	void OnDialogClose(wxCloseEvent& event);
 
-	int ProductSendBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
+	int ProductE2PRomWriteBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
+	int ProductE2PRomReadBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
+
+	int DumpE2PROM(unsigned char* RecvBuffer, unsigned int* currentIO);
+
+	void PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize);
 
 	wxDECLARE_EVENT_TABLE();
 
