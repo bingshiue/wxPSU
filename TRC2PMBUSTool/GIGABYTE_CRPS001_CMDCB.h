@@ -76,6 +76,7 @@ CMDQueryCBFunc g_GIGABYTE_CRPS001_CMDQueryCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE
 	GB_CRPS_Query_c0H, // New
 	GB_CRPS_Query_c1H, // New
 	GB_CRPS_Query_c2H, // New
+	GB_CRPS_Query_c3H, // New
 	GB_CRPS_Query_d0H,
 	GB_CRPS_Query_d9H, // New
 	GB_CRPS_Query_dcH,
@@ -152,6 +153,7 @@ CMDCoefficientsCBFunc g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc[GIGABYTE_CRPS001_
 	GB_CRPS_Coefficients_c0H, // New
 	GB_CRPS_Coefficients_c1H, // New
 	GB_CRPS_Coefficients_c2H, // New
+	GB_CRPS_Coefficients_c3H, // New
 	GB_CRPS_Coefficients_d0H,
 	GB_CRPS_Coefficients_d9H, // New
 	GB_CRPS_Coefficients_dcH,
@@ -228,6 +230,7 @@ CMDCookCBFunc g_GIGABYTE_CRPS001_CMDCookCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] 
 	GB_CRPS_Cook_c0H, // New
 	GB_CRPS_Cook_c1H, // New
 	GB_CRPS_Cook_c2H, // New
+	GB_CRPS_Cook_c3H, // New
 	GB_CRPS_Cook_d0H,
 	GB_CRPS_Cook_d9H, // New
 	GB_CRPS_Cook_dcH, 
@@ -304,6 +307,7 @@ CMDRawCBFunc g_GIGABYTE_CRPS001_CMDRawCBFunc[GIGABYTE_CRPS001_CMD_TABLE_SIZE] = 
 	GB_CRPS_Raw_c0H, // New
 	GB_CRPS_Raw_c1H, // New
 	GB_CRPS_Raw_c2H, // New
+	GB_CRPS_Raw_c3H, // New
 	GB_CRPS_Raw_d0H,
 	GB_CRPS_Raw_d9H, // New
 	GB_CRPS_Raw_dcH,

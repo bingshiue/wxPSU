@@ -3112,7 +3112,27 @@ int GB_CRPS_Cook_c2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-int GB_CRPS_Cook_c3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_c3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	const wchar_t* tmp_wchar;
+	unsigned char status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+
+	wxString wxstr("");
+
+	wxstr += wxT("CALIBRATION STATUS :");
+
+	// Calibration Status
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
 int GB_CRPS_Cook_c4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_c5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_c6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }

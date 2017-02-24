@@ -2127,12 +2127,17 @@ void MainFrame::OnResetRunTime(wxCommandEvent& event){
 	this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
 }
 
+#define CMD_C3H_BYTES_TO_READ  6/**< Bytes To Read */
 void MainFrame::OnEnableCalibration(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	// Do Enable Calibration
+	this->DoEnableCalibration();
 }
 
 void MainFrame::OnDisableCalibration(wxCommandEvent& event){
-	//PSU_DEBUG_PRINT(MSG_ALERT, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	// Disable Calibration Command
+	this->DoDisableCalibration();
 }
 
 void MainFrame::OnCalibration(wxCommandEvent& event){
@@ -4810,6 +4815,93 @@ void MainFrame::UpdateSTATUSPanel(unsigned int index){
 	if (index == this->findPMBUSCMDIndex(0xdc)){
 		// Update Total PMBUSStatusDCH Panel
 		this->PMBusStatusDCHPanel->UpdatePanel();
+	}
+}
+
+void MainFrame::DoEnableCalibration(void){
+	// Command Data For Enable Calibration
+	unsigned char enableCalibration[2];
+	enableCalibration[0] = 0x55;
+	enableCalibration[1] = 0xAA;
+
+	// Product Enable Calibration Command Send Buffer
+	unsigned char CalibrationEnableSendBuffer[64];
+
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		&this->m_CurrentUseIOInterface,
+		CalibrationEnableSendBuffer,
+		sizeof(CalibrationEnableSendBuffer),
+		0xC3, // CMD
+		enableCalibration,
+		sizeof(enableCalibration)
+		);
+
+	// Fill PMBUS Command Structure
+	PMBUSSendCOMMAND_t CMDC3H;
+
+	CMDC3H.m_sendDataLength = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT || this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
+	CMDC3H.m_bytesToRead = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < sendDataLength; idx++) {//sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]); idx++){
+		CMDC3H.m_sendData[idx] = CalibrationEnableSendBuffer[idx];
+	}
+
+	// Decide how to send this command by whether monitor is running or not
+	if (this->m_monitor_running == true){
+		if (this->m_sendCMDVector.size() == 0){
+			this->m_sendCMDVector.push_back(CMDC3H);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector.size());
+		}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		new(TP_SendWriteCMDTask)SendWriteCMDTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, CMDC3H);
+	}
+}
+
+
+void MainFrame::DoDisableCalibration(void){
+	// Command Data For Disable Calibration
+	unsigned char enableCalibration[2];
+	enableCalibration[0] = 0x00;
+	enableCalibration[1] = 0x00;
+
+	// Product Enable Calibration Command Send Buffer
+	unsigned char CalibrationEnableSendBuffer[64];
+
+	unsigned int sendDataLength = PMBUSHelper::ProductWriteCMDBuffer(
+		&this->m_CurrentUseIOInterface,
+		CalibrationEnableSendBuffer,
+		sizeof(CalibrationEnableSendBuffer),
+		0xC3, // CMD
+		enableCalibration,
+		sizeof(enableCalibration)
+		);
+
+	// Fill PMBUS Command Structure
+	PMBUSSendCOMMAND_t CMDC3H;
+
+	CMDC3H.m_sendDataLength = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT || this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
+	CMDC3H.m_bytesToRead = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < sendDataLength; idx++) {//sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]); idx++){
+		CMDC3H.m_sendData[idx] = CalibrationEnableSendBuffer[idx];
+	}
+
+	// Decide how to send this command by whether monitor is running or not
+	if (this->m_monitor_running == true){
+		if (this->m_sendCMDVector.size() == 0){
+			this->m_sendCMDVector.push_back(CMDC3H);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector.size());
+		}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		new(TP_SendWriteCMDTask)SendWriteCMDTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, CMDC3H);
 	}
 }
 

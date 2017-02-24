@@ -520,6 +520,9 @@ private:
 	void StartInCreaseCPUOverHeadThread(void);
 	void StopInCreaseCPUOverHeadThread(void);
 
+	void DoEnableCalibration(void);
+	void DoDisableCalibration(void);
+
 	BaseWritePage* getNewWritePage(int index, int register_number);
 	BaseReadPage*  getNewReadPage(int index, int register_number);
 
