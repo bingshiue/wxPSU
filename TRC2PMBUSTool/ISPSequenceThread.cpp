@@ -164,13 +164,22 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 		// Show Current Address
 		unsigned long currentAddress = this->m_tiHexFileStat->currentAddress();
 
-		if (this->m_developerMode == Generic_Enable){
-			
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
+		if (PMBUSHelper::runInMode == Generic_Enable)
+		{
+#endif
 			if (PMBUSHelper::runInMode == Generic_Enable){
 				information += wxString::Format("Run In Remain Times : %d", PMBUSHelper::runInTimes);
 				information += wxT("\n");
 			}
-			
+
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
+		}
+#endif
+
+
+		if (this->m_developerMode == Generic_Enable)
+		{			
 			information += wxString::Format("Current Process Address : %08x", currentAddress);
 			information += wxT("\n");
 		}

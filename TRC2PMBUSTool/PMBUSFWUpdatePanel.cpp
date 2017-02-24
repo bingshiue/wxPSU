@@ -66,8 +66,8 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_st1 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 	this->m_st2 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 
-	if (this->m_developerMode == Generic_Enable){
-
+	if (this->m_developerMode == Generic_Enable)
+	{
 		// Start Address
 		this->m_startAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("START Address : "));
 		this->m_startAddressST->SetFont(font);
@@ -139,7 +139,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_statisticSBS->Add(this->m_st2, wxSizerFlags(0).Expand().Border(wxALL));
 
 	// Run In Test GUI Component Initialize 
-	if (this->m_developerMode == Generic_Enable){
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
+	if (this->m_developerMode == Generic_Enable)
+	{
+#endif
 
 		this->m_RunInSizer = new wxBoxSizer(wxHORIZONTAL);
 		this->m_RunInCheckBox = new wxCheckBox(this, CID_RUN_IN_CHECKBOX, wxT("Run In Test"));
@@ -165,7 +168,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		// Static Line 3
 		this->m_st3 = new wxStaticLine(this->m_statisticSBS->GetStaticBox());
 		this->m_statisticSBS->Add(m_st3, wxSizerFlags(0).Expand().Border(wxALL));
+
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
 	}
+#endif
 
 	//
 	
@@ -340,7 +346,13 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 	}
 
 	/*** Check Run In Mode ***/
-	if (this->m_developerMode == Generic_Enable){
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
+	if (this->m_developerMode == Generic_Enable)
+	{
+#else
+	if (true)
+	{
+#endif
 		PMBUSHelper::runInMode = this->m_RunInCheckBox->GetValue()==true ? Generic_Enable : Generic_Disable;
 
 		if (PMBUSHelper::runInMode == Generic_Enable){
@@ -358,10 +370,12 @@ void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
 			}
 		}
 	}
+#if ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE == TRUE
 	else{
 		PMBUSHelper::runInMode = Generic_Disable;
 		PMBUSHelper::runInTimes = 0;
 	}
+#endif
 
 	/*** Write Count For Debug Purpose ***/
 	this->m_writeCount++;

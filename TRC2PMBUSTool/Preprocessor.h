@@ -23,4 +23,7 @@
 // Don't Enable ISP Function (Disable Administratot Menu Item)
 #define DEFAULT_DONT_ENABLE_ISP            (FALSE)
 
+// Only Enable ISP Run In Test in ISP Develop Mode
+#define ONLY_ENABLE_ISP_RUNIN_TEST_IN_DEVELOP_MODE  (FALSE)
+
 #endif
