@@ -42,14 +42,24 @@ wchar_t* GetHIDOpenDeviceName(void);
 int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting);
 
 /**
-* @brief HID Send Data
-*/
+ * @brief HID Send Data
+ */
 int HIDSendData(unsigned char* buff, unsigned int size);
 
 /**
-* @brief HID Port Read Data
-*/
+ * @brief HID Send Data Extra
+ */
+int HIDSendDataExtra(unsigned char* buff, unsigned int size, void* ptr);
+
+/**
+ * @brief HID Port Read Data
+ */
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff);
+
+/**
+ * @brief HID Port Read Data Extra
+ */
+int HIDReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr);
 
 /**
  * @brief Close HID Device

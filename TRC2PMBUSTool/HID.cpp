@@ -167,6 +167,10 @@ int HIDSendData(unsigned char* buff, unsigned int size){
 	return bytes_write;
 }
 
+int HIDSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
+	return HIDSendData(buff,size);
+}
+
 #define RETRY_TIMES  5
 #define HID_EXPECT_DATA_LENGTH  64/**< HID Expect Data Length */
 int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
@@ -194,6 +198,10 @@ int HIDReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	}
 
 	return sizeOfBuff + 2;//readSize;
+}
+
+int HIDReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr){
+	return HIDReadData(buff, sizeOfBuff);
 }
 
 int CloseHIDDevice(void){

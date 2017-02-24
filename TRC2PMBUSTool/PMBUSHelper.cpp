@@ -1308,3 +1308,248 @@ int PMBUSHelper::getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned i
    
 	return length;
 }
+
+int PMBUSHelper::ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned char* fruContentBuffer, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO){
+	unsigned int current_index = 0;
+
+	if (sendBuffer == NULL){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Send Buffer = NULL");
+		return 0;
+	}
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		sendBuffer[0] = 0x41;
+		sendBuffer[1] = 0x54;
+		sendBuffer[2] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[3] = idx; // Indicates Start Write Offset
+		// Data start from index 4
+		current_index = 4;
+		sendBuffer[current_index++] = fruContentBuffer[idx];
+
+		// Fill Last 2
+
+		if (sendBuffer[current_index - 1] == 0x0d){
+			sendBuffer[current_index++] = 0x0d;
+		}
+		sendBuffer[current_index++] = 0x0D;
+		sendBuffer[current_index++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		sendBuffer[0] = 0x05;
+
+		sendBuffer[2] = 0x41;
+		sendBuffer[3] = 0x54;
+		sendBuffer[4] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[5] = idx; // Indicates Start Write Offset
+		// Data start from index 6
+		current_index = 6;
+		sendBuffer[current_index++] = fruContentBuffer[idx];
+
+		// Fill Last 2
+
+		if (sendBuffer[current_index - 1] == 0x0d){
+			sendBuffer[current_index++] = 0x0d;
+		}
+		sendBuffer[current_index++] = 0x0D;
+		sendBuffer[current_index++] = 0x0A;
+
+		sendBuffer[1] = current_index - 2;
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		sendBuffer[0] = 0; // Write Bytes(Would be Updated later)
+		sendBuffer[1] = 0; // Read Bytes
+		sendBuffer[2] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[3] = idx; // Indicates Start Write Offset
+
+		// Data start from index 4
+		current_index = 4;
+		sendBuffer[current_index++] = fruContentBuffer[idx];
+
+		// Update Write Bytes For Write CMD
+		sendBuffer[0] = current_index - 3;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return current_index;
+}
+
+int PMBUSHelper::ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO){
+	unsigned int baseIndex = 0;
+	int buffer_len = 0;
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		sendBuffer[baseIndex++] = 0x41;
+		sendBuffer[baseIndex++] = 0x44;
+		sendBuffer[baseIndex++] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[baseIndex++] = idx;
+
+		// May Have 0x0d Command
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = fruSlaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
+
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+
+		buffer_len = baseIndex;
+
+
+		break;
+
+	case IOACCESS_HID:
+
+		sendBuffer[baseIndex++] = 0x05;           // Report ID is 0x05
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = 0x41;
+		sendBuffer[baseIndex++] = 0x44;
+		sendBuffer[baseIndex++] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[baseIndex++] = idx;
+
+		// May Have 0x0d Command
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = fruSlaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
+
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+
+		sendBuffer[1] = (baseIndex - 2);
+		buffer_len = baseIndex;
+
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;
+		sendBuffer[baseIndex++] = fruSlaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01; //
+		sendBuffer[baseIndex++] = fruSlaveAddr | 0x01;
+
+		for (int local = baseIndex; local<64; local++){
+			sendBuffer[local] = 0;
+		}
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		sendBuffer[baseIndex++] = 1;// write bytes
+		sendBuffer[baseIndex++] = 1;// read bytes
+		sendBuffer[baseIndex++] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[baseIndex++] = idx;
+
+		buffer_len = baseIndex;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+	return buffer_len;
+}
+
+void PMBUSHelper::PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize){
+	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
+	wxString data("");
+	unsigned int addr = 0x00;
+
+	for (unsigned int idx = 0; idx < dumpSize; idx++){
+
+		if (idx != 0 && idx % 0x10 == 0){
+			addr = (idx - 0x10);
+			PSU_DEBUG_PRINT(MSG_ALERT, "[%08x]%s", addr, data.c_str());
+			data.Clear();
+		}
+
+		data += wxString::Format("%02x", contentBuffer[idx]);
+		data += wxString::Format(" ");
+
+		// Last
+		if (idx == (dumpSize - 1)){
+			PSU_DEBUG_PRINT(MSG_ALERT, "[%08x]%s", addr + 0x10, data.c_str());
+			data.Clear();
+			break;
+		}
+	}
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
+}
+
+bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO){
+
+	bool failure_occurs = failed;
+
+	switch (CurrentUseIO){
+
+	case IOACCESS_SERIALPORT:
+	case IOACCESS_HID:
+		// Don't Update Original Result
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		// Ingore TotalPhase Send Error  
+		failure_occurs = false;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "%s:Something Error Occurs !", __FUNCTIONW__);
+		break;
+	}
+
+	return failure_occurs;
+}

@@ -17,6 +17,7 @@
 #include "IOACCESS.h"
 #include "PMBUSHelper.h"
 #include "PMBUSLogTextCtrl.h"
+#include "Task.h"
 #include "version.h"
 
 #define MAX_FRU_FILE_SIZE  256 // Max FRU File Size 
@@ -47,11 +48,17 @@ private:
 
 	wxLog* m_oldLog;
 
+	bool outputLog;
+	int wirteIntervalTime;
+	int readIntervalTime;
+
 	unsigned int m_fruFileLength;
 
-	unsigned char m_fruReadBuffer[MAX_FRU_FILE_SIZE];
+	unsigned char m_fruBinaryContent[MAX_FRU_FILE_SIZE];
 
-	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];
+	//unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];
+
+	bool m_preWriteBTNEnable;
 
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;
@@ -95,12 +102,10 @@ private:
 	void OnBtnWRITE(wxCommandEvent& event);
 	void OnDialogClose(wxCloseEvent& event);
 
-	int ProductE2PRomWriteBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
-	int ProductE2PRomReadBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
-
-	int DumpE2PROM(unsigned char* RecvBuffer, unsigned int* currentIO);
-
-	void PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize);
+	void OnE2PRomWriteEnd(wxThreadEvent& event);
+	void OnE2PRomReadEnd(wxThreadEvent& event);
+	void OnE2PRomWriteInterrupt(wxThreadEvent& event);
+	void OnE2PRomReadInterrupt(wxThreadEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

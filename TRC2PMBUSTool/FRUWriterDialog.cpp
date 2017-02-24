@@ -3,6 +3,11 @@
  */
 #include "FRUWriterDialog.h"
 
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_END, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent);
+
 #define FRU_WRITER_DIALOG_WIDTH   (800)
 #define FRU_WRITER_DIALOG_HEIGHT  (480)
 
@@ -32,6 +37,8 @@ FRUWriterDialog::FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 
 	this->m_ioaccess = ioaccess;
 	this->m_currentIO = currentIO;
+
+	this->outputLog = false;
 
 	// Setup Text Validator
 	DecCharIncludes = wxT("0123456789");
@@ -95,10 +102,8 @@ FRUWriterDialog::FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 	m_topLevelSizer->Add(m_btnSizer, wxSizerFlags().Expand().Border());
 	m_topLevelSizer->Add(m_logTC, wxSizerFlags(1).Expand().Border());
 
-	this->m_btnWRITE->Enable(true);
-
-	memset(this->m_fruReadBuffer, 0, MAX_FRU_FILE_SIZE);
-	memset(this->m_e2pRomContent, 0, MAX_FRU_FILE_SIZE);
+	memset(this->m_fruBinaryContent, 0, MAX_FRU_FILE_SIZE);
+	//memset(this->m_e2pRomContent, 0, MAX_FRU_FILE_SIZE);
 
 	SetSizer(m_topLevelSizer);
 }
@@ -106,195 +111,6 @@ FRUWriterDialog::FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned 
 FRUWriterDialog::~FRUWriterDialog(){
 
 	wxLog::SetActiveTarget(m_oldLog);
-}
-
-int FRUWriterDialog::ProductE2PRomWriteBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO){
-
-	unsigned int current_index = 0;
-
-	if (sendBuffer == NULL){
-		PSU_DEBUG_PRINT(MSG_ERROR, "Send Buffer = NULL");
-		return 0;
-	}
-
-	switch (*currentIO){
-
-	case IOACCESS_SERIALPORT:
-		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
-		sendBuffer[0] = 0x41;
-		sendBuffer[1] = 0x54;
-		sendBuffer[2] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[3] = 0x00; // Indicates Start Write Offset
-		// Data start from index 4
-		current_index = 4;
-		sendBuffer[current_index++] = this->m_fruReadBuffer[idx];
-
-		break;
-
-	case IOACCESS_HID:
-
-		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
-		sendBuffer[0] = 0x05;
-
-		sendBuffer[2] = 0x41;
-		sendBuffer[3] = 0x54;
-		sendBuffer[4] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[5] = idx; // Indicates Start Write Offset
-		// Data start from index 6
-		current_index = 6;
-		sendBuffer[current_index++] = this->m_fruReadBuffer[idx];
-
-		// Fill Last 2
-
-		if (sendBuffer[current_index - 1] == 0x0d){
-			sendBuffer[current_index++] = 0x0d;
-		}
-		sendBuffer[current_index++] = 0x0D;
-		sendBuffer[current_index++] = 0x0A;
-
-		sendBuffer[1] = current_index - 2;
-
-		break;
-
-	case IOACCESS_TOTALPHASE:
-
-		sendBuffer[0] = 0; // Write Bytes(Updated later)
-		sendBuffer[1] = 0; // Read Bytes
-		sendBuffer[2] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[3] = 0x00; // Indicates Start Write Offset
-
-		// Data start from index 4
-		current_index = 4;
-		sendBuffer[current_index++] = this->m_fruReadBuffer[idx];
-
-		// Update Write Bytes For Write CMD
-		sendBuffer[0] = current_index - 3;
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
-		break;
-	}
-
-	return current_index;
-
-
-}
-
-int FRUWriterDialog::ProductE2PRomReadBuffer(unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO){
-	unsigned int baseIndex = 0;
-	int buffer_len = 0;
-
-	switch (*currentIO){
-
-	case IOACCESS_SERIALPORT:
-
-		sendBuffer[baseIndex++] = 0x41;
-		sendBuffer[baseIndex++] = 0x44;
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[baseIndex++] = idx;
-
-		// May Have 0x0d Command
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()) | 0x01;
-		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
-
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
-
-		buffer_len = baseIndex;
-
-
-		break;
-
-	case IOACCESS_HID:
-
-		sendBuffer[baseIndex++] = 0x05;           // Report ID is 0x05
-		sendBuffer[baseIndex++] = 0x0a;
-		sendBuffer[baseIndex++] = 0x41;
-		sendBuffer[baseIndex++] = 0x44;
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[baseIndex++] = idx;
-
-		// May Have 0x0d Command
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()) | 0x01;
-		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
-
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
-
-		sendBuffer[1] = (baseIndex - 2);
-		buffer_len = baseIndex;
-
-		sendBuffer[baseIndex++] = 0x01;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x01;
-		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x02;
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()) | 0x01;
-		sendBuffer[baseIndex++] = 1;// Read 1 Byte Data
-
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x01; //
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()) | 0x01;
-
-		for (int local = baseIndex; local<64; local++){
-			sendBuffer[local] = 0;
-		}
-
-		break;
-
-	case IOACCESS_TOTALPHASE:
-
-		sendBuffer[baseIndex++] = 0;// write bytes
-		sendBuffer[baseIndex++] = 1;// read bytes
-		sendBuffer[baseIndex++] = (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str());// E2PROM Slave Address
-		sendBuffer[baseIndex++] = idx;
-
-		buffer_len = baseIndex;
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
-		break;
-	}
-
-	return buffer_len;
 }
 
 void FRUWriterDialog::OnBtnLOAD(wxCommandEvent& event){
@@ -313,7 +129,7 @@ void FRUWriterDialog::OnBtnLOAD(wxCommandEvent& event){
 	}
 
 	wxString path = LoadBINFileDialog.GetPath();
-	PSU_DEBUG_PRINT(MSG_ALERT, "BIN File Path : %s", path.c_str());
+	PSU_DEBUG_PRINT(MSG_ALERT, "BINARY File Path : %s", path.c_str());
 
 	// Update FRU File Path Static Text
 	m_fruFileTC->SetValue(path);
@@ -336,13 +152,13 @@ void FRUWriterDialog::OnBtnLOAD(wxCommandEvent& event){
 		return;
 	}
 
-	readBytes = fruFile->Read((void*)this->m_fruReadBuffer, MAX_FRU_FILE_LOAD_LENGTH);
+	readBytes = fruFile->Read((void*)this->m_fruBinaryContent, MAX_FRU_FILE_LOAD_LENGTH);
 	this->m_fruFileLength = readBytes;
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Bytes Loaeded : %d", readBytes);
 
 #ifdef DUMP_BINARY_CONTENT
 	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------- BINARY FILE CONTENT -------------------");
-	PrintFRUContent(this->m_fruReadBuffer, readBytes);
+	PMBUSHelper::PrintFRUContent(this->m_fruBinaryContent, readBytes);
 #endif
 
 	// Seems like No Error On FRU Binary File Content
@@ -350,317 +166,43 @@ void FRUWriterDialog::OnBtnLOAD(wxCommandEvent& event){
 	wxDELETE(fruFile);
 }
 
-#define WRITE_CMD_BYTES_TO_READ  6
 void FRUWriterDialog::OnBtnWRITE(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
-
-	unsigned char sendBuffer[MAX_FRU_FILE_WRITE_LENGTH];
-	unsigned char recvBuffer[MAX_RECV_BUFFER_LENGTH];
-	int sendResult;
-	int retry;
-	bool sendRetryStillFailed = false;
-	bool validateFailed = false;
-	int recvLength = 0;
-	int bytesToRead;
-
-	memset(sendBuffer, 0, sizeof(sendBuffer) / sizeof(sendBuffer[0]));
 
 	// Disable Read/Write Button
 	this->m_btnREAD->Enable(false);
 	this->m_btnWRITE->Enable(false);
 
-	for (int offset = 0; offset <MAX_FRU_FILE_WRITE_LENGTH; offset++){
-		// Prepare Send Buffer
-		int sendDataLength = 0;
-		sendDataLength = this->ProductE2PRomWriteBuffer(offset, sendBuffer, this->m_currentIO);
-
-		// 
-		wxString sendData("Send Data : ");
-		//if (*this->m_outputLog == true){
-			for (int idx = 0; idx < sendDataLength; idx++){
-				sendData += wxString::Format(" %02x ", sendBuffer[idx]);
-			}
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", sendData.c_str());
-		//}
-
-		// Decide Send Data Length
-		switch (*this->m_currentIO){
-
-		case IOACCESS_HID:
-			sendDataLength = HID_SEND_DATA_SIZE;
-			break;
-
-		default:
-
-			break;
-		}
-
-		retry = 0;
-
-		// Send Read CMD
-		do{
-			sendResult = this->m_ioaccess[*this->m_currentIO].m_DeviceSendData(sendBuffer, sendDataLength);
-			if (sendResult <= 0){
-				PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
-				// Retry 
-				retry++;
-				if (retry >= MAX_E2PROM_WRITE_RETRY_TIMES){
-					PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Failed, Retry Times = %d", retry);
-					sendRetryStillFailed = true;
-					break;
-				}
-				else{
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
-				}
-
-			}
-			else{
-				PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
-			}
-
-		} while (sendResult <= 0);
-
-		if (sendRetryStillFailed == true){
-			PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send Still Failed, Exit Task");
-			return;
-		}
-
-		wxMilliSleep(WRITE_CMD_INTERVAL_TIME);
-
-		// Receive Response
-		bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? WRITE_CMD_BYTES_TO_READ : WRITE_CMD_BYTES_TO_READ + 1;
-		recvLength = this->m_ioaccess[*this->m_currentIO].m_DeviceReadData(recvBuffer, bytesToRead);
-
-		//if (*this->m_outputLog == true){
-			PSU_DEBUG_PRINT(MSG_ALERT, "RecvLength = %d", recvLength);
-		//}
-
-		wxString RecvData("Recv Data : ");
-		//if (*this->m_outputLog == true){
-			for (int idx = 0; idx < recvLength; idx++){
-				RecvData += wxString::Format(" %02x ", recvBuffer[idx]);
-			}
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", RecvData.c_str());
-			PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
-		//}
-
+	// New E2PRomWriteDataTask To Write
+	int count = TaskEx::GetCount(task_ID_E2PRomWriteDataTask);
+	
+	if (count > 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Another E2PRomWriteDataTask is Running");
+		return;
 	}
 
-	// Read Data From E2PRom For Validate 
-	DumpE2PROM(recvBuffer, this->m_currentIO);
+	new(TP_E2PRomWriteDataTask) E2PRomWriteDataTask(this->m_ioaccess, this->m_currentIO, this->GetEventHandler(), (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()), this->m_fruBinaryContent, this->m_fruFileLength, &this->outputLog, WRITE_CMD_INTERVAL_TIME, READ_CMD_INTERVAL_TIME);
 
-	// Print Content of E2PROM 
-	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------- E2PROM CONTENT -------------------");
-	PrintFRUContent(this->m_e2pRomContent, 256);
-
-    // Compare Content of E2PROM with Original FRU Binary Data
-	for (unsigned int idx = 0; idx < this->m_fruFileLength; idx++){
-		if (this->m_fruReadBuffer[idx] != this->m_e2pRomContent[idx]){
-			PSU_DEBUG_PRINT(MSG_ERROR, "Offset %d Data Not The Same As Original FRU BINARY FILE !", idx);
-			PSU_DEBUG_PRINT(MSG_ERROR, "Original Data is %02x, Data On E2ROM is %02x", this->m_fruReadBuffer[idx], this->m_e2pRomContent[idx]);
-			validateFailed = true;
-		}
-	}
-
-	if (validateFailed == false){
-		PSU_DEBUG_PRINT(MSG_ALERT, "Write And Validate E2PRom Success !");
-	}
-
-	// Enable Read/Write Button
-	this->m_btnREAD->Enable(true);
-	this->m_btnWRITE->Enable(true);
 }
 
 void FRUWriterDialog::OnBtnREAD(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
-	bool preWriteBTNEnable = this->m_btnWRITE->IsEnabled();
-
-	unsigned char recvBuffer[MAX_RECV_BUFFER_LENGTH];
+	this->m_preWriteBTNEnable = this->m_btnWRITE->IsEnabled();
 
 	this->m_btnREAD->Enable(false);
 	this->m_btnWRITE->Enable(false);
-	this->UpdateWindowUI();
 
-	// Read Data From E2PRom For Validate 
-	DumpE2PROM(recvBuffer, this->m_currentIO);
+	// New E2PRomReadDataTask To Write
+	int count = TaskEx::GetCount(task_ID_E2PRomReadDataTask);
 
-	// Print Content of E2PROM 
-	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------- E2PROM CONTENT -------------------");
-	PrintFRUContent(this->m_e2pRomContent, 256);
-
-	this->m_btnREAD->Enable(true);
-	if (preWriteBTNEnable == true){
-		this->m_btnWRITE->Enable(true);
-	}
-}
-
-int FRUWriterDialog::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* currentIO){
-
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
-
-	int sendResult;
-	int retry;
-	int readRetry = 0;
-	bool sendRetryStillFailed = false;
-	int recvLength = 0;
-	int bytesToRead;
-	unsigned offset = 0;
-
-	unsigned char sendBuffer[MAX_FRU_FILE_WRITE_LENGTH];
-	unsigned char recvBuffer[MAX_RECV_BUFFER_LENGTH];
-
-
-	// Read Data From E2PRom
-	while (offset <MAX_FRU_FILE_READ_LENGTH){//for (unsigned int offset = 0; offset < MAX_FRU_FILE_READ_LENGTH; offset++){
-
-		// Prepare Read Operation Send Data Buffer
-		int sendDataLength = 0;
-		sendDataLength = ProductE2PRomReadBuffer(offset, sendBuffer, this->m_currentIO);
-		//if (*this->m_outputLog == true){
-			PSU_DEBUG_PRINT(MSG_ALERT, "SendBufferLen = %d", sendDataLength);
-		//}
-
-
-		wxString sendData("Send Data : ");
-		//if (*this->m_outputLog == true){
-			for (int idx = 0; idx < sendDataLength; idx++){
-				sendData += wxString::Format(" %02x ", sendBuffer[idx]);
-			}
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", sendData.c_str());
-		//}
-
-		// Decide Send Data Length
-		switch (*this->m_currentIO){
-
-		case IOACCESS_HID:
-			sendDataLength = HID_SEND_DATA_SIZE;
-			break;
-
-		default:
-
-			break;
-		}
-
-		retry = 0;
-
-		// Send Read CMD
-		do{
-			sendResult = this->m_ioaccess[*this->m_currentIO].m_DeviceSendData(sendBuffer, sendDataLength);
-			if (sendResult <= 0){
-				PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
-				// Retry 
-				retry++;
-				if (retry >= 3){
-					PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Failed, Retry Times = %d", retry);
-					sendRetryStillFailed = true;
-					break;
-				}
-				else{
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
-				}
-
-			}
-			else{
-				PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
-			}
-
-		} while (sendResult <= 0);
-
-		if (sendRetryStillFailed == true){
-			PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send Still Failed, Exit Task");
-			return -1;
-		}
-
-		wxMilliSleep(READ_CMD_INTERVAL_TIME);
-
-		// Receive Response
-		bytesToRead = 1 + BASE_RESPONSE_DATA_LENGTH;
-		recvLength = this->m_ioaccess[*this->m_currentIO].m_DeviceReadData(recvBuffer, bytesToRead);
-
-		//if (*this->m_outputLog == true){
-			PSU_DEBUG_PRINT(MSG_ALERT, "RecvLength = %d", recvLength);
-		//}
-
-		wxString RecvData("Recv Data : ");
-		//if (*this->m_outputLog == true){
-			for (int idx = 0; idx < recvLength; idx++){
-				RecvData += wxString::Format(" %02x ", recvBuffer[idx]);
-			}
-			PSU_DEBUG_PRINT(MSG_ALERT, "%s", RecvData.c_str());
-		//}
-
-		//if (m_intervalTime > 0){
-			//wxMilliSleep(m_intervalTime);
-		//}
-
-		// Copy Data To E2PROM Content Buffer
-		switch (*this->m_currentIO){
-
-		case IOACCESS_SERIALPORT:
-
-			break;
-
-		case IOACCESS_HID: // Offset Of Content Data is 6
-			if (recvBuffer[5] == 0x4e && recvBuffer[6]==0x47){
-				readRetry++;
-				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
-				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
-					continue;
-				}
-				else{
-					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data From E2PRom Retry Still Failed !");
-					offset++;
-					readRetry = 0;
-					continue;
-				}
-			}
-
-			this->m_e2pRomContent[offset] = recvBuffer[6];
-			offset++;
-			readRetry = 0;
-			break;
-
-		case IOACCESS_TOTALPHASE:
-
-			break;
-		
-		default:
-			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs !");
-			break;
-
-		}
-
+	if (count > 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Another E2PRomReadDataTask is Running");
+		return;
 	}
 
-	return 0;
-}
+	new(TP_E2PRomReadDataTask) E2PRomReadDataTask(this->m_ioaccess, this->m_currentIO, this->GetEventHandler(), (unsigned char)PMBUSHelper::HexToDecimal(this->m_e2pROMSlaveAddrTC->GetValue().c_str()), &this->outputLog, READ_CMD_INTERVAL_TIME);
 
-void FRUWriterDialog::PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize){
-	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
-	wxString data("");
-	unsigned int addr = 0x00;
-
-	for (unsigned int idx = 0; idx < dumpSize; idx++){
-
-		if (idx != 0 && idx % 0x10 == 0){
-			addr = (idx - 0x10);
-			PSU_DEBUG_PRINT(MSG_ALERT, "[%08x]%s", addr, data.c_str());
-			data.Clear();
-		}
-
-		data += wxString::Format("%02x", contentBuffer[idx]);
-		data += wxString::Format(" ");
-
-		// Last
-		if (idx == (dumpSize - 1)){
-			PSU_DEBUG_PRINT(MSG_ALERT, "[%08x]%s", addr + 0x10, data.c_str());
-			data.Clear();
-			break;
-		}
-	}
-
-	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
 }
 
 void FRUWriterDialog::OnDialogClose(wxCloseEvent& event){
@@ -669,6 +211,52 @@ void FRUWriterDialog::OnDialogClose(wxCloseEvent& event){
 
 	this->EndModal(wxID_CANCEL);
 
+}
+
+void FRUWriterDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	// Enable Read/Write Button
+	this->m_btnREAD->Enable(true);
+	this->m_btnWRITE->Enable(true);
+
+	wxMessageBox(wxT("Write & Verify E2PROM Success"),
+		wxT("Write E2PROM Success"),  // caption
+		wxOK | wxICON_INFORMATION);
+}
+
+void FRUWriterDialog::OnE2PRomReadEnd(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	this->m_btnREAD->Enable(true);
+	if (this->m_preWriteBTNEnable == true){
+		this->m_btnWRITE->Enable(true);
+	}
+
+	wxMessageBox(wxT("Read E2PROM Success"),
+		wxT("Read E2PROM Success"),  // caption
+		wxOK | wxICON_INFORMATION);
+}
+
+void FRUWriterDialog::OnE2PRomWriteInterrupt(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	// Enable Read/Write Button
+	this->m_btnREAD->Enable(true);
+	this->m_btnWRITE->Enable(true);
+
+	wxMessageBox(wxT("Write & Verify E2PROM Failed"),
+		wxT("Write E2PROM Failed"),  // caption
+		wxOK | wxICON_ERROR);
+}
+
+void FRUWriterDialog::OnE2PRomReadInterrupt(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	this->m_btnREAD->Enable(true);
+	if (this->m_preWriteBTNEnable == true){
+		this->m_btnWRITE->Enable(true);
+	}
+
+	wxMessageBox(wxT("Read E2PROM Failed"),
+		wxT("Read E2PROM Failed"),  // caption
+		wxOK | wxICON_INFORMATION);
 }
 
 void FRUWriterDialog::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
@@ -759,5 +347,9 @@ wxBEGIN_EVENT_TABLE(FRUWriterDialog, wxDialog)
 EVT_BUTTON(CID_BTN_LOAD, FRUWriterDialog::OnBtnLOAD)
 EVT_BUTTON(CID_BTN_READ, FRUWriterDialog::OnBtnREAD)
 EVT_BUTTON(CID_BTN_WRITE, FRUWriterDialog::OnBtnWRITE)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_END, FRUWriterDialog::OnE2PRomWriteEnd)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_END, FRUWriterDialog::OnE2PRomReadEnd)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, FRUWriterDialog::OnE2PRomWriteInterrupt)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, FRUWriterDialog::OnE2PRomReadInterrupt)
 EVT_CLOSE(FRUWriterDialog::OnDialogClose)
 wxEND_EVENT_TABLE()

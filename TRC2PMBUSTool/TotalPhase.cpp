@@ -186,6 +186,45 @@ int TotalPhaseSendData(unsigned char* buff, unsigned int size){
 	return num_write;
 }
 
+int TotalPhaseSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
+	
+	memset(i2cReadCMDBuffer, 0, BUFFER_SIZE);
+
+	i2cReadCMDBuffer[0] = buff[0];// Write Bytes
+	i2cReadCMDBuffer[1] = buff[1];// Read Bytes
+	i2cReadCMDBuffer[2] = TOTALPHASE_I2C_SLAVEADDR_TRAN(buff[2]);// Slave Address
+	i2cReadCMDBuffer[3] = buff[3];// CMD
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[0]=%02x", buff[0]);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[1]=%02x", buff[1]);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[2]=%02x", TOTALPHASE_I2C_SLAVEADDR_TRAN(buff[2]));
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[3]=%02x", buff[3]);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[4]=%02x", buff[4]);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "buff[5]=%02x", buff[5]);
+
+	// Use aa_i2c_write_ext In Send Data Extra Function
+
+	PMBUSHelper::getTotalPhaseWriteReadLastError() = aa_i2c_write_ext(
+		handle,// handle
+		TOTALPHASE_I2C_SLAVEADDR_TRAN(buff[2]),// slave address
+		AA_I2C_NO_FLAGS,// flags
+		buff[0],// out_num_bytes
+		&buff[3],// out_data
+		&num_write //num_written
+		);
+
+	if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
+		PSU_DEBUG_PRINT(MSG_ERROR, "ret = %s, Num_Write of aa_i2c_write_ext is %d", I2CStatusString[PMBUSHelper::getTotalPhaseWriteReadLastError()], num_write);
+
+#ifdef RESET_I2C_BUS_WHEN_FAIL
+
+#endif
+
+	}
+	
+	return num_write;
+}
+
 int TotalPhaseReadData(unsigned char* buff, unsigned int sizeOfBuff){
 
 #ifdef USE_WRITE_READ_FUNC
@@ -216,6 +255,30 @@ int TotalPhaseReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	}
 #endif
 
+	return num_read;
+}
+
+int TotalPhaseReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr){
+	
+	// Use aa_i2c_read_ext In Read Data Extra Function
+	u16 num_read;
+
+	PMBUSHelper::getTotalPhaseWriteReadLastError() = aa_i2c_read_ext(
+		handle,// handle
+		i2cReadCMDBuffer[2], // slave address
+		AA_I2C_NO_FLAGS,// flags
+		i2cReadCMDBuffer[1],// in_num_bytes
+		buff,// in_data
+		&num_read//num_read
+		);
+
+	if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0 || num_read == 0){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "ret = %s, Num_Read of aa_i2c_read_ext is %d:", I2CStatusString[PMBUSHelper::getTotalPhaseWriteReadLastError()], num_read);
+		//for (int idx = 0; idx < num_read; idx++){
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "buff[%d] = %02x", idx, buff[idx]);
+		//}
+	}
+	
 	return num_read;
 }
 

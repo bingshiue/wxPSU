@@ -42,9 +42,19 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 int SerialSendData(unsigned char* buff, unsigned int size);
 
 /**
+ * @brief Serial Port Send Data Extra
+ */
+int SerialSendDataExtra(unsigned char* buff, unsigned int size, void* ptr);
+
+/**
  * @brief Serial Port Read Data
  */
 int SerialReadData(unsigned char* buff, unsigned int bytesToRead);
+
+/**
+ * @brief Serial Port Read Data
+ */
+int SerialReadDataExtra(unsigned char* buff, unsigned int bytesToRead, void* ptr);
 
 /**
  * @brief Close Serial Port

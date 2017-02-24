@@ -2910,6 +2910,8 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_CloseDevice = CloseSerialPort;
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceSendData = SerialSendData;
 	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceReadData = SerialReadData;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceSendDataExtra = SerialSendDataExtra;
+	this->m_IOAccess[IOACCESS_SERIALPORT].m_DeviceReadDataExtra = SerialReadDataExtra;
 
 	// HID
 	this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice = EnumerateAvailableHIDDevice;
@@ -2919,6 +2921,8 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_HID].m_CloseDevice = CloseHIDDevice;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceSendData = HIDSendData;
 	this->m_IOAccess[IOACCESS_HID].m_DeviceReadData = HIDReadData;
+	this->m_IOAccess[IOACCESS_HID].m_DeviceSendDataExtra = HIDSendDataExtra;
+	this->m_IOAccess[IOACCESS_HID].m_DeviceReadDataExtra = HIDReadDataExtra;
 
 	// TOTAL PHASE I2C Host Adaptor
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice = EnumerateAvailableTotalPhaseDevice;
@@ -2928,6 +2932,8 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_CloseDevice = CloseTotalPhaseDevice;
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceSendData = TotalPhaseSendData;
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceReadData = TotalPhaseReadData;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceSendDataExtra = TotalPhaseSendDataExtra;
+	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceReadDataExtra = TotalPhaseReadDataExtra;
 
 	// Current Use IO
 	switch (this->m_appSettings.m_I2CAdaptorModuleBoard){

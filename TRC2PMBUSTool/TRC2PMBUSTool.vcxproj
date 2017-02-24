@@ -108,6 +108,8 @@
     <ClCompile Include="CalibrationDialog.cpp" />
     <ClCompile Include="ClearIOReadBufferTask.cpp" />
     <ClCompile Include="ComportDialog.cpp" />
+    <ClCompile Include="E2PRomReadDataTask.cpp" />
+    <ClCompile Include="E2PRomWriteDataTask.cpp" />
     <ClCompile Include="FRUWriterDialog.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBCoefficients.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBCook.cpp" />

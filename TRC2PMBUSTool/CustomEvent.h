@@ -37,5 +37,10 @@ wxDECLARE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_END, wxThreadEvent); /**< Declare Q
 
 wxDECLARE_EVENT(wxEVT_COMMAND_RELOAD_HEX_FILE, wxThreadEvent); /**< Declare Reload HEX File Event */
 
+wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_END, wxThreadEvent); /**< Declare E2PROM Write End Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent); /**< Declare E2PROM Read End Event */
+
+wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent); /**< Declare E2PROM Write Interrupt Event */
+wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent); /**< Declare E2PROM Read Interrupt Event */
 
 #endif

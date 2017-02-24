@@ -611,7 +611,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 										retry++;
 										if (retry >= 3){
 											PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
-											sendRetryStillFailed = true;
+											sendRetryStillFailed = PMBUSHelper::ReJudgeIOThreadSendFailure(true, *this->m_CurrentIO);//true;
 											break;
 										}
 										else{
@@ -789,7 +789,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 																	retry++;
 																	if (retry >= 3){
 																		PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
-																		sendRetryStillFailed = true;
+																		sendRetryStillFailed = PMBUSHelper::ReJudgeIOThreadSendFailure(true, *this->m_CurrentIO);//true;
 																		break;
 																	}
 																	else{
@@ -1016,7 +1016,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									retry++;
 									if (retry >= 3){
 										PSU_DEBUG_PRINT(MSG_ALERT, "Still Send Write Page CMD Failed, Retry Times = %d", retry);
-										sendRetryStillFailed = true;
+										sendRetryStillFailed = PMBUSHelper::ReJudgeIOThreadSendFailure(true, *this->m_CurrentIO);//true;
 										break;
 									}
 									else{
@@ -1145,7 +1145,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								retry++;
 								if (retry >= 3){
 									PSU_DEBUG_PRINT(MSG_DEBUG, "Still Send Failed, Retry Times = %d", retry);
-									sendRetryStillFailed = true;
+									sendRetryStillFailed = PMBUSHelper::ReJudgeIOThreadSendFailure(true, *this->m_CurrentIO);//true;
 									break;
 								}
 								else{

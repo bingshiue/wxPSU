@@ -38,6 +38,10 @@ typedef int (*DeviceReadData)(unsigned char*, unsigned int);/**< Funtion Pointer
 
 typedef int (*CloseDevice)(void);/**< Funtion Pointer Type For Close Device */
 
+typedef int(*DeviceReadDataExtra)(unsigned char*, unsigned int, void*);/**< Funtion Pointer Type For Device Read Data */
+
+typedef int (*DeviceSendDataExtra)(unsigned char*, unsigned int, void*);/**< Funtion Pointer Type For Device Send Data Extra */
+
 /**
  * @brief Struct For IO Access.
  */
@@ -48,6 +52,8 @@ typedef struct _IOACCESS {
 	OpenDevice m_OpenDevice;
 	DeviceSendData m_DeviceSendData;
 	DeviceReadData m_DeviceReadData;
+	DeviceSendDataExtra m_DeviceSendDataExtra;
+	DeviceReadDataExtra m_DeviceReadDataExtra;
 	CloseDevice m_CloseDevice;
 }IOACCESS;
 

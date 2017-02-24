@@ -55,6 +55,8 @@
 #define TP_PMBUSReadTestTask (0.5f)
 #define TP_PMBUSWriteTestTask (0.5f)
 #define TP_PMBUSBlockWRTestTask (0.5f)
+#define TP_E2PRomWriteDataTask (0.5f)
+#define TP_E2PRomReadDataTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -82,6 +84,8 @@ enum {
 	task_ID_PMBUSReadTestTask,
 	task_ID_PMBUSWriteTestTask,
 	task_ID_PMBUSBlockWRTestTask,
+	task_ID_E2PRomWriteDataTask,
+	task_ID_E2PRomReadDataTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -977,7 +981,7 @@ public:
 
 };
 
-class PMBUSWriteTestTask :public TaskEx {
+class PMBUSWriteTestTask : public TaskEx {
 	
 	double m_elapsedTimer;/**< for compute elapsed time */
 
@@ -1000,35 +1004,35 @@ public:
 	int m_intervalTime;
 
 	/**
-	* @brief Constructor.
-	*/
+	 * @brief Constructor.
+	 */
 	PMBUSWriteTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSWriteCMD_t* pmbusWriteCMD, int setsToRun, bool* outputLog, int intervalTime);
 
 	/**
-	* @brief Deconstructor.
-	*/
+	 * @brief Deconstructor.
+	 */
 	~PMBUSWriteTestTask(void);
 
 	/**
-	* @brief Draw function.
-	*/
+	 * @brief Draw function.
+	 */
 	void Draw(void);
 
 	/**
-	* @brief Main update function.
-	*
-	* @param elapsedTime elapsed time
-	* @retval success or failure
-	*/
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
 	int Main(double elapsedTime);
 
 	/**
-	* @brief Product Write CMD Buffer.
-	*/
+	 * @brief Product Write CMD Buffer.
+	 */
 	int ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, unsigned char* sendBuffer, unsigned int* currentIO);
 };
 
-class PMBUSBlockWRTestTask :public TaskEx {
+class PMBUSBlockWRTestTask : public TaskEx {
 
 	double m_elapsedTimer;/**< for compute elapsed time */
 
@@ -1051,14 +1055,110 @@ public:
 	int m_intervalTime;
 
 	/**
+	 * @brief Constructor.
+	 */
+	PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog, int intervalTime);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~PMBUSBlockWRTestTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+
+	/**
+	 * @brief Product Block Write Read CMD Buffer.
+	 */
+	int ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockWRCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+};
+
+#define MAX_FRU_FILE_SIZE  256 // Max FRU File Size 
+class E2PRomWriteDataTask : public TaskEx {
+	wxEvtHandler *m_evtHandler;
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+	unsigned char m_e2pRomSlaveAddr;/**< E2PRom Slave Address */
+	unsigned char *m_fruBinaryContent;/**< FRU Binary Content */
+	unsigned int m_fruBinaryLength;/**< FRU Binary Length */
+
+	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer for Put Read E2PRom Content */
+
+public:
+
+	bool m_running;
+	bool* m_outputLog;
+	int runningIndex;
+	int m_writeIntervalTime;
+	int m_readIntervalTime;
+
+	/**
+	 * @brief Constructor.
+	 */
+	E2PRomWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, unsigned char* fruBinaryContent, unsigned int fruBinaryLength, bool* outputLog, int writeIntervalTime, int readIntervalTime);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~E2PRomWriteDataTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+
+
+	int DumpE2PROM(unsigned char* RecvBuffer, unsigned int* currentIO);
+
+};
+
+class E2PRomReadDataTask : public TaskEx {
+	wxEvtHandler *m_evtHandler;
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+	unsigned char m_e2pRomSlaveAddr;/**< E2PRom Slave Address */
+	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer for Put Read E2PRom Content */
+
+public:
+
+	bool m_running;
+	bool* m_outputLog;
+	int runningIndex;
+	int m_readIntervalTime;
+
+	/**
 	* @brief Constructor.
 	*/
-	PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSBlockWRCMD_t* pmbusBlockWRCMD, int setsToRun, bool* outputLog, int intervalTime);
+	E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, bool* outputLog, int readIntervalTime);
 
 	/**
 	* @brief Deconstructor.
 	*/
-	~PMBUSBlockWRTestTask(void);
+	~E2PRomReadDataTask(void);
 
 	/**
 	* @brief Draw function.
@@ -1073,10 +1173,8 @@ public:
 	*/
 	int Main(double elapsedTime);
 
-	/**
-	* @brief Product Block Write Read CMD Buffer.
-	*/
-	int ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockWRCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+
+	int DumpE2PROM(unsigned char* RecvBuffer, unsigned int* currentIO);
 };
 
 #endif

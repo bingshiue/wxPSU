@@ -57,6 +57,11 @@ public :
 
 	static void ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength);
 
+
+	static int ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned char* fruContentBuffer, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
+	static int ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
+	static void PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize);
+
 	static long HexToDecimal(wxString string);
 
 	static void GetNowDateTimeString(wxString& string);
@@ -110,6 +115,10 @@ public :
 	 * @brief Get Expected Response Data Length by I/O.
 	 */
 	static int getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned int CMDResponseDataLength, unsigned char BaseDataLength);
+	/**
+	 * @brief Re-Judge IO Thread Send Failure.
+	 */
+	static bool ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO);
 
 protected :
 

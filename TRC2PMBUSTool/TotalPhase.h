@@ -43,9 +43,19 @@ int OpenTotalPhaseDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* 
 int TotalPhaseSendData(unsigned char* buff, unsigned int size);
 
 /**
+ * @brief Total Phase Send Data Extra
+ */
+int TotalPhaseSendDataExtra(unsigned char* buff, unsigned int size, void* ptr);
+
+/**
  * @brief Total Phase Port Read Data
  */
 int TotalPhaseReadData(unsigned char* buff, unsigned int sizeOfBuff);
+
+/**
+ * @brief Total Phase Port Read Data Extra
+ */
+int TotalPhaseReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr);
 
 /**
  * @brief Close Total Phase Device

@@ -304,6 +304,10 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	return dNoOfBytesWritten;
 }
 
+int SerialSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
+	return SerialSendData(buff, size);
+}
+
 //#define WAIT_INFINITE                  // Wait Infinite for Overlapped Operation
 
 #define NUMBER_OF_BYTES_TO_READ    1   // Number of Bytes To Read
@@ -783,6 +787,9 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	return i;// Return how many bytes data readed
 }
 
+int SerialReadDataExtra(unsigned char* buff, unsigned int bytesToRead, void* ptr){
+	return SerialReadData(buff, bytesToRead);
+}
 
 int CloseSerialPort(void){
 	int ret = SUCCESS;
