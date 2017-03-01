@@ -727,6 +727,8 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Writer"), wxT("FRU Writer"), wxITEM_NORMAL);
 
+	this->m_fruWriterMenuItem->SetBitmap(wxBITMAP_PNG(E2PROM_16));
+
 	this->m_utilityMenu->Append(this->m_fruWriterMenuItem);
 
 	// Help Menu

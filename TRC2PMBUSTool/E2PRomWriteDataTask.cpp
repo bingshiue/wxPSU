@@ -227,7 +227,7 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 
 		// Send Read CMD
 		do{
-			sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendData(sendBuffer, sendDataLength);
+			sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendDataExtra(sendBuffer, sendDataLength, NULL);
 			if (sendResult <= 0){
 				PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
 				// Retry 
@@ -257,7 +257,7 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 
 		// Receive Response
 		bytesToRead = 1 + BASE_RESPONSE_DATA_LENGTH;
-		recvLength = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(recvBuffer, bytesToRead);
+		recvLength = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadDataExtra(recvBuffer, bytesToRead, NULL);
 
 		//if (*this->m_outputLog == true){
 		PSU_DEBUG_PRINT(MSG_DEBUG, "RecvLength = %d", recvLength);

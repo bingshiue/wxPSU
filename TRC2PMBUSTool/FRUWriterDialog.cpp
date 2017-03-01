@@ -30,7 +30,12 @@ wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent);
 
 #define DUMP_BINARY_CONTENT                 
 
-FRUWriterDialog::FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("FRU Writer Dialog")), wxDefaultPosition, wxSize(FRU_WRITER_DIALOG_WIDTH, FRU_WRITER_DIALOG_HEIGHT)){
+FRUWriterDialog::FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("FRU Writer/Reader")), wxDefaultPosition, wxSize(FRU_WRITER_DIALOG_WIDTH, FRU_WRITER_DIALOG_HEIGHT)){
+
+	wxIcon icon;
+	icon.CopyFromBitmap(wxBITMAP_PNG(E2PROM_16));
+
+	this->SetIcon(icon);
 
 	m_oldLog = wxLog::GetActiveTarget();
 	wxLog::SetActiveTarget(this);
@@ -256,7 +261,7 @@ void FRUWriterDialog::OnE2PRomReadInterrupt(wxThreadEvent& event){
 
 	wxMessageBox(wxT("Read E2PROM Failed"),
 		wxT("Read E2PROM Failed"),  // caption
-		wxOK | wxICON_INFORMATION);
+		wxOK | wxICON_ERROR);
 }
 
 void FRUWriterDialog::DoLogLine(wxLogLevel level, wxTextCtrl *text, const wxString& timestr, const wxString& threadstr, const wxString& msg)
