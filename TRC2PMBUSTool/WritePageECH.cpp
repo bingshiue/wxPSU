@@ -31,6 +31,7 @@ WritePageECH::WritePageECH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	wxString hexString = wxString::Format("%02x", DEFULT_SETPOINT);
 	this->m_inputValue->SetValue(hexString);
+	this->m_inputValue->SetMaxLength(4);
 
 	// Set Validator
 	this->m_inputValue->SetValidator(this->m_hexValidator);
@@ -87,6 +88,9 @@ void WritePageECH::OnRadioButtonRaw(wxCommandEvent& event){
 
 }
 
+#define INPUT_SET_POINT_MAX_VALUE  0x0A7F /**< Maximum Input Value of Set Pinter */
+#define INPUT_SET_POINT_MIN_VALUE  0x0600 /**< Minimum Input Value of Set Pinter */
+
 #define CMD_ECH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePageECH::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
@@ -110,6 +114,22 @@ void WritePageECH::OnButtonWrite(wxCommandEvent& event){
 	else if (this->m_cookRadioButton->GetValue() == true){
 		setPointValue = wxAtoi(this->m_inputValue->GetValue());
 		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %d", setPointValue);
+	}
+
+	// Check Maximum & Minimum Range Of Input Set Point
+	if (setPointValue > INPUT_SET_POINT_MAX_VALUE){
+		wxMessageBox(wxT("Input Set Point Value Too Large ! Please Re-Input Set Point Value Then Try Again"),
+			wxT("Input Set Point Value Too Large !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+	else if (setPointValue < INPUT_SET_POINT_MIN_VALUE){
+		wxMessageBox(wxT("Input Set Point Value Too Small ! Please Re-Input Set Point Value Then Try Again"),
+			wxT("Input Set Point Value Too Small !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
 	}
 
 	unsigned char SetPointSendBuffer[64];
