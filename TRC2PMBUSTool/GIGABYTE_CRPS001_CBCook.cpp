@@ -3117,13 +3117,20 @@ int GB_CRPS_Cook_c3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
 	const wchar_t* tmp_wchar;
+	wxString enable_disable("");
 	unsigned char status = pmbuscmd->m_recvBuff.m_dataBuff[0];
 
 	wxString wxstr("");
 
-	wxstr += wxT("CALIBRATION STATUS :");
+	wxstr += wxT("Pointer : ");
 
-	// Calibration Status
+	// Pointer Value
+	wxstr += wxString::Format("%02x", pmbuscmd->m_recvBuff.m_dataBuff[0]);
+
+	// Enable / Disable
+	enable_disable += (pmbuscmd->m_recvBuff.m_dataBuff[1] == 0) ? wxT(", Enable") : wxT(", Disable");
+
+	wxstr += enable_disable;
 
 	tmp_wchar = wxstr.wc_str();
 	lstrcpyn(string, tmp_wchar, 256);
