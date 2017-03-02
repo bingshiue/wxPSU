@@ -1733,6 +1733,15 @@ void MainFrame::OnBlockWRTest(wxCommandEvent& event){
 void MainFrame::OnFRUWriter(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
+	/*** Check if Monitor is Running ***/
+	if (this->m_monitor_running == true){
+		wxMessageBox(wxT("Monitor is running, Please stop monitor then try again !"),
+			wxT("Monitor is running !"),  // caption
+			wxOK | wxICON_INFORMATION);
+
+		return;
+	}
+
 	FRUWriterDialog* fruWriterDialog = new FRUWriterDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
 	fruWriterDialog->Centre();
 	fruWriterDialog->ShowModal();

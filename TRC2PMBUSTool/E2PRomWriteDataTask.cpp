@@ -162,15 +162,20 @@ int E2PRomWriteDataTask::Main(double elapsedTime){
 
 	if (validateFailed == false){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Write And Validate E2PRom Success !");
+
+		// Emit Write End Event
+		wxThreadEvent* e2pRomWriteEndEvt;
+		e2pRomWriteEndEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_E2PROM_WRITE_END);
+		wxQueueEvent(this->m_evtHandler, e2pRomWriteEndEvt);
 	}
 	else {
 		PSU_DEBUG_PRINT(MSG_ERROR, "Write And Validate E2PRom Failed !");
-	}
 
-	// Emit Write End Event
-	wxThreadEvent* e2pRomWriteEndEvt;
-	e2pRomWriteEndEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_E2PROM_WRITE_END);
-	wxQueueEvent(this->m_evtHandler, e2pRomWriteEndEvt);
+		// Emit Write Interrupt Event
+		wxThreadEvent* e2pRomWriteIntEvt;
+		e2pRomWriteIntEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT);
+		wxQueueEvent(this->m_evtHandler, e2pRomWriteIntEvt);
+	}
 
 	delete this;
 
