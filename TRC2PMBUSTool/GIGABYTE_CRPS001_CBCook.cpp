@@ -3170,7 +3170,43 @@ int GB_CRPS_Cook_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	return EXIT_SUCCESS;
 }
 
-int GB_CRPS_Cook_d1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+int GB_CRPS_Cook_d1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
+
+	// Check have checksum error ?
+	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
+
+	// Show FW Version
+	const wchar_t* tmp_wchar;
+
+	wxString wxstr("Current Mode : ");
+
+	switch (pmbuscmd->m_recvBuff.m_dataBuff[0]){
+	// Standard Redundant Mode
+	case 0x00:
+		wxstr += wxT("Standard Redundant Mode");
+		break;
+	// Zero Output Enable Mode
+	case 0x01:
+		wxstr += wxT("Zero Output Enable Mode");
+		break;
+	// Zero Output Sleep Mode
+	case 0x03:
+		wxstr += wxT("Zero Output Sleep Mode");
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "%s:Something Error Occurs", __FUNCTIONW__);
+		break;
+	}
+
+	tmp_wchar = wxstr.wc_str();
+	lstrcpyn(string, tmp_wchar, 256);
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	return EXIT_SUCCESS;
+}
+
 int GB_CRPS_Cook_d2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_d3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_d4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }

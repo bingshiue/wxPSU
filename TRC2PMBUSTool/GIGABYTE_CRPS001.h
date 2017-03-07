@@ -147,17 +147,19 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	{ true, "C3H", 0xc3, "CALIBRATION_STATUS", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// D0h [65]
 	{ true, "D0H", 0xd0, "Cold_Redundancy_Config", cmd_access_readwrite, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// D9h [66]
+	// D1h [66]
+	{ true, "D1H", 0xd1, "Cold_Redundancy_Status", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
+	// D9h [67]
 	{ true, "D9H", 0xd9, "F.W.Revision", cmd_access_br, 0, 0, { 0 }, 0x06, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// DCh [67]
+	// DCh [68]
 	{ true, "DCH", 0xdc, "Read_BoxSTATUS", cmd_access_br, 0, 0, { 0 }, 0x0D, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// E0h [68]
+	// E0h [69]
 	{ true, "E0H", 0xe0, "PFC_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// E1h [69]
+	// E1h [70]
 	{ true, "E1H", 0xe1, "PFC_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// E2h [70]
+	// E2h [71]
 	{ true, "E2H", 0xe2, "SR_TEMPERATURE_1", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
-	// E3h [71]
+	// E3h [72]
 	{ true, "E3H", 0xe3, "SR_TEMPERATURE_2", cmd_access_read, 0, 0, { 0 }, 0x03, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
 
 };
