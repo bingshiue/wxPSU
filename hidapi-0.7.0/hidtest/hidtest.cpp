@@ -27,18 +27,756 @@ which use HIDAPI.
 #include <unistd.h>
 #endif
 
+int sendData(hid_device *handle, unsigned char* buffer, unsigned int sizeOfBuffer){
+	int res = 0;
+	
+	printf("================================================");
+	printf("Data Send: ");
+	// Print out the returned buffer.
+	for (unsigned int i = 0; i < sizeOfBuffer; i++){
+		if (i % 0x10 == 0) printf("\n");
+		printf("%02hhx ", buffer[i]);
+	}
+	printf("\n");
+	
+	res = hid_write(handle, buffer, 65);
+	printf("res=%d \n", res);
+	if (res < 0){
+		printf("Unable to write() (2)\n");
+		wprintf(L"ERROR : %ls", hid_error(handle));
+		printf("\n");
+	}
+	else{
+		printf("write() (2) Success \n");
+	}
 
-void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsigned int command, unsigned int responseLength);
+	return res;
+}
 
+int readData(hid_device *handle, unsigned char* buffer){
+	int readBytes = 0;
+	int reTry = 0;
+
+	readBytes = 0;
+	while (readBytes == 0) {
+		readBytes = hid_read(handle, buffer, 256);
+		if (readBytes == 0){
+			printf("waiting...\n");
+			reTry++;
+
+			if (reTry >= 3){
+				printf("Retry = %d, Break \n", reTry);
+				break;
+			}
+
+#ifdef WIN32
+			Sleep(5);
+#else
+			usleep(500 * 1000);
+#endif
+		}
+		if (readBytes < 0)
+			printf("Unable to read()\n");
+	}
+
+
+	if (readBytes > 0){
+		printf("Data Read: readBytes = %d\n", readBytes);
+		// Print out the returned buffer.
+		for (int i = 0; i < readBytes; i++){
+			if (i % 0x10 == 0) printf("\n");
+			printf("%02hhx ", buffer[i]);
+		}
+		printf("\n");
+	}
+
+	return readBytes;
+}
+
+int InitPicKit(hid_device *handle, unsigned char* sendBuffer, unsigned char* recvBuffer){
+	unsigned int offset = 0;
+
+	//# 1
+#if 1   //76000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x76;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 2);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 2
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+
+	//# 3
+#if 1   //01000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 2);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 4
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 5
+#if 1	//02 c0 00 00 0a ff 00 00 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 00 31 000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x02;
+	sendBuffer[offset++] = 0xc0;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x0a;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x31;
+	sendBuffer[offset++] = 0x20;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x3f;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x03;
+	sendBuffer[offset++] = 0x06;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x31;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 26);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 6 (Point For Pickit Can Write/Read Correctly)
+#if 1   //01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x01;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 7
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 8
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 9
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 10
+#if 1   //01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x00;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 11
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 12
+#if 1	//02 e0 00 00 0a ff 00 00 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 00 31 00 00 02 000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x02;
+	sendBuffer[offset++] = 0xe0;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x0a;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x31;
+	sendBuffer[offset++] = 0x20;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x3f;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x03;
+	sendBuffer[offset++] = 0x06;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x31;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 29);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+#endif
+
+	//# 13
+#if 1   //01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x01;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 14
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 15
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 16
+#if 1	//030212c1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x03;
+	sendBuffer[offset++] = 0x02;
+	sendBuffer[offset++] = 0x12;
+	sendBuffer[offset++] = 0xc1;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 5);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 17
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 18
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 19
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 20
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 21
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 22
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 23
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 24
+#if 1   //01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x00;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 25
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 26
+#if 1	//02 c0 00 00 0a ff 00 00 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 00 31 00 00 02 000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x02;
+	sendBuffer[offset++] = 0xc0;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x0a;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x31;
+	sendBuffer[offset++] = 0x20;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0xff;
+	sendBuffer[offset++] = 0x3f;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x03;
+	sendBuffer[offset++] = 0x06;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x31;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x02;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 29);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	//# 27
+#if 1   //01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x01;
+	sendBuffer[offset++] = 0x01;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	/*** Skip 23 Times 01 02 ***/
+
+	//# 28
+#if 1	//0bab0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	memset(sendBuffer, 0, 256);
+	offset = 0;
+
+	sendBuffer[offset++] = 0x00;
+	sendBuffer[offset++] = 0x0b;
+	sendBuffer[offset++] = 0xab;
+
+	for (int idx = offset; idx<65; idx++){
+		sendBuffer[idx] = 0;
+	}
+
+	// Send 
+	sendData(handle, sendBuffer, 3);
+
+	// Receive Response
+	readData(handle, recvBuffer);
+
+#endif
+
+	return 0;
+}
+
+#define LOOP_TIIMES 1000
 int main(int argc, char* argv[])
 {
 	int res;
-	unsigned char buf[64];
+	unsigned char buf[256];
+	unsigned char recvBuffer[256];
 #define MAX_STR 255
 	wchar_t wstr[MAX_STR];
 	hid_device *handle;
 	int i;
 	int times = 0;
+	int sendTimes = 0;
+	unsigned int offset = 0;
 
 #ifdef WIN32
 	UNREFERENCED_PARAMETER(argc);
@@ -47,8 +785,10 @@ int main(int argc, char* argv[])
 
 	struct hid_device_info *devs, *cur_dev;
 
+	memset(recvBuffer, 0, 256);
+
 #if 1
-	devs = hid_enumerate(0x0, 0x0);
+	devs = hid_enumerate(0x4d8, 0x036);
 	cur_dev = devs;
 	while (cur_dev) {
 		printf("Device Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls", cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
@@ -64,6 +804,7 @@ int main(int argc, char* argv[])
 	}
 	hid_free_enumeration(devs);
 #endif
+
 	// Set up the command buffer.
 	memset(buf, 0x00, sizeof(buf));
 	buf[0] = 0x01;
@@ -72,13 +813,14 @@ int main(int argc, char* argv[])
 
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
-	////handle = hid_open(0x4d8, 0x3f, L"12345");
+	//handle = hid_open(0x4d8, 0x3f, L"12345");
 	handle = hid_open(0x4d8, 0x36, NULL);
 	if (!handle) {
 		printf("unable to open device\n");
 		return 1;
 	}
 
+#if 1
 	// Read the Manufacturer String
 	wstr[0] = 0x0000;
 	res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
@@ -107,6 +849,7 @@ int main(int argc, char* argv[])
 	if (res < 0)
 		printf("Unable to read indexed string 1\n");
 	printf("Indexed String 1: %ls\n", wstr);
+#endif
 
 	// Set the hid_read() function to be non-blocking.
 	hid_set_nonblocking(handle, 1);
@@ -116,38 +859,14 @@ int main(int argc, char* argv[])
 	res = hid_read(handle, buf, 17);
 
 	// Send a Feature Report to the device
-	buf[0] = 0x01;
-	buf[1] = 0x00;
-	buf[2] = 0x00;
-	buf[3] = 0x00;
-	buf[4] = 0x0a;
-	buf[5] = 0xff;
-	buf[6] = 0x00;
-	buf[7] = 0x00;
-	buf[8] = 0x00;
-	buf[9] = 0x01;
-	buf[10] = 0x31;
-	buf[11] = 0x20;
-	buf[12] = 0x00;
-	buf[13] = 0x00;
-	buf[14] = 0x00;
-	buf[15] = 0x00;
-	buf[16] = 0x00;
-	buf[17] = 0x03;
-	buf[18] = 0x06;
-	buf[19] = 0x00;
-	buf[20] = 0x00;
-	buf[21] = 0x00;
-	buf[22] = 0x00;
-	buf[23] = 0x00;
-	buf[24] = 0x31;
 
-	for (unsigned int idx = 25; idx<64; idx++){
-		buf[idx] = 0;
-	}
-	res = hid_send_feature_report(handle, buf, 64);
+#if 1
+	res = hid_send_feature_report(handle, buf, 17);
 	if (res < 0) {
 		printf("Unable to send a feature report.\n");
+	}
+	else{
+		printf("Send a feature report OK.\n");
 	}
 
 	memset(buf, 0, sizeof(buf));
@@ -157,7 +876,7 @@ int main(int argc, char* argv[])
 	res = hid_get_feature_report(handle, buf, sizeof(buf));
 	if (res < 0) {
 		printf("Unable to get a feature report.\n");
-		printf("%ls", hid_error(handle));
+		printf("%ls \n", hid_error(handle));
 	}
 	else {
 		// Print out the returned buffer.
@@ -166,49 +885,86 @@ int main(int argc, char* argv[])
 			printf("%02hhx ", buf[i]);
 		printf("\n");
 	}
+#endif
 
-	do {
-		// Issue Command
-		//productSendBuffer(buf, sizeof(buf), 0xdb, 0x05);// dynamic change value
-		productSendBuffer(buf, sizeof(buf), 0x00, 0x02);
+	// Initialize Pickit
+	InitPicKit(handle, buf, recvBuffer);
 
+	// Infinite Loop
+	for (;;){
 
-		// Read Data form HID Device
-		res = 0;
-		res = hid_write(handle, buf, 64);
-		printf("res=%d \n", res);
-		if (res < 0){
-			printf("Unable to write() (2)\n");
+		printf("SendTimes =%d \n", sendTimes);
+		sendTimes++;
+
+		if (sendTimes % 2 == 0){
+
+#if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+			offset = 0;
+
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x01;
+			buf[offset++] = 0x02;
+
+			for (int idx = offset; idx < 65; idx++){
+				buf[idx] = 0;
+			}
+
+			// Send 
+			sendData(handle, buf, 3);
+
+#endif
 		}
+		else
+		{
+#if 1	//03 0e 81 84 02 b6 ec 83 84 01 b7 89 03 82 1f 77 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+		//Response As Below
+		//86 0a 80 10 00 10 08 10 c2 81 1c 77 80 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 
+		//00 31 83 00 02 00 00 00 00 01 f6 00 00 00 00 00 00 00 00 00 c2 c2 31 84 00 ff 00 ff 
+		//00 ff 80 b6 56 2c 9e 55
+			offset = 0;
+
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x03;
+			buf[offset++] = 0x0e;
+			buf[offset++] = 0x81;
+			buf[offset++] = 0x84;
+			buf[offset++] = 0x02;
+			buf[offset++] = 0xb6;
+			buf[offset++] = 0xec;
+			buf[offset++] = 0x83;
+			buf[offset++] = 0x84;
+			buf[offset++] = 0x01;
+			buf[offset++] = 0xb7;
+			buf[offset++] = 0x89;
+			buf[offset++] = 0x03;
+			buf[offset++] = 0x82;
+			buf[offset++] = 0x1f;
+			buf[offset++] = 0x77;
+
+			for (int idx = offset; idx < 65; idx++){
+				buf[idx] = 0;
+			}
+
+			// Send 
+			sendData(handle, buf, 17);
+		}
+
+#endif
+		Sleep(1);
 
 		// Read requested state. hid_read() has been set to be
 		// non-blocking by the call to hid_set_nonblocking() above.
 		// This loop demonstrates the non-blocking nature of hid_read().
-		res = 0;
-		while (res == 0) {
-			res = hid_read(handle, buf, sizeof(buf));
-			if (res == 0)
-				printf("waiting...\n");
-			if (res < 0)
-				printf("Unable to read()\n");
-#ifdef WIN32
-			Sleep(20);
-#else
-			usleep(500 * 1000);
-#endif
+		readData(handle, recvBuffer);
+
+		Sleep(1);
+
+		if (sendTimes >= LOOP_TIIMES){
+			printf("SendTimes = %d, Break Loop  \n", sendTimes);
+			break;
 		}
 
-		printf("Data read: Res = %d\n", res);
-		// Print out the returned buffer.
-		for (i = 0; i < res; i++){
-			if (i % 0x10 == 0) printf("\n");
-			printf("%02hhx ", buf[i]);
-		}
-		printf("\n");
-
-		times++;
-
-	} while (times < 5);
+	}
 
 	/* Close handle */
 	hid_close(handle);
@@ -221,146 +977,4 @@ int main(int argc, char* argv[])
 #endif
 
 	return 0;
-}
-
-void productSendBuffer(unsigned char* buffer, unsigned int lengthOfBuffer, unsigned int command, unsigned int responseLength){
-	memset(buffer, 0x00, lengthOfBuffer);
-	buffer[0] = 0x05;           // Report ID is 0x05
-	buffer[1] = 0x0a;
-	buffer[2] = 0x41;
-	buffer[3] = 0x44;
-	buffer[4] = 0xb6;           // Slave Address
-	buffer[5] = command;        // Command is 0x3a
-	buffer[6] = 0x0d;
-	buffer[7] = 0x0a;
-	buffer[8] = 0xb7;
-	buffer[9] = responseLength; // Response Data Length
-	buffer[10] = 0x0d;
-	buffer[11] = 0x0a;
-	buffer[12] = 0x01;
-	buffer[13] = 0x00;
-	buffer[14] = 0x00;
-	buffer[15] = 0x00;
-
-	buffer[16] = 0x00;
-	buffer[17] = 0x00;
-	buffer[18] = 0x00;
-	buffer[19] = 0x00;
-	buffer[20] = 0x00;
-	buffer[21] = 0x00;
-	buffer[22] = 0x00;
-	buffer[23] = 0x00;
-	buffer[24] = 0x00;
-	buffer[25] = 0x01;
-	buffer[26] = responseLength; // Response Data Length
-	buffer[27] = 0x00;
-	buffer[28] = 0x00;
-	buffer[29] = 0x02;
-	buffer[30] = 0xb7;
-	buffer[31] = responseLength; // Response Data Length
-
-	buffer[32] = 0x00;
-	buffer[33] = 0x01; //
-	buffer[34] = 0xb7; //
-	buffer[35] = 0x00;
-	buffer[36] = 0x00;
-	buffer[37] = 0x00;
-	buffer[38] = 0x00;
-	buffer[39] = 0x00;
-	buffer[40] = 0x00;
-	buffer[41] = 0x00;
-	buffer[42] = 0x00;
-	buffer[43] = 0x00;
-	buffer[44] = 0x00;
-	buffer[45] = 0x00;
-	buffer[46] = 0x00;
-	buffer[47] = 0x00;
-
-	buffer[48] = 0x00;
-	buffer[49] = 0x00;
-	buffer[50] = 0x00;
-	buffer[51] = 0x00;
-	buffer[52] = 0x00;
-	buffer[53] = 0x00;
-	buffer[54] = 0x00;
-	buffer[55] = 0x00;
-	buffer[56] = 0x00;
-	buffer[57] = 0x00;
-	buffer[58] = 0x00;
-	buffer[59] = 0x00;
-	buffer[60] = 0x00;
-	buffer[61] = 0x00;
-	buffer[62] = 0x00;
-	buffer[63] = 0x00;
-
-#if 0
-	memset(buf, 0x00, sizeof(buf));
-	buf[0] = 0x05; // ID is 0x05
-	buf[1] = 0x0a;
-	buf[2] = 0x41;
-	buf[3] = 0x44;
-	buf[4] = 0xb6; // Slave Address
-	buf[5] = 0x3a; // Command is 0x3a
-	buf[6] = 0x0d;
-	buf[7] = 0x0a;
-	buf[8] = 0xb7;
-	buf[9] = 0x02; // Response Data Length
-	buf[10] = 0x0d;
-	buf[11] = 0x0a;
-	buf[12] = 0x01;
-	buf[13] = 0x00;
-	buf[14] = 0x00;
-	buf[15] = 0x00;
-
-	buf[16] = 0x00;
-	buf[17] = 0x00;
-	buf[18] = 0x00;
-	buf[19] = 0x00;
-	buf[20] = 0x00;
-	buf[21] = 0x00;
-	buf[22] = 0x00;
-	buf[23] = 0x00;
-	buf[24] = 0x00;
-	buf[25] = 0x01;
-	buf[26] = 0x02;//
-	buf[27] = 0x00;
-	buf[28] = 0x00;
-	buf[29] = 0x02;
-	buf[30] = 0xb7;
-	buf[31] = 0x02;
-
-	buf[32] = 0x00;
-	buf[33] = 0x01;//
-	buf[34] = 0xb7;//
-	buf[35] = 0x00;
-	buf[36] = 0x00;
-	buf[37] = 0x00;
-	buf[38] = 0x00;
-	buf[39] = 0x00;
-	buf[40] = 0x00;
-	buf[41] = 0x00;
-	buf[42] = 0x00;
-	buf[43] = 0x00;
-	buf[44] = 0x00;
-	buf[45] = 0x00;
-	buf[46] = 0x00;
-	buf[47] = 0x00;
-
-	buf[48] = 0x00;
-	buf[49] = 0x00;
-	buf[50] = 0x00;
-	buf[51] = 0x00;
-	buf[52] = 0x00;
-	buf[53] = 0x00;
-	buf[54] = 0x00;
-	buf[55] = 0x00;
-	buf[56] = 0x00;
-	buf[57] = 0x00;
-	buf[58] = 0x00;
-	buf[59] = 0x00;
-	buf[60] = 0x00;
-	buf[61] = 0x00;
-	buf[62] = 0x00;
-	buf[63] = 0x00;
-#endif
 }
