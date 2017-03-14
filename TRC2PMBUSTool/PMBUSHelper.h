@@ -110,6 +110,10 @@ public :
 	 * @brief Get Expected Response Data Length by I/O.
 	 */
 	static int getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned int CMDResponseDataLength, unsigned char BaseDataLength);
+	/**
+	 * @brief Dump Receive Buffer.
+	 */
+	static void dumpReceiveBuffer(unsigned char* buffer, int bufferLength);
 
 protected :
 

@@ -126,60 +126,46 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 
 	case IOACCESS_PICKIT:
 
-		sendBuffer[baseIndex++] = 0x03;           // Report ID is 0x03
-		sendBuffer[baseIndex++] = 0x0a;
-		sendBuffer[baseIndex++] = 0x41;
-		sendBuffer[baseIndex++] = 0x44;
+		//buf[offset++] = 0x00;
+		//buf[offset++] = 0x03;
+		//buf[offset++] = 0x0e;
+		//buf[offset++] = 0x81;
+		//buf[offset++] = 0x84;
+		//buf[offset++] = 0x02;
+		//buf[offset++] = 0xb6;
+		//buf[offset++] = 0xec;
+		//buf[offset++] = 0x83;
+		//buf[offset++] = 0x84;
+		//buf[offset++] = 0x01;
+		//buf[offset++] = 0xb7;
+		//buf[offset++] = 0x89;
+		//buf[offset++] = 0x03;
+		//buf[offset++] = 0x82;
+		//buf[offset++] = 0x1f;
+		//buf[offset++] = 0x77;
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+		sendBuffer[baseIndex++] = 0x0e;
+		sendBuffer[baseIndex++] = 0x81;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
-		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;        // Command
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Command
 
-		// May Have 0x0d Command
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = 0x83;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x01;
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 0x89;
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+		sendBuffer[baseIndex++] = 0x82;
+		sendBuffer[baseIndex++] = 0x1f;
+		sendBuffer[baseIndex++] = 0x77;
 
-		if (sendBuffer[baseIndex - 1] == 0x0d){
-			sendBuffer[baseIndex++] = 0x0d;
-		}
-
-		sendBuffer[baseIndex++] = 0x0d;
-		sendBuffer[baseIndex++] = 0x0a;
-
-		sendBuffer[1] = (baseIndex - 2);
 		buffer_len = baseIndex;
 
-		sendBuffer[baseIndex++] = 0x01;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x01;
-		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x02;
-		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
-		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
-
-		sendBuffer[baseIndex++] = 0x00;
-		sendBuffer[baseIndex++] = 0x01; //
-		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
-
-		for (int local = baseIndex; local<64; local++){
+		for (int local = baseIndex; local<65; local++){
 			sendBuffer[local] = 0;
 		}
 
@@ -232,6 +218,9 @@ int PMBUSReadTestTask::Main(double elapsedTime){
 	switch (*m_CurrentIO){
 
 	case IOACCESS_PICKIT:
+		sendDataLength = HID_SEND_DATA_SIZE + 1;
+		break;
+
 	case IOACCESS_HID:
 		sendDataLength = HID_SEND_DATA_SIZE;
 		break;

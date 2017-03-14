@@ -55,6 +55,7 @@
 #define TP_PMBUSReadTestTask (0.5f)
 #define TP_PMBUSWriteTestTask (0.5f)
 #define TP_PMBUSBlockWRTestTask (0.5f)
+#define TP_PickitConfigTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -82,6 +83,7 @@ enum {
 	task_ID_PMBUSReadTestTask,
 	task_ID_PMBUSWriteTestTask,
 	task_ID_PMBUSBlockWRTestTask,
+	task_ID_PickitConfigTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -934,8 +936,8 @@ class PMBUSReadTestTask :public TaskEx {
 	PMBUSReadCMD_t* m_pmbusReadCMDArray;/**< Read CMD Array */
 	int m_setsToRun;
 
-	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];
-	unsigned char m_recvBuff[SEND_BUFFER_MAX_SIZE];
+	unsigned char m_sendBuff[256];
+	unsigned char m_recvBuff[256];
 
 	DWORD startTick;
 	DWORD stopTick;
@@ -1077,6 +1079,39 @@ public:
 	* @brief Product Block Write Read CMD Buffer.
 	*/
 	int ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockWRCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+};
+
+class PickitConfigTask : public TaskEx {
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS* m_IOAccess;
+	unsigned int *m_currentUseIO;
+
+public:
+
+	/**
+	 * @brief Constructor.
+	 */
+	PickitConfigTask(IOACCESS* ioaccess, unsigned int* currentIO);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~PickitConfigTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
 };
 
 #endif

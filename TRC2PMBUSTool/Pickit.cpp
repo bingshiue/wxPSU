@@ -113,7 +113,6 @@ int OpenPickitDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* port
 	}
 	else{
 
-#if 1
 		// Read the Manufacturer String
 		pickit_wstr[0] = 0x0000;
 		res = hid_get_manufacturer_string(pickitHandle, pickit_wstr, MAX_STR);
@@ -156,65 +155,8 @@ int OpenPickitDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* port
 		// Set the hid_read() function to be non-blocking.
 		res = hid_set_nonblocking(pickitHandle, 1);
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Ret of hid_set_nonblocking is %d", res);
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Return of hid_set_nonblocking is %d", res);
 #endif
-
-#endif
-		//for (unsigned id = 1; id < 2; id++){
-			
-		    
-			// Test Write
-			InitArray[0] = 0x01;//0x02;
-			InitArray[1] = 0x02;//0x02;
-			
-			/*
-		    InitArray[0] = 0x02;
-			InitArray[1] = 0xc0;
-			InitArray[2] = 0x00;
-			InitArray[3] = 0x00;
-			InitArray[4] = 0x0a;
-			InitArray[5] = 0xff;
-			InitArray[6] = 0x00;
-			InitArray[7] = 0x00;
-			InitArray[8] = 0x00;
-			InitArray[9] = 0x01;
-			InitArray[10] = 0x31;
-			InitArray[11] = 0x20;
-			InitArray[12] = 0x00;
-			InitArray[13] = 0x00;
-			InitArray[14] = 0x00;
-			InitArray[15] = 0x00;
-			InitArray[16] = 0x00;
-			InitArray[17] = 0x03;
-			InitArray[18] = 0x06;
-			InitArray[19] = 0x00;
-			InitArray[20] = 0x00;
-			InitArray[21] = 0x00;
-			InitArray[22] = 0x00;
-			InitArray[23] = 0x00;
-			InitArray[24] = 0x31;
-
-			*/
-
-			for (unsigned int idx = 2; idx < 64; idx++){
-				InitArray[idx] = 0;
-			}
-
-
-			for (unsigned int len = 0; len < 256; len++){
-
-				res = PickitSendData(InitArray, len);
-				PSU_DEBUG_PRINT(MSG_DEBUG, "res of Pickit Test Write is %d, len = %d", res, len);
-
-				if (res < 0){
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Pickit Write Error String : %s", hid_error(pickitHandle));
-					wxMilliSleep(10);
-				}
-				else{
-					PSU_DEBUG_PRINT(MSG_DEBUG, "Pickit Write Successfully");
-				}
-			}
-		//}
 
 	}
 
@@ -223,11 +165,13 @@ int OpenPickitDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* port
 
 int PickitSendData(unsigned char* buff, unsigned int size){
 
+	int LengthToWrite = size;
 	int bytes_write = 0;
 
 	if (pickitHandle == NULL) { return 0; }
+	if (LengthToWrite != 65) LengthToWrite = 65;
 
-	bytes_write = hid_write(pickitHandle, buff, size);
+	bytes_write = hid_write(pickitHandle, buff, LengthToWrite);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "bytes_write of hid_write is %d", bytes_write);
 
 
@@ -235,21 +179,86 @@ int PickitSendData(unsigned char* buff, unsigned int size){
 }
 
 #define RETRY_TIMES  5
+#define SECONDARY_RETRY_TIMES  10 /**< Secondary Retry Times */
 #define HID_EXPECT_DATA_LENGTH  64/**< HID Expect Data Length */
 int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
+	bool bDataReceived = false;
+	unsigned char TmpBuffer[256] = { 0 };
 	unsigned int retry = 0;
-	unsigned int readSize = 0;
-	//                                         { 3, 20, 50, 100, 200 };
-	unsigned int retryTimeArray[RETRY_TIMES] = { 1, 3, 5, 10, 100 };
+	unsigned int secRerty = 0; /**< Secondary Retry */
+	int readSize = 0;
+	int secReadSize = 0;
+	// Retry Interval Time                     { 3, 20, 50, 100, 200 };
+	unsigned int retryTimeArray[RETRY_TIMES] = { 3, 3, 5, 10, 100 };
+	unsigned int secRetryTimeArray[SECONDARY_RETRY_TIMES] = { 1, 1 ,1, 1, 1, 1, 1, 1, 1, 1 };
+	unsigned int readOffset = 0;
 
+	// Read Data
 	while (retry < RETRY_TIMES && readSize <= 0){
 
+		// Sleep
 		wxMilliSleep(retryTimeArray[retry]);//3);
 
-		readSize = hid_read(pickitHandle, buff, sizeOfBuff + 2);// Read To [0x0d] [0x0a]
+		// Read Data To TmpBuffer
+		readSize = hid_read(pickitHandle, TmpBuffer, 64);//sizeOfBuff + 2);// Read To [0x0d] [0x0a]
+		// Check Data Length of Receive Data
 		if (readSize != HID_EXPECT_DATA_LENGTH){
 			PSU_DEBUG_PRINT(MSG_DEBUG, "readSize = %d", readSize);
 		}
+
+		if (readSize > 0 ){
+
+			PMBUSHelper::dumpReceiveBuffer(TmpBuffer, readSize);
+
+			if (TmpBuffer[0] == 0x86){
+
+				// Copy Previous Received Data To Target Buffer
+				for (int idx = 0; idx < TmpBuffer[1] + 2; idx++){
+					buff[idx] = TmpBuffer[idx];
+					readOffset = idx;
+				}
+				readOffset++;
+
+				PSU_DEBUG_PRINT(MSG_DEBUG, "readOffset = %d", readOffset);
+				PMBUSHelper::dumpReceiveBuffer(buff, readOffset);
+
+				// Read Util No Data Income
+				while (secRerty < SECONDARY_RETRY_TIMES){// && secReadSize <= 0){
+					PSU_DEBUG_PRINT(MSG_DEBUG, "Read Until No Data, Retry Times = %d", secRerty);
+
+					// Read Data To TmpBuffer
+					secReadSize = hid_read(pickitHandle, TmpBuffer, 64);
+
+					// Check Data Length of Receive Data
+					if (secReadSize != HID_EXPECT_DATA_LENGTH){
+						PSU_DEBUG_PRINT(MSG_DEBUG, "secReadSize = %d", secReadSize);
+					}
+
+					if (secReadSize > 0){
+						PMBUSHelper::dumpReceiveBuffer(TmpBuffer, secReadSize);
+
+						PSU_DEBUG_PRINT(MSG_DEBUG, "TmpBuffer[1] = %d", TmpBuffer[1]);
+						for (int idx = 0, off = readOffset; idx < TmpBuffer[1]; idx++){
+							PSU_DEBUG_PRINT(MSG_DEBUG, "buff[%d] = %02x", (off + idx), TmpBuffer[2 + idx]);
+							buff[off + idx] = TmpBuffer[2 + idx];
+							readOffset = (off + idx);
+						}
+
+						readOffset++;
+					}
+
+					buff[1] = (readOffset - 2);
+					PMBUSHelper::dumpReceiveBuffer(buff, readOffset);
+
+					secRerty++;
+				}
+
+			}
+			else{
+				readOffset = readSize;
+			}
+		}
+
 
 		retry++;
 	}
@@ -260,7 +269,7 @@ int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
 		return readSize;
 	}
 
-	return sizeOfBuff + 2;//readSize;
+	return readOffset;//64;//sizeOfBuff + 2;//readSize;
 }
 
 int ClosePickitDevice(void){
@@ -268,9 +277,12 @@ int ClosePickitDevice(void){
 	int ret = 0;
 
 	/* Close handle */
-	hid_close(pickitHandle);
+	if (pickitHandle != NULL){
+		hid_close(pickitHandle);
 
-	pickitHandle = NULL;
+		pickitHandle = NULL;
+	}
+
 
 	/* Free static HIDAPI objects. */
 	ret = hid_exit();

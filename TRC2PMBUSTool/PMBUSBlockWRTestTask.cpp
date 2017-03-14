@@ -173,6 +173,41 @@ int PMBUSBlockWRTestTask::ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockW
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+		sendBuffer[baseIndex++] = 1 + 0x0e + pmBusBlockWRCMD->m_numOfWriteBytes;// Should be decided dynanically
+		sendBuffer[baseIndex++] = 0x81;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 1 + pmBusBlockWRCMD->m_numOfWriteBytes + 0x02;//0x02;// ??? (Maybe This Field Indicates "Slave Address + CMD")
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_cmd;// Command
+
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfWriteBytes;
+		// Write Data
+		for (unsigned int idx = 0; idx < pmBusBlockWRCMD->m_numOfWriteBytes; idx++){
+			sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_writeBytes[idx];
+		}
+
+		sendBuffer[baseIndex++] = 0x83;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 0x89;
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfReadBytes; // Response Data Length
+		sendBuffer[baseIndex++] = 0x82;
+		sendBuffer[baseIndex++] = 0x1f;
+		sendBuffer[baseIndex++] = 0x77;
+
+		for (int local = baseIndex; local<65; local++){
+			sendBuffer[local] = 0;
+		}
+
+		buffer_len = baseIndex;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		sendBuffer[0] = pmBusBlockWRCMD->m_numOfWriteBytes; // Write Bytes
@@ -230,6 +265,10 @@ int PMBUSBlockWRTestTask::Main(double elapsedTime){
 
 	// Decide Send Data Length
 	switch (*m_CurrentIO){
+
+	case IOACCESS_PICKIT:
+		sendDataLength = HID_SEND_DATA_SIZE + 1;
+		break;
 
 	case IOACCESS_HID:
 		sendDataLength = HID_SEND_DATA_SIZE;
