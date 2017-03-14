@@ -87,6 +87,33 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		m_writePageSendBuff[0] = 0x00;
+		m_writePageSendBuff[1] = 0x03;
+
+		m_writePageSendBuff[3] = 0x81;
+		m_writePageSendBuff[4] = 0x84;
+		m_writePageSendBuff[5] = 1 + 3; //(Slave Address + CMD + PEC + DATA)
+		m_writePageSendBuff[6] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		m_writePageSendBuff[7] = 0x00; // CMD
+		m_writePageSendBuff[8] = cmdPageValue;
+
+		// Compute PEC
+		m_writePageSendBuff[9] = PMBusSlave_Crc8MakeBitwise(0, 7, m_writePageSendBuff + 6, 2 + 1);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", m_writePageSendBuff[9]);
+
+		// Fill Last 3
+		m_writePageSendBuff[10] = 0x82;
+		m_writePageSendBuff[11] = 0x1f;
+		m_writePageSendBuff[12] = 0x77;
+
+		// Fill Total Length
+		m_writePageSendBuff[2] = 10;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		m_writePageSendBuff[0] = 1;// pmBusWriteCMD->m_numOfSendBytes; // Write Bytes
@@ -437,6 +464,70 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 		}
 
 		break;
+
+	case IOACCESS_PICKIT:
+
+		if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x03;// Report ID is 0x03
+			this->m_sendBuff[baseIndex++] = 0x0e;
+			this->m_sendBuff[baseIndex++] = 0x81;
+			this->m_sendBuff[baseIndex++] = 0x84;
+			this->m_sendBuff[baseIndex++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;// Command
+
+			this->m_sendBuff[baseIndex++] = 0x83;
+			this->m_sendBuff[baseIndex++] = 0x84;
+			this->m_sendBuff[baseIndex++] = 0x01;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = 0x89;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+			this->m_sendBuff[baseIndex++] = 0x82;
+			this->m_sendBuff[baseIndex++] = 0x1f;
+			this->m_sendBuff[baseIndex++] = 0x77;
+
+			for (int local = baseIndex; local<65; local++){
+				this->m_sendBuff[local] = 0;
+			}
+
+		}
+		else if (this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x03;// Report ID is 0x03
+			this->m_sendBuff[baseIndex++] = 0x0e + this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength;// Should be decided dynanically
+			this->m_sendBuff[baseIndex++] = 0x81;
+			this->m_sendBuff[baseIndex++] = 0x84;
+			this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 0x02;//0x02;// ??? (Maybe This Field Indicates "Slave Address + CMD")
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			this->m_sendBuff[baseIndex++] = command;// Command
+
+			// Write Data
+			for (unsigned int len = 0; len < (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength); len++){
+				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+			}
+
+			this->m_sendBuff[baseIndex++] = 0x83;
+			this->m_sendBuff[baseIndex++] = 0x84;
+			this->m_sendBuff[baseIndex++] = 0x01;
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			this->m_sendBuff[baseIndex++] = 0x89;
+			this->m_sendBuff[baseIndex++] = responseDataLength; // Response Data Length
+			this->m_sendBuff[baseIndex++] = 0x82;
+			this->m_sendBuff[baseIndex++] = 0x1f;
+			this->m_sendBuff[baseIndex++] = 0x77;
+
+			for (int local = baseIndex; local<65; local++){
+				this->m_sendBuff[local] = 0;
+			}
+
+		}
+
+		break;
+
+
 
 	case IOACCESS_TOTALPHASE:
 
@@ -1077,6 +1168,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									
 									case IOACCESS_SERIALPORT:
 									case IOACCESS_HID:
+									case IOACCESS_PICKIT:
 										PSU_DEBUG_PRINT(MSG_ERROR, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
 										break;
 
@@ -1394,7 +1486,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								}
 								//
 								else{
-									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%d, Length=%d(ExpectReceiveDataLength=%d)", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length, ExpectReceiveDataLength);
+									PSU_DEBUG_PRINT(MSG_ALERT, "RecvBuff's Length Don't As Expected CMD=%02x, Length=%d(ExpectReceiveDataLength=%d)", this->m_pmBusCommand[idx].m_register, this->m_recvBuff->m_length, ExpectReceiveDataLength);
 									// 0d  0a  4e  47  0d  0a : May Receive Response as left when I2C Slave Address was wrong
 
 									wxString receive("");
@@ -1469,7 +1561,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							}
 							else{
 								//PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
-								int sendCMDIndex = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : 5;
+								// Serial Port & Total Phase is 3, USBHID is 5 , And Pickit is 7
+								int sendCMDIndex = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 5 : 7);
 								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %x H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
 							}
 
@@ -1632,6 +1725,16 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
 			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx+6];
+		}
+
+		break;
+
+	case IOACCESS_PICKIT:
+		// 86 0a 80 10 [01] 10 [ac] 10 [22] 81 1c 77
+		// 86 0a 80 10 [01] 10 [f0] 10 [e2] 81 1c 77
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[4 + idx*2];
 		}
 
 		break;

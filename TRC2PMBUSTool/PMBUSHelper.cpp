@@ -750,6 +750,39 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		buff[0] = 0x00;
+		buff[1] = 0x03;
+
+		buff[3] = 0x81;
+		buff[4] = 0x84;
+		buff[5] = sizeOfDataBuffer + 3;
+		buff[6] = PMBUSHelper::GetSlaveAddress(); // Slave Address
+		buff[7] = cmd; // CMD
+
+		// Data start from index 6
+		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
+			buff[8 + idx] = dataBuffer[idx];
+			pec_start_index = (8 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 6, 2 + sizeOfDataBuffer);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+
+		// Fill Last 3
+		pec_start_index++;
+		buff[pec_start_index++] = 0x82;
+		buff[pec_start_index++] = 0x1f;
+		buff[pec_start_index++] = 0x77;
+
+		// Fill Total Length
+		buff[2] = pec_start_index - 3;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		buff[0] = sizeOfDataBuffer; // Write Bytes
@@ -1086,6 +1119,12 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		if (sizeOfBuffer == 0) result = response_ng;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 		if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
 			result = response_ng;
@@ -1127,6 +1166,14 @@ unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsign
 		}
 
 		if (chk_cnt == sizeof(usbhid_no_ack) / sizeof(usbhid_no_ack[0])){
+			result = response_ng;
+		}
+
+		break;
+
+	case IOACCESS_PICKIT:
+
+		if (SizeOfBuffer == 0){
 			result = response_ng;
 		}
 
@@ -1297,6 +1344,10 @@ int PMBUSHelper::getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned i
 		length = CMDResponseDataLength + BaseDataLength + 2;
 		break;
 
+	case IOACCESS_PICKIT:
+		length = CMDResponseDataLength*2 + BaseDataLength;
+		break;
+
 	case IOACCESS_TOTALPHASE:
 		length = CMDResponseDataLength;
 		break;
@@ -1307,6 +1358,20 @@ int PMBUSHelper::getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned i
 	}
    
 	return length;
+}
+
+void PMBUSHelper::dumpReceiveBuffer(unsigned char* buffer, int bufferLength){
+
+	if (buffer == NULL || bufferLength < 0) return;
+
+	wxString string("Data : ");
+
+	for (int idx = 0; idx < bufferLength; idx++){
+		string += wxString::Format("%02x ", buffer[idx]);
+	}
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", string.c_str());
+
 }
 
 int PMBUSHelper::ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned char* fruContentBuffer, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO){

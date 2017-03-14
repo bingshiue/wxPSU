@@ -3192,6 +3192,13 @@ int MainFrame::OpenIODevice(void){
 					// Update I2C Clock Speed Field
 					this->UpdateStatusBarIOSettingFiled(100);
 
+					// Create Pickit Config Task
+					new(TP_PickitConfigTask) PickitConfigTask(this->m_IOAccess, &this->m_CurrentUseIOInterface);
+
+					while (TaskEx::GetCount(task_ID_PickitConfigTask) != 0){
+						wxMilliSleep(10);
+					};
+
 				}
 		
 				//

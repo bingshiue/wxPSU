@@ -126,6 +126,7 @@
     <ClCompile Include="ModelSelectDialog.cpp" />
     <ClCompile Include="PEC.cpp" />
     <ClCompile Include="Pickit.cpp" />
+    <ClCompile Include="PickitConfigTask.cpp" />
     <ClCompile Include="PMBUSArtProv.cpp" />
     <ClCompile Include="PMBUSBitmapButton.cpp" />
     <ClCompile Include="PMBUSBlockWRTestTask.cpp" />

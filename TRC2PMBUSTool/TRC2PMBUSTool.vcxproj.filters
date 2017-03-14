@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="原始程式檔">
@@ -348,6 +348,9 @@
     <ClCompile Include="Pickit.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="PickitConfigTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
     <ClCompile Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
@@ -639,30 +642,6 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="Pickit.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCook.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBQuery.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCoefficients.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CMDCB.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="FRU.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
-    <ClInclude Include="FRUUtilityDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

@@ -116,6 +116,10 @@ public :
 	 */
 	static int getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned int CMDResponseDataLength, unsigned char BaseDataLength);
 	/**
+	 * @brief Dump Receive Buffer.
+	 */
+	static void dumpReceiveBuffer(unsigned char* buffer, int bufferLength);
+	/**
 	 * @brief Re-Judge IO Thread Send Failure.
 	 */
 	static bool ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO);

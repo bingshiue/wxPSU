@@ -91,6 +91,40 @@ int PMBUSWriteTestTask::ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, un
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		sendBuffer[0] = 0x00;
+		sendBuffer[1] = 0x03;
+
+		sendBuffer[3] = 0x81;
+		sendBuffer[4] = 0x84;
+		sendBuffer[5] = pmBusWriteCMD->m_numOfSendBytes + 3;
+		sendBuffer[6] = pmBusWriteCMD->m_slaveAddr; // Slave Address
+		sendBuffer[7] = pmBusWriteCMD->m_cmd; // CMD
+
+		// Data start from index 6
+		for (unsigned int idx = 0; idx < pmBusWriteCMD->m_numOfSendBytes; idx++){
+			sendBuffer[8 + idx] = pmBusWriteCMD->m_sendBytes[idx];
+			pec_start_index = (8 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		sendBuffer[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 6, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", sendBuffer[pec_start_index]);
+
+		// Fill Last 3
+		pec_start_index++;
+		sendBuffer[pec_start_index++] = 0x82;
+		sendBuffer[pec_start_index++] = 0x1f;
+		sendBuffer[pec_start_index++] = 0x77;
+
+		// Fill Total Length
+		sendBuffer[2] = pec_start_index - 3;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		sendBuffer[0] = pmBusWriteCMD->m_numOfSendBytes; // Write Bytes
@@ -151,6 +185,10 @@ int PMBUSWriteTestTask::Main(double elapsedTime){
 
 	// Decide Send Data Length
 	switch (*m_CurrentIO){
+
+	case IOACCESS_PICKIT:
+		sendDataLength = HID_SEND_DATA_SIZE + 1;
+		break;
 
 	case IOACCESS_HID:
 		sendDataLength = HID_SEND_DATA_SIZE;
