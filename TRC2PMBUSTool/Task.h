@@ -1142,6 +1142,7 @@ class E2PRomReadDataTask : public TaskEx {
 
 	unsigned char m_e2pRomSlaveAddr;/**< E2PRom Slave Address */
 	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer for Put Read E2PRom Content */
+	unsigned char *m_targetE2pRomContent;/**< Pointer of Target E2PRom Content */
 
 public:
 
@@ -1153,7 +1154,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, bool* outputLog, int readIntervalTime);
+	E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, unsigned char* e2pRomContent,bool* outputLog, int readIntervalTime);
 
 	/**
 	* @brief Deconstructor.

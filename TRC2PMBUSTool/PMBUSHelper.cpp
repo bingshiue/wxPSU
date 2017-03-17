@@ -1504,7 +1504,7 @@ int PMBUSHelper::ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned in
 }
 
 void PMBUSHelper::PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize){
-	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
+	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------------------------------------------------");
 	wxString data("");
 	unsigned int addr = 0x00;
 
@@ -1527,7 +1527,7 @@ void PMBUSHelper::PrintFRUContent(unsigned char* contentBuffer, unsigned int dum
 		}
 	}
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "------------------------------------------------------------");
+	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------------------------------------------------");
 }
 
 bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO){

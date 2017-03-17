@@ -360,13 +360,16 @@
     <ClCompile Include="WritePageECH.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
-    <ClCompile Include="FRUWriterDialog.cpp">
-      <Filter>原始程式檔</Filter>
-    </ClCompile>
     <ClCompile Include="E2PRomWriteDataTask.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
     <ClCompile Include="E2PRomReadDataTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="FRU.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="FRUUtilityDialog.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
@@ -650,7 +653,10 @@
     <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="FRUWriterDialog.h">
+    <ClInclude Include="FRU.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="FRUUtilityDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

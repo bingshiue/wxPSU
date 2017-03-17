@@ -725,7 +725,7 @@ void MainFrame::SetupMenuBar(void){
 	*/
 	this->m_utilityMenu = new wxMenu();
 
-	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Writer"), wxT("FRU Writer"), wxITEM_NORMAL);
+	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Utility"), wxT("FRU Utility"), wxITEM_NORMAL);
 
 	this->m_fruWriterMenuItem->SetBitmap(wxBITMAP_PNG(E2PROM_16));
 
@@ -1742,11 +1742,11 @@ void MainFrame::OnFRUWriter(wxCommandEvent& event){
 		return;
 	}
 
-	FRUWriterDialog* fruWriterDialog = new FRUWriterDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
-	fruWriterDialog->Centre();
-	fruWriterDialog->ShowModal();
+	FRUUtilityDialog* fruUtilityDialog = new FRUUtilityDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	fruUtilityDialog->Centre();
+	fruUtilityDialog->ShowModal();
 
-	wxDELETE(fruWriterDialog);
+	wxDELETE(fruUtilityDialog);
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)

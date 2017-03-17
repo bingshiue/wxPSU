@@ -13,7 +13,7 @@
 #define MAX_E2PROM_WRITE_RETRY_TIMES          3
 #define MAX_E2PROM_READ_RETRY_TIMES           3
 
-E2PRomReadDataTask::E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, bool* outputLog, int readIntervalTime) {
+E2PRomReadDataTask::E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char e2pRomSlaveAddr, unsigned char* e2pRomContent, bool* outputLog, int readIntervalTime) {
 	this->m_id = task_ID_E2PRomReadDataTask;
 
 	this->m_evtHandler = evtHandler;
@@ -22,6 +22,7 @@ E2PRomReadDataTask::E2PRomReadDataTask(IOACCESS* ioaccess, unsigned int* current
 	this->m_CurrentIO = currentIO;
 
 	this->m_e2pRomSlaveAddr = e2pRomSlaveAddr;
+	this->m_targetE2pRomContent = e2pRomContent;
 	this->m_outputLog = outputLog;
 	this->m_readIntervalTime = readIntervalTime;
 }
@@ -43,11 +44,16 @@ int E2PRomReadDataTask::Main(double elapsedTime){
 
 	unsigned char recvBuffer[MAX_RECV_BUFFER_LENGTH];
 
-	// Read Data From E2PRom For Validate 
+	// Read Data From E2PRom
 	result = DumpE2PROM(recvBuffer, this->m_CurrentIO);
 
+	// Copy Content of E2PRom Comtent To Target Buffer
+	for (unsigned int idx = 0; idx<MAX_FRU_FILE_SIZE; idx++){
+		this->m_targetE2pRomContent[idx] = this->m_e2pRomContent[idx];
+	}
+
 	// Print Content of E2PROM 
-	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------- E2PROM CONTENT -------------------");
+	PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
 	PMBUSHelper::PrintFRUContent(this->m_e2pRomContent, 256);
 
 	if (result < 0){
@@ -144,6 +150,7 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 
 		} while (sendResult <= 0);
 
+		// Send Failure Occurs
 		if (sendRetryStillFailed == true){
 			PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send Still Failed, Exit Task");
 			return -1;

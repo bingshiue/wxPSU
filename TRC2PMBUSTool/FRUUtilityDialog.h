@@ -1,3 +1,6 @@
+/**
+ * @file FRUUtilityDialog.h
+ */
 #ifndef _FRU_WRITER_DIALOG_H_
 #define _FRU_WRITER_DIALOG_H_
 
@@ -14,6 +17,7 @@
 #include <wx/statline.h>
 
 #include "CommonDef.h"
+#include "FRU.h"
 #include "IOACCESS.h"
 #include "PMBUSHelper.h"
 #include "PMBUSLogTextCtrl.h"
@@ -22,17 +26,18 @@
 
 #define MAX_FRU_FILE_SIZE  256 // Max FRU File Size 
 
-class FRUWriterDialog : public wxDialog, private wxLog
+class FRUUtilityDialog : public wxDialog, private wxLog
 {
 public:
-	FRUWriterDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO);
+	FRUUtilityDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO);
 
-	~FRUWriterDialog();
+	~FRUUtilityDialog();
 
 	enum {
 		CID_BTN_LOAD, /**< Load Button */
+		CID_BTN_WRITE,/**< Write Button */
 		CID_BTN_READ, /**< Read Button */
-		CID_BTN_WRITE /**< Write Button */
+		CID_BTN_SAVE_AS_FILE,/**< Save As File Button */
 	};
 
 protected:
@@ -54,15 +59,17 @@ private:
 
 	unsigned int m_fruFileLength;
 
-	unsigned char m_fruBinaryContent[MAX_FRU_FILE_SIZE];
-
-	//unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];
+	unsigned char m_fruBinaryContent[MAX_FRU_FILE_SIZE];/**< Buffer for Save FRU Binary File Content */
+	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer For Save E2PRom Content */
 
 	bool m_preWriteBTNEnable;
 
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;
 	wxStaticBoxSizer *m_e2pROMSBS;
+	wxStaticBoxSizer *m_fruWriteSBS;
+	wxStaticBoxSizer *m_fruReadSBS;
+	wxStaticBoxSizer *m_logSBS;
 	wxBoxSizer *m_e2pROMLine1Sizer;
 	wxBoxSizer *m_e2pROMLine2Sizer;
 	wxBoxSizer *m_btnSizer;
@@ -82,6 +89,7 @@ private:
 
 	// Button
 	wxButton *m_btnREAD;
+	wxButton *m_btnSaveAsFile;
 	wxButton *m_btnWRITE;
 
 	// TextValidator
@@ -98,14 +106,19 @@ private:
 		const wxString& msg);
 
 	void OnBtnLOAD(wxCommandEvent& event);
-	void OnBtnREAD(wxCommandEvent& event);
 	void OnBtnWRITE(wxCommandEvent& event);
+	void OnBtnREAD(wxCommandEvent& event);
+	void OnBtnSaveAsFile(wxCommandEvent& event);
 	void OnDialogClose(wxCloseEvent& event);
 
 	void OnE2PRomWriteEnd(wxThreadEvent& event);
 	void OnE2PRomReadEnd(wxThreadEvent& event);
 	void OnE2PRomWriteInterrupt(wxThreadEvent& event);
 	void OnE2PRomReadInterrupt(wxThreadEvent& event);
+
+	void dump_fru_field(const char * description, size_t offset, unsigned char * field);
+	void dump_PRODUCT(struct PRODUCT_INFO *fru);
+	void dump_MULTIRECORD(struct MULTIRECORD_INFO *fru);
 
 	wxDECLARE_EVENT_TABLE();
 
