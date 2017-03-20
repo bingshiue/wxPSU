@@ -53,8 +53,8 @@ int E2PRomReadDataTask::Main(double elapsedTime){
 	}
 
 	// Print Content of E2PROM 
-	PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
-	PMBUSHelper::PrintFRUContent(this->m_e2pRomContent, 256);
+	//PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
+	//PMBUSHelper::PrintFRUContent(this->m_e2pRomContent, 256);
 
 	if (result < 0){
 

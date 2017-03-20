@@ -196,11 +196,12 @@ void FRUUtilityDialog::OnBtnLOAD(wxCommandEvent& event){
 		}
 
 		free_FRU(fru);
+
+		// Seems like No Error On FRU Binary File Content
+		m_btnWRITE->Enable(true);
 	}
 #endif
 
-	// Seems like No Error On FRU Binary File Content
-	m_btnWRITE->Enable(true);
 	wxDELETE(fruFile);
 }
 
@@ -315,6 +316,10 @@ void FRUUtilityDialog::OnE2PRomReadEnd(wxThreadEvent& event){
 		this->m_btnWRITE->Enable(true);
 	}
 
+	// Print Content of E2PROM
+	PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
+	PMBUSHelper::PrintFRUContent(this->m_e2pRomContent, 256);
+
 	// Parse FRU
 	struct FRU_DATA *fru = NULL;
 	fru = parse_FRU(m_e2pRomContent);
@@ -418,6 +423,8 @@ void FRUUtilityDialog::dump_MULTIRECORD(struct MULTIRECORD_INFO *fru){
 
 	// If Power Supply Information Exist
 	if (fru->power_supply_info){
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "----------------------  MULTI AREA INFO ---------------------");
 
 		z = (unsigned char*)x_calloc(1, 24);
 		p = fru->power_supply_info;
