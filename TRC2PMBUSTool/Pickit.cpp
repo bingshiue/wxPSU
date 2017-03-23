@@ -179,22 +179,33 @@ int PickitSendData(unsigned char* buff, unsigned int size){
 }
 
 #define RETRY_TIMES  5
-#define SECONDARY_RETRY_TIMES  10 /**< Secondary Retry Times */
+#define SECONDARY_RETRY_TIMES  50 /**< Secondary Retry Times */
 #define HID_EXPECT_DATA_LENGTH  64/**< HID Expect Data Length */
-int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
+int PickitReadData(unsigned char* buff, unsigned int bytesToRead){
 	bool bDataReceived = false;
+	int BytesToRead;
 	unsigned char TmpBuffer[256] = { 0 };
 	unsigned int retry = 0;
 	unsigned int secRerty = 0; /**< Secondary Retry */
 	int readSize = 0;
 	int secReadSize = 0;
 	// Retry Interval Time                     { 3, 20, 50, 100, 200 };
-	unsigned int retryTimeArray[RETRY_TIMES] = { 3, 3, 5, 10, 100 };
-	unsigned int secRetryTimeArray[SECONDARY_RETRY_TIMES] = { 1, 1 ,1, 1, 1, 1, 1, 1, 1, 1 };
+	unsigned int retryTimeArray[RETRY_TIMES] = { 3, 3, 5, 100, 1000 };
+	//unsigned int secRetryTimeArray[SECONDARY_RETRY_TIMES] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 	unsigned int readOffset = 0;
+
+	// Detemine BytesToRead
+	if (bytesToRead >= 6){
+		BytesToRead = (((int)bytesToRead - 6) * 2) + 4;// Bytes To Read (bytesToRead = 0x1C, Total Length Should be 0x3C) 
+	}
+	else{
+		BytesToRead = 4;
+	}
 
 	// Read Data
 	while (retry < RETRY_TIMES && readSize <= 0){
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "BytesToRead = %x, retry = %d", BytesToRead, retry);
 
 		// Sleep
 		wxMilliSleep(retryTimeArray[retry]);//3);
@@ -218,12 +229,17 @@ int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
 					readOffset = idx;
 				}
 				readOffset++;
+				PSU_DEBUG_PRINT(MSG_DETAIL, "BytesToRead (%x)- TmpBuffer[1] (%x)", BytesToRead, TmpBuffer[1]);
+				BytesToRead -= TmpBuffer[1];
 
 				PSU_DEBUG_PRINT(MSG_DEBUG, "readOffset = %d", readOffset);
 				PMBUSHelper::dumpReceiveBuffer(buff, readOffset);
 
 				// Read Util No Data Income
-				while (secRerty < SECONDARY_RETRY_TIMES){// && secReadSize <= 0){
+				while (BytesToRead > 0){//secRerty < SECONDARY_RETRY_TIMES){//secRerty < SECONDARY_RETRY_TIMES){// && secReadSize <= 0){
+					// Sleep
+					wxMilliSleep(1);
+
 					PSU_DEBUG_PRINT(MSG_DEBUG, "Read Until No Data, Retry Times = %d", secRerty);
 
 					// Read Data To TmpBuffer
@@ -245,17 +261,34 @@ int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
 						}
 
 						readOffset++;
+						PSU_DEBUG_PRINT(MSG_DEBUG, "BytesToRead (%x)- TmpBuffer[1] (%x)", BytesToRead, TmpBuffer[1]);
+						BytesToRead -= TmpBuffer[1];
 					}
 
 					buff[1] = (readOffset - 2);
 					PMBUSHelper::dumpReceiveBuffer(buff, readOffset);
 
 					secRerty++;
+
+					if (BytesToRead <= 0 || secRerty > SECONDARY_RETRY_TIMES){
+						if (BytesToRead > 0){
+							PSU_DEBUG_PRINT(MSG_ALERT, "BREAK : BytesToRead = %x, secRerty = %d", BytesToRead, secRerty);
+						}
+						break;
+					}
 				}
 
 			}
 			else{
-				readOffset = readSize;
+
+				// Copy Received Data To Target Buffer
+				for (int idx = 0; idx < TmpBuffer[1] + 2; idx++){
+					buff[idx] = TmpBuffer[idx];
+					readOffset = idx;
+				}
+				readOffset++;
+				break;
+				//readOffset = readSize;
 			}
 		}
 
@@ -270,6 +303,17 @@ int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff){
 	}
 
 	return readOffset;//64;//sizeOfBuff + 2;//readSize;
+}
+
+int PickitSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
+
+	return PickitSendData(buff, size);
+}
+
+
+int PickitReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr){
+
+	return PickitReadData(buff, sizeOfBuff);
 }
 
 int ClosePickitDevice(void){

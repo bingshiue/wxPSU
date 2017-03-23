@@ -88,6 +88,32 @@ unsigned int ISPSequenceThread::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_PICKIT:
+		
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x03;
+		buffer[active_index++] = 0x00; // Total Length, Detemine Later
+		buffer[active_index++] = 0x81;
+		buffer[active_index++] = 0x84;
+		buffer[active_index++] = 1 + 3;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
+		buffer[active_index++] = this->m_target; // Target
+
+		// Compute PEC
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 6, 3);
+
+		// Fill Last 3
+		buffer[active_index++] = 0x82;
+		buffer[active_index++] = 0x1f;
+		buffer[active_index++] = 0x77;
+
+		// Fill Total Length
+		buffer[2] = active_index - 3;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		buffer[active_index++] = 2; // Write Bytes
@@ -126,7 +152,7 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 	PMBUSSendCOMMAND_t CMDF0H;
 
 	CMDF0H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMDF0H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
+	CMDF0H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_F0H_BYTES_TO_READ);//(*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_F0H_BYTES_TO_READ : CMD_F0H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMDF0H.m_sendData[idx] = SendBuffer[idx];
 	}

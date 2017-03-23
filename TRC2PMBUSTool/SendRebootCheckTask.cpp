@@ -65,6 +65,29 @@ unsigned int SendRebootCheckTask::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x03;// Report ID is 0x03
+		buffer[active_index++] = 0x0e;
+		buffer[active_index++] = 0x81;
+		buffer[active_index++] = 0x84;
+		buffer[active_index++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
+
+		buffer[active_index++] = 0x83;
+		buffer[active_index++] = 0x84;
+		buffer[active_index++] = 0x01;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress() | 0x01; // Slave Address + 1
+		buffer[active_index++] = 0x89;
+		buffer[active_index++] = 0x02;// Response Data Length 
+		buffer[active_index++] = 0x82;
+		buffer[active_index++] = 0x1f;
+		buffer[active_index++] = 0x77;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		buffer[active_index++] = 1;// write bytes

@@ -325,9 +325,15 @@ void FRUUtilityDialog::OnE2PRomReadEnd(wxThreadEvent& event){
 	fru = parse_FRU(m_e2pRomContent);
 
 	if (fru){
+		
 		if (fru->Product_Area){
 			dump_PRODUCT(fru->Product_Area);
 		}
+
+		if (fru->MultiRecord_Area){
+			dump_MULTIRECORD(fru->MultiRecord_Area);
+		}
+
 		free_FRU(fru);
 
 		m_btnSaveAsFile->Enable(true);

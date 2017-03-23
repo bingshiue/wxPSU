@@ -103,7 +103,7 @@ int PMBUSWriteTestTask::ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, un
 		sendBuffer[6] = pmBusWriteCMD->m_slaveAddr; // Slave Address
 		sendBuffer[7] = pmBusWriteCMD->m_cmd; // CMD
 
-		// Data start from index 6
+		// Data start from index 8
 		for (unsigned int idx = 0; idx < pmBusWriteCMD->m_numOfSendBytes; idx++){
 			sendBuffer[8 + idx] = pmBusWriteCMD->m_sendBytes[idx];
 			pec_start_index = (8 + idx);
@@ -237,7 +237,7 @@ int PMBUSWriteTestTask::Main(double elapsedTime){
 		//wxMilliSleep(1);
 
 		// Receive Response
-		bytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? WRITE_CMD_BYTES_TO_READ : WRITE_CMD_BYTES_TO_READ + 1;
+		bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_CurrentIO, WRITE_CMD_BYTES_TO_READ);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? WRITE_CMD_BYTES_TO_READ : WRITE_CMD_BYTES_TO_READ + 1;
 		recvLength = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff, bytesToRead);
 
 		if (*this->m_outputLog == true){

@@ -61,6 +61,32 @@ unsigned int ReceiveISPStartVerifyCMDTask::ProductISPStartCMDSendBuffer(unsigned
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x03;
+		buffer[active_index++] = 0x00; // Total Length, Determine Later
+		buffer[active_index++] = 0x81;
+		buffer[active_index++] = 0x84;
+		buffer[active_index++] = 1 + 3;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Slave Address
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD(); // FW Upload Mode Command
+		buffer[active_index++] = this->m_target; // Target
+
+		// Compute PEC
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 6, 3);
+
+		// Fill Last 3
+		buffer[active_index++] = 0x82;
+		buffer[active_index++] = 0x1f;
+		buffer[active_index++] = 0x77;
+
+		// Fill Total Length
+		buffer[2] = active_index - 3;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		buffer[active_index++] = 2; // Write Bytes
@@ -105,6 +131,7 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 
 		case IOACCESS_SERIALPORT:
 		case IOACCESS_HID:
+		case IOACCESS_PICKIT:
 			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 			isp_response_error = true;
 			break;
@@ -160,6 +187,7 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 
 			case IOACCESS_SERIALPORT:
 			case IOACCESS_HID:
+			case IOACCESS_PICKIT:
 
 				if (PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime > 0){
 					// Sleep (For wait primary chip return correct reponse ) 

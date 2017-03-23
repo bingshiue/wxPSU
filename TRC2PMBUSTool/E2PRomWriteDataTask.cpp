@@ -123,7 +123,7 @@ int E2PRomWriteDataTask::Main(double elapsedTime){
 		wxMilliSleep(this->m_writeIntervalTime);
 
 		// Receive Response
-		bytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? WRITE_CMD_BYTES_TO_READ : WRITE_CMD_BYTES_TO_READ + 1;
+		bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_CurrentIO, WRITE_CMD_BYTES_TO_READ);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? WRITE_CMD_BYTES_TO_READ : WRITE_CMD_BYTES_TO_READ + 1;
 		recvLength = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadDataExtra(recvBuffer, bytesToRead, NULL);
 
 		//if (*this->m_outputLog == true){
@@ -218,6 +218,10 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 
 		// Decide Send Data Length
 		switch (*this->m_CurrentIO){
+
+		case IOACCESS_PICKIT:
+			sendDataLength = HID_SEND_DATA_SIZE + 1;
+			break;
 
 		case IOACCESS_HID:
 			sendDataLength = HID_SEND_DATA_SIZE;
@@ -321,6 +325,29 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 			this->m_e2pRomContent[offset] = recvBuffer[6];
 			offset++;
 			readRetry = 0;
+			break;
+
+		case IOACCESS_PICKIT:
+			// 86 0a 80 10 [01] 10 ac 10 22 81 1c 77
+			// 86 04 80 81 [1c]  77 for failed (May Casused By Wrong Slave Address)
+			if (recvBuffer[4] == 0x1c && recvBuffer[5] == 0x77){
+				readRetry++;
+				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
+				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
+					continue;
+				}
+				else{
+					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data From E2PRom Retry Still Failed !");
+					offset++;
+					readRetry = 0;
+					continue;
+				}
+			}
+
+			this->m_e2pRomContent[offset] = recvBuffer[4];
+			offset++;
+			readRetry = 0;
+
 			break;
 
 		case IOACCESS_TOTALPHASE:

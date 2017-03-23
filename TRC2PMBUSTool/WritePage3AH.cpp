@@ -91,11 +91,11 @@ void WritePage3AH::OnButtonWrite(wxCommandEvent& event){
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		fan12ConfigValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_inputValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", fan12ConfigValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, Value = %d", fan12ConfigValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		fan12ConfigValue = wxAtoi(this->m_inputValue->GetValue());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", fan12ConfigValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %d", fan12ConfigValue);
 	}
 
 #if 0
@@ -124,7 +124,7 @@ void WritePage3AH::OnButtonWrite(wxCommandEvent& event){
 	PMBUSSendCOMMAND_t CMD3AH;
 
 	CMD3AH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD3AH.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_3AH_BYTES_TO_READ : CMD_3AH_BYTES_TO_READ+1;
+	CMD3AH.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_3AH_BYTES_TO_READ);//(*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_3AH_BYTES_TO_READ : CMD_3AH_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD3AH.m_sendData[idx] = SendBuffer[idx];
 	}

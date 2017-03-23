@@ -29,7 +29,7 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 	bool isp_response_error = false;
 
 	// Receive Data 
-	unsigned int ispEndDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
+	unsigned int ispEndDataBytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_CurrentIO, ISP_ENDDATA_BYTES_TO_READ);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 1;
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data From I/O, Bytes To Read = %d", ispEndDataBytesToRead);
@@ -43,6 +43,7 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 
 		case IOACCESS_SERIALPORT:
 		case IOACCESS_HID:
+		case IOACCESS_PICKIT:
 			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 			isp_response_error = true;
 			break;

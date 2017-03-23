@@ -279,7 +279,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			if (this->m_IOAccess[IOACCESS_HID].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
 
 				// Hint User Can Use USB Adaptor Device
-				wxMessageBox(wxT("Found Acbel USB I2C Adaptor Board \n\nCurrent I/O Setting is Serial Port, You Can Setup I/O to Use USB I2C Adaptor Board in Next Popup Setting Window"),
+				wxMessageBox(wxT("Found Acbel USB I2C Adaptor Board \n\nYou Can Setup I/O to Use USB I2C Adaptor Board in Next Popup Setting Window"),
 					wxT("Found Acbel USB I2C Adaptor Board !"),  // caption
 					wxOK | wxICON_INFORMATION);
 
@@ -291,11 +291,27 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 				delete i2cIFDialog;
 
 			}
+			// If Find Pickit Serial
+			else if (this->m_IOAccess[IOACCESS_PICKIT].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
+
+				// Hint User Can Use USB Adaptor Device
+				wxMessageBox(wxT("Found Pickit Serial Analyzer \n\nYou Can Setup I/O to Use Pickit Serial Analyzer in Next Popup Setting Window"),
+					wxT("Found Pickit Serial Analyzer !"),  // caption
+					wxOK | wxICON_INFORMATION);
+
+				// Popup I2C Interface Dialog 
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar, true, I2C_AdaptorModuleBoard_PICKIT_SERIAL);
+				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
+				i2cIFDialog->ShowModal();
+
+				delete i2cIFDialog;
+
+			}
 			// If Find Total Phase I2C Host Adaptor
 			else if(this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
 				
 				// Hint User Can Use TotalPhase I2C Host Adaptor Device
-				wxMessageBox(wxT("Found TotalPhase I2C Host Adaptor Device \n\nCurrent I/O Setting is Serial Port, You Can Setup I/O to Use TotalPhase I2C Host Adaptor Device in Next Popup Setting Window"),
+				wxMessageBox(wxT("Found TotalPhase I2C Host Adaptor Device \n\nYou Can Setup I/O to Use TotalPhase I2C Host Adaptor Device in Next Popup Setting Window"),
 					wxT("Found TotalPhase I2C Host Adaptor Device !"),  // caption
 					wxOK | wxICON_INFORMATION);
 
@@ -2943,6 +2959,8 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_PICKIT].m_CloseDevice = ClosePickitDevice;
 	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceSendData = PickitSendData;
 	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceReadData = PickitReadData;
+	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceSendDataExtra = PickitSendDataExtra;
+	this->m_IOAccess[IOACCESS_PICKIT].m_DeviceReadDataExtra = PickitReadDataExtra;
 
 	// TOTAL PHASE I2C Host Adaptor
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_EnumerateAvailableDevice = EnumerateAvailableTotalPhaseDevice;
@@ -4893,7 +4911,7 @@ void MainFrame::DoEnableCalibration(void){
 	PMBUSSendCOMMAND_t CMDC3H;
 
 	CMDC3H.m_sendDataLength = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT || this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
-	CMDC3H.m_bytesToRead = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
+	CMDC3H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(this->m_CurrentUseIOInterface, CMD_C3H_BYTES_TO_READ);//(this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sendDataLength; idx++) {//sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]); idx++){
 		CMDC3H.m_sendData[idx] = CalibrationEnableSendBuffer[idx];
 	}
@@ -4937,7 +4955,7 @@ void MainFrame::DoDisableCalibration(void){
 	PMBUSSendCOMMAND_t CMDC3H;
 
 	CMDC3H.m_sendDataLength = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT || this->m_CurrentUseIOInterface == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
-	CMDC3H.m_bytesToRead = (this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
+	CMDC3H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(this->m_CurrentUseIOInterface, CMD_C3H_BYTES_TO_READ);//(this->m_CurrentUseIOInterface == IOACCESS_SERIALPORT) ? CMD_C3H_BYTES_TO_READ : CMD_C3H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sendDataLength; idx++) {//sizeof(changePageSendBuffer) / sizeof(changePageSendBuffer[0]); idx++){
 		CMDC3H.m_sendData[idx] = CalibrationEnableSendBuffer[idx];
 	}

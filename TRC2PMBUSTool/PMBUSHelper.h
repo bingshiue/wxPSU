@@ -123,6 +123,11 @@ public :
 	 * @brief Re-Judge IO Thread Send Failure.
 	 */
 	static bool ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO);
+	/**
+	 * @brief Get BytesToRead Of Write CMD.
+	 */
+	static unsigned int GetBytesToReadOfWriteCMD(unsigned int CurrentUseIO, unsigned int BaseLength);
+
 
 protected :
 

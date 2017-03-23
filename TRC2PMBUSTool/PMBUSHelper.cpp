@@ -623,6 +623,69 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
+			sendBuffer[baseIndex++] = 0x00;
+			sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+			sendBuffer[baseIndex++] = 0x0e;
+			sendBuffer[baseIndex++] = 0x81;
+			sendBuffer[baseIndex++] = 0x84;
+			sendBuffer[baseIndex++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[baseIndex++] = command;// Command
+
+			sendBuffer[baseIndex++] = 0x83;
+			sendBuffer[baseIndex++] = 0x84;
+			sendBuffer[baseIndex++] = 0x01;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[baseIndex++] = 0x89;
+			sendBuffer[baseIndex++] = responseDataLength; // Response Data Length
+			sendBuffer[baseIndex++] = 0x82;
+			sendBuffer[baseIndex++] = 0x1f;
+			sendBuffer[baseIndex++] = 0x77;
+
+			buffer_len = baseIndex;
+
+			for (int local = baseIndex; local < 65; local++){
+				sendBuffer[local] = 0;
+			}
+		}
+		else if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_also_send_write_data){
+
+			sendBuffer[baseIndex++] = 0x00;
+			sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+			sendBuffer[baseIndex++] = 0x0e + pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength;// Should be decided dynanically
+			sendBuffer[baseIndex++] = 0x81;
+			sendBuffer[baseIndex++] = 0x84;
+			sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 0x02;//0x02;// ??? (Maybe This Field Indicates "Slave Address + CMD")
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();
+			sendBuffer[baseIndex++] = command;// Command
+
+			// Write Data
+			for (unsigned int len = 0; len < (pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength); len++){
+				sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+			}
+
+			sendBuffer[baseIndex++] = 0x83;
+			sendBuffer[baseIndex++] = 0x84;
+			sendBuffer[baseIndex++] = 0x01;
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress() | 0x01;
+			sendBuffer[baseIndex++] = 0x89;
+			sendBuffer[baseIndex++] = responseDataLength; // Response Data Length
+			sendBuffer[baseIndex++] = 0x82;
+			sendBuffer[baseIndex++] = 0x1f;
+			sendBuffer[baseIndex++] = 0x77;
+
+			for (int local = baseIndex; local<65; local++){
+				sendBuffer[local] = 0;
+			}
+
+			buffer_len = baseIndex;
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		if (pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData == cmd_normal_read_data){
@@ -836,6 +899,16 @@ void PMBUSHelper::ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* 
 
 		break;
 
+	case IOACCESS_PICKIT:
+		// 86 0a 80 10 [01] 10 [ac] 10 [22] 81 1c 77
+		// 86 0a 80 10 [01] 10 [f0] 10 [e2] 81 1c 77
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[4 + idx * 2];
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
@@ -959,6 +1032,16 @@ unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		//
+		if (buffer[4] != REBOOT_OK){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch, Return Code = %02xh", buffer[4]);
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		if (buffer[0] != REBOOT_OK){
@@ -1002,6 +1085,16 @@ unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, u
 
 		//
 		if (buffer[6] != target){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[6]);
+		}
+
+		break;
+
+	case IOACCESS_PICKIT:
+
+		//
+		if (buffer[4] != target){
 			result = response_ng;
 			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[6]);
 		}
@@ -1056,6 +1149,15 @@ unsigned char PMBUSHelper::IsISPCheckStatusResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		if (buffer[4] != 0x30){
+			result = response_ng;
+			PrintISPCheckStatusError(buffer[4]);
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		if (buffer[0] != 0x30){
@@ -1079,8 +1181,10 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 	// 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a
 	// 0x15  0x07  0x41  0x43  0x02  0x4f  0x4b  0x0d  0x0a <- If OK
 	// 0x15  0x07  0x41  0x43  0x02  0x4e  0x47  0x0d  0x0a <- If NG
+	// 86  04  80  81  1c  77 Pickit OK
 	unsigned char ok_buffer[6] = { 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a };
 	unsigned char ok_hid_buffer[9] = { 0x15, 0x07, 0x41, 0x43, 0x02, 0x4f, 0x4b, 0x0d, 0x0a };
+	unsigned char ok_pickit_buffer[6] = { 0x86, 0x04, 0x80, 0x81, 0x1c, 0x77 };
 	unsigned char result = response_ok;
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
@@ -1121,7 +1225,17 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 
 	case IOACCESS_PICKIT:
 
-		if (sizeOfBuffer == 0) result = response_ng;
+		if (sizeOfBuffer < sizeof(ok_pickit_buffer) / sizeof(ok_pickit_buffer[0])){
+			result = response_ng;
+			return result;
+		}
+
+		for (int idx = 0; idx < sizeof(ok_pickit_buffer) / sizeof(ok_pickit_buffer[0]); idx++){
+			if (buffer[idx] != ok_pickit_buffer[idx]){
+				result = response_ng;
+				break;
+			}
+		}
 
 		break;
 
@@ -1429,6 +1543,32 @@ int PMBUSHelper::ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned c
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		sendBuffer[0] = 0x00;
+		sendBuffer[1] = 0x03;
+
+		sendBuffer[3] = 0x81;
+		sendBuffer[4] = 0x84;
+		sendBuffer[5] = 1 + 2;
+		sendBuffer[6] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[7] = idx; // Indicates Start Write Offset
+
+		// Data start from index 8
+		current_index = 8;
+		sendBuffer[current_index++] = fruContentBuffer[idx];
+
+		// Fill Last 3
+		sendBuffer[current_index++] = 0x82;
+		sendBuffer[current_index++] = 0x1f;
+		sendBuffer[current_index++] = 0x77;
+
+		// Fill Total Length
+		sendBuffer[2] = current_index - 3;
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		sendBuffer[0] = 0; // Write Bytes(Would be Updated later)
@@ -1549,6 +1689,35 @@ int PMBUSHelper::ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned in
 
 		break;
 
+	case IOACCESS_PICKIT:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+		sendBuffer[baseIndex++] = 0x0e;
+		sendBuffer[baseIndex++] = 0x81;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
+		sendBuffer[baseIndex++] = fruSlaveAddr;// E2PROM Slave Address
+		sendBuffer[baseIndex++] = idx;// Offset
+
+		sendBuffer[baseIndex++] = 0x83;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = fruSlaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 0x89;
+		sendBuffer[baseIndex++] = 1; // Response Data Length
+		sendBuffer[baseIndex++] = 0x82;
+		sendBuffer[baseIndex++] = 0x1f;
+		sendBuffer[baseIndex++] = 0x77;
+
+		buffer_len = baseIndex;
+
+		for (int local = baseIndex; local < 65; local++){
+			sendBuffer[local] = 0;
+		}
+
+		break;
+
 	case IOACCESS_TOTALPHASE:
 
 		sendBuffer[baseIndex++] = 1;// write bytes
@@ -1603,6 +1772,7 @@ bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUs
 
 	case IOACCESS_SERIALPORT:
 	case IOACCESS_HID:
+	case IOACCESS_PICKIT:
 		// Don't Update Original Result
 		break;
 
@@ -1617,4 +1787,30 @@ bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUs
 	}
 
 	return failure_occurs;
+}
+
+unsigned int PMBUSHelper::GetBytesToReadOfWriteCMD(unsigned int CurrentUseIO, unsigned int BaseLength){
+	unsigned int BytesToRead;
+
+	switch (CurrentUseIO){
+
+	case IOACCESS_SERIALPORT:
+		BytesToRead = BaseLength;
+		break;
+
+	case IOACCESS_HID:
+	case IOACCESS_TOTALPHASE:
+		BytesToRead = BaseLength + 1;
+		break;
+
+	case IOACCESS_PICKIT:
+		BytesToRead = 0;// Fill 0 If IO is Pickit
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+		break;
+	}
+
+	return BytesToRead;
 }

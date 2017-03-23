@@ -345,7 +345,7 @@ void WritePage05H::OnButtonWrite(wxCommandEvent& event){
 	PMBUSSendCOMMAND_t CMD05H;
 
 	CMD05H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	CMD05H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_05H_BYTES_TO_READ : CMD_05H_BYTES_TO_READ + 1;
+	CMD05H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_05H_BYTES_TO_READ);//(*this->m_currentIO == IOACCESS_SERIALPORT) ? CMD_05H_BYTES_TO_READ : CMD_05H_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
 		CMD05H.m_sendData[idx] = SendBuffer[idx];
 	}

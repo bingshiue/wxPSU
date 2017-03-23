@@ -119,6 +119,10 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 			sendDataLength = HID_SEND_DATA_SIZE;
 			break;
 
+		case IOACCESS_PICKIT :
+			sendDataLength = HID_SEND_DATA_SIZE + 1;
+			break;
+
 		default:
 
 			break;
@@ -220,6 +224,30 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 			this->m_e2pRomContent[offset] = recvBuffer[6];
 			offset++;
 			readRetry = 0;
+			break;
+
+		case IOACCESS_PICKIT:
+			// 86 0a 80 10 [01] 10 ac 10 22 81 1c 77
+			// 86 04 80 81 [1c]  77 for failed (May Casused By Wrong Slave Address)
+			if (recvBuffer[4] == 0x1c && recvBuffer[5] == 0x77){
+				readRetry++;
+				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
+				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
+					continue;
+				}
+				else{
+					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data From E2PRom Retry Still Failed !");
+					offset++;
+					readRetry = 0;
+					continue;
+				}
+			}
+
+			this->m_e2pRomContent[offset] = recvBuffer[4];
+			offset++;
+			readRetry = 0;
+
+
 			break;
 
 		case IOACCESS_TOTALPHASE:

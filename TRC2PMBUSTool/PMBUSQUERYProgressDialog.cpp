@@ -32,7 +32,7 @@ PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString ti
 	//m_okButton->Enable(false);
 
 	// Add GUI Component To Static Box
-	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(1).Align(wxALIGN_CENTRE_HORIZONTAL).Expand());
+	m_statisticsSB->Add(this->m_infoST, wxSizerFlags(1).Expand());
 
 	// Add Sizer To Top Level Sizer
 	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(1).Border().Expand());

@@ -31,7 +31,7 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 	// Receive Data 
 	unsigned int ispDataBytesToRead = 0;
 
-	ispDataBytesToRead = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
+	ispDataBytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_CurrentIO, ISP_WRITEDATA_BYTES_TO_READ);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_WRITEDATA_BYTES_TO_READ : ISP_WRITEDATA_BYTES_TO_READ+1;
 
 	unsigned long hexStartAddr = 0;
 	this->m_tiHexFileStat->startAddress(&hexStartAddr);

@@ -47,7 +47,17 @@ int PickitSendData(unsigned char* buff, unsigned int size);
 /**
  * @brief Pickit Read Data
  */
-int PickitReadData(unsigned char* buff, unsigned int sizeOfBuff);
+int PickitReadData(unsigned char* buff, unsigned int bytesToRead);
+
+/**
+ * @brief Pickit Send Data Extra
+ */
+int PickitSendDataExtra(unsigned char* buff, unsigned int size, void* ptr);
+
+/**
+ * @brief Pickit Read Data Extra
+ */
+int PickitReadDataExtra(unsigned char* buff, unsigned int sizeOfBuff, void* ptr);
 
 /**
  * @brief Close Pickit Device

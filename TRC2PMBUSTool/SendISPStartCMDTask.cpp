@@ -26,6 +26,7 @@ SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* curre
 
 		case IOACCESS_SERIALPORT:
 		case IOACCESS_HID:
+		case IOACCESS_PICKIT:
 
 			PSU_DEBUG_PRINT(MSG_ALERT, "PFC ISP F3 CMD Delay Time is %d ms", PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime);
 

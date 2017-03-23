@@ -288,6 +288,12 @@ wxEND_EVENT_TABLE()
 #define INDEX_DATA_2_START       8
 #define INDEX_PEC               10 
 
+#define INDEX_CALIBRATION_ITEM_PICKIT   6+2
+#define INDEX_POINTER_PICKIT            7+2
+#define INDEX_DATA_1_START_PICKIT       8+2
+#define INDEX_DATA_2_START_PICKIT      10+2
+#define INDEX_PEC_PICKIT               12+2
+
 #define INDEX_CALIBRATION_ITEM_HID   4+2
 #define INDEX_POINTER_HID            5+2
 #define INDEX_DATA_1_START_HID       6+2
@@ -487,6 +493,74 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		buffer[1] = active_index - 2;
 
 #endif
+
+		break;
+
+	case IOACCESS_PICKIT:
+
+		// 0x03 [0x06] 0x81 0x84 [0x05] [0xB6] [0xEC] [0x00] [0x08] [0xE0] 0x82 0x1f 0x77
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x03;
+		buffer[active_index++] = 0x00; // Total Length, Detemine Later
+		buffer[active_index++] = 0x81;
+		buffer[active_index++] = 0x84;
+		buffer[active_index++] = 6 + 3;
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();
+		buffer[active_index++] = 0xCB;
+
+		// Data
+		// Get Calibration Item Command
+		buffer[INDEX_CALIBRATION_ITEM_PICKIT] = calibrationItemCommand[this->m_calibrationItemCB->GetSelection()];
+
+		// Get Pointer
+		buffer[INDEX_POINTER_PICKIT] =
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+
+		// Data 1
+		value1 = 0;
+		this->m_data1TC->GetValue().ToDouble(&value1);
+
+		resolution1 = 0;
+		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START_PICKIT, value1, resolution1);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START_PICKIT, value1, resolution1);
+#endif
+
+		// Data 2
+		value2 = 0;
+		this->m_data2TC->GetValue().ToDouble(&value2);
+
+		resolution2 = 0;
+		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START_PICKIT, value2, resolution2);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START_PICKIT, value2, resolution2);
+#endif
+
+
+		// Compute PEC
+		separate_pec = 0;
+
+		separate_pec = PMBusSlave_Crc8MakeBitwise(0, 7, buffer + 6, 8);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+		buffer[INDEX_PEC_PICKIT] = separate_pec;
+
+		active_index = INDEX_PEC_PICKIT + 1;
+
+		// Fill Last 3
+		buffer[active_index++] = 0x82;
+		buffer[active_index++] = 0x1f;
+		buffer[active_index++] = 0x77;
+
+		// Fill Total Length
+		buffer[2] = active_index - 3;
+
 
 		break;
 
