@@ -110,6 +110,7 @@ public:
 		MENU_ID_WRITE_TEST,
 		MENU_ID_BLOCK_WR_TEST,
 
+		MENU_ID_FRU_MAKER,
 		MENU_ID_FRU_WRITER,
 
 		MENU_ID_ABOUT,
@@ -312,6 +313,7 @@ public:
 
 	wxMenu      *m_utilityMenu;
 
+	wxMenuItem  *m_fruMakerMenuItem;
 	wxMenuItem  *m_fruWriterMenuItem;
 
 	wxMenu      *m_helpMenu;
@@ -450,6 +452,7 @@ private:
 	void OnWriteTest(wxCommandEvent& event);
 	void OnBlockWRTest(wxCommandEvent& event);
 
+	void OnFRUMaker(wxCommandEvent& event);
 	void OnFRUWriter(wxCommandEvent& event);
 
 	void OnAbout(wxCommandEvent& event);

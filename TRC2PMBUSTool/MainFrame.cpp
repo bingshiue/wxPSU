@@ -737,9 +737,16 @@ void MainFrame::SetupMenuBar(void){
 
 	// Utility Menu
 	/*
+	| - FRU Maker
 	| - FRU Writer
 	*/
 	this->m_utilityMenu = new wxMenu();
+
+	this->m_fruMakerMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_MAKER, wxT("FRU Maker"), wxT("FRU Maker"), wxITEM_NORMAL);
+
+	this->m_fruMakerMenuItem->SetBitmap(wxBITMAP_PNG(MAKER_16));
+
+	this->m_utilityMenu->Append(this->m_fruMakerMenuItem);
 
 	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Utility"), wxT("FRU Utility"), wxITEM_NORMAL);
 
@@ -1743,6 +1750,12 @@ void MainFrame::OnBlockWRTest(wxCommandEvent& event){
 	blockWRTestDialog->ShowModal();
 
 	wxDELETE(blockWRTestDialog);
+
+}
+
+void MainFrame::OnFRUMaker(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
 
 }
 
@@ -5014,6 +5027,7 @@ EVT_MENU(MENU_ID_POPUP_PRINT_SCREEN, MainFrame::OnPopupPrintScreen)
 EVT_MENU(MENU_ID_READ_TEST, MainFrame::OnReadTest)
 EVT_MENU(MENU_ID_WRITE_TEST, MainFrame::OnWriteTest)
 EVT_MENU(MENU_ID_BLOCK_WR_TEST, MainFrame::OnBlockWRTest)
+EVT_MENU(MENU_ID_FRU_MAKER, MainFrame::OnFRUMaker)
 EVT_MENU(MENU_ID_FRU_WRITER, MainFrame::OnFRUWriter)
 EVT_MENU(MENU_ID_ABOUT, MainFrame::OnAbout)
 EVT_MENU(MENU_ID_ACBEL_WEBSITE, MainFrame::OnAcbelWebSite)
