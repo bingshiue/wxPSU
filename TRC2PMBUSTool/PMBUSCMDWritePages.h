@@ -659,6 +659,8 @@ protected:
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
 
+	wxStaticText *m_hintMaxLengthST;
+
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
@@ -792,8 +794,12 @@ public:
 
 protected:
 
+	wxTextValidator m_textValidator;
+
 	wxStaticText *m_hintName;
 	wxTextCtrl *m_inputValue;
+
+	wxStaticText *m_hintMaxLengthST;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
