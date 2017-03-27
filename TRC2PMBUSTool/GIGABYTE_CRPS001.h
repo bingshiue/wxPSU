@@ -100,17 +100,17 @@ PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = {
 	// 98h [41]        
 	{ true, "98H", 0x98, "PMBUS_REVISION", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
 	// 99h [42]        
-	{ true, "99H", 0x99, "MFR_ID", cmd_access_br, 0, 0, { 0 }, 0x07, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
+	{ true, "99H", 0x99, "MFR_ID", cmd_access_brbw, 0, 0, { 0 }, MFR_ID_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// 9Ah [43]        
 	{ true, "9AH", 0x9a, "MFR_MODEL", cmd_access_brbw, 0, 0, { 0 }, MFR_MODEL_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
 	// 9Bh [44]       
-	{ true, "9BH", 0x9b, "MFR_REVISION", cmd_access_br, 0, 0, { 0 }, 0x04, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
+	{ true, "9BH", 0x9b, "MFR_REVISION", cmd_access_brbw, 0, 0, { 0 }, MFR_REVISION_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// 9Ch [45]      
-	{ true, "9CH", 0x9c, "MFR_LOCATION", cmd_access_br, 0, 0, { 0 }, 0x05, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
+	{ true, "9CH", 0x9c, "MFR_LOCATION", cmd_access_brbw, 0, 0, { 0 }, MFR_LOCATION_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// 9Dh [46]        
-	{ true, "9DH", 0x9d, "MFR_DATE", cmd_access_br, 0, 0, { 0 }, 0x08, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
+	{ true, "9DH", 0x9d, "MFR_DATE", cmd_access_brbw, 0, 0, { 0 }, MFR_DATE_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// 9Eh [47]       
-	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, 0x1c, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
+	{ true, "9EH", 0x9e, "MFR_SERIAL", cmd_access_brbw, 0, 0, { 0 }, MFR_SERIAL_LENGTH+2, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 	// 9FH [48]
 	{ true, "9FH", 0x9f, "APP_PROFILE_SUPPORT", cmd_access_br, 0, 0, { 0 }, 0x04, { 0 }, { 0 }, { 0 }, NULL, NULL, { } },
 	// A0h [49]       
