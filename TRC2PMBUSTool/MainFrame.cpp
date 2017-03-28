@@ -1756,7 +1756,11 @@ void MainFrame::OnBlockWRTest(wxCommandEvent& event){
 void MainFrame::OnFRUMaker(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
+	FRUMakerDialog* fruMakerDialog = new FRUMakerDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface);
+	fruMakerDialog->Centre();
+	fruMakerDialog->ShowModal();
 
+	wxDELETE(fruMakerDialog);
 }
 
 void MainFrame::OnFRUWriter(wxCommandEvent& event){

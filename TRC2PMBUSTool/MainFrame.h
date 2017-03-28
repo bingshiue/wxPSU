@@ -54,6 +54,7 @@
 #include "WriteTestDialog.h"
 #include "BlockWRTestDialog.h"
 #include "FRUUtilityDialog.h"
+#include "FRUMakerDialog.h"
 
 #define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
 #define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */

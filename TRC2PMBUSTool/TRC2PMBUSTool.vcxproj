@@ -111,6 +111,7 @@
     <ClCompile Include="E2PRomReadDataTask.cpp" />
     <ClCompile Include="E2PRomWriteDataTask.cpp" />
     <ClCompile Include="FRU.cpp" />
+    <ClCompile Include="FRUMakerDialog.cpp" />
     <ClCompile Include="FRUUtilityDialog.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBCoefficients.cpp" />
     <ClCompile Include="GIGABYTE_CRPS001_CBCook.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="CustomerType.h" />
     <ClInclude Include="CustomEvent.h" />
     <ClInclude Include="FRU.h" />
+    <ClInclude Include="FRUMakerDialog.h" />
     <ClInclude Include="FRUUtilityDialog.h" />
     <ClInclude Include="FSG003_000G.h" />
     <ClInclude Include="FSG003_000G_CMDCB.h" />

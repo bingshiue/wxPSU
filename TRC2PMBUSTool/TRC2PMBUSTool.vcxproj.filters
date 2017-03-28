@@ -378,6 +378,9 @@
     <ClCompile Include="FRUUtilityDialog.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="FRUMakerDialog.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">
@@ -642,6 +645,33 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="Pickit.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCoefficients.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBCook.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBQuery.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CBRaw.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="ACBEL_RFWE_24_28_1200W_SCP_CMDCB.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="FRU.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="FRUUtilityDialog.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="FRUMakerDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
