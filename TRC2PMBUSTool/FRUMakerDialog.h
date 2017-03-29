@@ -53,7 +53,8 @@ private:
 
 	bool outputLog;
 
-	unsigned char m_fruBinaryContent[MAX_FRU_FILE_SIZE];/**< Buffer for Save FRU Binary File Content */
+	unsigned char *m_pFRUBinaryContent;
+	unsigned char  m_fruBinaryContent[MAX_FRU_FILE_SIZE];/**< Buffer for Save FRU Binary File Content */
 
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;

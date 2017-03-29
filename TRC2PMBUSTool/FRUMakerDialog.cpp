@@ -372,7 +372,102 @@ FRUMakerDialog::~FRUMakerDialog(){
 
 void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	
-	PSU_DEBUG_PRINT(MSG_DEBUG, "OnBtnMAKE");
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnMAKE");
+
+	size_t len;
+
+
+
+	// Start Build FRU
+	struct FRU_DATA *fru = NULL;
+
+	fru = (FRU_DATA *)x_calloc(1, sizeof(struct FRU_DATA));
+
+	if (fru == NULL){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Allocate Space For FRU Build");
+		return;
+	}
+
+	fru->Product_Area = (PRODUCT_INFO*)x_calloc(1, sizeof(struct PRODUCT_INFO));
+
+	if (fru->Product_Area == NULL){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Allocate Space For FRU PRODUCT INFO Build");
+		return;
+	}
+
+	// === Start of Product Info Area ===
+	PSU_DEBUG_PRINT(MSG_ALERT, "=== Start of Product Info Area ===");
+	// Manufacturer Name
+	wxString pi_manufacturer_name = this->m_piManufacturerNameTC->GetValue();
+	fru->Product_Area->manufacturer_name = (unsigned char*)x_calloc(1, strlen(pi_manufacturer_name.c_str()) + 3);
+	
+	fru->Product_Area->manufacturer_name[0] = strlen(pi_manufacturer_name.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->manufacturer_name[1], pi_manufacturer_name.c_str(), strlen(pi_manufacturer_name.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area manufacturer name to %s", pi_manufacturer_name.c_str());
+
+	// Product Name
+	wxString pi_product_name = this->m_piProductNameTC->GetValue();
+	fru->Product_Area->product_name = (unsigned char*)x_calloc(1, strlen(pi_product_name.c_str()) + 3);
+
+	fru->Product_Area->product_name[0] = strlen(pi_product_name.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->product_name[1], pi_product_name.c_str(), strlen(pi_product_name.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area product name to %s", pi_product_name.c_str());
+
+	// Model Number
+	wxString pi_model_number = this->m_piProductModelNumberTC->GetValue();
+	fru->Product_Area->model_number = (unsigned char*)x_calloc(1, strlen(pi_model_number.c_str()) + 3);
+
+	fru->Product_Area->model_number[0] = strlen(pi_model_number.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->model_number[1], pi_model_number.c_str(), strlen(pi_model_number.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area model number to %s", pi_model_number.c_str());
+
+	// Version
+	wxString pi_version = this->m_piProductVersionTC->GetValue();
+	fru->Product_Area->version = (unsigned char*)x_calloc(1, strlen(pi_version.c_str()) + 3);
+
+	fru->Product_Area->version[0] = strlen(pi_version.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->version[1], pi_version.c_str(), strlen(pi_version.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area version to %s", pi_version.c_str());
+
+	// Serial Number
+	wxString pi_serial_number = this->m_piProductSerialNumberTC->GetValue();
+	fru->Product_Area->serial_number = (unsigned char*)x_calloc(1, strlen(pi_serial_number.c_str()) + 3);
+
+	fru->Product_Area->serial_number[0] = strlen(pi_serial_number.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->serial_number[1], pi_serial_number.c_str(), strlen(pi_serial_number.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area serial number to %s", pi_serial_number.c_str());
+
+	// Asset Tag
+	wxString pi_asset_tag = this->m_piAssetTagTC->GetValue();
+	fru->Product_Area->asset_tag = (unsigned char*)x_calloc(1, strlen(pi_asset_tag.c_str()) + 3);
+
+	fru->Product_Area->asset_tag[0] = strlen(pi_asset_tag.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->asset_tag[1], pi_asset_tag.c_str(), strlen(pi_asset_tag.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area asset tag to %s", pi_asset_tag.c_str());
+
+	// FRU File ID
+	wxString pi_fru_file_id = this->m_piFRUFileIDTC->GetValue();
+	fru->Product_Area->FRU_file_ID = (unsigned char*)x_calloc(1, strlen(pi_fru_file_id.c_str()) + 3);
+
+	fru->Product_Area->FRU_file_ID[0] = strlen(pi_fru_file_id.c_str()) | (FRU_STRING_ASCII << 6);
+	memcpy(&fru->Product_Area->FRU_file_ID[1], pi_fru_file_id.c_str(), strlen(pi_fru_file_id.c_str()));
+	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area fru file id to %s", pi_fru_file_id.c_str());
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "=== End of Product Info Area ===");
+
+
+	m_pFRUBinaryContent = build_FRU_blob(fru, &len, false);
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "Length of FRU Binary is %d", len);
+	PSU_DEBUG_PRINT(MSG_ALERT, "E2PROM CONTENT :");
+	PMBUSHelper::PrintFRUContent(this->m_pFRUBinaryContent, 256);
+
+	// Free FRU
+	if (fru) free(fru);
+
+	// Free 
+	if (m_pFRUBinaryContent) free(m_pFRUBinaryContent);
+
 }
 
 void FRUMakerDialog::OnDialogClose(wxCloseEvent& event){
