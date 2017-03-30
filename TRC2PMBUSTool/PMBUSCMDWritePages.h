@@ -618,6 +618,10 @@ public:
 	*/
 	~WritePage99H();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -630,6 +634,8 @@ protected:
 
 	wxStaticText *m_hintMaxLengthST;
 
+	wxButton *m_loadDefaultBTN;
+
 	IOACCESS *m_ioaccess;
 	unsigned int *m_currentIO;
 
@@ -640,6 +646,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -656,6 +664,10 @@ public:
 	*/
 	~WritePage9AH();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -664,6 +676,8 @@ protected:
 	wxTextCtrl *m_inputValue;
 
 	wxStaticText *m_hintMaxLengthST;
+
+	wxButton *m_loadDefaultBTN;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
@@ -678,6 +692,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -694,6 +710,10 @@ public:
 	*/
 	~WritePage9BH();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -706,6 +726,8 @@ protected:
 
 	wxStaticText *m_hintMaxLengthST;
 
+	wxButton *m_loadDefaultBTN;
+
 	IOACCESS *m_ioaccess;
 	unsigned int *m_currentIO;
 
@@ -716,6 +738,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -732,6 +756,10 @@ public:
 	*/
 	~WritePage9CH();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -744,6 +772,8 @@ protected:
 
 	wxStaticText *m_hintMaxLengthST;
 
+	wxButton *m_loadDefaultBTN;
+
 	IOACCESS *m_ioaccess;
 	unsigned int *m_currentIO;
 
@@ -754,6 +784,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -770,6 +802,10 @@ public:
 	*/
 	~WritePage9DH();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -782,6 +818,8 @@ protected:
 
 	wxStaticText *m_hintMaxLengthST;
 
+	wxButton *m_loadDefaultBTN;
+
 	IOACCESS *m_ioaccess;
 	unsigned int *m_currentIO;
 
@@ -792,6 +830,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };
@@ -808,6 +848,10 @@ public:
 	*/
 	~WritePage9EH();
 
+	enum {
+		CID_BUTTON_LOADDEFAULT = 9101,
+	};
+
 protected:
 
 	wxTextValidator m_textValidator;
@@ -816,6 +860,8 @@ protected:
 	wxTextCtrl *m_inputValue;
 
 	wxStaticText *m_hintMaxLengthST;
+
+	wxButton *m_loadDefaultBTN;
 
 	bool *m_monitor_running;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
@@ -830,6 +876,8 @@ private:
 	void OnRadioButtonRaw(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
+
+	void OnButtonLoadDefault(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };

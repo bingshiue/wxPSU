@@ -23,6 +23,12 @@ unsigned char PMBUSHelper::m_FWUploadModeCMD;
 unsigned char PMBUSHelper::m_FWUploadCMD;
 unsigned char PMBUSHelper::m_FWUploadStatusCMD;
 int PMBUSHelper::TotalPhaseWriteReadLastError;
+wxString PMBUSHelper::m_default_mfr_id = wxT("");
+wxString PMBUSHelper::m_default_mfr_model = wxT("");
+wxString PMBUSHelper::m_default_mfr_revision = wxT("");
+wxString PMBUSHelper::m_default_mfr_location = wxT("");
+wxString PMBUSHelper::m_default_mfr_date = wxT("");
+wxString PMBUSHelper::m_default_mfr_serial = wxT("");
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -1813,4 +1819,28 @@ unsigned int PMBUSHelper::GetBytesToReadOfWriteCMD(unsigned int CurrentUseIO, un
 	}
 
 	return BytesToRead;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_ID(void){
+	return m_default_mfr_id;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_MODEL(void){
+	return m_default_mfr_model;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_REVISION(void){
+	return m_default_mfr_revision;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_LOCATION(void){
+	return m_default_mfr_location;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_DATE(void){
+	return m_default_mfr_date;
+}
+
+wxString& PMBUSHelper::getDefaultMFR_SERIAL(void){
+	return m_default_mfr_serial;
 }

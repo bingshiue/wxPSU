@@ -264,6 +264,7 @@
     <ClInclude Include="ISPSequenceThread.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MainFrame.h" />
+    <ClInclude Include="MFR.h" />
     <ClInclude Include="ModelList.h" />
     <ClInclude Include="Models.h" />
     <ClInclude Include="ModelSelectDialog.h" />

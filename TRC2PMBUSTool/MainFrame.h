@@ -55,6 +55,7 @@
 #include "BlockWRTestDialog.h"
 #include "FRUUtilityDialog.h"
 #include "FRUMakerDialog.h"
+#include "MFR.h"
 
 #define DEFAULT_WINDOW_WIDTH_SCALE   0.75f /**< Default Window Width Scale */
 #define DEFAULT_WINDOW_HEIGHT_SCALE  0.75f /**< Default Window Height Scale */
@@ -488,6 +489,8 @@ private:
 	void OnQUERYSequenceStart(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
+
+	void CheckIfModelChange(void);
 
 	// logging helper
 	void DoLogLine(

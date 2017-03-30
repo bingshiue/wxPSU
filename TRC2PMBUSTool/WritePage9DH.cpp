@@ -10,6 +10,8 @@ WritePage9DH::WritePage9DH(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"MFR_DATE: "), wxDefaultPosition, wxSize(-1, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY);
 
+	m_loadDefaultBTN = new wxButton(this, CID_BUTTON_LOADDEFAULT, wxT("Load Default"));
+
 	wxString hintSTR = wxString::Format("MFR_DATE Maximum Input Length is (%d)", MFR_DATE_LENGTH);
 	m_hintMaxLengthST = new wxStaticText(this, wxID_ANY, hintSTR, wxDefaultPosition, wxSize(-1, -1));
 
@@ -24,6 +26,8 @@ WritePage9DH::WritePage9DH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	this->m_staticBoxlSizer->Add(m_hintMaxLengthST, wxSizerFlags(0).Border(wxALL, 5));
 
+	this->m_staticBoxlSizer->Add(m_loadDefaultBTN, wxSizerFlags(0).Border(wxALL, 5));
+
 	// Disable Radio Button
 	this->m_cookRadioButton->Enable(false);
 	this->m_rawRadioButton->Enable(false);
@@ -34,7 +38,7 @@ WritePage9DH::WritePage9DH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Input Max Length & Default String
 	this->m_inputValue->SetMaxLength(MFR_DATE_LENGTH);
-	this->m_inputValue->SetValue(DEF_MFR_DATE);
+	this->m_inputValue->SetValue(PMBUSHelper::GetAppSettings()->m_mfr_date);
 
 	// Save Member
 	this->m_monitor_running = monitor_running;
@@ -67,6 +71,8 @@ void WritePage9DH::OnButtonWrite(wxCommandEvent& event){
 	char mfr_date[MFR_DATE_LENGTH + 1] = { 0 };
 
 	wxString input_mfr_date = this->m_inputValue->GetValue();
+
+	PMBUSHelper::GetAppSettings()->m_mfr_date = input_mfr_date;
 
 	strncpy(mfr_date, (const char*)input_mfr_date.mb_str(wxConvUTF8), MFR_DATE_LENGTH);
 
@@ -108,8 +114,15 @@ void WritePage9DH::OnButtonWrite(wxCommandEvent& event){
 	}
 }
 
+void WritePage9DH::OnButtonLoadDefault(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	this->m_inputValue->SetValue(PMBUSHelper::getDefaultMFR_DATE());
+}
+
 wxBEGIN_EVENT_TABLE(WritePage9DH, wxPanel)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage9DH::OnRadioButtonCook)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage9DH::OnRadioButtonRaw)
 EVT_BUTTON(CID_BUTTON_WRITE, WritePage9DH::OnButtonWrite)
+EVT_BUTTON(CID_BUTTON_LOADDEFAULT, WritePage9DH::OnButtonLoadDefault)
 wxEND_EVENT_TABLE()

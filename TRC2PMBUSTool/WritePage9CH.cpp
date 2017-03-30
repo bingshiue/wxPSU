@@ -10,6 +10,8 @@ WritePage9CH::WritePage9CH(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"MFR_LOCATION: "), wxDefaultPosition, wxSize(-1, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY);
 
+	m_loadDefaultBTN = new wxButton(this, CID_BUTTON_LOADDEFAULT, wxT("Load Default"));
+
 	wxString hintSTR = wxString::Format("MFR_LOCATION Maximum Input Length is (%d)", MFR_LOCATION_LENGTH);
 	m_hintMaxLengthST = new wxStaticText(this, wxID_ANY, hintSTR, wxDefaultPosition, wxSize(-1, -1));
 
@@ -24,6 +26,8 @@ WritePage9CH::WritePage9CH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	this->m_staticBoxlSizer->Add(m_hintMaxLengthST, wxSizerFlags(0).Border(wxALL, 5));
 
+	this->m_staticBoxlSizer->Add(m_loadDefaultBTN, wxSizerFlags(0).Border(wxALL, 5));
+
 	// Disable Radio Button
 	this->m_cookRadioButton->Enable(false);
 	this->m_rawRadioButton->Enable(false);
@@ -34,7 +38,7 @@ WritePage9CH::WritePage9CH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Input Max Length & Default String
 	this->m_inputValue->SetMaxLength(MFR_LOCATION_LENGTH);
-	this->m_inputValue->SetValue(DEF_MFR_LOCATION);
+	this->m_inputValue->SetValue(PMBUSHelper::GetAppSettings()->m_mfr_location);
 
 	// Save Member
 	this->m_monitor_running = monitor_running;
@@ -66,9 +70,11 @@ void WritePage9CH::OnButtonWrite(wxCommandEvent& event){
 
 	char mfr_location[MFR_LOCATION_LENGTH + 1] = { 0 };
 
-	wxString input_mfr_id = this->m_inputValue->GetValue();
+	wxString input_mfr_location = this->m_inputValue->GetValue();
 
-	strncpy(mfr_location, (const char*)input_mfr_id.mb_str(wxConvUTF8), MFR_LOCATION_LENGTH);
+	PMBUSHelper::GetAppSettings()->m_mfr_location = input_mfr_location;
+
+	strncpy(mfr_location, (const char*)input_mfr_location.mb_str(wxConvUTF8), MFR_LOCATION_LENGTH);
 
 	// Fill ASCII Space Code '0x20'
 	for (int idx = 0; idx < MFR_LOCATION_LENGTH; idx++){
@@ -109,8 +115,15 @@ void WritePage9CH::OnButtonWrite(wxCommandEvent& event){
 
 }
 
+void WritePage9CH::OnButtonLoadDefault(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	this->m_inputValue->SetValue(PMBUSHelper::getDefaultMFR_LOCATION());
+}
+
 wxBEGIN_EVENT_TABLE(WritePage9CH, wxPanel)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage9CH::OnRadioButtonCook)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage9CH::OnRadioButtonRaw)
 EVT_BUTTON(CID_BUTTON_WRITE, WritePage9CH::OnButtonWrite)
+EVT_BUTTON(CID_BUTTON_LOADDEFAULT, WritePage9CH::OnButtonLoadDefault)
 wxEND_EVENT_TABLE()

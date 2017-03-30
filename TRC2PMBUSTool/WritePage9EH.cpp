@@ -10,6 +10,8 @@ WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label, bool* monitor_runn
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"MFR_SERIAL: "), wxDefaultPosition, wxSize(80, -1));
 	m_inputValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(200,-1));
 
+	m_loadDefaultBTN = new wxButton(this, CID_BUTTON_LOADDEFAULT, wxT("Load Default"));
+
 	wxString hintSTR = wxString::Format("MFR_SERIAL Maximum Input Length is (%d)", MFR_SERIAL_LENGTH);
 	m_hintMaxLengthST = new wxStaticText(this, wxID_ANY, hintSTR, wxDefaultPosition, wxSize(-1, -1));
 
@@ -24,6 +26,8 @@ WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	this->m_staticBoxlSizer->Add(m_hintMaxLengthST, wxSizerFlags(0).Border(wxALL, 5));
 
+	this->m_staticBoxlSizer->Add(m_loadDefaultBTN, wxSizerFlags(0).Border(wxALL, 5));
+
 	// Disable Radio Button
 	this->m_cookRadioButton->Enable(false);
 	this->m_rawRadioButton->Enable(false);
@@ -34,7 +38,7 @@ WritePage9EH::WritePage9EH(wxWindow* parent, wxString& label, bool* monitor_runn
 
 	// Set Input Max Length & Default String
 	this->m_inputValue->SetMaxLength(MFR_SERIAL_LENGTH);
-	this->m_inputValue->SetValue(DEF_MFR_SERIAL);
+	this->m_inputValue->SetValue(PMBUSHelper::GetAppSettings()->m_mfr_serial);
 
 	// Save Member
 	this->m_monitor_running = monitor_running;
@@ -63,11 +67,24 @@ void WritePage9EH::OnRadioButtonRaw(wxCommandEvent& event){
 #define CMD_9EH_BYTES_TO_READ  6/**< Bytes To Read */
 void WritePage9EH::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+	int dialogRet;
 
 	char mfr_serial[MFR_SERIAL_LENGTH + 1] = { 0 };
 	memset(mfr_serial, 0x20, MFR_SERIAL_LENGTH);
 
 	wxString input_mfr_serial = this->m_inputValue->GetValue();
+
+	if (input_mfr_serial.size() != 24){
+		dialogRet = wxMessageBox(wxT("Input Serial Number's Length Not Equal To 24 !, Continue Anyway ?"),
+			wxT("Input Serial Number's Length Not Equal To 24 !"),  // caption
+			wxYES | wxNO | wxICON_WARNING);
+
+		if (dialogRet == wxNO)
+			return;
+	}
+
+
+	PMBUSHelper::GetAppSettings()->m_mfr_serial = input_mfr_serial;
 
 	strncpy(mfr_serial, (const char*)input_mfr_serial.mb_str(wxConvUTF8), MFR_SERIAL_LENGTH);
 
@@ -110,8 +127,15 @@ void WritePage9EH::OnButtonWrite(wxCommandEvent& event){
 
 }
 
+void WritePage9EH::OnButtonLoadDefault(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	this->m_inputValue->SetValue(PMBUSHelper::getDefaultMFR_SERIAL());
+}
+
 wxBEGIN_EVENT_TABLE(WritePage9EH, wxPanel)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage9EH::OnRadioButtonCook)
 //EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage9EH::OnRadioButtonRaw)
 EVT_BUTTON(CID_BUTTON_WRITE, WritePage9EH::OnButtonWrite)
+EVT_BUTTON(CID_BUTTON_LOADDEFAULT, WritePage9EH::OnButtonLoadDefault)
 wxEND_EVENT_TABLE()

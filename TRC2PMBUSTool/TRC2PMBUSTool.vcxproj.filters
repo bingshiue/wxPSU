@@ -674,13 +674,16 @@
     <ClInclude Include="FRUMakerDialog.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="MFR.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Aardvark\aardvark.dll" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
       <Filter>資源檔</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Aardvark\aardvark.dll" />
   </ItemGroup>
 </Project>

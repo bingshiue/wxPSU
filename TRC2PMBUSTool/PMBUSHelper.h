@@ -127,6 +127,30 @@ public :
 	 * @brief Get BytesToRead Of Write CMD.
 	 */
 	static unsigned int GetBytesToReadOfWriteCMD(unsigned int CurrentUseIO, unsigned int BaseLength);
+	/**
+	 * @brief Get MFR_ID.
+	 */
+	static wxString& getDefaultMFR_ID(void);
+	/**
+	 * @brief Get MFR_MODEL.
+	 */
+	static wxString& getDefaultMFR_MODEL(void);
+	/**
+	 * @brief Get MFR_REVISION.
+	 */
+	static wxString& getDefaultMFR_REVISION(void);
+	/**
+	 * @brief Get MFR_LOCATION.
+	 */
+	static wxString& getDefaultMFR_LOCATION(void);
+	/**
+	 * @brief Get MFR_DATE.
+	 */
+	static wxString& getDefaultMFR_DATE(void);
+	/**
+	 * @brief Get MFR_SERIAL.
+	 */
+	static wxString& getDefaultMFR_SERIAL(void);
 
 
 protected :
@@ -153,6 +177,18 @@ private :
 	static unsigned char m_FWUploadCMD;/**< FW Upload Command */
 
 	static unsigned char m_FWUploadStatusCMD;/**< FW Upload Status Command */
+
+	static wxString m_default_mfr_id;
+
+	static wxString m_default_mfr_model;
+
+	static wxString m_default_mfr_revision;
+
+	static wxString m_default_mfr_location;
+
+	static wxString m_default_mfr_date;
+
+	static wxString m_default_mfr_serial;
 
 };
 

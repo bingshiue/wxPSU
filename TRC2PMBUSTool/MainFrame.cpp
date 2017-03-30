@@ -3778,6 +3778,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_currentUseCustomer = customer;
 	}
 
+	// Previous Customer
+	long previousCustomer;
+	if (pConfig->Read(wxT("PreviousCustomer"), &previousCustomer) == false){
+		pConfig->Write(wxT("PreviousCustomer"), DEFAULT_CUSTOMER);
+		this->m_appSettings.m_previousUseCustomer = DEFAULT_CUSTOMER;
+	}
+	else{
+		this->m_appSettings.m_previousUseCustomer = previousCustomer;
+	}
+
 	// Model
 	long model;
 	if (pConfig->Read(wxT("Model"), &model) == false){
@@ -3788,6 +3798,18 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_currentUseModel = model;
 	}
 
+	// Precious Model
+	long previousModel;
+	if (pConfig->Read(wxT("PreviousModel"), &previousModel) == false){
+		pConfig->Write(wxT("PreviousModel"), DEFAULT_MODEL);
+		this->m_appSettings.m_previousUseModel = DEFAULT_MODEL;
+	}
+	else{
+		this->m_appSettings.m_previousUseModel = previousModel;
+	}
+
+	/* Check If Model Change */
+	this->CheckIfModelChange();
 
 	// I2C Adaptor Module Board
 	long i2cAdaptorModuleBoard;
@@ -4210,6 +4232,68 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_ISPDDWaitRootTime = ddWaitRebootTime;
 	}
 
+	pConfig->SetPath(wxT("/MFR"));
+
+	// MFR_ID
+	wxString mfr_id;
+	if (pConfig->Read(wxT("MFRID"), &mfr_id) == false){
+		pConfig->Write(wxT("MFRID"), PMBUSHelper::getDefaultMFR_ID());
+		this->m_appSettings.m_mfr_id = wxString::Format("%s", PMBUSHelper::getDefaultMFR_ID().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_id = wxString::Format("%s", mfr_id);
+	}
+
+	// MFR_MODEL
+	wxString mfr_model;
+	if (pConfig->Read(wxT("MFRMODEL"), &mfr_model) == false){
+		pConfig->Write(wxT("MFRMODEL"), PMBUSHelper::getDefaultMFR_MODEL());
+		this->m_appSettings.m_mfr_model = wxString::Format("%s", PMBUSHelper::getDefaultMFR_MODEL().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_model = wxString::Format("%s", mfr_model);
+	}
+	
+	// MFR_REVISION
+	wxString mfr_revision;
+	if (pConfig->Read(wxT("MFRREVISION"), &mfr_revision) == false){
+		pConfig->Write(wxT("MFRREVISION"), PMBUSHelper::getDefaultMFR_REVISION());
+		this->m_appSettings.m_mfr_revision = wxString::Format("%s", PMBUSHelper::getDefaultMFR_REVISION().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_revision = wxString::Format("%s", mfr_revision);
+	}
+
+	// MFR_LOCATION
+	wxString mfr_location;
+	if (pConfig->Read(wxT("MFRLOCATION"), &mfr_location) == false){
+		pConfig->Write(wxT("MFRLOCATION"), PMBUSHelper::getDefaultMFR_LOCATION());
+		this->m_appSettings.m_mfr_location = wxString::Format("%s", PMBUSHelper::getDefaultMFR_LOCATION().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_location = wxString::Format("%s", mfr_location);
+	}
+
+	// MFR_DATE
+	wxString mfr_date;
+	if (pConfig->Read(wxT("MFRDATE"), &mfr_date) == false){
+		pConfig->Write(wxT("MFRDATE"), PMBUSHelper::getDefaultMFR_DATE());
+		this->m_appSettings.m_mfr_date = wxString::Format("%s", PMBUSHelper::getDefaultMFR_DATE().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_date = wxString::Format("%s", mfr_date);
+	}
+
+	// MFR_SERIAL
+	wxString mfr_serial;
+	if (pConfig->Read(wxT("MFRSERIAL"), &mfr_serial) == false){
+		pConfig->Write(wxT("MFRSERIAL"), PMBUSHelper::getDefaultMFR_SERIAL());
+		this->m_appSettings.m_mfr_serial = wxString::Format("%s", PMBUSHelper::getDefaultMFR_SERIAL().c_str());
+	}
+	else{
+		this->m_appSettings.m_mfr_serial = wxString::Format("%s", mfr_serial);
+	}
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;
@@ -4226,6 +4310,130 @@ void MainFrame::CheckAndLoadConfig(void){
 	PMBUSHelper::SetAppSettings(&this->m_appSettings);
 }
 
+void MainFrame::CheckIfModelChange(void){
+
+	// Action : Setup Default MFR_XXX
+
+	// Setup Default MFR_ID
+	PMBUSHelper::getDefaultMFR_ID() = wxString::Format("%s", DEF_MFR_ID);
+
+	// Setup Default MFR_MODEL
+	PMBUSHelper::getDefaultMFR_MODEL() = wxString::Format("%s", DEF_MFR_MODEL);
+
+	// Setup Default MFR_REVISION
+	PMBUSHelper::getDefaultMFR_REVISION() = wxString::Format("%s", DEF_MFR_REVISION);
+
+	// Setup Default MFR_LOCATION
+	PMBUSHelper::getDefaultMFR_LOCATION() = wxString::Format("%s", DEF_MFR_LOCATION);
+
+	// Setup Default MFR_DATE
+	wxString dateString("");
+	wxDateTime datetime = wxDateTime::Now();
+
+	dateString += wxString::Format("%2d", datetime.GetYear());
+
+	dateString.erase(0, 2);
+
+	if (datetime.GetMonth()+1 >= 10 ){
+		dateString += wxString::Format("%2d", datetime.GetMonth() + 1);
+	}
+	else{
+		dateString += wxString::Format("0%d", datetime.GetMonth() + 1);
+	}
+	
+	dateString += wxString::Format("%2d", datetime.GetDay());
+
+	PMBUSHelper::getDefaultMFR_DATE() = wxString::Format("%s", dateString.c_str());
+
+	// Force let MFR_DATE equal to Now system Time
+	this->m_appSettings.m_mfr_date = PMBUSHelper::getDefaultMFR_DATE();
+
+	// Setup Default MFR_SERIAL
+	PMBUSHelper::getDefaultMFR_SERIAL() = wxString::Format("%s", DEF_MFR_SERIAL);
+	
+
+	// If Model or Customer Changed
+	if (this->m_appSettings.m_currentUseCustomer != this->m_appSettings.m_previousUseCustomer || this->m_appSettings.m_currentUseModel != this->m_appSettings.m_previousUseModel)
+	{ 
+		// Action : Setup MFR_XXX by Specified Customer And Model
+
+		switch (this->m_appSettings.m_currentUseCustomer){
+		
+		case Customer_GIGABYTE:
+
+			switch (this->m_appSettings.m_currentUseModel){
+
+			case GIGABYTE_Model_CRPS001:
+
+				break;
+
+			case GIGABYTE_Model_CRPS001_ALL_PMBUS_COMMANDS:
+
+				break;
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+			case GIGABYTE_Model_Generic:
+
+				break;
+#endif
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+				break;
+			}
+
+			break;
+
+		case Customer_ACBEL:
+
+			switch (this->m_appSettings.m_currentUseModel){
+
+			case ACBEL_RFWE_24_28_1200W_SCP:
+
+				break;
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+			case ACBEL__Model_Generic:
+
+				break;
+#endif
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+				break;
+			}
+
+			break;
+
+#if (HAVE_GENERIC_CUSTOMER == TRUE)
+		case Customer_Generic:
+
+			switch (this->m_appSettings.m_currentUseModel){
+
+			case GENERIC_Model_Generic:
+
+				break;
+
+			default:
+				PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+				break;
+			}
+
+			break;
+#endif
+		
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
+
+		// Set Current To Previous
+		this->m_appSettings.m_currentUseCustomer = this->m_appSettings.m_previousUseCustomer;
+		this->m_appSettings.m_currentUseModel = this->m_appSettings.m_previousUseModel;
+	}
+
+}
+
 void MainFrame::SaveConfig(void){
 
 	wxConfigBase *pConfig = wxConfigBase::Get();
@@ -4237,8 +4445,14 @@ void MainFrame::SaveConfig(void){
 	// Customer
 	pConfig->Write(wxT("Customer"), this->m_appSettings.m_currentUseCustomer);
 
+	// Previous Customer
+	pConfig->Write(wxT("PreviousCustomer"), this->m_appSettings.m_previousUseCustomer);
+
 	// Model
 	pConfig->Write(wxT("Model"), this->m_appSettings.m_currentUseModel);
+	
+	// Previous Model
+	pConfig->Write(wxT("PreviousModel"), this->m_appSettings.m_previousUseModel);
 
 	// I2C Adaptor Module Board
 	pConfig->Write(wxT("I2CAdaptorModuleBoard"), this->m_appSettings.m_I2CAdaptorModuleBoard);
@@ -4321,6 +4535,27 @@ void MainFrame::SaveConfig(void){
 	pConfig->Write(wxT("PFCWaitRebootTime"), this->m_appSettings.m_ISPPFCWaitRootTime);
 
 	pConfig->Write(wxT("DDWaitRebootTime"), this->m_appSettings.m_ISPDDWaitRootTime);
+
+	
+	pConfig->SetPath(wxT("/MFR"));
+
+	// MFR_ID
+	pConfig->Write(wxT("MFRID"), this->m_appSettings.m_mfr_id);
+
+	// MFR_MODEL
+	pConfig->Write(wxT("MFRMODEL"), this->m_appSettings.m_mfr_model);
+
+	// MFR_REVISION
+	pConfig->Write(wxT("MFRREVISION"), this->m_appSettings.m_mfr_revision);
+
+	// MFR_LOCATION
+	pConfig->Write(wxT("MFRLOCATION"), this->m_appSettings.m_mfr_location);
+
+	// MFR_DATE
+	pConfig->Write(wxT("MFRDATE"), this->m_appSettings.m_mfr_date);
+
+	// MFR_SERIAL
+	pConfig->Write(wxT("MFRSERIAL"), this->m_appSettings.m_mfr_serial);
 
 	// Delete wxConfig Object
 	delete wxConfigBase::Set((wxConfigBase *)NULL);

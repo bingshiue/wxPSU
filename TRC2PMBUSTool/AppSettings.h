@@ -281,7 +281,9 @@ typedef struct usb_adaptor_gpio_setting {
 typedef struct appSettings_t {
 
 	unsigned long m_currentUseCustomer;/**< Current Use Customer */
+	unsigned long m_previousUseCustomer;/**< Previous Use Customer */
 	unsigned long m_currentUseModel;/**< Current Use Model */
+	unsigned long m_previousUseModel;/**< Previous Use Model */
 
 	COMPORT_SETTING_t m_comportSetting;/**< Serial Port Settings */
 	
@@ -313,13 +315,23 @@ typedef struct appSettings_t {
 	USB_ADAPTOR_UART_SETTING_t m_usbAdaptorUARTSetting[USB_ADAPTOR_UART_SIZE];
 	USB_ADAPTOR_GPIO_SETTING_t m_usbAdaptorGPIOSetting;
 
+	wxString m_mfr_id;
+	wxString m_mfr_model;
+	wxString m_mfr_revision;
+	wxString m_mfr_location;
+	wxString m_mfr_date;
+	wxString m_mfr_serial;
+
 	/* ----- Developer Setting ----- */
 	unsigned long m_developerMode;/**< Developer Mode */
 
 	void Reset(void){
 		
 		this->m_currentUseCustomer = DEFAULT_CUSTOMER;
+		this->m_previousUseCustomer = this->m_currentUseCustomer;
+
 		this->m_currentUseModel = DEFAULT_MODEL;
+		this->m_previousUseModel = this->m_currentUseModel;
 		
 		this->m_comportSetting.Reset();
 
