@@ -630,8 +630,8 @@ struct MULTIRECORD_INFO * parse_multiboard_area(unsigned char *data)
 
 		case MULTIRECORD_POWER_SUPPLY_INFO:
 
-			multi->power_supply_info = (unsigned char*)x_calloc(1, p[2] + 6);// Record Length + 6
-			memcpy(multi->power_supply_info, p, p[2] + 6);
+			multi->power_supply_info = (unsigned char*)x_calloc(1, p[2] + 5);// Record Length + 6
+			memcpy(multi->power_supply_info, p, p[2] + 5);
 			multi->power_supply_info[1] = multi->power_supply_info[1] & 0x7F;
 
 			break;
@@ -642,8 +642,8 @@ struct MULTIRECORD_INFO * parse_multiboard_area(unsigned char *data)
 			if ((tmp) >= NUM_SUPPLIES)
 				PSU_DEBUG_PRINT(MSG_ERROR, "Too many Supplies defined in Multirecords");
 
-			multi->supplies[tmp] = (unsigned char*)x_calloc(1, p[2] + 6);// Record Length + 6
-			memcpy(multi->supplies[tmp], p, p[2] + 6);
+			multi->supplies[tmp] = (unsigned char*)x_calloc(1, p[2] + 5);// Record Length + 6
+			memcpy(multi->supplies[tmp], p, p[2] + 5);
 			multi->supplies[tmp][1] = multi->supplies[tmp][1] & 0x7F;
 			break;
 		case MULTIRECORD_FMC:
