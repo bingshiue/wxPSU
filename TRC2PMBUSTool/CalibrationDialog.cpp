@@ -48,7 +48,7 @@ unsigned char CalibrationDialog::calibrationItemPointerValue[10] = {
 };
 
 double CalibrationDialog::defSelectablePointerCount[CALIBRATION_ITEM_SIZE] = {
-	4,
+	5,
 	4,
 	1,
 	1,
@@ -63,7 +63,7 @@ double CalibrationDialog::defSelectablePointerCount[CALIBRATION_ITEM_SIZE] = {
 DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 	/* Data1  Resolution1  Data2  Resolution2 */
-	{   0.0000, 0.12500000, 0.0000, 0.12500000 },
+	{   0.0000, 0.25000000, 0.0000, 0.25000000 },
 	{   0.0000, 0.00390625, 0.0000, 0.00390625 },
 	{   0.0000, 0.10000000, 0.0000, 0.10000000 },
 	{   0.0000, 0.10000000, 0.0000, 0.10000000 },
@@ -155,10 +155,16 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_pointerST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT("Pointer"), wxDefaultPosition, wxDefaultSize);
 	m_pointerCB = new wxComboBox(m_settingControlSBS->GetStaticBox(), CID_CB_POINTER, wxEmptyString, wxDefaultPosition, wxDefaultSize);
 
-	m_pointerCB->Append(wxT("0"));
-	m_pointerCB->Append(wxT("1"));
-	m_pointerCB->Append(wxT("2"));
-	m_pointerCB->Append(wxT("3"));
+	wxString item("");
+	for (int idx = 0; idx < defSelectablePointerCount[0]; idx++){
+		item = wxString::Format("%d", idx);
+		m_pointerCB->Append(item);
+	}
+
+	//m_pointerCB->Append(wxT("0"));
+	//m_pointerCB->Append(wxT("1"));
+	//m_pointerCB->Append(wxT("2"));
+	//m_pointerCB->Append(wxT("3"));
 	m_pointerCB->SetSelection(0);
 
 	m_padding1ST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
@@ -179,7 +185,8 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_resolution1ST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT("Resolution 1"), wxDefaultPosition, wxDefaultSize);
 	m_resolution1TC = new wxTextCtrl(m_settingControlSBS->GetStaticBox(), wxID_ANY);
 
-	wxString resolution1DefaultText("0.12500000");
+	wxString resolution1DefaultText("");
+	resolution1DefaultText = wxString::Format("%.8f", m_dataResolution[0].m_Resolution1);
 	m_resolution1TC->SetValue(resolution1DefaultText);
 
 #ifndef USE_LINEAR_DATA_FORMAT
@@ -195,7 +202,8 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_resolution2ST = new wxStaticText(m_settingControlSBS->GetStaticBox(), wxID_ANY, wxT("Resolution 2"), wxDefaultPosition, wxDefaultSize);
 	m_resolution2TC = new wxTextCtrl(m_settingControlSBS->GetStaticBox(), wxID_ANY);
 
-	wxString resolution2DefaultText("0.12500000");
+	wxString resolution2DefaultText("");
+	resolution2DefaultText = wxString::Format("%.8f", m_dataResolution[0].m_Resolution2);
 	m_resolution2TC->SetValue(resolution2DefaultText);
 
 #ifndef USE_LINEAR_DATA_FORMAT
