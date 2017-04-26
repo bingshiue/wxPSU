@@ -43,7 +43,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.18       |     Add Adjustable PFC ISP F3 Delay Time For All I/O Interface |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.19       |     Add FRU Maker/Writer/Reader                                |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.18" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.19" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif

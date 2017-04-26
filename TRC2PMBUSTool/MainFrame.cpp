@@ -37,6 +37,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	CheckAndLoadConfig();
 
+	this->m_cmdListDVC = NULL;
+	this->m_monitor_running = false;
+
 	this->m_customerList = customerList;
 	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
 
@@ -261,6 +264,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_destroying = 0;
 	m_sendThreadStopFlag = true;
 	m_increaseCPUOverHeadThreadStopFlag = true;
+	this->m_increaseCPUOverHeadThread = NULL;
+	this->m_logFileFFileOutputStream = NULL;
+	this->m_logFileTextOutputStream = NULL;
 
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);

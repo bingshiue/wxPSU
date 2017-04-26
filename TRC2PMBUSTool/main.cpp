@@ -57,6 +57,9 @@ bool WXPSU::OnInit()
 	wxString winTitle(APP_NAME);
 	winTitle += wxT(" ");
 	winTitle += wxT(VERSION_STRING);
+	winTitle += wxT(" ");
+	winTitle += wxT("Build Date : ");
+	winTitle += wxString::Format("%s", __DATE__);
 
 	MainFrame *mainFrame = new MainFrame(winTitle, wxPoint(50, 50), size, g_CustomerList);
 	
