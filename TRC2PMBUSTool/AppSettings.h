@@ -69,8 +69,8 @@ enum {
 #define DEFAULT_ACS_SETPOINT_INPUT_MAX  2400
 #define DEFAULT_ACS_SETPOINT_INPUT_MIN  2000
 
-#define DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME                   6 //(Unit : millisecond)
-#define DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME       12 //(Unit : millisecond) 
+#define DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME                   25// 6 //(Unit : millisecond)
+#define DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME        30//12 //(Unit : millisecond)
 
 #define DEFAULT_RUNIN_TIMES  10
 
