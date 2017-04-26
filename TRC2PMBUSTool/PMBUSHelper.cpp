@@ -1334,7 +1334,7 @@ wxString& PMBUSHelper::GetNowTimeString(void){
 
 	// Make Time String
 	//timeString = wxString::Format("%d-%d %d:%d.%d", systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wMilliseconds);
-	m_timeString = wxString::Format("%02d:%02d:%02d.%03d", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
+	m_timeString = wxString::Format("%04d/%02d/%02d %02d:%02d:%02d.%03d", systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
 
 	return m_timeString;
 }
