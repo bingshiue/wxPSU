@@ -801,19 +801,84 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != previous_status){
+		
+		if (previous_status != 0x00){
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				// If Previous Fail But Clear Now
+				if ( ((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_byte.status & status[idx]) == 0) ){
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log 
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
+	}
+#if 0
+	else{
+
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -890,19 +955,85 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != 0x0000){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != previous_status){
+		
+		if (previous_status != 0x0000){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 16; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x0000;
+		}
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != 0x0000){
+			
+			// Output Fault/Warning MSG to Log
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
+	}
+#if 0
+	else{
+
+		if (previous_status != 0x0000){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 16; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x0000;
 		}
 	}
-	else{
-		previous_status = 0x0000;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -963,19 +1094,85 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH] : ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log
+			wxString output = wxString::Format("Assert [%02XH] : ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
-
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
 		}
+
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
 	}
+#if 0
 	else{
-		previous_status = 0x00;
+
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
+		}
+
 	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1038,19 +1235,84 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+
+		if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
+	}
+#if 0
+	else{
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1112,19 +1374,84 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_input.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != 0x00){
 			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
+	}
+#if 0
+	else{
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1185,19 +1512,84 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log 
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
+	}
+#if 0
+	else{
+
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1258,19 +1650,84 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+
+		if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
+	}
+#if 0
+	else{
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1332,19 +1789,85 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("Status: [ ");
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_other.status & status[idx]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+
+		
+		if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log 
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
+	}
+#if 0
+	else{
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			bFirstError = false;
+
+			clear_string += wxString::Format("CLEAR Status: [ ");
+
+			for (unsigned int idx = 0; idx < 8; idx++){
+				if ((previous_status & status[idx]) == status[idx]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[idx]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[idx]);
+					}
+				}
+			}
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -1425,20 +1948,112 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != 0x00){
-		if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != previous_status){
-			// Output MSG to Log 
-			wxString output = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != previous_status){
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			clear_string += wxString::Format("Fan 1: [ ");
+			bFirstError = false;
+			// If Previous Fail But Clear Now
+			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+				if (((previous_status & status[fan_1_check[idx]]) == status[fan_1_check[idx]]) && ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[fan_1_check[idx]]) == 0)) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[fan_1_check[idx]]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[fan_1_check[idx]]);
+					}
+				}
+			}
+
+			wxstr += wxString::Format(" ], Fan 2 : [ ");
+
+			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+				if ((previous_status & status[fan_2_check[idx]]) == status[fan_2_check[idx]]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[fan_2_check[idx]]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[fan_2_check[idx]]);
+					}
+				}
+			}
+
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log If Have Clear Status
+			if (bFirstError == true){
+				wxString output_clear_string = wxString::Format("De-Assert [%02XH]: ", pmbuscmd->m_register);
+				output_clear_string += clear_string;
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+			}
+
+			//previous_status = 0x00;
+		}
+
+		if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != 0x00){
+			
+			// Output Fault/Warning MSG to Log 
+			wxString output = wxString::Format("Assert [%02XH]: ", pmbuscmd->m_register);
 			output += wxstr;
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
+		}
 
-			previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
+		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
+	}
+#if 0
+	else{
+		
+		if (previous_status != 0x00){
+
+			// Print Clear XXX Messages
+			wxString clear_string("");
+			clear_string += wxString::Format("CLEAR Fan 1: [ ");
+			bFirstError = false;
+
+			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+				if ((previous_status & status[fan_1_check[idx]]) == status[fan_1_check[idx]]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[fan_1_check[idx]]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[fan_1_check[idx]]);
+					}
+				}
+			}
+
+			wxstr += wxString::Format(" ], Fan 2 : [ ");
+
+			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
+				if ((previous_status & status[fan_2_check[idx]]) == status[fan_2_check[idx]]) {
+					if (bFirstError == false){
+						clear_string += wxString::Format(" %s ", status_string[fan_2_check[idx]]);
+						bFirstError = true;
+					}
+					else{
+						clear_string += wxString::Format(", %s ", status_string[fan_2_check[idx]]);
+					}
+				}
+			}
+
+
+			clear_string += wxString::Format(" ]");
+
+			// Output MSG to Log 
+			wxString output_clear_string = wxString::Format("[%02xH]:", pmbuscmd->m_register);
+			output_clear_string += clear_string;
+			PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_clear_string.c_str());
+
+			previous_status = 0x00;
 		}
 	}
-	else{
-		previous_status = 0x00;
-	}
-
+#endif
 
 	return EXIT_SUCCESS;
 }

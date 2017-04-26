@@ -931,6 +931,7 @@ void MainFrame::SetupStatusBar(void){
 void MainFrame::SetupCMDListDVL(wxPanel* parent){
 
 	wxASSERT(!this->m_cmdListDVC && !m_cmdListModel);
+
 	this->m_cmdListDVC = new wxDataViewCtrl(this->CMDListPanel, CID_CMDLIST_DVC, wxDefaultPosition,
 		wxDefaultSize, wxDV_VERT_RULES | wxDV_ROW_LINES);
 
