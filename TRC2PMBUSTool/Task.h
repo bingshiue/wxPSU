@@ -58,6 +58,8 @@
 #define TP_PickitConfigTask (0.5f)
 #define TP_E2PRomWriteDataTask (0.5f)
 #define TP_E2PRomReadDataTask (0.5f)
+#define TP_SendReadCMDTask (0.5f)
+#define TP_ReceiveReadCMDTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -88,6 +90,8 @@ enum {
 	task_ID_PickitConfigTask,
 	task_ID_E2PRomWriteDataTask,
 	task_ID_E2PRomReadDataTask,
+	task_ID_SendReadCMDTask,
+	task_ID_ReceiveReadCMDTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -615,6 +619,85 @@ public :
 	 * @brief Deconstructor.
 	 */
 	~ReceiveWriteCMDTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+
+};
+
+class SendReadCMDTask : public TaskEx {
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	pmbusReadCMD_t m_pmbusReadCommand;/**< Read Command */
+	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	SendReadCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, pmbusReadCMD_t pmbusReadCommand);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~SendReadCMDTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+
+	/**
+	 * @brief Product ReadCMD Buffer.
+	 */
+	int ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+
+};
+
+class ReceiveReadCMDTask : public TaskEx {
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
+	pmbusReadCMD_t m_pmbusReadCommand;/**< Read Command */
+
+	unsigned int m_bytesToRead;/**< Bytes To Read */
+
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	ReceiveReadCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, pmbusReadCMD_t pmbusReadCommand);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~ReceiveReadCMDTask(void);
 
 	/**
 	 * @brief Draw function.

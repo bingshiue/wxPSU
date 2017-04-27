@@ -381,6 +381,12 @@
     <ClCompile Include="FRUMakerDialog.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="SendReadCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceiveReadCMDTask.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SerialPort.h">

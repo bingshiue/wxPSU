@@ -159,6 +159,7 @@
     <ClCompile Include="ReceiveISPStartCMDTask.cpp" />
     <ClCompile Include="ReceiveISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="ReceiveISPWriteDataTask.cpp" />
+    <ClCompile Include="ReceiveReadCMDTask.cpp" />
     <ClCompile Include="ReceiveRebootCheckTask.cpp" />
     <ClCompile Include="ReceiveUSBAdaptorSettingCMDTask.cpp" />
     <ClCompile Include="ReceiveWriteCMDTask.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="SendISPStartCMDTask.cpp" />
     <ClCompile Include="SendISPStartVerifyCMDTask.cpp" />
     <ClCompile Include="SendISPWriteDataTask.cpp" />
+    <ClCompile Include="SendReadCMDTask.cpp" />
     <ClCompile Include="SendRebootCheckTask.cpp" />
     <ClCompile Include="SendUSBAdaptorBitRateTask.cpp" />
     <ClCompile Include="SendUSBAdaptorConfigTask.cpp" />

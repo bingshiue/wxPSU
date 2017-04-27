@@ -99,7 +99,7 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	m_btnDone = new wxButton(this, CID_BTN_DONE, wxT("Done"));
 
 	m_btnRead = new wxButton(this, CID_BTN_READ, wxT("Read"));
-	m_btnRead->Enable(false);// Don't Support Read Currently
+	//m_btnRead->Enable(false);// Don't Support Read Currently
 	
 	m_btnExit = new wxButton(this, wxID_CLOSE, wxT("&Exit"));
 
@@ -921,8 +921,24 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 }
 
+#define CALIBRATION_READ_DATA_SIZE  25 /**< Calibration Read Data Size (Don't Include PEC Byte) */
 void CalibrationDialog::OnBtnRead(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Not Implement");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	// Read Calibration Setting Data
+	pmbusReadCMD_t cdCMD;
+	cdCMD.m_slaveAddr = PMBUSHelper::GetSlaveAddress();
+	cdCMD.m_cmd = 0xCD;
+	cdCMD.m_numOfReadBytes = CALIBRATION_READ_DATA_SIZE + 1;// +1 : + PEC Byte
+
+	// New SendReadCMDTask
+	int cnt = TaskEx::GetCount(task_ID_SendReadCMDTask);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
+
+	if (cnt == 0){
+		new(TP_SendReadCMDTask) SendReadCMDTask(this->m_ioaccess, this->m_currentIO, cdCMD);
+	}
+
 }
 
 void CalibrationDialog::OnCBCalibrationItem(wxCommandEvent& event){
