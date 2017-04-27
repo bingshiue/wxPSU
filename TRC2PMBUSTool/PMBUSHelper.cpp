@@ -29,6 +29,16 @@ wxString PMBUSHelper::m_default_mfr_revision = wxT("");
 wxString PMBUSHelper::m_default_mfr_location = wxT("");
 wxString PMBUSHelper::m_default_mfr_date = wxT("");
 wxString PMBUSHelper::m_default_mfr_serial = wxT("");
+unsigned char  PMBUSHelper::cmd_3AH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_78H_previous = 0x00;
+unsigned short PMBUSHelper::cmd_79H_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7AH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7BH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7CH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7DH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7EH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_7FH_previous = 0x00;
+unsigned char  PMBUSHelper::cmd_81H_previous = 0x00;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;

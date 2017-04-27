@@ -74,9 +74,10 @@ enum {
 
 #define DEFAULT_RUNIN_TIMES  10
 
-#define DEFAULT_ONLY_POLLING_SUPPORT_CMD  (unsigned long)Generic_Disable
-#define DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN (unsigned long)Generic_Disable
-#define DEFAULT_QUERY_CMD_BEFORE_POLLING  (unsigned long)Generic_Enable
+#define DEFAULT_ONLY_POLLING_SUPPORT_CMD       (unsigned long)Generic_Disable
+#define DEFAULT_CLEAR_LOG_BEFORE_MONITOR_RUN   (unsigned long)Generic_Enable
+#define DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN      (unsigned long)Generic_Disable
+#define DEFAULT_QUERY_CMD_BEFORE_POLLING       (unsigned long)Generic_Enable
 
 #define DEFAULT_INCREASE_CPU_OVERHEAD     (unsigned long)Generic_Disable
 
@@ -302,6 +303,7 @@ typedef struct appSettings_t {
 	unsigned long m_pfcIspF3CMDDelayTime;/**< PFC ISP F3 CMD Delay Time */
 	unsigned long m_pfcIspF3CMDTotalPhaseDelayTime;/**< PFC ISP F3 CMD Total Phase Delay Time */
 	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
+	unsigned long m_clearLogBeforeMonitorRun;/**< Clear Log Before Monitor Run */
 	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
 	unsigned long m_ISPDDWaitRootTime;/**< ISP DD Wait Reboot Time */
 	unsigned long m_autoQueryCMDOnIOOpen;/**< Auto Query Command On I/O Open */
@@ -352,6 +354,7 @@ typedef struct appSettings_t {
 		this->m_pfcIspF3CMDTotalPhaseDelayTime = DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME;
 
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
+		this->m_clearLogBeforeMonitorRun = DEFAULT_CLEAR_LOG_BEFORE_MONITOR_RUN;
 		this->m_autoQueryCMDOnIOOpen = DEFAULT_AUTO_QUERY_CMD_ON_IO_OPEN;
 		this->m_queryCMDBeforePolling = DEFAULT_QUERY_CMD_BEFORE_POLLING;
 		this->m_increaseCPUOverhead = DEFAULT_INCREASE_CPU_OVERHEAD;

@@ -36,6 +36,17 @@ public :
 	static unsigned int runInMode;
 	static int runInTimes;
 
+	static unsigned char  cmd_3AH_previous;
+	static unsigned char  cmd_78H_previous;
+	static unsigned short cmd_79H_previous;
+	static unsigned char  cmd_7AH_previous;
+	static unsigned char  cmd_7BH_previous;
+	static unsigned char  cmd_7CH_previous;
+	static unsigned char  cmd_7DH_previous;
+	static unsigned char  cmd_7EH_previous;
+	static unsigned char  cmd_7FH_previous;
+	static unsigned char  cmd_81H_previous;
+
 	static void SetSlaveAddress(unsigned char slaveAddress);
 	static unsigned char& GetSlaveAddress(void);
 	static PMBUSSTATUS_t* GetPMBusStatus(void);

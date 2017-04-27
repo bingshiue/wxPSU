@@ -407,6 +407,8 @@ int GB_CRPS_Cook_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
 
+	unsigned char* previous_status = &(PMBUSHelper::cmd_3AH_previous);
+
 	const wchar_t* tmp_wchar;
 	wxString wxstr("");
 	char *install_str[2] = { "", "Install" };
@@ -472,8 +474,13 @@ int GB_CRPS_Cook_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 	lstrcpyn(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
+	wxString output_msg("Assert [3AH]: ");
+	if (*previous_status != pmbuscmd->m_recvBuff.m_dataBuff[0]){
+		output_msg += wxstr;
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", output_msg.c_str());
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+		*previous_status = pmbuscmd->m_recvBuff.m_dataBuff[0];
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -744,8 +751,10 @@ int GB_CRPS_Cook_74H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 int GB_CRPS_Cook_75H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_76H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_77H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
+
 int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_78H_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -801,9 +810,9 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_byte.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 			// Print Clear XXX Messages
 			wxString clear_string("");
 			bFirstError = false;
@@ -812,7 +821,7 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 			for (unsigned int idx = 0; idx < 8; idx++){
 				// If Previous Fail But Clear Now
-				if ( ((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_byte.status & status[idx]) == 0) ){
+				if ( ((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_byte.status & status[idx]) == 0) ){
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -843,7 +852,7 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_byte.status;
 	}
 #if 0
 	else{
@@ -884,7 +893,7 @@ int GB_CRPS_Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned short previous_status = 0x00;
+	static unsigned short* previous_status = &(PMBUSHelper::cmd_79H_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -955,9 +964,9 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_word.status != *previous_status){
 		
-		if (previous_status != 0x0000){
+		if (*previous_status != 0x0000){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -966,7 +975,7 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 16; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_word.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -998,7 +1007,7 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 		
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_word.status;
 	}
 #if 0
 	else{
@@ -1039,7 +1048,7 @@ int GB_CRPS_Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7AH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1094,9 +1103,9 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_vout.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1105,7 +1114,7 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_vout.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1136,7 +1145,7 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_vout.status;
 	}
 #if 0
 	else{
@@ -1178,7 +1187,7 @@ int GB_CRPS_Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7BH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1235,9 +1244,9 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_iout.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1246,7 +1255,7 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_iout.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1277,7 +1286,7 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_iout.status;
 	}
 #if 0
 	else{
@@ -1318,7 +1327,7 @@ int GB_CRPS_Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7CH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1374,9 +1383,9 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_input.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1385,7 +1394,7 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_input.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_input.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1416,7 +1425,7 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_input.status;
 	}
 #if 0
 	else{
@@ -1457,7 +1466,7 @@ int GB_CRPS_Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7DH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1512,9 +1521,9 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_temperature.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1523,7 +1532,7 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_temperature.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1554,7 +1563,7 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_temperature.status;
 	}
 #if 0
 	else{
@@ -1595,7 +1604,7 @@ int GB_CRPS_Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7EH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1650,9 +1659,9 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_cml.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1661,7 +1670,7 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_cml.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1692,7 +1701,7 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_cml.status;
 	}
 #if 0
 	else{
@@ -1733,7 +1742,7 @@ int GB_CRPS_Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 }
 
 int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_7FH_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1789,9 +1798,9 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_other.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1800,7 +1809,7 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			clear_string += wxString::Format("Status: [ ");
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < 8; idx++){
-				if (((previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_other.status & status[idx]) == 0)) {
+				if (((*previous_status & status[idx]) == status[idx]) && ((PMBUSHelper::GetPMBusStatus()->m_status_other.status & status[idx]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[idx]);
 						bFirstError = true;
@@ -1832,7 +1841,7 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_other.status;
 	}
 #if 0
 	else{
@@ -1875,7 +1884,7 @@ int GB_CRPS_Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 int GB_CRPS_Cook_80H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return GB_CRPS_Cook_Not_Implement(pmbuscmd, string, sizeOfstr); }
 int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
-	static unsigned char previous_status = 0x00;
+	static unsigned char* previous_status = &(PMBUSHelper::cmd_81H_previous);//0x00;
 
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;
@@ -1948,9 +1957,9 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
-	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != previous_status){
+	if (PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status != *previous_status){
 		
-		if (previous_status != 0x00){
+		if (*previous_status != 0x00){
 
 			// Print Clear XXX Messages
 			wxString clear_string("");
@@ -1958,7 +1967,7 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			bFirstError = false;
 			// If Previous Fail But Clear Now
 			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
-				if (((previous_status & status[fan_1_check[idx]]) == status[fan_1_check[idx]]) && ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[fan_1_check[idx]]) == 0)) {
+				if (((*previous_status & status[fan_1_check[idx]]) == status[fan_1_check[idx]]) && ((PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status & status[fan_1_check[idx]]) == 0)) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[fan_1_check[idx]]);
 						bFirstError = true;
@@ -1972,7 +1981,7 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			wxstr += wxString::Format(" ], Fan 2 : [ ");
 
 			for (unsigned int idx = 0; idx < sizeof(fan_1_check) / sizeof(fan_1_check[0]); idx++){
-				if ((previous_status & status[fan_2_check[idx]]) == status[fan_2_check[idx]]) {
+				if ((*previous_status & status[fan_2_check[idx]]) == status[fan_2_check[idx]]) {
 					if (bFirstError == false){
 						clear_string += wxString::Format(" %s ", status_string[fan_2_check[idx]]);
 						bFirstError = true;
@@ -2004,7 +2013,7 @@ int GB_CRPS_Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfs
 			PSU_DEBUG_PRINT(MSG_ERROR, "%s", output.c_str());
 		}
 
-		previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
+		*previous_status = PMBUSHelper::GetPMBusStatus()->m_status_fan_1_2.status;
 	}
 #if 0
 	else{

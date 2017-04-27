@@ -421,6 +421,7 @@ void MainFrame::SetupMenuBar(void){
 	|- Only Polling Support Command
 	|- Auto Query Command On I/O Open
 	|- Query Command Before Polling 
+	|- Clear Log Before Monitor Run
 	|------------------------------------
 	|- Clear Error Log
 	|- Reset Max./Min. Value
@@ -496,11 +497,18 @@ void MainFrame::SetupMenuBar(void){
 		this->m_queryCMDBeforePollingMenuItem->Check(true);
 	}
 
+	this->m_clearLogBeforeMonitorRun = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Log_Before_Monitor_Run, wxT("Clear Log Before Monitor Run"), wxT("Clear Log Before Monitor Run"), wxITEM_CHECK);
+
+	if (this->m_appSettings.m_clearLogBeforeMonitorRun == Generic_Enable){
+		this->m_clearLogBeforeMonitorRun->Check(true);
+	}
+
 	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
 	this->m_runMenu->Append(m_onlyPollingSupportCMDMenuItem);
 	this->m_runMenu->Append(m_autoQueryCMDOnIOOpenMenuItem);
 	this->m_runMenu->Append(m_queryCMDBeforePollingMenuItem);
+	this->m_runMenu->Append(m_clearLogBeforeMonitorRun);
 	this->m_runMenu->AppendSeparator();
 
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
@@ -2166,6 +2174,21 @@ void MainFrame::OnQueryCMDBeforePolling(wxCommandEvent& event){
 	}
 }
 
+void MainFrame::OnClearLogBeforeMonitorRun(wxCommandEvent& event){
+	
+	if (this->m_appSettings.m_clearLogBeforeMonitorRun == Generic_Enable){
+		this->m_appSettings.m_clearLogBeforeMonitorRun = Generic_Disable;
+
+		this->m_clearLogBeforeMonitorRun->Check(false);
+	}
+	else if (this->m_appSettings.m_clearLogBeforeMonitorRun == Generic_Disable){
+		this->m_appSettings.m_clearLogBeforeMonitorRun = Generic_Enable;
+
+		this->m_clearLogBeforeMonitorRun->Check(true);
+	}
+
+}
+
 void MainFrame::OnClearErrorLog(wxCommandEvent& event){
 	this->m_debugLogTC->Clear();
 }
@@ -2464,6 +2487,22 @@ void MainFrame::StartMonitor(void){
 	
 	// Select Notebook Page 0
 	this->m_notebook->SetSelection(0);
+
+	// Clear Log Before Monitor Run
+	if (this->m_appSettings.m_clearLogBeforeMonitorRun == Generic_Enable){
+		this->m_debugLogTC->Clear();
+
+		PMBUSHelper::cmd_3AH_previous = 0x00;
+		PMBUSHelper::cmd_78H_previous = 0x00;
+		PMBUSHelper::cmd_79H_previous = 0x00;
+		PMBUSHelper::cmd_7AH_previous = 0x00;
+		PMBUSHelper::cmd_7BH_previous = 0x00;
+		PMBUSHelper::cmd_7CH_previous = 0x00;
+		PMBUSHelper::cmd_7DH_previous = 0x00;
+		PMBUSHelper::cmd_7EH_previous = 0x00;
+		PMBUSHelper::cmd_7FH_previous = 0x00;
+		PMBUSHelper::cmd_81H_previous = 0x00;
+	}
 
 	// Check Count of Enabled CMD
 	int enabledCount = 0;
@@ -3889,6 +3928,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_onlyPollingSupportCMD = onlyPollingSupportCMD;
 	}
 
+	// Clear Log Before Monitor Run
+	long clearLogBeforeMonitorRun;
+	if (pConfig->Read(wxT("ClearLogBeforeMonitorRun"), &clearLogBeforeMonitorRun) == false){
+		pConfig->Write(wxT("ClearLogBeforeMonitorRun"), DEFAULT_CLEAR_LOG_BEFORE_MONITOR_RUN);
+		this->m_appSettings.m_clearLogBeforeMonitorRun = DEFAULT_CLEAR_LOG_BEFORE_MONITOR_RUN;
+	}
+	else{
+		this->m_appSettings.m_clearLogBeforeMonitorRun = clearLogBeforeMonitorRun;
+	}
+
 	// Auto Query CMD on I/O Open
 	long autoQueryCMDOnIOOpen;
 	if (pConfig->Read(wxT("AutoQueryCMDOnIOOpen"), &autoQueryCMDOnIOOpen) == false){
@@ -4481,6 +4530,9 @@ void MainFrame::SaveConfig(void){
 
 	// Only Polling Support CMD
 	pConfig->Write(wxT("OnlyPollingSupportCMD"), this->m_appSettings.m_onlyPollingSupportCMD);
+
+	// Clear Log Before Monitor Run
+	pConfig->Write(wxT("ClearLogBeforeMonitorRun"), this->m_appSettings.m_clearLogBeforeMonitorRun);
 
 	// Auto Query CMD On I/O Open
 	pConfig->Write(wxT("AutoQueryCMDOnIOOpen"), this->m_appSettings.m_autoQueryCMDOnIOOpen);
@@ -5248,6 +5300,7 @@ EVT_MENU(MENU_ID_Enable_Checksum, MainFrame::OnEnableChecksum)
 EVT_MENU(MENU_ID_Only_Polling_Support_Command, MainFrame::OnOnlyPollingSupportCommand)
 EVT_MENU(MENU_ID_Auto_Query_CMD_On_IO_Open, MainFrame::OnAutoQueryCMDOnIOOpen)
 EVT_MENU(MENU_ID_Query_CMD_Before_Polling, MainFrame::OnQueryCMDBeforePolling)
+EVT_MENU(MENU_ID_Clear_Log_Before_Monitor_Run, MainFrame::OnClearLogBeforeMonitorRun)
 EVT_MENU(MENU_ID_Clear_Error_Log, MainFrame::OnClearErrorLog)
 EVT_MENU(MENU_ID_Reset_MaxMin_Value, MainFrame::OnResetMaxMinValue)
 EVT_MENU(MENU_ID_Reset_Run_Time, MainFrame::OnResetRunTime)
