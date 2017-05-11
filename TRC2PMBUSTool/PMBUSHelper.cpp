@@ -39,6 +39,7 @@ unsigned char  PMBUSHelper::cmd_7DH_previous = 0x00;
 unsigned char  PMBUSHelper::cmd_7EH_previous = 0x00;
 unsigned char  PMBUSHelper::cmd_7FH_previous = 0x00;
 unsigned char  PMBUSHelper::cmd_81H_previous = 0x00;
+wxCriticalSection PMBUSHelper::m_SendVectorCritsect;
 
 void PMBUSHelper::SetSlaveAddress(unsigned char slaveAddress){
 	m_slaveAddress = slaveAddress;
@@ -749,6 +750,173 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 	return buffer_len;
 }
 
+int PMBUSHelper::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned char* sendBuffer, unsigned int* currentIO){
+	// Read Byte/Word , Block Read
+	unsigned int baseIndex = 0;
+	int buffer_len = 0;
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+
+		sendBuffer[baseIndex++] = 0x41;
+		sendBuffer[baseIndex++] = 0x44;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;
+
+		// May Have 0x0d Command
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;
+
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+
+		buffer_len = baseIndex;
+
+
+		break;
+
+	case IOACCESS_HID:
+
+		sendBuffer[baseIndex++] = 0x05;           // Report ID is 0x05
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = 0x41;
+		sendBuffer[baseIndex++] = 0x44;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;        // Command
+
+		// May Have 0x0d Command
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+
+		if (sendBuffer[baseIndex - 1] == 0x0d){
+			sendBuffer[baseIndex++] = 0x0d;
+		}
+
+		sendBuffer[baseIndex++] = 0x0d;
+		sendBuffer[baseIndex++] = 0x0a;
+
+		sendBuffer[1] = (baseIndex - 2);
+		buffer_len = baseIndex;
+
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x01; //
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+
+		for (int local = baseIndex; local<64; local++){
+			sendBuffer[local] = 0;
+		}
+
+		buffer_len = 64;// For HID
+
+		break;
+
+	case IOACCESS_PICKIT:
+
+		//buf[offset++] = 0x00;
+		//buf[offset++] = 0x03;
+		//buf[offset++] = 0x0e;
+		//buf[offset++] = 0x81;
+		//buf[offset++] = 0x84;
+		//buf[offset++] = 0x02;
+		//buf[offset++] = 0xb6;
+		//buf[offset++] = 0xec;
+		//buf[offset++] = 0x83;
+		//buf[offset++] = 0x84;
+		//buf[offset++] = 0x01;
+		//buf[offset++] = 0xb7;
+		//buf[offset++] = 0x89;
+		//buf[offset++] = 0x03;
+		//buf[offset++] = 0x82;
+		//buf[offset++] = 0x1f;
+		//buf[offset++] = 0x77;
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x03;// Report ID is 0x03
+		sendBuffer[baseIndex++] = 0x0e;
+		sendBuffer[baseIndex++] = 0x81;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x02;// ??? (Maybe This Field Indicates Length of "Slave Address + Command")
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Command
+
+		sendBuffer[baseIndex++] = 0x83;
+		sendBuffer[baseIndex++] = 0x84;
+		sendBuffer[baseIndex++] = 0x01;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr | 0x01;
+		sendBuffer[baseIndex++] = 0x89;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes; // Response Data Length
+		sendBuffer[baseIndex++] = 0x82;
+		sendBuffer[baseIndex++] = 0x1f;
+		sendBuffer[baseIndex++] = 0x77;
+
+		buffer_len = baseIndex;
+
+		for (int local = baseIndex; local<65; local++){
+			sendBuffer[local] = 0;
+		}
+
+		buffer_len = 64;// For HID
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		sendBuffer[baseIndex++] = 1;// write bytes
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;// read bytes
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;
+
+		buffer_len = baseIndex;
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
+		break;
+	}
+
+	return buffer_len;
+}
+
 int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer){
 
 	unsigned int pec_start_index = 0;
@@ -893,6 +1061,52 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 	}
 
 	return pec_start_index;
+}
+
+
+void PMBUSHelper::ProductDataBuffer(unsigned char* DestBuff, unsigned int* currentIO, unsigned char* SourceBuff, unsigned int responseDataLength){
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			DestBuff[idx] = SourceBuff[idx];
+		}
+
+		break;
+
+	case IOACCESS_HID:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			DestBuff[idx] = SourceBuff[idx + 6];
+		}
+
+		break;
+
+	case IOACCESS_PICKIT:
+		// 86 0a 80 10 [01] 10 [ac] 10 [22] 81 1c 77
+		// 86 0a 80 10 [01] 10 [f0] 10 [e2] 81 1c 77
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			DestBuff[idx] = SourceBuff[4 + idx * 2];
+		}
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			DestBuff[idx] = SourceBuff[idx];
+		}
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Wrong !");
+		break;
+	}
+
 }
 
 void PMBUSHelper::ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength){
@@ -1853,4 +2067,228 @@ wxString& PMBUSHelper::getDefaultMFR_DATE(void){
 
 wxString& PMBUSHelper::getDefaultMFR_SERIAL(void){
 	return m_default_mfr_serial;
+}
+
+void PMBUSHelper::ParseCustomizedReadCMDRecvData(unsigned char cmd, unsigned char* DataBuff, unsigned int DataLengh){
+
+	bool checkSumError = false;
+	unsigned int count = 0;
+	//const wchar_t* tmp_wchar;
+	unsigned char tmp_buffer[256];
+
+	//if (string == NULL) return -1;
+
+	wxString wxstr("");
+
+	// I2C Address
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress()).Upper();
+	tmp_buffer[0] = PMBUSHelper::GetSlaveAddress();
+
+	wxstr += "-";
+
+	// Command (Register)
+	wxstr += wxString::Format("%02x", cmd);
+	tmp_buffer[1] = cmd;
+
+	wxstr += "-";
+
+	// Read Command
+	wxstr += wxString::Format("%2x", PMBUSHelper::GetSlaveAddress() | 0x01).Upper();
+	tmp_buffer[2] = PMBUSHelper::GetSlaveAddress() | 0x01;
+
+	for (unsigned int idx = 0; idx < DataLengh; idx++){
+		wxstr += "-";
+		wxstr += wxString::Format("%02x", DataBuff[idx]);
+		tmp_buffer[3 + idx] = DataBuff[idx];
+	}
+
+	wxstr.UpperCase();
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
+
+	// Check If CheckSum Error
+	unsigned char verify_pec = 0;
+	if (PMBUSHelper::GetAppSettings()->m_EnableChecksum == Generic_Enable){
+		verify_pec = PMBusSlave_Crc8MakeBitwise(0, 7, tmp_buffer + 0, ((DataLengh + 3) - 1));
+
+		PSU_DEBUG_PRINT(MSG_DETAIL, "verify_pec = %02x, pec = %02x", verify_pec, DataBuff[DataLengh - 1]);
+
+		if (verify_pec != DataBuff[DataLengh - 1]){
+			wxstr += L" (Checksum Error)";
+			//pmbuscmd->m_cmdStatus.m_status = cmd_status_checksum_error;
+			checkSumError = true;
+		}
+
+	}
+
+	// If CheckSum Error Occurs , Return
+	if (checkSumError == true){
+		PSU_DEBUG_PRINT(MSG_ERROR, "%s", wxstr.c_str());
+		return;
+	}
+	else{
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", wxstr.c_str());
+	}
+
+
+	switch (cmd){
+
+	case 0xCA:
+
+		/*
+		Error Code Defined As Below 
+
+		0x00: On normal mode. (Calibration is disabled)
+		0x60: Can't execute calibration
+		0x61: Ready for calibration
+		0x62: Busy. MCU is on calibrating.
+		0x63: Calibration done
+		0x64: Transmit timeout
+		0x65: Checksum error
+		0x66: Invalid command
+		0x67: Invalid channel
+		0x68: Invalid index
+		0x69: Invalid value
+		0x6A: Raw fault
+		0x6B: Calculated fault
+		0x6C: Save calibration data fail
+		0x6D: Full index
+		0x6E: Non-Calibration data
+		0x6F: STOP_CALIBRATION
+		Others: Unknown Fault
+		*/
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "Read Calibration Status(CMD=0xCA) :");
+
+		switch (DataBuff[0]){
+
+		case 0x00:
+			PSU_DEBUG_PRINT(MSG_ERROR, "On normal mode. (Calibration is disabled)");
+			break;
+
+		case 0x60:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Can't execute calibration");
+			break;
+
+		case 0x61:
+			PSU_DEBUG_PRINT(MSG_ALERT, "Ready for calibration");
+			break;
+
+		case 0x62:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Busy. MCU is on calibrating");
+			break;
+
+		case 0x63:
+			PSU_DEBUG_PRINT(MSG_ALERT, "Calibration done");
+			break;
+
+		case 0x64:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Transmit timeout");
+			break;
+
+		case 0x65:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Checksum error");
+			break;
+
+		case 0x66:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Invalid command");
+			break;
+
+		case 0x67:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Invalid channel");
+			break;
+
+		case 0x68:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Invalid index");
+			break;
+
+		case 0x69:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Invalid value");
+			break;
+
+		case 0x6A:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Raw fault");
+			break;
+
+		case 0x6B:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Calculated fault");
+			break;
+
+		case 0x6C:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Save calibration data fail");
+			break;
+
+		case 0x6D:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Full index");
+			break;
+
+		case 0x6E:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Non-Calibration data");
+			break;
+
+		case 0x6F:
+			PSU_DEBUG_PRINT(MSG_ERROR, "STOP_CALIBRATION");
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Unknown Fault");
+			break;
+		}
+
+		break;
+
+
+	case 0xCD:
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "Read Calibration Data(CMD=0xCD) :")
+		PSU_DEBUG_PRINT(MSG_ALERT, "Point =  %d", DataBuff[1] | (DataBuff[2] << 8));
+
+		// DATA 1
+		PSU_DEBUG_PRINT(MSG_ALERT, "Data 1 = %d", DataBuff[3] | (DataBuff[4] << 8));
+
+		// DATA 2
+		PSU_DEBUG_PRINT(MSG_ALERT, "Data 2 = %d", DataBuff[5] | (DataBuff[6] << 8));
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Unsupport CMD : %X", cmd);
+		break;
+	}
+
+}
+
+unsigned int PMBUSHelper::getIndexOfCMDFieldInSendBuffer(unsigned int* currentUseIO){
+	//return (*currentUseIO == IOACCESS_SERIALPORT) ? 3 : ((*currentUseIO == IOACCESS_HID) ? 5 : 7);
+	unsigned int idx = 0;
+
+	switch (*currentUseIO){
+
+	case IOACCESS_SERIALPORT:
+		return   3;
+		break;
+
+	case IOACCESS_HID:
+		return   5;
+		break;
+
+	case IOACCESS_PICKIT:
+		return   7;
+		break;
+
+	case IOACCESS_TOTALPHASE:
+		return   3;
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs : Current USE I/O is %d", *currentUseIO);
+		return 0;
+		break;
+	}
+
+
+}
+
+wxCriticalSection* PMBUSHelper::getSendVectorCriticalSectionObject(void){
+	return &m_SendVectorCritsect;
 }

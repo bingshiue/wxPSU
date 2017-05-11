@@ -157,7 +157,8 @@ public:
 	AppSettings_t m_appSettings;
 
 	//bool m_ioDeviceOpen;/**< Indicator for IO Device Open */
-	bool m_monitor_running;/**< Indicator for mobitor is running */
+	bool m_monitor_running;/**< Indicator for monitor is running */
+	bool m_monitor_pause;/**< Indicator for monitor is pause */
 
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 
@@ -490,6 +491,9 @@ private:
 	//void OnISPSequenceInterrupt(wxThreadEvent& event);
 
 	void OnQUERYSequenceStart(wxThreadEvent& event);
+
+	void OnIOThreadReqPause(wxThreadEvent& event);
+	void OnIOThreadReqResume(wxThreadEvent& event);
 
 	void OnInfoBarTimer(wxTimerEvent& WXUNUSED(event));
 

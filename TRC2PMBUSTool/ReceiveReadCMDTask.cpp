@@ -64,6 +64,14 @@ int ReceiveReadCMDTask::Main(double elapsedTime){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", str.c_str());
 
+
+	// Handle Recived Data
+	unsigned char DataBuffer[64];
+	memset(DataBuffer, 0, 64);
+	PMBUSHelper::ProductDataBuffer(DataBuffer, this->m_CurrentIO, this->m_recvBuff.m_recvBuff, this->m_pmbusReadCommand.m_numOfReadBytes);
+
+	PMBUSHelper::ParseCustomizedReadCMDRecvData(this->m_pmbusReadCommand.m_cmd, DataBuffer, this->m_pmbusReadCommand.m_numOfReadBytes);
+
 	delete this;
 
 	return 0;

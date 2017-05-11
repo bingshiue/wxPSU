@@ -40,6 +40,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	this->m_pmbusStatusPanel = pmbusStatusPanel;
 	this->m_pmbusStatusDCHPanel = pmbusStatusDCHPanel;
 	this->m_sendCMDVector = sendCMDVector;
+	this->m_pause = false;
 }
 
 IOPortSendCMDThread::~IOPortSendCMDThread() {
@@ -649,6 +650,30 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 #else
 				wxQueueEvent(m_pHandler->GetEventHandler(), new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE));
+#endif
+
+	
+#if 0
+				if (this->m_pause == true){
+					PSU_DEBUG_PRINT(MSG_ALERT, "%s: Pause", __FUNCTIONW__);
+					wxMilliSleep(25);
+					continue;
+				}
+#endif
+
+#if 0
+				int task_cnts = 0;;
+				task_cnts += TaskEx::GetCount(task_ID_SendWriteCMDTask);
+				task_cnts += TaskEx::GetCount(task_ID_SendReadCMDTask);
+
+				if (task_cnts > 0){
+
+					PSU_DEBUG_PRINT(MSG_ALERT, "SendWriteCMDTask/SendReadCMDTask Exists, Wait Tasks End");
+
+					wxMilliSleep(25);
+
+					continue;
+				}
 #endif
 
 				/*** If toggle is enable ***/
@@ -1536,6 +1561,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				/*-------------------- Send if user issue send CMD on write page when monitor is running  --------------------*/
 				if (this->m_sendCMDVector->size() > 0){
 
+					// Lock Critical Section
+					wxCriticalSectionLocker locker(*(PMBUSHelper::getSendVectorCriticalSectionObject()));
+
 					vector<PMBUSSendCOMMAND_t>::iterator sendCMDVector_Iterator;
 
 					for (sendCMDVector_Iterator = this->m_sendCMDVector->begin(); sendCMDVector_Iterator != this->m_sendCMDVector->end(); sendCMDVector_Iterator++)
@@ -1562,8 +1590,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							else{
 								//PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
 								// Serial Port & Total Phase is 3, USBHID is 5 , And Pickit is 7
-								int sendCMDIndex = (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 5 : 7);
-								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %x H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
+								int sendCMDIndex = PMBUSHelper::getIndexOfCMDFieldInSendBuffer(this->m_CurrentIO);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_HID) ? 5 : 7);
+								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %X H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
 							}
 
 						} while (sendResult <= 0);
@@ -1602,16 +1630,51 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Separate Write CMD is %d", this->m_recvBuff->m_length);
 							wxString writePageRes("");
 							for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){
-								writePageRes += wxString::Format("%02x,", this->m_recvBuff->m_recvBuff[idx]);
+								writePageRes += wxString::Format("%02X,", this->m_recvBuff->m_recvBuff[idx]);
 							}
-							PSU_DEBUG_PRINT(MSG_DEBUG, "Send Separate Write CMD Response : %s", writePageRes.c_str());
+							PSU_DEBUG_PRINT(MSG_DEBUG, "Send Separate CMD Response : %s", writePageRes.c_str());
 
 							// Verify Receive Data
 							if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, this->m_recvBuff->m_recvBuff, 256) == PMBUSHelper::response_ok){
 								PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
+
+								// Work-Around For Parse Response Data (Of Read CMD) If User Send 'Read' CMD by Using Vector And I/O is Total Phase
+								if (*this->m_CurrentIO == IOACCESS_TOTALPHASE){
+									int sendCMDIdx = PMBUSHelper::getIndexOfCMDFieldInSendBuffer(this->m_CurrentIO);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_HID) ? 5 : 7);
+									if (sendCMDVector_Iterator->m_sendData[sendCMDIdx] == 0xCD || sendCMDVector_Iterator->m_sendData[sendCMDIdx] == 0xCA){
+										// Handle Recived Data
+										unsigned char DataBuffer[64];
+										memset(DataBuffer, 0, 64);
+										PMBUSHelper::ProductDataBuffer(DataBuffer, this->m_CurrentIO, this->m_recvBuff->m_recvBuff, sendCMDVector_Iterator->m_bytesToRead - BASE_RESPONSE_DATA_LENGTH);
+
+										PMBUSHelper::ParseCustomizedReadCMDRecvData(sendCMDVector_Iterator->m_sendData[sendCMDIdx], DataBuffer, sendCMDVector_Iterator->m_bytesToRead - BASE_RESPONSE_DATA_LENGTH);
+
+									}
+								}
+
 							}
 							else {
-								PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+								// Work-Around For Parse Response Data (Of Read CMD) If User Send 'Read' CMD by Using Vector
+								int sendCMDIdx = PMBUSHelper::getIndexOfCMDFieldInSendBuffer(this->m_CurrentIO);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_HID) ? 5 : 7);
+								if (sendCMDVector_Iterator->m_sendData[sendCMDIdx] == 0xCD || sendCMDVector_Iterator->m_sendData[sendCMDIdx] == 0xCA){
+									// Handle Recived Data
+									unsigned char DataBuffer[64];
+									memset(DataBuffer, 0, 64);
+									PMBUSHelper::ProductDataBuffer(DataBuffer, this->m_CurrentIO, this->m_recvBuff->m_recvBuff, sendCMDVector_Iterator->m_bytesToRead - BASE_RESPONSE_DATA_LENGTH);
+
+									PMBUSHelper::ParseCustomizedReadCMDRecvData(sendCMDVector_Iterator->m_sendData[sendCMDIdx], DataBuffer, sendCMDVector_Iterator->m_bytesToRead - BASE_RESPONSE_DATA_LENGTH);
+								
+								}
+								else{
+									PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+								}
+							}
+
+							// Work-Around For Receive Wrong Response Of CMD 0xCA (After Send CMD 0xCB || 0x08)
+							int sendCMDIdx2 = PMBUSHelper::getIndexOfCMDFieldInSendBuffer(this->m_CurrentIO);
+							if (sendCMDVector_Iterator->m_sendData[sendCMDIdx2] == 0xCB || sendCMDVector_Iterator->m_sendData[sendCMDIdx2] == 0x08){
+								PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep 200ms After Send %02X CMD", sendCMDVector_Iterator->m_sendData[sendCMDIdx2]);
+								wxMilliSleep(200);
 							}
 
 						}

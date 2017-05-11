@@ -42,6 +42,7 @@ public:
 	unsigned char m_writePageSendBuff[SEND_BUFFER_MAX_SIZE];/**< Send  Buffer for Write Page */
 	unsigned int  *m_pollingTime;/**< polling time */
 	BOOL          m_enumIOPort[IO_PORT_MAX_COUNT];
+	bool          m_pause;/**< Pause */
 
 	IOPortSendCMDThread(wxSemaphore* semaphore);
 	IOPortSendCMDThread(
@@ -92,6 +93,7 @@ public:
 
 	// thread execution starts here
 	virtual wxThread::ExitCode Entry() wxOVERRIDE;
+
 };
 
 #endif

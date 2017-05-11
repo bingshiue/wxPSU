@@ -28,6 +28,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
 
 wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_START, wxThreadEvent);
 
+wxDEFINE_EVENT(wxEVT_IOTHREAD_REQ_PAUSE, wxThreadEvent);/**< Declare IO Thread Pause */
+wxDEFINE_EVENT(wxEVT_IOTHREAD_REQ_RESUME, wxThreadEvent);/**< Declare IO Thread Resume */
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList) : wxFrame(NULL, wxID_ANY, title, pos, size)
 {	
@@ -39,6 +41,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	this->m_cmdListDVC = NULL;
 	this->m_monitor_running = false;
+	this->m_monitor_pause = false;
 
 	this->m_customerList = customerList;
 	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
@@ -2216,7 +2219,7 @@ void MainFrame::OnDisableCalibration(wxCommandEvent& event){
 
 void MainFrame::OnCalibration(wxCommandEvent& event){
 	// Show Calibration Dialog
-	CalibrationDialog* calibrationDlg = new CalibrationDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, &this->m_sendCMDVector);
+	CalibrationDialog* calibrationDlg = new CalibrationDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_monitor_running, &this->m_monitor_pause, &this->m_sendCMDVector);
 	calibrationDlg->Centre();
 	calibrationDlg->ShowModal();
 
@@ -3760,6 +3763,32 @@ void MainFrame::OnQUERYSequenceStart(wxThreadEvent& event){
 
 	m_pmbusQUERYProgressDialog->Destroy();
 	wxDELETE(m_pmbusQUERYProgressDialog);
+}
+
+void MainFrame::OnIOThreadReqPause(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnIOThreadReqPause");
+
+	if (this->m_monitor_running == true){
+		if (this->m_IOPortSendCMDThread != NULL){
+			this->m_IOPortSendCMDThread->m_pause = true;
+
+			this->m_monitor_pause = true;
+		}
+	}
+
+}
+
+void MainFrame::OnIOThreadReqResume(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnIOThreadReqResume");
+
+	if (this->m_monitor_running == true){
+		if (this->m_IOPortSendCMDThread != NULL){
+			this->m_IOPortSendCMDThread->m_pause = false;
+
+			this->m_monitor_pause = false;
+		}
+	}
+
 }
 
 int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
@@ -5358,6 +5387,9 @@ EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 //EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_THREAD(wxEVT_COMMAND_QUERY_SEQUENCE_START, MainFrame::OnQUERYSequenceStart)
+
+EVT_THREAD(wxEVT_IOTHREAD_REQ_PAUSE, MainFrame::OnIOThreadReqPause)
+EVT_THREAD(wxEVT_IOTHREAD_REQ_RESUME, MainFrame::OnIOThreadReqResume)
 
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()

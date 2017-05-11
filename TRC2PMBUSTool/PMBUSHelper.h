@@ -64,8 +64,11 @@ public :
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
 	static int ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer,unsigned int* currentIO,unsigned int idx, unsigned int command, unsigned int responseDataLength);
+	static int ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned char* sendBuffer, unsigned int* currentIO);
+
 	static int ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
 
+	static void ProductDataBuffer(unsigned char* DestBuff, unsigned int* currentIO, unsigned char* SourceBuff, unsigned int responseDataLength);
 	static void ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength);
 
 
@@ -162,7 +165,18 @@ public :
 	 * @brief Get MFR_SERIAL.
 	 */
 	static wxString& getDefaultMFR_SERIAL(void);
-
+	/**
+	 * @brief Parse Customized Read CMD Recive Data.
+	 */
+	static void ParseCustomizedReadCMDRecvData(unsigned char cmd, unsigned char* DataBuff, unsigned int DataLengh);
+	/**
+	 * @brief Get Index of CMD-Field in Send Buffer By Giving Current I/O.
+	 */
+	static unsigned int getIndexOfCMDFieldInSendBuffer(unsigned int* currentUseIO);
+	/**
+	 * @brief Get Send Vector Critical Section Object.
+	 */
+	static wxCriticalSection* getSendVectorCriticalSectionObject(void);
 
 protected :
 
@@ -200,6 +214,8 @@ private :
 	static wxString m_default_mfr_date;
 
 	static wxString m_default_mfr_serial;
+
+	static wxCriticalSection m_SendVectorCritsect;
 
 };
 

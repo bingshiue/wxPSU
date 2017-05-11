@@ -43,4 +43,7 @@ wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent); /**< Declare E2PR
 wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent); /**< Declare E2PROM Write Interrupt Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent); /**< Declare E2PROM Read Interrupt Event */
 
+wxDECLARE_EVENT(wxEVT_IOTHREAD_REQ_PAUSE, wxThreadEvent);/**< Declare IO Thread Pause */
+wxDECLARE_EVENT(wxEVT_IOTHREAD_REQ_RESUME, wxThreadEvent);/**< Declare IO Thread Resume */
+
 #endif

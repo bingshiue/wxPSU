@@ -31,7 +31,7 @@
 //#define DEF_MFR_DATE             "170327"
 
 // 9E MFR_SERIAL
-#define MFR_SERIAL_LENGTH        0x1A
+#define MFR_SERIAL_LENGTH        0x18
 //#define DEF_MFR_SERIAL           "FSF0590S37LAGT1549000001"
 
 

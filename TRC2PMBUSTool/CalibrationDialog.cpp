@@ -76,7 +76,7 @@ DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 
 };
 
-CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(CALIBRATION_DIALOG_WIDTH, CALIBRATION_DIALOG_HEIGHT))
+CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, bool* monitor_pause, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(CALIBRATION_DIALOG_WIDTH, CALIBRATION_DIALOG_HEIGHT))
 {
 	wxIcon icon;
 	icon.CopyFromBitmap(wxBITMAP_PNG(CALIBRATION_16));
@@ -89,6 +89,7 @@ CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsig
 	this->m_ioaccess = ioaccess;
 	this->m_currentIO = currentIO;
 	this->m_monitor_running = monitor_running;
+	this->m_monitor_pause = monitor_pause;
 	this->m_sendCMDVector = sendCMDVector;
 
 	m_bottonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -313,6 +314,8 @@ wxEND_EVENT_TABLE()
 #define INDEX_DATA_1_START_TOTALPHASE       6
 #define INDEX_DATA_2_START_TOTALPHASE       8
 #define INDEX_PEC_TOTALPHASE               10 
+
+#define CALIBRATION_STATUS_DATA_SIZE        1
 
 int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int SizeOfBuffer, bool done){
 	
@@ -638,6 +641,9 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 #define CALIBRATION_ITEM_BYTES_TO_READ  6
 void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	
+	// Lock Critical Section
+	wxCriticalSectionLocker locker(*(PMBUSHelper::getSendVectorCriticalSectionObject()));
+
 	// Validate Input Data
 	bool result = ValidateInputData();
 	if (result == false) return;
@@ -764,6 +770,7 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	// Send Data
 	if (*this->m_monitor_running == true){
+				
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(calibrationItem);
 			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
@@ -777,10 +784,55 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, calibrationItem);
 	}
 
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Read Calibration Data Reply");
+	wxMilliSleep(200);
+
+	pmbusReadCMD_t Read_CA_CMD;
+	Read_CA_CMD.m_slaveAddr = PMBUSHelper::GetSlaveAddress();
+	Read_CA_CMD.m_cmd = 0xCA;
+	Read_CA_CMD.m_numOfReadBytes = CALIBRATION_STATUS_DATA_SIZE + 1;// +1 : + PEC Byte
+
+	memset(SendBuffer, 0, sizeof(SendBuffer) / sizeof(SendBuffer[0]));
+	SendLength = PMBUSHelper::ProductReadCMDBuffer(&Read_CA_CMD, SendBuffer, this->m_currentIO);
+
+	PMBUSSendCOMMAND_t cmdCAH;
+
+	cmdCAH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	cmdCAH.m_bytesToRead = (CALIBRATION_STATUS_DATA_SIZE + 1) + BASE_RESPONSE_DATA_LENGTH;
+
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		cmdCAH.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	wxString debugStr2("Send Buffer :");
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		debugStr2 += wxString::Format(" %02x ", SendBuffer[idx]);
+	}
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr2.c_str());
+
+	// Send Data
+	if (*this->m_monitor_running == true){
+		//if (this->m_sendCMDVector->size() == 0){
+			this->m_sendCMDVector->push_back(cmdCAH);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		//}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		//new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, cmdCDH);
+		new(TP_SendReadCMDTask) SendReadCMDTask(this->m_ioaccess, this->m_currentIO, Read_CA_CMD);
+	}
+
 }
 
 void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	
+	// Lock Critical Section
+	wxCriticalSectionLocker locker(*(PMBUSHelper::getSendVectorCriticalSectionObject()));
+
 	// Validate Input Data
 	bool result = ValidateInputData();
 	if (result == false) return;
@@ -906,6 +958,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 
 	// Send Data
 	if (*this->m_monitor_running == true){
+		
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(calibrationItem);
 			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
@@ -919,18 +972,166 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, calibrationItem);
 	}
 
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Read Calibration Data Reply");
+	wxMilliSleep(200);
+
+	pmbusReadCMD_t Read_CA_CMD;
+	Read_CA_CMD.m_slaveAddr = PMBUSHelper::GetSlaveAddress();
+	Read_CA_CMD.m_cmd = 0xCA;
+	Read_CA_CMD.m_numOfReadBytes = CALIBRATION_STATUS_DATA_SIZE + 1;// +1 : + PEC Byte
+
+	memset(SendBuffer, 0, sizeof(SendBuffer) / sizeof(SendBuffer[0]));
+	SendLength = PMBUSHelper::ProductReadCMDBuffer(&Read_CA_CMD, SendBuffer, this->m_currentIO);
+
+	PMBUSSendCOMMAND_t cmdCAH;
+
+	cmdCAH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	cmdCAH.m_bytesToRead = (CALIBRATION_STATUS_DATA_SIZE + 1) + BASE_RESPONSE_DATA_LENGTH;
+
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		cmdCAH.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	wxString debugStr2("Send Buffer :");
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		debugStr2 += wxString::Format(" %02x ", SendBuffer[idx]);
+	}
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr2.c_str());
+
+	// Send Data
+	if (*this->m_monitor_running == true){
+		//if (this->m_sendCMDVector->size() == 0){
+			this->m_sendCMDVector->push_back(cmdCAH);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		//}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		//new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, cmdCDH);
+		new(TP_SendReadCMDTask) SendReadCMDTask(this->m_ioaccess, this->m_currentIO, Read_CA_CMD);
+	}
+
 }
 
-#define CALIBRATION_READ_DATA_SIZE  25 /**< Calibration Read Data Size (Don't Include PEC Byte) */
+#define CALIBRATION_READ_DATA_SIZE  11 /**< Calibration Read Data Size (Don't Include PEC Byte) */
 void CalibrationDialog::OnBtnRead(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
-	// Read Calibration Setting Data
-	pmbusReadCMD_t cdCMD;
-	cdCMD.m_slaveAddr = PMBUSHelper::GetSlaveAddress();
-	cdCMD.m_cmd = 0xCD;
-	cdCMD.m_numOfReadBytes = CALIBRATION_READ_DATA_SIZE + 1;// +1 : + PEC Byte
+	// Lock Critical Section
+	wxCriticalSectionLocker locker(*(PMBUSHelper::getSendVectorCriticalSectionObject()));
 
+	// Send 08H To Notice Device We Want To Read Calibration Data
+	// Send Buffer
+	unsigned int SendLength = 0;
+	unsigned char SendBuffer[64] = { 0 };
+	unsigned char data = 0x00;
+
+	SendLength = PMBUSHelper::ProductWriteCMDBuffer(this->m_currentIO, SendBuffer, sizeof(SendBuffer) / sizeof(unsigned char), 0x08, &data, sizeof(data)/sizeof(unsigned char));
+
+	PMBUSSendCOMMAND_t cmd08H;
+
+	cmd08H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	cmd08H.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ + 1;
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		cmd08H.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	wxString debugStr("Send Buffer :");
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		debugStr += wxString::Format(" %02x ", SendBuffer[idx]);
+	}
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr.c_str());
+
+	// Send Data
+	if (*this->m_monitor_running == true){
+				
+		if (this->m_sendCMDVector->size() == 0){
+			this->m_sendCMDVector->push_back(cmd08H);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, cmd08H);
+	}
+
+#if 0
+	int cnt = TaskEx::GetCount(task_ID_SendWriteCMDTask);
+	if (cnt != 0) return;
+
+	// Send Request Pause Event
+	wxThreadEvent *threadIOThreadPause_evt;
+
+	threadIOThreadPause_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_IOTHREAD_REQ_PAUSE);
+	//threadIOThreadPause_evt->SetString(wxT("IOThread Request Pause"));
+	wxQueueEvent(this->m_parent->GetEventHandler(), threadIOThreadPause_evt);
+
+	wxMilliSleep(1000);
+
+	new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, cmd08H);
+
+	do{
+		wxMilliSleep(100);
+
+		cnt = TaskEx::GetCount(task_ID_SendWriteCMDTask);
+
+	} while (cnt != 0);
+#endif
+
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep 200 ms for wait DD get data from PFC");
+	wxMilliSleep(200);
+
+	// Read Calibration Setting Data
+	pmbusReadCMD_t Read_CD_CMD;
+	Read_CD_CMD.m_slaveAddr = PMBUSHelper::GetSlaveAddress();
+	Read_CD_CMD.m_cmd = 0xCD;
+	Read_CD_CMD.m_numOfReadBytes = CALIBRATION_READ_DATA_SIZE + 1;// +1 : + PEC Byte
+
+	memset(SendBuffer, 0, sizeof(SendBuffer) / sizeof(SendBuffer[0]));
+	SendLength = PMBUSHelper::ProductReadCMDBuffer(&Read_CD_CMD, SendBuffer, this->m_currentIO);
+
+	PMBUSSendCOMMAND_t cmdCDH;
+
+	cmdCDH.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	cmdCDH.m_bytesToRead = (CALIBRATION_READ_DATA_SIZE + 1) + BASE_RESPONSE_DATA_LENGTH;
+
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		cmdCDH.m_sendData[idx] = SendBuffer[idx];
+	}
+
+	wxString debugStr2("Send Buffer :");
+	for (unsigned idx = 0; idx < SendLength; idx++){
+		debugStr2 += wxString::Format(" %02x ", SendBuffer[idx]);
+	}
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", debugStr2.c_str());
+
+	// Send Data
+	if (*this->m_monitor_running == true){
+		//if (this->m_sendCMDVector->size() == 0){
+			this->m_sendCMDVector->push_back(cmdCDH);
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		//}
+		//else{
+			//PSU_DEBUG_PRINT(MSG_ERROR, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+		//}
+	}
+	else{
+		// If monitor is not running
+		int cnt = Task::GetCount();
+		if (cnt != 0) return;
+
+		//new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, cmdCDH);
+		new(TP_SendReadCMDTask) SendReadCMDTask(this->m_ioaccess, this->m_currentIO, Read_CD_CMD);
+	}
+
+#if 0
 	// New SendReadCMDTask
 	int cnt = TaskEx::GetCount(task_ID_SendReadCMDTask);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
@@ -938,6 +1139,21 @@ void CalibrationDialog::OnBtnRead(wxCommandEvent& event){
 	if (cnt == 0){
 		new(TP_SendReadCMDTask) SendReadCMDTask(this->m_ioaccess, this->m_currentIO, cdCMD);
 	}
+
+	do{
+		wxMilliSleep(100);
+
+		cnt = TaskEx::GetCount(task_ID_SendReadCMDTask);
+
+	} while (cnt != 0);
+
+	// Send Request Resume Event
+	wxThreadEvent *threadIOThreadResume_evt;
+
+	threadIOThreadResume_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_IOTHREAD_REQ_RESUME);
+	//threadIOThreadResume_evt->SetString(wxT("IOThread Resume Pause"));
+	wxQueueEvent(this->m_parent->GetEventHandler(), threadIOThreadResume_evt);
+#endif
 
 }
 

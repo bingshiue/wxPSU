@@ -39,7 +39,7 @@ typedef struct data_resolution_t {
 class CalibrationDialog : public wxDialog, private wxLog
 {
 public:
-	CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector);
+	CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, bool* monitor_pause, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector);
 
 	~CalibrationDialog();
 
@@ -99,6 +99,7 @@ private:
 	unsigned int *m_currentIO;
 
 	bool *m_monitor_running;
+	bool *m_monitor_pause;
 	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
 
 	wxButton *m_btnApply, *m_btnDone, *m_btnRead, *m_btnExit;
