@@ -288,7 +288,7 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 		switch (*this->m_CurrentIO){
 
 		case IOACCESS_SERIALPORT:// // Offset Of Content Data is 2
-			if (recvBuffer[2] == 0x4e && recvBuffer[3] == 0x47){
+			if (recvBuffer[3] == 0x4e && recvBuffer[3] == 0x47){
 				readRetry++;
 				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
 				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
@@ -302,7 +302,7 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 				}
 			}
 
-			this->m_e2pRomContent[offset] = recvBuffer[2];
+			this->m_e2pRomContent[offset] = recvBuffer[0];
 			offset++;
 			readRetry = 0;
 			break;
