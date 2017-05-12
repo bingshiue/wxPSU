@@ -86,31 +86,31 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_piManufacturerNameTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("ACBEL"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piProductNameST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Product Name: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piProductNameTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("R1CA2551B"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piProductNameTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("CRPS195"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piProductModelNumberST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Product Model Number: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piProductModelNumberTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FSF059"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piProductModelNumberTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FSG003"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piProductVersionST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Product Version: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piProductVersionTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("7LAG"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piProductVersionTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("000G"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piProductSerialNumberST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Product Serial Number: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piProductSerialNumberTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FSF0590S37LAGT1549000001"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piProductSerialNumberTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FSG0030S4000GA1717000001"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piAssetTagST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Asset Tag: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piAssetTagTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("0S3"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piAssetTagTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("0S4"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_piFRUFileIDST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FRU File ID: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
-	m_piFRUFileIDTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("APM13V0001"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
+	m_piFRUFileIDTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("FSG003V1"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
 
 	m_mapsiOverallcapacityST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Overall capacity (watts): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiOverallcapacityTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("550"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiOverallcapacityTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("2200"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiPeakVAST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Peak VA: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
 	m_mapsiPeakVATC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("825"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiInrushCurrentST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Inrush current: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiInrushCurrentTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("40"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiInrushCurrentTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("35"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiInrushIntervalST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Inrush Interval(ms): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
 	m_mapsiInrushIntervalTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("10"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
@@ -119,13 +119,13 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_mapsiLowEndInputVoltageRange1TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("9000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiHighEndInputVoltageRange1ST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("High end Input voltage range 1: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiHighEndInputVoltageRange1TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("26400"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiHighEndInputVoltageRange1TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("14000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiLowEndInputVoltageRange2ST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Low end Input voltage range 2: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiLowEndInputVoltageRange2TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiLowEndInputVoltageRange2TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("18000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiHighEndInputVoltageRange2ST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("High end Input voltage range 2: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiHighEndInputVoltageRange2TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiHighEndInputVoltageRange2TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("26400"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiLowEndInputFrequencyRangeST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Low End Input Frequency Range: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
 	m_mapsiLowEndInputFrequencyRangeTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("47"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
@@ -143,7 +143,7 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_mapsiPeakWattageHoldUpTimeTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("15"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiPeakWattagePeakCapacityST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Peak Wattage Peak Capacity: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
-	m_mapsiPeakWattagePeakCapacityTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("825"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
+	m_mapsiPeakWattagePeakCapacityTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("2200"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
 	m_mapsiCombinedWattageVoltage1ST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("Combined Wattage Voltage 1: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
 	m_mapsiCombinedWattageVoltage1TC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
@@ -173,10 +173,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput1RippleAndNoiseTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("120"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput1MinimumCurrentDrawST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Minimum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput1MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput1MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("1000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput1MaximumCurrentDrawST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Maximum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput1MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("45833"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput1MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("16700"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2OutputNumberST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Output Number: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
 	m_maDCOutput2OutputNumberTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("130"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
@@ -194,10 +194,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput2RippleAndNoiseTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("120"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2MinimumCurrentDrawST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Minimum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput2MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput2MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("1000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2MaximumCurrentDrawST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Maximum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput2MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("3000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput2MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("16700"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	// Log TextCtrl
 	//m_logTC = new PMBUSLogTextCtrl(m_logSBS->GetStaticBox(), wxID_ANY);
