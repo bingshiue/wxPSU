@@ -3,10 +3,10 @@
  */
 #include "FRUUtilityDialog.h"
 
-wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_END, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_END, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent);
 
 #define FRU_WRITER_DIALOG_WIDTH   (800)
 #define FRU_WRITER_DIALOG_HEIGHT  (480)
@@ -86,7 +86,7 @@ FRUUtilityDialog::FRUUtilityDialog(wxWindow *parent, IOACCESS *ioaccess, unsigne
 	m_btnREAD = new wxButton(this, CID_BTN_READ, wxT("READ"));
 	m_btnREAD->Enable(true);
 
-	m_btnSaveAsFile = new wxButton(this, CID_BTN_SAVE_AS_FILE, wxT("Save As File"));
+	m_btnSaveAsFile = new wxButton(this, CID_BTN_SAVE_AS_FILE, wxT("Save As Binary File"));
 	m_btnSaveAsFile->Enable(false);
 
 	m_logTC = new PMBUSLogTextCtrl(m_logSBS->GetStaticBox(), wxID_ANY);
@@ -208,9 +208,12 @@ void FRUUtilityDialog::OnBtnLOAD(wxCommandEvent& event){
 void FRUUtilityDialog::OnBtnWRITE(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
+	this->m_preSaveAsFileBTNEnable = this->m_btnSaveAsFile->IsEnabled();
+
 	// Disable Read/Write Button
 	this->m_btnREAD->Enable(false);
 	this->m_btnWRITE->Enable(false);
+	this->m_btnSaveAsFile->Enable(false);
 
 	// New E2PRomWriteDataTask To Write
 	int count = TaskEx::GetCount(task_ID_E2PRomWriteDataTask);
@@ -250,7 +253,12 @@ void FRUUtilityDialog::OnBtnSaveAsFile(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
 	// Save FRU Binary File
-	wxFileDialog SaveFRUBinaryFileDialog(this, L"Save FRU Binary File", "", "FRU.bin", "BIN Files (*.bin)|*.bin", wxFD_SAVE);
+	wxString SaveFileName("");
+	SaveFileName += wxT("FRU-");
+	SaveFileName += this->m_ProductAreaSerialNumber;
+	SaveFileName += wxT(".bin");
+
+	wxFileDialog SaveFRUBinaryFileDialog(this, L"Save FRU Binary File", "", SaveFileName, "BIN Files (*.bin)|*.bin", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	SaveFRUBinaryFileDialog.Centre();
 
@@ -298,6 +306,9 @@ void FRUUtilityDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
 	// Enable Read/Write Button
 	this->m_btnREAD->Enable(true);
 	this->m_btnWRITE->Enable(true);
+	if (this->m_preSaveAsFileBTNEnable == true){
+		this->m_btnSaveAsFile->Enable(true);
+	}
 
 	wxMessageBox(wxT("Write & Verify E2PROM Success"),
 		wxT("Write E2PROM Success"),  // caption
@@ -346,6 +357,9 @@ void FRUUtilityDialog::OnE2PRomWriteInterrupt(wxThreadEvent& event){
 	// Enable Read/Write Button
 	this->m_btnREAD->Enable(true);
 	this->m_btnWRITE->Enable(true);
+	if (this->m_preSaveAsFileBTNEnable == true){
+		this->m_btnSaveAsFile->Enable(true);
+	}
 
 	wxMessageBox(wxT("Write & Verify E2PROM Failed"),
 		wxT("Write E2PROM Failed"),  // caption
@@ -375,6 +389,16 @@ void FRUUtilityDialog::dump_fru_field(const char * description, size_t offset, u
 
 				for (int idx = 0; idx < FIELD_LEN(field); idx++){
 					str += wxString::Format("%c", *&field[offset + 1 + idx]);
+				}
+
+				if (strncmp(description, "Serial Number : ", 11) == 0){
+					// Save Product Area Serial Number
+					this->m_ProductAreaSerialNumber = wxT("");
+
+					for (int idx = 0; idx < FIELD_LEN(field); idx++){
+						this->m_ProductAreaSerialNumber += wxString::Format("%c", *&field[offset + 1 + idx]);
+					}
+
 				}
 
 				PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());

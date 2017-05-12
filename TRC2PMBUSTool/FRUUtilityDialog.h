@@ -63,6 +63,9 @@ private:
 	unsigned char m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer For Save E2PRom Content */
 
 	bool m_preWriteBTNEnable;
+	bool m_preSaveAsFileBTNEnable;
+
+	wxString m_ProductAreaSerialNumber;
 
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;

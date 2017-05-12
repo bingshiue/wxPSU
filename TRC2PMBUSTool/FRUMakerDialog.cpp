@@ -3,6 +3,11 @@
  */
 #include "FRUMakerDialog.h"
 
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_END, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_END, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, wxThreadEvent);
+
 #define FRU_MAKER_DIALOG_WIDTH   (1024)
 #define FRU_MAKER_DIALOG_HEIGHT  (720)
 
@@ -23,13 +28,15 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 	this->SetIcon(icon);
 
-	m_oldLog = wxLog::GetActiveTarget();
-	wxLog::SetActiveTarget(this);
+	//m_oldLog = wxLog::GetActiveTarget();
+	//wxLog::SetActiveTarget(this);
 
 	this->m_ioaccess = ioaccess;
 	this->m_currentIO = currentIO;
 
 	this->outputLog = false;
+
+	fru = NULL;
 
 	// Setup Text Validator
 	DecCharIncludes = wxT("0123456789");
@@ -51,7 +58,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maPowerSupplyInformationFGS = new wxFlexGridSizer(6, 6, 0, 0);
 	m_maDCOutput1FGS = new wxFlexGridSizer(6, 6, 0, 0);
 	m_maDCOutput2FGS = new wxFlexGridSizer(6, 6, 0, 0);
-	m_logSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Operation Log"));
+	m_operationSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Operations"));
+	m_makeSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Make"));
+	m_writeSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Write"));
+	//m_logSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Operation Log"));
 
 	m_piManufacturerNameBS = new wxBoxSizer(wxHORIZONTAL);
 	m_piProductNameBS = new wxBoxSizer(wxHORIZONTAL);
@@ -63,7 +73,14 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 
 	// Initilaize Components
-	m_makeBTN = new wxButton(this, CID_BTN_MAKE, wxT("Make"), wxDefaultPosition, wxDefaultSize);
+	m_makeBTN = new wxButton(this, CID_BTN_MAKE, wxT("Save As Binary File"), wxDefaultPosition, wxDefaultSize);
+
+	m_slaveAddressST = new wxStaticText(this, wxID_ANY, wxT("FRU EEPROM Slave Address :"), wxDefaultPosition, wxSize(120, -1));
+	m_slaveAddressTC = new wxTextCtrl(this, wxID_ANY, wxT("AE"), wxDefaultPosition, wxSize(30, -1));
+	m_slaveAddressTC->SetValidator(this->m_hexValidator);
+	m_slaveAddressTC->SetMaxLength(2);
+
+	m_writeBTN = new wxButton(this, CID_BTN_WRITE, wxT("Write"), wxDefaultPosition, wxDefaultSize);
 
 	m_piManufacturerNameST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Manufacturer Name: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
 	m_piManufacturerNameTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("ACBEL"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
@@ -183,13 +200,13 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput2MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("3000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	// Log TextCtrl
-	m_logTC = new PMBUSLogTextCtrl(m_logSBS->GetStaticBox(), wxID_ANY);
+	//m_logTC = new PMBUSLogTextCtrl(m_logSBS->GetStaticBox(), wxID_ANY);
 
 	// use fixed width font to align output in nice columns
-	wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
-		wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	//wxFont font(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_TELETYPE,
+		//wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
-	this->m_logTC->SetFont(font);
+	//this->m_logTC->SetFont(font);
 
 	// Add Components To Sizer
 	// --- Product Info Area ---
@@ -353,12 +370,22 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_multiRecordAreaSBS->Add(m_dcOutput2SBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
 
 
-	m_logSBS->Add(m_logTC, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
+	m_makeSBS->Add(m_makeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxDirection::wxALL, 5));
+
+	m_writeSBS->Add(m_slaveAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
+	m_writeSBS->Add(m_slaveAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
+	m_writeSBS->Add(m_writeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxDirection::wxALL, 5));
+
+	m_operationSBS->Add(m_makeSBS, wxSizerFlags(1).Border(wxDirection::wxALL, 5));
+	m_operationSBS->Add(m_writeSBS, wxSizerFlags(1).Border(wxDirection::wxALL, 5));
+
+	//m_logSBS->Add(m_logTC, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
 	
 	m_topLevelSizer->Add(m_productInfoAreaSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
 	m_topLevelSizer->Add(m_multiRecordAreaSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
-	m_topLevelSizer->Add(m_makeBTN, wxSizerFlags(0).Expand());
-	m_topLevelSizer->Add(m_logSBS, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
+	//m_topLevelSizer->Add(m_makeBTN, wxSizerFlags(0).Expand());
+	m_topLevelSizer->Add(m_operationSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+	//m_topLevelSizer->Add(m_logSBS, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
 
 	SetSizer(m_topLevelSizer);
 
@@ -366,20 +393,16 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 FRUMakerDialog::~FRUMakerDialog(){
 
-	wxLog::SetActiveTarget(m_oldLog);
+	//wxLog::SetActiveTarget(m_oldLog);
 
 }
 
-void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
-	
-	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnMAKE");
+void FRUMakerDialog::MakeFRU(void){
 
 	size_t len;
 
-
-
 	// Start Build FRU
-	struct FRU_DATA *fru = NULL;
+	//struct FRU_DATA *fru = NULL;
 
 	fru = (FRU_DATA *)x_calloc(1, sizeof(struct FRU_DATA));
 
@@ -400,7 +423,7 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	// Manufacturer Name
 	wxString pi_manufacturer_name = this->m_piManufacturerNameTC->GetValue();
 	fru->Product_Area->manufacturer_name = (unsigned char*)x_calloc(1, strlen(pi_manufacturer_name.c_str()) + 3);
-	
+
 	fru->Product_Area->manufacturer_name[0] = strlen(pi_manufacturer_name.c_str()) | (FRU_STRING_ASCII << 6);
 	memcpy(&fru->Product_Area->manufacturer_name[1], pi_manufacturer_name.c_str(), strlen(pi_manufacturer_name.c_str()));
 	PSU_DEBUG_PRINT(MSG_ALERT, "changing Product Info Area manufacturer name to %s", pi_manufacturer_name.c_str());
@@ -618,7 +641,7 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	/*
 	Offset 20, Length 1, Predictive fail tachometer lower threshold (RPS)
 	*/
-	unsigned char RPS= (unsigned short)wxAtoi(this->m_mapsiRPSTC->GetValue());
+	unsigned char RPS = (unsigned short)wxAtoi(this->m_mapsiRPSTC->GetValue());
 
 	memcpy(fru->MultiRecord_Area->power_supply_info + 28, &RPS, 1);
 	PSU_DEBUG_PRINT(MSG_ALERT, "[28]=%02x", fru->MultiRecord_Area->power_supply_info[28]);
@@ -772,14 +795,25 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "E2PROM CONTENT :");
 	PMBUSHelper::PrintFRUContent(this->m_pFRUBinaryContent, 256);
 
+	/* ========================================================= */
+
+}
+
+void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
+	
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnMAKE");
+
+	this->MakeFRU();
+
 	/* Save Built FRU To File */
 
 	// Save FRU Binary File
 	wxString FileName = wxT("FRU-");
-	wxString DateString("");
+	//wxString DateString("");
 
-	PMBUSHelper::GetNowDateTimeString(DateString);
-	FileName += DateString;
+	//PMBUSHelper::GetNowDateTimeString(DateString);
+	//FileName += DateString;
+	FileName += this->m_piProductSerialNumberTC->GetValue();
 	FileName += wxT(".bin");
 
 	wxFileDialog SaveFRUBinaryFileDialog(this, L"Save FRU Binary File", "", FileName, "BIN Files (*.bin)|*.bin", wxFD_SAVE);
@@ -826,6 +860,117 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	if (m_pFRUBinaryContent) free(m_pFRUBinaryContent);
 
 }
+
+#define WRITE_CMD_INTERVAL_TIME              10 // Millisecond
+#define READ_CMD_INTERVAL_TIME               10 // Millisecond
+void FRUMakerDialog::OnBtnWRITE(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnWRITE");
+
+	this->MakeFRU();
+
+	// Disable Read/Write Button
+	this->m_makeBTN->Enable(false);
+	this->m_writeBTN->Enable(false);
+
+	// New E2PRomWriteDataTask To Write
+	int count = TaskEx::GetCount(task_ID_E2PRomWriteDataTask);
+
+	if (count > 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Another E2PRomWriteDataTask is Running");
+		return;
+	}
+
+	new(TP_E2PRomWriteDataTask) E2PRomWriteDataTask(
+		this->m_ioaccess, 
+		this->m_currentIO, 
+		this->GetEventHandler(), 
+		(unsigned char)PMBUSHelper::HexToDecimal(this->m_slaveAddressTC->GetValue().c_str()), 
+		//this->m_fruBinaryContent, sizeof(this->m_fruBinaryContent) / sizeof(this->m_fruBinaryContent[0]),
+		m_pFRUBinaryContent,
+		256,
+		&this->outputLog, 
+		WRITE_CMD_INTERVAL_TIME, 
+		READ_CMD_INTERVAL_TIME
+		);
+
+}
+
+void FRUMakerDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s", __FUNCTIONW__);
+	// Enable Read/Write Button
+	this->m_makeBTN->Enable(true);
+	this->m_writeBTN->Enable(true);
+
+	wxMessageBox(wxT("Write & Verify E2PROM Success"),
+		wxT("Write E2PROM Success"),  // caption
+		wxOK | wxICON_INFORMATION);
+}
+
+void FRUMakerDialog::OnE2PRomReadEnd(wxThreadEvent& event){
+	
+#if 0
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+
+	wxMessageBox(wxT("Read E2PROM Success"),
+		wxT("Read E2PROM Success"),  // caption
+		wxOK | wxICON_INFORMATION);
+
+	//this->m_btnREAD->Enable(true);
+	//if (this->m_preWriteBTNEnable == true){
+		//this->m_btnWRITE->Enable(true);
+	//}
+
+	// Print Content of E2PROM
+	PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
+	PMBUSHelper::PrintFRUContent(this->m_e2pRomContent, 256);
+
+	// Parse FRU
+	struct FRU_DATA *fru = NULL;
+	fru = parse_FRU(m_e2pRomContent);
+
+	if (fru){
+
+		if (fru->Product_Area){
+			dump_PRODUCT(fru->Product_Area);
+		}
+
+		if (fru->MultiRecord_Area){
+			dump_MULTIRECORD(fru->MultiRecord_Area);
+		}
+
+		free_FRU(fru);
+
+		m_btnSaveAsFile->Enable(true);
+	}
+#endif
+
+}
+
+void FRUMakerDialog::OnE2PRomWriteInterrupt(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_ALERT, "%s", __FUNCTIONW__);
+	// Enable Read/Write Button
+	this->m_makeBTN->Enable(true);
+	this->m_writeBTN->Enable(true);
+
+	wxMessageBox(wxT("Write & Verify E2PROM Failed"),
+		wxT("Write E2PROM Failed"),  // caption
+		wxOK | wxICON_ERROR);
+}
+
+void FRUMakerDialog::OnE2PRomReadInterrupt(wxThreadEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
+	
+	//this->m_btnREAD->Enable(true);
+	//if (this->m_preWriteBTNEnable == true){
+		//this->m_btnWRITE->Enable(true);
+	//}
+
+	wxMessageBox(wxT("Read E2PROM Failed"),
+		wxT("Read E2PROM Failed"),  // caption
+		wxOK | wxICON_ERROR);
+}
+
 
 void FRUMakerDialog::OnDialogClose(wxCloseEvent& event){
 
@@ -921,5 +1066,10 @@ void FRUMakerDialog::DoLogRecord(wxLogLevel level, const wxString& msg, const wx
 
 wxBEGIN_EVENT_TABLE(FRUMakerDialog, wxDialog)
 EVT_BUTTON(CID_BTN_MAKE, FRUMakerDialog::OnBtnMAKE)
+EVT_BUTTON(CID_BTN_WRITE, FRUMakerDialog::OnBtnWRITE)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_END, FRUMakerDialog::OnE2PRomWriteEnd)
+//EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_END, FRUMakerDialog::OnE2PRomReadEnd)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, FRUMakerDialog::OnE2PRomWriteInterrupt)
+//EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, FRUMakerDialog::OnE2PRomReadInterrupt)
 EVT_CLOSE(FRUMakerDialog::OnDialogClose)
 wxEND_EVENT_TABLE()

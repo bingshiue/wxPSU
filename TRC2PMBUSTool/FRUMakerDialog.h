@@ -35,10 +35,13 @@ public:
 
 	enum {
 		CID_BTN_MAKE, /**< Make Button */
+
+		CID_BTN_WRITE  /**< Write Button */
 	};
 
 protected:
 
+	void MakeFRU(void);
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
 
@@ -56,6 +59,8 @@ private:
 	unsigned char *m_pFRUBinaryContent;
 	unsigned char  m_fruBinaryContent[MAX_FRU_FILE_SIZE];/**< Buffer for Save FRU Binary File Content */
 
+	struct FRU_DATA *fru;
+
 	// Sizer
 	wxBoxSizer *m_topLevelSizer;
 	wxStaticBoxSizer *m_productInfoAreaSBS;
@@ -63,8 +68,12 @@ private:
 	wxStaticBoxSizer *m_powerSupplyInformationSBS;
 	wxStaticBoxSizer *m_dcOutput1SBS;
 	wxStaticBoxSizer *m_dcOutput2SBS;
+	wxStaticBoxSizer *m_operationSBS;
+	wxStaticBoxSizer *m_makeSBS;
+	wxStaticBoxSizer *m_writeSBS;
 
-	wxStaticBoxSizer *m_logSBS;
+
+	//wxStaticBoxSizer *m_logSBS;
 
 	wxBoxSizer *m_piManufacturerNameBS;
 	wxBoxSizer *m_piProductNameBS;
@@ -81,6 +90,10 @@ private:
 
 	// Components
 	wxButton *m_makeBTN;
+
+	wxStaticText *m_slaveAddressST;
+	wxTextCtrl *m_slaveAddressTC;
+	wxButton *m_writeBTN;
 
 	wxStaticText *m_piManufacturerNameST;
 	wxTextCtrl *m_piManufacturerNameTC;
@@ -214,7 +227,13 @@ private:
 		const wxString& threadstr,
 		const wxString& msg);
 
+	void OnE2PRomWriteEnd(wxThreadEvent& event);
+	void OnE2PRomReadEnd(wxThreadEvent& event);
+	void OnE2PRomWriteInterrupt(wxThreadEvent& event);
+	void OnE2PRomReadInterrupt(wxThreadEvent& event);
+
 	void OnBtnMAKE(wxCommandEvent& event);
+	void OnBtnWRITE(wxCommandEvent& event);
 	void OnDialogClose(wxCloseEvent& event);
 
 	wxDECLARE_EVENT_TABLE();

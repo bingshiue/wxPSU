@@ -145,7 +145,20 @@ int E2PRomWriteDataTask::Main(double elapsedTime){
 	PSU_DEBUG_PRINT(MSG_ALERT, "Read E2PROM For Verify Write Operaton");
 
 	// Read Data From E2PRom For Validate 
-	DumpE2PROM(recvBuffer, this->m_CurrentIO);
+	int dumpStatus = DumpE2PROM(recvBuffer, this->m_CurrentIO);
+
+	if (dumpStatus < 0){
+		PSU_DEBUG_PRINT(MSG_ERROR, "Dump E2PROM Failed !");
+
+		// Emit Write Interrupt Event
+		wxThreadEvent* e2pRomWriteIntEvt;
+		e2pRomWriteIntEvt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT);
+		wxQueueEvent(this->m_evtHandler, e2pRomWriteIntEvt);
+
+		delete this;
+		return -1;
+	}
+
 
 	// Print Content of E2PROM 
 	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------- E2PROM CONTENT -------------------");
