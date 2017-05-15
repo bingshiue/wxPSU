@@ -4513,8 +4513,8 @@ void MainFrame::CheckIfModelChange(void){
 		}
 
 		// Set Current To Previous
-		this->m_appSettings.m_currentUseCustomer = this->m_appSettings.m_previousUseCustomer;
-		this->m_appSettings.m_currentUseModel = this->m_appSettings.m_previousUseModel;
+		this->m_appSettings.m_previousUseCustomer = this->m_appSettings.m_currentUseCustomer;
+		this->m_appSettings.m_previousUseModel = this->m_appSettings.m_currentUseModel;
 	}
 
 }
