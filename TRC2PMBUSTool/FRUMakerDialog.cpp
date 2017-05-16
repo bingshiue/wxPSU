@@ -60,7 +60,7 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput2FGS = new wxFlexGridSizer(6, 6, 0, 0);
 	m_operationSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Operations"));
 	m_makeSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Make"));
-	m_writeSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Write"));
+	m_writeSBS = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Read/Write"));
 	//m_logSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Operation Log"));
 
 	m_piManufacturerNameBS = new wxBoxSizer(wxHORIZONTAL);
@@ -80,7 +80,8 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_slaveAddressTC->SetValidator(this->m_hexValidator);
 	m_slaveAddressTC->SetMaxLength(2);
 
-	m_writeBTN = new wxButton(this, CID_BTN_WRITE, wxT("Write"), wxDefaultPosition, wxDefaultSize);
+	m_importBTN = new wxButton(this, CID_BTN_IMPORT, wxT("Import From Device"), wxDefaultPosition, wxDefaultSize);
+	m_writeBTN = new wxButton(this, CID_BTN_WRITE, wxT("Write To Device"), wxDefaultPosition, wxDefaultSize);
 
 	m_piManufacturerNameST = new wxStaticText(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("Manufacturer Name: "), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_ST_WIDTH, -1));
 	m_piManufacturerNameTC = new wxTextCtrl(m_productInfoAreaSBS->GetStaticBox(), wxID_ANY, wxT("ACBEL"), wxDefaultPosition, wxSize(DEF_PRODUCTINFO_TC_WIDTH, -1));
@@ -157,6 +158,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_mapsiRPSST = new wxStaticText(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("RPS: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_ST_WIDTH, -1));
 	m_mapsiRPSTC = new wxTextCtrl(m_powerSupplyInformationSBS->GetStaticBox(), wxID_ANY, wxT("15"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_POWER_SUPPLY_INFOMATION_TC_WIDTH, -1));
 
+	m_maDCOutput1StandbyST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
+	m_maDCOutput1StandbyCB = new wxCheckBox(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT(""));
+	m_maDCOutput1StandbyCB->SetValue(false);
+
 	m_maDCOutput1OutputNumberST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Output Number: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
 	m_maDCOutput1OutputNumberTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("1"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
@@ -173,13 +178,18 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput1RippleAndNoiseTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("120"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput1MinimumCurrentDrawST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Minimum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput1MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("1000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput1MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("100"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput1MaximumCurrentDrawST = new wxStaticText(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("Maximum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput1MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("16700"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput1MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput1SBS->GetStaticBox(), wxID_ANY, wxT("1670"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+
+	m_maDCOutput2StandbyST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
+	m_maDCOutput2StandbyCB = new wxCheckBox(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT(""));
+	m_maDCOutput2StandbyCB->SetValue(true);
 
 	m_maDCOutput2OutputNumberST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Output Number: "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput2OutputNumberTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("130"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput2OutputNumberTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("2"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	//m_maDCOutput2OutputNumberTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("130"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2NominalVoltageST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Nominal voltage (10 mV): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
 	m_maDCOutput2NominalVoltageTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("1200"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
@@ -194,10 +204,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_maDCOutput2RippleAndNoiseTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("120"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2MinimumCurrentDrawST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Minimum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput2MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("1000"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput2MinimumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("100"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	m_maDCOutput2MaximumCurrentDrawST = new wxStaticText(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("Maximum current draw (mA): "), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_ST_WIDTH, -1));
-	m_maDCOutput2MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("16700"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
+	m_maDCOutput2MaximumCurrentDrawTC = new wxTextCtrl(m_dcOutput2SBS->GetStaticBox(), wxID_ANY, wxT("1670"), wxDefaultPosition, wxSize(DEF_MULTIRECORD_DC_OUTPUT_TC_WIDTH, -1));
 
 	// Log TextCtrl
 	//m_logTC = new PMBUSLogTextCtrl(m_logSBS->GetStaticBox(), wxID_ANY);
@@ -318,6 +328,9 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 	m_multiRecordAreaSBS->Add(m_powerSupplyInformationSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
 	
+	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+
 	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
 	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
 
@@ -342,6 +355,9 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	m_dcOutput1SBS->Add(m_maDCOutput1FGS);
 
 	m_multiRecordAreaSBS->Add(m_dcOutput1SBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+
+	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
 
 	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
 	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
@@ -374,6 +390,7 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 	m_writeSBS->Add(m_slaveAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
 	m_writeSBS->Add(m_slaveAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
+	m_writeSBS->Add(m_importBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
 	m_writeSBS->Add(m_writeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxDirection::wxALL, 5));
 
 	m_operationSBS->Add(m_makeSBS, wxSizerFlags(1).Border(wxDirection::wxALL, 5));
@@ -395,6 +412,104 @@ FRUMakerDialog::~FRUMakerDialog(){
 
 	//wxLog::SetActiveTarget(m_oldLog);
 
+}
+
+bool FRUMakerDialog::isHaveEmptyField(void){
+
+	wxTextCtrl* TCArray[39] = {
+		// 0
+		m_piManufacturerNameTC,
+		// 1
+		m_piProductNameTC,
+		// 2
+		m_piProductModelNumberTC,
+		// 3
+		m_piProductVersionTC,
+		// 4
+		m_piProductSerialNumberTC,
+		// 5
+		m_piAssetTagTC,
+		// 6
+		m_piFRUFileIDTC,
+
+		// 7
+		m_mapsiOverallcapacityTC,
+		// 8
+		m_mapsiPeakVATC,
+		// 9
+		m_mapsiInrushCurrentTC,
+		// 10
+		m_mapsiInrushIntervalTC,
+		// 11
+		m_mapsiLowEndInputVoltageRange1TC,
+		// 12
+		m_mapsiHighEndInputVoltageRange1TC,
+		// 13
+		m_mapsiLowEndInputVoltageRange2TC,
+		// 14
+		m_mapsiHighEndInputVoltageRange2TC,
+		// 15
+		m_mapsiLowEndInputFrequencyRangeTC,
+		// 16
+		m_mapsiHighEndInputFrequencyRangeTC,
+		// 17
+		m_mapsiACDropoutToleranceTC,
+		// 18
+		m_mapsiBinaryFlagsTC,
+		// 19
+		m_mapsiPeakWattageHoldUpTimeTC,
+		// 20
+		m_mapsiPeakWattagePeakCapacityTC,
+		// 21
+		m_mapsiCombinedWattageVoltage1TC,
+		// 22
+		m_mapsiCombinedWattageVoltage2TC,
+		// 23
+		m_mapsiTotalCombinedWattageTC,
+		// 24
+		m_mapsiRPSTC,
+
+
+		// 25
+		m_maDCOutput1OutputNumberTC,
+		// 26
+		m_maDCOutput1NominalVoltageTC,
+		// 27
+		m_maDCOutput1MaximumNegativeVoltageDeviationTC,
+		// 28
+		m_maDCOutput1MaximumPositiveVoltageDeviationTC,
+		// 29
+		m_maDCOutput1RippleAndNoiseTC,
+		// 30
+		m_maDCOutput1MinimumCurrentDrawTC,
+		// 31
+		m_maDCOutput1MaximumCurrentDrawTC,
+
+
+		// 32
+		m_maDCOutput2OutputNumberTC,
+		// 33
+		m_maDCOutput2NominalVoltageTC,
+		// 34
+		m_maDCOutput2MaximumNegativeVoltageDeviationTC,
+		// 35
+		m_maDCOutput2MaximumPositiveVoltageDeviationTC,
+		// 36
+		m_maDCOutput2RippleAndNoiseTC,
+		// 37
+		m_maDCOutput2MinimumCurrentDrawTC,
+		// 38
+		m_maDCOutput2MaximumCurrentDrawTC
+	};
+
+	for (unsigned int idx = 0; idx < sizeof(TCArray) / sizeof(TCArray[0]); idx++){
+		if (TCArray[idx]->GetValue() == wxEmptyString){
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void FRUMakerDialog::MakeFRU(void){
@@ -607,7 +722,7 @@ void FRUMakerDialog::MakeFRU(void){
 	unsigned char HoldUpTimeInTimes = (unsigned char)wxAtoi(this->m_mapsiPeakWattageHoldUpTimeTC->GetValue());
 	unsigned short PeakCapacity = (unsigned short)wxAtoi(this->m_mapsiPeakWattagePeakCapacityTC->GetValue());
 
-	unsigned short PeakWattage_Combine = (unsigned short)((HoldUpTimeInTimes & 0x0f) << 12) | 0xf000;
+	unsigned short PeakWattage_Combine = (unsigned short)((HoldUpTimeInTimes & 0x0f) << 12) & 0xf000;
 
 	PeakWattage_Combine |= (PeakCapacity & 0x0fff);
 
@@ -625,10 +740,10 @@ void FRUMakerDialog::MakeFRU(void){
 	unsigned char voltage1 = (unsigned char)wxAtoi(this->m_mapsiCombinedWattageVoltage1TC->GetValue());
 	unsigned char voltage2 = (unsigned char)wxAtoi(this->m_mapsiCombinedWattageVoltage2TC->GetValue());
 
-	voltage1 |= (voltage1 & 0xf0) << 4;
-	voltage2 |= (voltage2 & 0x0f);
+	//voltage1 |= (voltage1 & 0xf0) << 4;
+	//voltage2 |= (voltage2 & 0x0f);
 
-	unsigned byte1 = voltage1 | voltage2;
+	unsigned byte1 = ((voltage1 & 0x0f) << 4) | (voltage2 & 0x0f);//voltage1 | voltage2;
 
 	memcpy(fru->MultiRecord_Area->power_supply_info + 25, &byte1, 1);
 	PSU_DEBUG_PRINT(MSG_ALERT, "[25]=%02x", fru->MultiRecord_Area->power_supply_info[25]);
@@ -662,6 +777,11 @@ void FRUMakerDialog::MakeFRU(void){
 	3:0 ¡V Output number
 	*/
 	unsigned char OutputInformation = (unsigned char)wxAtoi(this->m_maDCOutput1OutputNumberTC->GetValue());
+
+	// StandBy
+	if (this->m_maDCOutput1StandbyCB->GetValue()==true){
+		OutputInformation |= 0x80;
+	}
 
 	memcpy(fru->MultiRecord_Area->supplies[0] + 5, &OutputInformation, 1);
 	PSU_DEBUG_PRINT(MSG_ALERT, "[5]=%02x", fru->MultiRecord_Area->supplies[0][5]);
@@ -733,6 +853,11 @@ void FRUMakerDialog::MakeFRU(void){
 	*/
 	unsigned char OutputInformation2 = (unsigned char)wxAtoi(this->m_maDCOutput2OutputNumberTC->GetValue());
 
+	// StandBy
+	if (this->m_maDCOutput2StandbyCB->GetValue() == true){
+		OutputInformation2 |= 0x80;
+	}
+
 	memcpy(fru->MultiRecord_Area->supplies[1] + 5, &OutputInformation2, 1);
 	PSU_DEBUG_PRINT(MSG_ALERT, "[5]=%02x", fru->MultiRecord_Area->supplies[1][5]);
 
@@ -803,6 +928,16 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 	
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnMAKE");
 
+	if (this->isHaveEmptyField() == true){
+
+		wxMessageBox(wxT("Some Field's Input Value is Empty"),
+			wxT("Empty Input Value"),  // caption
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
+
+
 	this->MakeFRU();
 
 	/* Save Built FRU To File */
@@ -863,13 +998,44 @@ void FRUMakerDialog::OnBtnMAKE(wxCommandEvent& event){
 
 #define WRITE_CMD_INTERVAL_TIME              10 // Millisecond
 #define READ_CMD_INTERVAL_TIME               10 // Millisecond
+
+void FRUMakerDialog::OnBtnIMPORT(wxCommandEvent& event){
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnBtnIMPORT");
+
+	this->m_makeBTN->Enable(false);
+	this->m_importBTN->Enable(false);
+	this->m_writeBTN->Enable(false);
+
+	// New E2PRomReadDataTask
+	int count = TaskEx::GetCount(task_ID_E2PRomReadDataTask);
+
+	if (count > 0){
+		PSU_DEBUG_PRINT(MSG_ALERT, "Another E2PRomReadDataTask is Running");
+		return;
+	}
+
+	new(TP_E2PRomReadDataTask) E2PRomReadDataTask(this->m_ioaccess, this->m_currentIO, this->GetEventHandler(), (unsigned char)PMBUSHelper::HexToDecimal(this->m_slaveAddressTC->GetValue().c_str()), m_e2pRomContent, &this->outputLog, READ_CMD_INTERVAL_TIME);
+
+
+}
+
 void FRUMakerDialog::OnBtnWRITE(wxCommandEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "OnBtnWRITE");
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnBtnWRITE");
+
+	if (this->isHaveEmptyField() == true){
+
+		wxMessageBox(wxT("Some Field's Input Value is Empty"),
+			wxT("Empty Input Value"),  // caption
+			wxOK | wxICON_ERROR);
+
+		return;
+	}
 
 	this->MakeFRU();
 
 	// Disable Read/Write Button
 	this->m_makeBTN->Enable(false);
+	this->m_importBTN->Enable(false);
 	this->m_writeBTN->Enable(false);
 
 	// New E2PRomWriteDataTask To Write
@@ -896,9 +1062,10 @@ void FRUMakerDialog::OnBtnWRITE(wxCommandEvent& event){
 }
 
 void FRUMakerDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", __FUNCTIONW__);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 	// Enable Read/Write Button
 	this->m_makeBTN->Enable(true);
+	this->m_importBTN->Enable(true);
 	this->m_writeBTN->Enable(true);
 
 	wxMessageBox(wxT("Write & Verify E2PROM Success"),
@@ -908,18 +1075,15 @@ void FRUMakerDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
 
 void FRUMakerDialog::OnE2PRomReadEnd(wxThreadEvent& event){
 	
-#if 0
-
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 
-	wxMessageBox(wxT("Read E2PROM Success"),
-		wxT("Read E2PROM Success"),  // caption
-		wxOK | wxICON_INFORMATION);
+	//wxMessageBox(wxT("Import FRU From Device Success"),
+		//wxT("Import FRU From Device Success"),  // caption
+		//wxOK | wxICON_INFORMATION);
 
-	//this->m_btnREAD->Enable(true);
-	//if (this->m_preWriteBTNEnable == true){
-		//this->m_btnWRITE->Enable(true);
-	//}
+	this->m_makeBTN->Enable(true);
+	this->m_importBTN->Enable(true);
+	this->m_writeBTN->Enable(true);
 
 	// Print Content of E2PROM
 	PSU_DEBUG_PRINT(MSG_ALERT, "----------------------- E2PROM CONTENT ----------------------");
@@ -941,14 +1105,23 @@ void FRUMakerDialog::OnE2PRomReadEnd(wxThreadEvent& event){
 
 		free_FRU(fru);
 
-		m_btnSaveAsFile->Enable(true);
+		wxMessageBox(wxT("Import FRU From Device Success"),
+		wxT("Import FRU From Device Success"),  // caption
+		wxOK | wxICON_INFORMATION);
+
 	}
-#endif
+	else{
+
+		wxMessageBox(wxT("The Device Don't Contain Valid FRU Data !"),
+			wxT("Invalid FRU Data Read !"),  // caption
+			wxOK | wxICON_ERROR);
+
+	}
 
 }
 
 void FRUMakerDialog::OnE2PRomWriteInterrupt(wxThreadEvent& event){
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", __FUNCTIONW__);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 	// Enable Read/Write Button
 	this->m_makeBTN->Enable(true);
 	this->m_writeBTN->Enable(true);
@@ -961,10 +1134,9 @@ void FRUMakerDialog::OnE2PRomWriteInterrupt(wxThreadEvent& event){
 void FRUMakerDialog::OnE2PRomReadInterrupt(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTIONW__);
 	
-	//this->m_btnREAD->Enable(true);
-	//if (this->m_preWriteBTNEnable == true){
-		//this->m_btnWRITE->Enable(true);
-	//}
+	this->m_makeBTN->Enable(true);
+	this->m_importBTN->Enable(true);
+	this->m_writeBTN->Enable(true);
 
 	wxMessageBox(wxT("Read E2PROM Failed"),
 		wxT("Read E2PROM Failed"),  // caption
@@ -1064,12 +1236,383 @@ void FRUMakerDialog::DoLogRecord(wxLogLevel level, const wxString& msg, const wx
 
 }
 
+wxString FRUMakerDialog::dump_fru_field(const char * description, size_t offset, unsigned char * field){
+	
+	wxString dumpString;
+	
+	/* does field exist, and have length? */
+	if (field) {
+		//PSU_DEBUG_PRINT(MSG_ALERT, "%s : ", description);
+		if (FIELD_LEN(field)) {
+			if (TYPE_CODE(field) == FRU_STRING_ASCII || offset) {
+				wxString str("");
+				str += wxString::Format("%32s", description);
+
+				for (int idx = 0; idx < FIELD_LEN(field); idx++){
+					str += wxString::Format("%c", *&field[offset + 1 + idx]);
+					dumpString += wxString::Format("%c", *&field[offset + 1 + idx]);
+				}
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "%s", str.c_str());
+			}
+			else {
+				PSU_DEBUG_PRINT(MSG_ALERT, "Non-ASCII");
+			}
+		}
+		else
+			PSU_DEBUG_PRINT(MSG_ERROR, "Empty Field");
+	}
+
+	return dumpString;
+}
+
+void FRUMakerDialog::dump_PRODUCT(struct PRODUCT_INFO *fru){
+
+	wxString ManufacturerName(wxT(""));
+	wxString ProductName(wxT(""));
+	wxString ModelNumber(wxT(""));
+	wxString VERSION(wxT(""));
+	wxString SerialNumber(wxT(""));
+	wxString asset_tag(wxT(""));
+	wxString FRUFileID(wxT(""));
+
+	PSU_DEBUG_PRINT(MSG_ALERT, "-----------------------  PRODUCT INFO  ----------------------");
+	ManufacturerName = dump_fru_field("Manufacturer Name : ", 0, fru->manufacturer_name);
+	ProductName = dump_fru_field("Product Name : ", 0, fru->product_name);
+	ModelNumber = dump_fru_field("Model Number : ", 0, fru->model_number);
+	VERSION = dump_fru_field("VERSION : ", 0, fru->version);
+	SerialNumber = dump_fru_field("Serial Number : ", 0, fru->serial_number);
+	asset_tag = dump_fru_field("asset_tag : ", 0, fru->asset_tag);
+	FRUFileID = dump_fru_field("FRU File ID : ", 0, fru->FRU_file_ID);
+
+	// Update GUI Fileds
+	this->m_piManufacturerNameTC->SetValue(ManufacturerName);
+	this->m_piManufacturerNameTC->SetBackgroundColour(wxColour(255,255,0));
+	this->m_piManufacturerNameTC->SetFocus();
+
+	this->m_piProductNameTC->SetValue(ProductName);
+	this->m_piProductNameTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piProductNameTC->SetFocus();
+
+	this->m_piProductModelNumberTC->SetValue(ModelNumber);
+	this->m_piProductModelNumberTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piProductModelNumberTC->SetFocus();
+
+	this->m_piProductVersionTC->SetValue(VERSION);
+	this->m_piProductVersionTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piProductVersionTC->SetFocus();
+
+	this->m_piProductSerialNumberTC->SetValue(SerialNumber);
+	this->m_piProductSerialNumberTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piProductSerialNumberTC->SetFocus();
+
+	this->m_piAssetTagTC->SetValue(asset_tag);
+	this->m_piAssetTagTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piAssetTagTC->SetFocus();
+
+	this->m_piFRUFileIDTC->SetValue(FRUFileID);
+	this->m_piFRUFileIDTC->SetBackgroundColour(wxColour(255, 255, 0));
+	this->m_piFRUFileIDTC->SetFocus();
+
+}
+
+void FRUMakerDialog::dump_MULTIRECORD(struct MULTIRECORD_INFO *fru){
+
+	unsigned char *p, *n, *z;
+	int i;
+
+	/*
+	* Power Supply Information
+	*/
+	const char * POWER_SUPPLY_INFO[] = {
+		"Overall capacity (watts)", /**< Overall capacity (watts) */
+		"Peak VA", /**< Peak VA */
+		"Inrush Current", /**< Inrush Current */
+		"Inrush Interval", /**< Inrush Interval */
+		"Low  End Input Voltage Range 1", /**< Low  End Input Voltage Range 1 */
+		"High End Input Voltage Range 1", /**< High End Input Voltage Range 1 */
+		"Low  End Input Voltage Range 2", /**< Low  End Input Voltage Range 2 */
+		"High End Input Voltage Range 2", /**< High End Input Voltage Range 2 */
+		"Low End Input Frequence Range", /**< Low End Input Frequence Range */
+		"High End Input Frequence Range", /**< High End Input Frequence Range */
+		"A/C Dropout Tolerance", /**< A/C Dropout Tolerance */
+		"Binary Flags", /**<  */
+		"Peak Wattage", /**< Peak Wattage */
+		"Combined Wattage", /**< Combined Wattage */
+		"Predictive fail tachometer lower threshold (RPS)", /**< Predictive fail tachometer lower threshold (RPS) */
+	};
+
+	// If Power Supply Information Exist
+	if (fru->power_supply_info){
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "----------------------  MULTI AREA INFO ---------------------");
+
+		z = (unsigned char*)x_calloc(1, 24);
+		p = fru->power_supply_info;
+		n = p + 5;
+
+		if (memcmp(&n[0], z, 24)) {
+			PSU_DEBUG_PRINT(MSG_ALERT, "Power Supply Infomation");
+			// Overall Capacity Watt
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[0], (n[0] | (n[1] << 8) & 0x0fff));
+			this->m_mapsiOverallcapacityTC->SetValue(wxString::Format("%d", (n[0] | (n[1] << 8) & 0x0fff)));
+			this->m_mapsiOverallcapacityTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiOverallcapacityTC->SetFocus();
+
+			// Peak VA
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[1], (n[2] | (n[3] << 8)));
+			this->m_mapsiPeakVATC->SetValue(wxString::Format("%d", (n[2] | (n[3] << 8))));
+			this->m_mapsiPeakVATC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiPeakVATC->SetFocus();
+
+			// Inrush Current
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[2], (n[4]));
+			this->m_mapsiInrushCurrentTC->SetValue(wxString::Format("%d", (n[4])));
+			this->m_mapsiInrushCurrentTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiInrushCurrentTC->SetFocus();
+
+			// Inrush Interval (ms)
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d(ms)", POWER_SUPPLY_INFO[3], (n[5]));
+			this->m_mapsiInrushIntervalTC->SetValue(wxString::Format("%d", (n[5])));
+			this->m_mapsiInrushIntervalTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiInrushIntervalTC->SetFocus();
+
+			// Low end Input voltage range 1
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[4], (n[6] | (n[7] << 8)));
+			this->m_mapsiLowEndInputVoltageRange1TC->SetValue(wxString::Format("%d", (n[6] | (n[7] << 8))));
+			this->m_mapsiLowEndInputVoltageRange1TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiLowEndInputVoltageRange1TC->SetFocus();
+
+			// High end Input voltage range 1
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[5], (n[8] | (n[9] << 8)) * 10);
+			this->m_mapsiHighEndInputVoltageRange1TC->SetValue(wxString::Format("%d", (n[8] | (n[9] << 8))));
+			this->m_mapsiHighEndInputVoltageRange1TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiHighEndInputVoltageRange1TC->SetFocus();
+
+			// Low end Input voltage range 2
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[6], (n[10] | (n[11] << 8)) * 10);
+			this->m_mapsiLowEndInputVoltageRange2TC->SetValue(wxString::Format("%d", (n[10] | (n[11] << 8))));
+			this->m_mapsiLowEndInputVoltageRange2TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiLowEndInputVoltageRange2TC->SetFocus();
+
+			// High end Input voltage range 2
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[7], (n[12] | (n[13] << 8)) * 10);
+			this->m_mapsiHighEndInputVoltageRange2TC->SetValue(wxString::Format("%d", (n[12] | (n[13] << 8))));
+			this->m_mapsiHighEndInputVoltageRange2TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiHighEndInputVoltageRange2TC->SetFocus();
+
+			// Low end Input frequency range
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[8], (n[14]));
+			this->m_mapsiLowEndInputFrequencyRangeTC->SetValue(wxString::Format("%d", (n[14])));
+			this->m_mapsiLowEndInputFrequencyRangeTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiLowEndInputFrequencyRangeTC->SetFocus();
+
+			// High end Input frequency range
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[9], (n[15]));
+			this->m_mapsiHighEndInputFrequencyRangeTC->SetValue(wxString::Format("%d", (n[15])));
+			this->m_mapsiHighEndInputFrequencyRangeTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiHighEndInputFrequencyRangeTC->SetFocus();
+
+			// A/C dropout tolerance in ms
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d(ms)", POWER_SUPPLY_INFO[10], (n[16]));
+			this->m_mapsiACDropoutToleranceTC->SetValue(wxString::Format("%d", (n[16])));
+			this->m_mapsiACDropoutToleranceTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiACDropoutToleranceTC->SetFocus();
+
+			// Binary flags
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[11], (n[17]));
+			this->m_mapsiBinaryFlagsTC->SetValue(wxString::Format("%d", (n[17])));
+			this->m_mapsiBinaryFlagsTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiBinaryFlagsTC->SetFocus();
+
+			// Peak Wattage
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s:", POWER_SUPPLY_INFO[12]);
+			PSU_DEBUG_PRINT(MSG_ALERT, "    Hold up time in seconds: %d", ((n[18] | (n[19] << 8)) & 0xf000) >> 12);
+			this->m_mapsiPeakWattageHoldUpTimeTC->SetValue(wxString::Format("%d", ((n[18] | (n[19] << 8)) & 0xf000) >> 12));
+			this->m_mapsiPeakWattageHoldUpTimeTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiPeakWattageHoldUpTimeTC->SetFocus();
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "    Peak capacity (watts): %d", (n[18] | (n[19] << 8)) & 0x0fff);
+			this->m_mapsiPeakWattagePeakCapacityTC->SetValue(wxString::Format("%d", (n[18] | (n[19] << 8)) & 0x0fff));
+			this->m_mapsiPeakWattagePeakCapacityTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiPeakWattagePeakCapacityTC->SetFocus();
+
+
+			// Combined Wattage
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s:", POWER_SUPPLY_INFO[13]);
+			PSU_DEBUG_PRINT(MSG_ALERT, "    Voltage 1: %d", ((n[20]) & 0xF0) >> 4);
+			this->m_mapsiCombinedWattageVoltage1TC->SetValue(wxString::Format("%d", ((n[20]) & 0xF0) >> 4));
+			this->m_mapsiCombinedWattageVoltage1TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiCombinedWattageVoltage1TC->SetFocus();
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "    Voltage 2: %d", ((n[20]) & 0x0F));
+			this->m_mapsiCombinedWattageVoltage2TC->SetValue(wxString::Format("%d", ((n[20]) & 0x0F)));
+			this->m_mapsiCombinedWattageVoltage2TC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiCombinedWattageVoltage2TC->SetFocus();
+
+
+			PSU_DEBUG_PRINT(MSG_ALERT, "    Total Combined Wattage: %d", (n[21] | (n[22] << 8)));
+			this->m_mapsiTotalCombinedWattageTC->SetValue(wxString::Format("%d", (n[21] | (n[22] << 8))));
+			this->m_mapsiTotalCombinedWattageTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiTotalCombinedWattageTC->SetFocus();
+
+
+			// Predictive fail tachometer lower threshold (RPS)
+			PSU_DEBUG_PRINT(MSG_ALERT, "  %s: %d", POWER_SUPPLY_INFO[14], (n[23]));
+			this->m_mapsiRPSTC->SetValue(wxString::Format("%d", (n[23])));
+			this->m_mapsiRPSTC->SetBackgroundColour(wxColour(255, 255, 0));
+			this->m_mapsiRPSTC->SetFocus();
+		}
+		else{
+			PSU_DEBUG_PRINT(MSG_ALERT, "  All Zeros");
+		}
+
+		free(z);
+	}
+
+
+	/*
+	* DC Load and DC Output Multi-record Definitions
+	* Table 8 from the VITA/ANSI 57.1 Spec
+	*/
+	const char * DC_Loads[] = {
+		"P1 VADJ",			/* Load   :  0 */
+		" ",//"P1 3P3V",	/* Load   :  1 */
+		" ",//"P1 12P0V",	/* Load   :  2 */
+		"P1 VIO_B_M2C",		/* Output :  3 */
+		"P1 VREF_A_M2C",	/* Output :  4 */
+		"P1 VREF_B_M2C",	/* Output :  5 */
+		"P2 VADJ",			/* Load   :  6 */
+		"P2 3P3V",			/* Load   :  7 */
+		"P2 12P0V",			/* Load   :  8 */
+		"P2 VIO_B_M2C",		/* Load   :  9 */
+		"P2 VREF_A_M2C",	/* Load   : 10 */
+		"P2 VREF_B_M2C",	/* Load   : 11 */
+	};
+
+	// UI Component Array
+
+	wxCheckBox* DCOutputCheckBoxArray[2][1] = {
+		{
+			m_maDCOutput1StandbyCB
+		},
+
+		{
+			m_maDCOutput2StandbyCB
+		}
+
+	};
+
+	wxTextCtrl* DCOutputTextTCArray[2][7] = {
+		{
+			m_maDCOutput1OutputNumberTC,
+			m_maDCOutput1NominalVoltageTC,
+			m_maDCOutput1MaximumNegativeVoltageDeviationTC,
+			m_maDCOutput1MaximumPositiveVoltageDeviationTC,
+			m_maDCOutput1RippleAndNoiseTC,
+			m_maDCOutput1MinimumCurrentDrawTC,
+			m_maDCOutput1MaximumCurrentDrawTC
+		},
+
+		{
+			m_maDCOutput2OutputNumberTC,
+			m_maDCOutput2NominalVoltageTC,
+			m_maDCOutput2MaximumNegativeVoltageDeviationTC,
+			m_maDCOutput2MaximumPositiveVoltageDeviationTC,
+			m_maDCOutput2RippleAndNoiseTC,
+			m_maDCOutput2MinimumCurrentDrawTC,
+			m_maDCOutput2MaximumCurrentDrawTC
+		}
+	};
+
+	z = (unsigned char*)x_calloc(1, 12);
+
+	unsigned char DCOutputCnt = 0;
+	for (i = 0; i <= NUM_SUPPLIES - 1; i++) {
+		if (!fru->supplies[i])
+			continue;
+		p = fru->supplies[i];
+		n = p + 5;
+		switch (p[0]) {
+		case 1:
+			PSU_DEBUG_PRINT(MSG_ALERT, "DC Output");
+			//PSU_DEBUG_PRINT(MSG_ALERT, "  Output Number: %d (%s)", n[0] & 0xF, DC_Loads[n[0] & 0xF]);
+			PSU_DEBUG_PRINT(MSG_ALERT,    "  Output Number:              %d", n[0] & 0xF);
+			DCOutputTextTCArray[DCOutputCnt][0]->SetValue(wxString::Format("%d", n[0] & 0xF));
+			DCOutputTextTCArray[DCOutputCnt][0]->SetBackgroundColour(wxColour(255, 255, 0));
+			DCOutputTextTCArray[DCOutputCnt][0]->SetFocus();
+
+			// Standby
+			if (n[0] & 0x80){
+				DCOutputCheckBoxArray[DCOutputCnt][0]->SetValue(true);
+			}
+			else{
+				DCOutputCheckBoxArray[DCOutputCnt][0]->SetValue(false);
+			}
+			DCOutputCheckBoxArray[DCOutputCnt][0]->SetFocus();
+
+			if (memcmp(&n[1], z, 11)) {
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Nominal volts:              %d (mV)", (n[1] | (n[2] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][1]->SetValue(wxString::Format("%d", (n[1] | (n[2] << 8))));
+				DCOutputTextTCArray[DCOutputCnt][1]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][1]->SetFocus();
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Maximum negative deviation: %d (mV)", (n[3] | (n[4] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][2]->SetValue(wxString::Format("%d", (n[3] | (n[4] << 8))));
+				DCOutputTextTCArray[DCOutputCnt][2]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][2]->SetFocus();
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Maximum positive deviation: %d (mV)", (n[5] | (n[6] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][3]->SetValue(wxString::Format("%d", (n[5] | (n[6] << 8))));
+				DCOutputTextTCArray[DCOutputCnt][3]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][3]->SetFocus();
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Ripple and Noise pk-pk:     %d (mV)", n[7] | (n[8] << 8));
+				DCOutputTextTCArray[DCOutputCnt][4]->SetValue(wxString::Format("%d", n[7] | (n[8] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][4]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][4]->SetFocus();
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Minimum current draw:       %d (mA)", n[9] | (n[10] << 8));
+				DCOutputTextTCArray[DCOutputCnt][5]->SetValue(wxString::Format("%d", n[9] | (n[10] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][5]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][5]->SetFocus();
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "  Maximum current draw:       %d (mA)", n[11] | (n[12] << 8));
+				DCOutputTextTCArray[DCOutputCnt][6]->SetValue(wxString::Format("%d", n[11] | (n[12] << 8)));
+				DCOutputTextTCArray[DCOutputCnt][6]->SetBackgroundColour(wxColour(255, 255, 0));
+				DCOutputTextTCArray[DCOutputCnt][6]->SetFocus();
+
+			}
+			else
+				PSU_DEBUG_PRINT(MSG_ALERT, "  All Zeros");
+
+			DCOutputCnt++;
+
+			break;
+		case 2:
+			PSU_DEBUG_PRINT(MSG_ALERT, "DC Load");
+			PSU_DEBUG_PRINT(MSG_ALERT, "  Output number: %d (%s)", n[0] & 0xF, DC_Loads[n[0] & 0xF]);
+			PSU_DEBUG_PRINT(MSG_ALERT, "  Nominal Volts:         %04d (mV)", (n[1] | (n[2] << 8)) * 10);
+			PSU_DEBUG_PRINT(MSG_ALERT, "  minimum voltage:       %04d (mV)", (n[3] | (n[4] << 8)) * 10);
+			PSU_DEBUG_PRINT(MSG_ALERT, "  maximum voltage:       %04d (mV)", (n[5] | (n[6] << 8)) * 10);
+			PSU_DEBUG_PRINT(MSG_ALERT, "  Ripple and Noise pk-pk %04d (mV)", n[7] | (n[8] << 8));
+			PSU_DEBUG_PRINT(MSG_ALERT, "  Minimum current load   %04d (mA)", n[9] | (n[10] << 8));
+			PSU_DEBUG_PRINT(MSG_ALERT, "  Maximum current load   %04d (mA)", n[11] | (n[12] << 8));
+			break;
+		}
+	}
+	free(z);
+
+}
+
+
 wxBEGIN_EVENT_TABLE(FRUMakerDialog, wxDialog)
 EVT_BUTTON(CID_BTN_MAKE, FRUMakerDialog::OnBtnMAKE)
+EVT_BUTTON(CID_BTN_IMPORT, FRUMakerDialog::OnBtnIMPORT)
 EVT_BUTTON(CID_BTN_WRITE, FRUMakerDialog::OnBtnWRITE)
 EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_END, FRUMakerDialog::OnE2PRomWriteEnd)
-//EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_END, FRUMakerDialog::OnE2PRomReadEnd)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_END, FRUMakerDialog::OnE2PRomReadEnd)
 EVT_THREAD(wxEVT_COMMAND_E2PROM_WRITE_INTERRUPT, FRUMakerDialog::OnE2PRomWriteInterrupt)
-//EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, FRUMakerDialog::OnE2PRomReadInterrupt)
+EVT_THREAD(wxEVT_COMMAND_E2PROM_READ_INTERRUPT, FRUMakerDialog::OnE2PRomReadInterrupt)
 EVT_CLOSE(FRUMakerDialog::OnDialogClose)
 wxEND_EVENT_TABLE()

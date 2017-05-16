@@ -34,8 +34,8 @@ public:
 	~FRUMakerDialog();
 
 	enum {
-		CID_BTN_MAKE, /**< Make Button */
-
+		CID_BTN_MAKE,  /**< Make Button */
+		CID_BTN_IMPORT,/**< Import Button */
 		CID_BTN_WRITE  /**< Write Button */
 	};
 
@@ -58,6 +58,7 @@ private:
 
 	unsigned char *m_pFRUBinaryContent;
 	unsigned char  m_fruBinaryContent[MAX_FRU_FILE_SIZE];/**< Buffer for Save FRU Binary File Content */
+	unsigned char  m_e2pRomContent[MAX_FRU_FILE_SIZE];/**< Buffer For Save E2PRom Content */
 
 	struct FRU_DATA *fru;
 
@@ -93,6 +94,7 @@ private:
 
 	wxStaticText *m_slaveAddressST;
 	wxTextCtrl *m_slaveAddressTC;
+	wxButton *m_importBTN;
 	wxButton *m_writeBTN;
 
 	wxStaticText *m_piManufacturerNameST;
@@ -170,6 +172,9 @@ private:
 	wxStaticText *m_mapsiRPSST;
 	wxTextCtrl *m_mapsiRPSTC;
 
+	wxStaticText *m_maDCOutput1StandbyST;
+	wxCheckBox *m_maDCOutput1StandbyCB;
+
 	wxStaticText *m_maDCOutput1OutputNumberST;
 	wxTextCtrl *m_maDCOutput1OutputNumberTC;
 
@@ -190,6 +195,9 @@ private:
 
 	wxStaticText *m_maDCOutput1MaximumCurrentDrawST;
 	wxTextCtrl *m_maDCOutput1MaximumCurrentDrawTC;
+
+	wxStaticText *m_maDCOutput2StandbyST;
+	wxCheckBox *m_maDCOutput2StandbyCB;
 
 	wxStaticText *m_maDCOutput2OutputNumberST;
 	wxTextCtrl *m_maDCOutput2OutputNumberTC;
@@ -233,8 +241,15 @@ private:
 	void OnE2PRomReadInterrupt(wxThreadEvent& event);
 
 	void OnBtnMAKE(wxCommandEvent& event);
+	void OnBtnIMPORT(wxCommandEvent& event);
 	void OnBtnWRITE(wxCommandEvent& event);
 	void OnDialogClose(wxCloseEvent& event);
+
+	wxString dump_fru_field(const char * description, size_t offset, unsigned char * field);
+	void dump_PRODUCT(struct PRODUCT_INFO *fru);
+	void dump_MULTIRECORD(struct MULTIRECORD_INFO *fru);
+
+	bool isHaveEmptyField(void);
 
 	wxDECLARE_EVENT_TABLE();
 };

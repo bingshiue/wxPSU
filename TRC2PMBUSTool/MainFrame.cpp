@@ -2549,6 +2549,8 @@ void MainFrame::StartMonitor(void){
 	this->m_readTestMenuItem->Enable(false);
 	this->m_writeTestMenuItem->Enable(false);
 	this->m_blockWRTestMenuItem->Enable(false);
+	this->m_fruMakerMenuItem->Enable(false);
+	this->m_fruWriterMenuItem->Enable(false);
 
 	(this->m_status_bar->getTimer())->Start();
 	this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
@@ -3395,6 +3397,8 @@ void MainFrame::OnSendThreadCompletion(wxThreadEvent& event)
 	this->m_readTestMenuItem->Enable(true);
 	this->m_writeTestMenuItem->Enable(true);
 	this->m_blockWRTestMenuItem->Enable(true);
+	this->m_fruMakerMenuItem->Enable(true);
+	this->m_fruWriterMenuItem->Enable(true);
 
 	// (Work-Around) Set Gauge To Determinate Mode, Seems If the value of gauge is the same as previous the 'SetValue' method don't work
 	this->m_status_bar->getGauge()->SetValue(1);

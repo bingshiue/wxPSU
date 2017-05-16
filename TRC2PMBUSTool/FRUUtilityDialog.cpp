@@ -237,7 +237,7 @@ void FRUUtilityDialog::OnBtnREAD(wxCommandEvent& event){
 	this->m_btnREAD->Enable(false);
 	this->m_btnWRITE->Enable(false);
 
-	// New E2PRomReadDataTask To Write
+	// New E2PRomReadDataTask
 	int count = TaskEx::GetCount(task_ID_E2PRomReadDataTask);
 
 	if (count > 0){
@@ -500,8 +500,8 @@ void FRUUtilityDialog::dump_MULTIRECORD(struct MULTIRECORD_INFO *fru){
 	 */
 	const char * DC_Loads[] = {
 		"P1 VADJ",			/* Load   :  0 */
-		"P1 3P3V",			/* Load   :  1 */
-		"P1 12P0V",			/* Load   :  2 */
+		" ",//"P1 3P3V",	/* Load   :  1 */
+		" ",//"P1 12P0V",	/* Load   :  2 */
 		"P1 VIO_B_M2C",		/* Output :  3 */
 		"P1 VREF_A_M2C",	/* Output :  4 */
 		"P1 VREF_B_M2C",	/* Output :  5 */
@@ -524,7 +524,8 @@ void FRUUtilityDialog::dump_MULTIRECORD(struct MULTIRECORD_INFO *fru){
 		switch (p[0]) {
 		case 1:
 			PSU_DEBUG_PRINT(MSG_ALERT, "DC Output");
-			PSU_DEBUG_PRINT(MSG_ALERT, "  Output Number: %d (%s)", n[0] & 0xF, DC_Loads[n[0] & 0xF]);
+			//PSU_DEBUG_PRINT(MSG_ALERT, "  Output Number: %d (%s)", n[0] & 0xF, DC_Loads[n[0] & 0xF]);
+			PSU_DEBUG_PRINT(MSG_ALERT,     "  Output Number:              %d", n[0] & 0xF);
 			if (memcmp(&n[1], z, 11)) {
 				PSU_DEBUG_PRINT(MSG_ALERT, "  Nominal volts:              %d (mV)", (n[1] | (n[2] << 8)) * 10);
 				PSU_DEBUG_PRINT(MSG_ALERT, "  Maximum negative deviation: %d (mV)", (n[3] | (n[4] << 8)) * 10);
