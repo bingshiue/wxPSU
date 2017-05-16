@@ -2,6 +2,7 @@
  * @brief ReceiveRebootCheckTask.cpp
  */
 
+#include <string.h>
 #include "Task.h"
 
 ReceiveRebootCheckTask::ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
@@ -34,6 +35,9 @@ int ReceiveRebootCheckTask::Main(double elapsedTime){
 
 #ifndef ISP_DONT_WAIT_RESPONSE
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Receive Data From I/O, Bytes To Read = %d", (*this->m_CurrentIO == IOACCESS_SERIALPORT) ? ISP_ENDDATA_BYTES_TO_READ : ISP_ENDDATA_BYTES_TO_READ + 2);
+
+	// Reset Buffer To 0xFF
+	memset(this->m_recvBuff.m_recvBuff, 0xFF, 256);
 
 	// Read Data From IO
 	this->m_recvBuff.m_length = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadData(this->m_recvBuff.m_recvBuff, ispEndDataBytesToRead);
