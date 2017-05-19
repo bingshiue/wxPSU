@@ -24,7 +24,7 @@ IOPortSendCMDThread::IOPortSendCMDThread(
 	PMBUSStatusPanel* pmbusStatusPanel,
 	PMBUSStatusDCHPanel* pmbusStatusDCHPanel,
 	std::vector<PMBUSSendCOMMAND_t> *sendCMDVector
-	)
+	) : wxThread(wxTHREAD_DETACHED)
 {
 	this->m_pHandler = pHandler;
 	this->m_IOAccess = ioaccess;
@@ -1234,7 +1234,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Send");
 						// Sleep Polling Time
-						Sleep(*this->m_pollingTime);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
+						/*Sleep*/wxMilliSleep(*this->m_pollingTime);//this->m_pollingTime - SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
 
 						retry = 0;
@@ -1713,6 +1713,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 				wxThreadEvent* threadSTATUSPage_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE);
 				threadSTATUSPage_evt->SetInt(idx);
 				wxQueueEvent(m_pHandler->GetEventHandler(), threadSTATUSPage_evt);
+
 
 #if 0
 				if (idx == (PMBUSHelper::GetCurrentCMDTableSize() - 1)){

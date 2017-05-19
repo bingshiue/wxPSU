@@ -4,7 +4,10 @@
 #ifndef _IOACCESS_H_
 #define _IOACCESS_H_
 
-#include<Windows.h>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include<stdio.h>
 #include<stdlib.h>
 #include "CommonDef.h"

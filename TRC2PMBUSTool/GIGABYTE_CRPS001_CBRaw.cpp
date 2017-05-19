@@ -2,7 +2,7 @@
  * @file GIGABYTE_CRPS001_CBRaw.cpp
  */
 
-#include "GIGABYTE_CRPS001_CBRAW.h"
+#include "GIGABYTE_CRPS001_CBRaw.h"
 
 int GB_CRPS_Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength);
 
@@ -17,7 +17,7 @@ int GB_CRPS_Raw_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 	wxString wxstr("");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -121,7 +121,7 @@ int GB_CRPS_Raw_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -204,7 +204,7 @@ int GB_CRPS_Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -519,7 +519,7 @@ int GB_CRPS_Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataB
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -619,7 +619,7 @@ int GB_CRPS_Raw_06H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 
 	//
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -710,7 +710,7 @@ int GB_CRPS_Raw_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataByte
 	}
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 

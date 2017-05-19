@@ -116,7 +116,7 @@ int Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 		wxstr += wxString::Format("Unsupport");
 
 		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+		COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -246,7 +246,7 @@ int Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Data Format in CMD");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 

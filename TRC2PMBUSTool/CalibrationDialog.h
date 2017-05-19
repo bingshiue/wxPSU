@@ -86,7 +86,7 @@ public:
 
 	static unsigned char calibrationItemCommand[CALIBRATION_ITEM_SIZE];/**< Calibration Item Command */
 	static unsigned char calibrationItemPointerMask[CALIBRATION_ITEM_SIZE];/**< Calibration Item Pointer Mask Value */
-	static unsigned char CalibrationDialog::calibrationItemPointerValue[10];/**< Calibration Item Pointer Value */
+	static unsigned char calibrationItemPointerValue[10];/**< Calibration Item Pointer Value */
 	static double defSelectablePointerCount[CALIBRATION_ITEM_SIZE];/**< Default Selectable Pointer Count */
 	static DATA_RESOLUTION_t m_dataResolution[CALIBRATION_ITEM_SIZE];/**< Data & Resolution */
 

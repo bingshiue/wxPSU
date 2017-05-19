@@ -11,7 +11,7 @@ using namespace std;
 
 BOOL GetSerialPortName(wchar_t *buff, unsigned int sizeOfBuff, unsigned int num){
 	BOOL ret = TRUE;
-
+#ifdef _WIN32	
 	if (sizeOfBuff < 16 || num < 0){
 		PSU_DEBUG_PRINT(MSG_ERROR, "%s: Error Occurs, sizeOfBuff=%d, num=%d", __FUNCTIONW__, sizeOfBuff, num);
 		ret = FALSE;
@@ -24,12 +24,12 @@ BOOL GetSerialPortName(wchar_t *buff, unsigned int sizeOfBuff, unsigned int num)
 	else{
 		wsprintf(buff, L"\\\\.\\COM%d", num + 1);// "\\.\COMx"
 	}
-
+#endif
 	return ret;
 }
 
 int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray){
-
+#ifdef _WIN32
 	HANDLE enumHandle;
 	wchar_t SerialPortName[64];
 	unsigned int success = 0;
@@ -61,36 +61,39 @@ int EnumerateAvailableSerialPort(BOOL *array, unsigned int sizeofArray){
 	}
 
 	return success;
+#else
+	return 0;
+#endif
 }
 
 unsigned int GetFirstAvailableSerialPortIndex(BOOL *array, unsigned int sizeofArray){
 
 	unsigned int index = 0;
-
+#ifdef _WIN32
 	for (unsigned int idx = 0; idx < sizeofArray; idx++){
 		if (array[idx] == TRUE){
 			index = idx;
 			return index;
 		}
 	}
-
+#endif
 	return index;
 
 }
 
 
 
-
+#ifdef _WIN32
 HANDLE hComm = INVALID_HANDLE_VALUE;/**< Handle for Serial Port */
 wchar_t ComPortName[64] = L""; // Name of the Serial port to be opened,
 DCB dcbSerialParams = { 0 };/**< Initializing DCB structure */
 OVERLAPPED ol_write;/**< Overlapped Write */
 OVERLAPPED ol_read;/**< Overlapped Read */
 OVERLAPPED ol_wait;/**< Overlapped Wait */
-
+#endif
 
 int SetSerialPortTimeouts(void){
-
+#ifdef _WIN32
 	COMMTIMEOUTS timeouts = { 0 };
 
 	timeouts.ReadIntervalTimeout = MAXWORD;//50;
@@ -109,9 +112,13 @@ int SetSerialPortTimeouts(void){
 	}
 
 	return EXIT_SUCCESS;
+#else
+	return 0;
+#endif
 }
 
 int GetSerialPortStatus(void){
+#ifdef _WIN32
 	PSU_DEBUG_PRINT(MSG_DEBUG, "hComm = %p", hComm);
 	if (hComm == INVALID_HANDLE_VALUE){
 		return IODEVICE_CLOSE;
@@ -119,14 +126,22 @@ int GetSerialPortStatus(void){
 	else{
 		return IODEVICE_OPEN;
 	}
+#else
+	return IODEVICE_CLOSE;
+#endif
 }
 
 wchar_t* GetSerialPortOpenDeviceName(){
+#ifdef _WIN32	
 	return ComPortName;
+#else
+	return NULL;
+#endif
 }
 
 int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSetting)
 {
+#ifdef _WIN32	
 	int ret = EXIT_SUCCESS;
 	BOOL Status;
 
@@ -198,9 +213,13 @@ int OpenSerialPort(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSe
 	PurgeComm(hComm, PURGE_TXCLEAR | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_RXABORT);
 
 	return ret;
+#else
+        return EXIT_FAILURE;
+#endif
 }
 
 int DumpComStat(void){
+#ifdef _WIN32		
 	DWORD dwErrors;
 	COMSTAT ComStat;
 
@@ -213,12 +232,15 @@ int DumpComStat(void){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "ComStat.cbInQue=%ld", ComStat.cbInQue);
 
 	return ComStat.cbInQue;// Return how many data bytes in In-Queue
+#else
+	return 0;
+#endif
 }
 
 //#define WRITE_WAIT_INFINITE // Wait Infinite for Write Overlapped Operation
 
 int SerialSendData(unsigned char* buff, unsigned int size){
-
+#ifdef _WIN32	
 	BOOL Status;
 	DWORD  dNoOfBytesWritten = 0;
 	DWORD endtime; // For Compute Timeout
@@ -302,10 +324,17 @@ int SerialSendData(unsigned char* buff, unsigned int size){
 	}
 
 	return dNoOfBytesWritten;
+#else
+	return 0;
+#endif
 }
 
 int SerialSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
+#ifdef _WIN32	
 	return SerialSendData(buff, size);
+#else
+	return 0;
+#endif
 }
 
 //#define WAIT_INFINITE                  // Wait Infinite for Overlapped Operation
@@ -315,6 +344,7 @@ int SerialSendDataExtra(unsigned char* buff, unsigned int size, void* ptr){
 #define READ_OVERLAPPED_TIMEOUT  500   // Milliseconds
 #define STATUS_CHECK_TIMEOUT      50   // Milliseconds
 int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
+#ifdef _WIN32		
 	//wxString outputMsg("");                // Output Messages
 	BOOL  Status;                          // Status of the various operations
 	int ReadFileStatus;                    //
@@ -785,6 +815,9 @@ int SerialReadData(unsigned char* buff, unsigned int bytesToRead){
 	CloseHandle(ol_read.hEvent);
 
 	return i;// Return how many bytes data readed
+#else
+	return 0;
+#endif
 }
 
 int SerialReadDataExtra(unsigned char* buff, unsigned int bytesToRead, void* ptr){
@@ -792,6 +825,7 @@ int SerialReadDataExtra(unsigned char* buff, unsigned int bytesToRead, void* ptr
 }
 
 int CloseSerialPort(void){
+#ifdef _WIN32		
 	int ret = SUCCESS;
 
 	PSU_DEBUG_PRINT(MSG_DEBUG ,"Close Serial Port %p", hComm);
@@ -800,4 +834,7 @@ int CloseSerialPort(void){
 	hComm = INVALID_HANDLE_VALUE;
 
 	return ret;
+#else
+	return 0;
+#endif
 }

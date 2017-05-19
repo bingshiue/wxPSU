@@ -18,7 +18,7 @@
 
 #include "CommonDef.h"
 #include "FRU.h"
-#include "IOACCESS.h"
+#include "IOAccess.h"
 #include "PMBUSHelper.h"
 #include "PMBUSLogTextCtrl.h"
 #include "Task.h"

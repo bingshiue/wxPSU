@@ -112,13 +112,13 @@ PMBUSCMDListModel::PMBUSCMDListModel(PMBUSCOMMAND_t *pmBusCommand, unsigned int 
 
 #ifdef USE_PNG
 	// Setup Icon
-	m_icon[XPM_red].CopyFromBitmap(wxBITMAP_PNG(STATUS_RED));    //= wxIcon(red_xpm);
+	m_icon[XPM_red].CopyFromBitmap(LOAD_PNG_RESOURCE(status_red));    //= wxIcon(red_xpm);
 
-	m_icon[XPM_green].CopyFromBitmap(wxBITMAP_PNG(STATUS_GREEN));  //= wxIcon(green_xpm);
+	m_icon[XPM_green].CopyFromBitmap(LOAD_PNG_RESOURCE(status_green));  //= wxIcon(green_xpm);
 
-	m_icon[XPM_yellow].CopyFromBitmap(wxBITMAP_PNG(STATUS_YELLOW)); //= wxIcon(yellow_xpm);
+	m_icon[XPM_yellow].CopyFromBitmap(LOAD_PNG_RESOURCE(status_yellow)); //= wxIcon(yellow_xpm);
 
-	m_icon[XPM_grey].CopyFromBitmap(wxBITMAP_PNG(STATUS_GREY)); //= wxIcon(gray_xpm);
+	m_icon[XPM_grey].CopyFromBitmap(LOAD_PNG_RESOURCE(status_grey)); //= wxIcon(gray_xpm);
 
 #else
 	// Setup Icon

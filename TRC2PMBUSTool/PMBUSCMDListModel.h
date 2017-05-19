@@ -6,7 +6,7 @@
 
 #include "main.h"
 #include "CommonDef.h"
-#include "PMBusCommandType.h"
+#include "PMBUSCommandType.h"
 #include "wx/hashmap.h"
 
 class MyCustomRenderer : public wxDataViewCustomRenderer

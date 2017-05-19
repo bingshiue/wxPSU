@@ -92,7 +92,7 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 			// Start Send Data
 			*this->m_ispStatus = ISP_Status_InProgress;
 			this->m_tiHexFileStat->begin();
-			PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Start Send HEX Data, Start Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Start Send HEX Data, Start Address = 0x%08lx", this->m_tiHexFileStat->currentAddress());
 			new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 
 			break;
@@ -100,11 +100,11 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 		case ISP_Status_InProgress: // In Progress
 
 			if (this->m_tiHexFileStat->endOfData()){
-				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Latest HEX Data Has Been Sent : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Latest HEX Data Has Been Sent : Current Address = 0x%08lx", this->m_tiHexFileStat->currentAddress());
 				new(TP_SendISPEndCMDTask) SendISPEndCMDTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 			}
 			else{
-				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Sending HEX Data : Current Address = 0x%08x", this->m_tiHexFileStat->currentAddress());
+				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Sending HEX Data : Current Address = 0x%08lx", this->m_tiHexFileStat->currentAddress());
 				new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 			}
 

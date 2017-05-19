@@ -5,7 +5,10 @@
 #ifndef _HID_H_
 #define _HID_H_
 
+#ifdef _WIN32
 #include<Windows.h>
+#endif
+
 #include<stdio.h>
 #include<stdlib.h>
 #include "hidapi.h"

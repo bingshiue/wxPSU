@@ -31,7 +31,7 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 	switch (col){
 
 	case Col_ADDRESS:
-		value = wxString::Format("%08x", this->m_startAddress + (row*0x10));
+		value = wxString::Format("%08lx", this->m_startAddress + (row*0x10));
 
 		value.UpperCase();
 

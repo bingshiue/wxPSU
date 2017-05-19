@@ -3,7 +3,7 @@
  */
 
 #include "math.h"
-#include "pec.h"
+#include "PEC.h"
 #include "PMBUSHelper.h"
 
 unsigned char PMBUSHelper::m_slaveAddress;
@@ -1553,12 +1553,22 @@ unsigned char PMBUSHelper::ComputeISPDataCheckSum(unsigned char *buffer, unsigne
 wxString& PMBUSHelper::GetNowTimeString(void){
 	// Get Now Time
 	wxDateTime dateTime = wxDateTime::UNow();
+
+#ifdef _WIN32
 	_SYSTEMTIME systemTime;
 	dateTime.GetAsMSWSysTime(&systemTime);
 
 	// Make Time String
 	//timeString = wxString::Format("%d-%d %d:%d.%d", systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wMilliseconds);
-	m_timeString = wxString::Format("%04d/%02d/%02d %02d:%02d:%02d.%03d", systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
+	m_timeString = wxString::Format("%02d:%02d:%02d.%03d", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
+#endif
+
+#ifdef __GNUC__
+
+	// Make Time String
+	m_timeString = wxString::Format("%02d:%02d:%02d.%03d", dateTime.GetHour(), dateTime.GetMinute(), dateTime.GetSecond(), dateTime.GetMillisecond());
+	//m_timeString = wxString::Format("%02d:%02d:%02d.%03d", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds);
+#endif
 
 	return m_timeString;
 }
@@ -2067,6 +2077,21 @@ wxString& PMBUSHelper::getDefaultMFR_DATE(void){
 
 wxString& PMBUSHelper::getDefaultMFR_SERIAL(void){
 	return m_default_mfr_serial;
+}
+
+unsigned long PMBUSHelper::GetTickCount(void){
+#ifdef __GNUC__
+        struct timeval tv;
+        if(gettimeofday(&tv, NULL) != 0)
+                return 0;
+
+        return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+#endif
+
+#ifdef _WIN32
+	return GetTickCount();
+#endif
+
 }
 
 void PMBUSHelper::ParseCustomizedReadCMDRecvData(unsigned char cmd, unsigned char* DataBuff, unsigned int DataLengh){

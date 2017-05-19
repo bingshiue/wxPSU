@@ -15,6 +15,7 @@
 #include <wx/wfstream.h>
 #include <wx/animate.h>
 #include <wx/statline.h>
+#include <wx/tooltip.h>
 
 #include "CommonDef.h"
 #include "PMBUSBitmapButton.h"

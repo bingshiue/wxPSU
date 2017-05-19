@@ -12,7 +12,7 @@ wxBitmap PMBUSArtProvider::CreateBitmap(const wxArtID& id,
 	//if (client == wxART_MESSAGE_BOX)
 	//{
 		if (id == wxART_INFORMATION)
-			return wxBITMAP_PNG(ABOUT_16);
+			return LOAD_PNG_RESOURCE(about_16);
 
 #if 0
 		if (id == wxART_ERROR)

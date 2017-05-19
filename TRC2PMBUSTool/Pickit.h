@@ -5,7 +5,10 @@
 #ifndef _PICKIT_H_
 #define _PICKIT_H_
 
+#ifdef _WIN32
 #include<Windows.h>
+#endif
+
 #include<stdio.h>
 #include<stdlib.h>
 #include "hidapi.h"

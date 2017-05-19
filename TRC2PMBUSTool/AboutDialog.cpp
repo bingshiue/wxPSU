@@ -4,12 +4,12 @@
 
 #include "main.h"
 #include "AboutDialog.h"
-#include "acbel_large.xpm"
+#include "Acbel_large.xpm"
 
 AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About")), wxDefaultPosition, wxSize(300, 300))
 {
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(ABOUT_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(about_16));
 
 	this->SetIcon(icon);
 	

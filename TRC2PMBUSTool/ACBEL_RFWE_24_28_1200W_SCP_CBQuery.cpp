@@ -55,7 +55,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* strin
 		wxstr += wxString::Format("Unsupport");
 
 		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+		COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -185,7 +185,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Query_Common(pmbuscmd_t* pmbuscmd, wchar_t* strin
 	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Data Format in CMD");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 

@@ -9,6 +9,7 @@
 #include <wx/wx.h>
 #endif
 
+#include "CommonDef.h"
 #include "wx/artprov.h"
 
 class PMBUSArtProvider : public wxArtProvider

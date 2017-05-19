@@ -11,9 +11,17 @@
 #endif
 
 #define FILED_IO_SETTING_WIDTH             150
+#ifdef __GNUC__
+#define FILED_I2C_CLOCK_WIDTH               50 + 25
+#define FILED_RUN_MODE_WIDTH                75 + 50
+#define FILED_MONITORING_COMMAND_WIDTH     150 + 50
+#else
+#ifdef __VISUALC__
 #define FILED_I2C_CLOCK_WIDTH               50
 #define FILED_RUN_MODE_WIDTH                75
 #define FILED_MONITORING_COMMAND_WIDTH     150
+#endif
+#endif
 #define FILED_GAUGE_WIDTH                  100
 #define FILED_MONITOR_TIME                 100
 #define FILED_MONITOR_SUMMARY               -1 // -1 means growable
@@ -44,7 +52,11 @@ PMBUSStatusBar::PMBUSStatusBar(wxWindow *parent, long style) : wxStatusBar(paren
 	//m_checkbox->SetValue(true);
 #endif
 
+#ifdef __GNUC__
+	m_gauge = new wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH);
+#else
 	m_gauge = new wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH | wxGA_PROGRESS);
+#endif
 
 	m_gauge->SetValue(0);
 

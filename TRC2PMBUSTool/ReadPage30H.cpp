@@ -36,10 +36,10 @@ ReadPage30H::ReadPage30H(wxWindow* parent, wxString& label, bool* monitor_runnin
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
 
-	wxString hexString = wxString::Format("%02lx", DEFAULT_CMD);
+	wxString hexString = wxString::Format("%02x", DEFAULT_CMD);
 	this->m_cmdInputValue->SetValue(hexString);
 
-	wxString hexString2 = wxString::Format("%02lx", DEFAULT_RW);
+	wxString hexString2 = wxString::Format("%02x", DEFAULT_RW);
 	this->m_rwInputValue->SetValue(hexString2);
 
 	// Set Validator

@@ -121,7 +121,8 @@ int OpenPickitDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* port
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer String: %ls", wstr);
 		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Manufacturer : %ls", pickit_wstr);
 
-		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_vendor_name, pickit_wstr, 255);
+		//lstrcpynW(PMBUSHelper::GetUSBInfo()->m_vendor_name, pickit_wstr, 255);
+		COPY_WIDE_CHARACTERS(PMBUSHelper::GetUSBInfo()->m_vendor_name, pickit_wstr, 255);
 
 		// Read the Product String
 		pickit_wstr[0] = 0x0000;
@@ -131,7 +132,8 @@ int OpenPickitDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* port
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Product String: %ls", wstr);
 		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Product Name : %ls", pickit_wstr);
 
-		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_product_name, pickit_wstr, 255);
+		//lstrcpynW(PMBUSHelper::GetUSBInfo()->m_product_name, pickit_wstr, 255);
+		COPY_WIDE_CHARACTERS(PMBUSHelper::GetUSBInfo()->m_product_name, pickit_wstr, 255);
 
 		// Read the Serial Number String
 		pickit_wstr[0] = 0x0000;

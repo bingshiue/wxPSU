@@ -11,7 +11,7 @@
 
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
-#include "pec.h"
+#include "PEC.h"
 
 // Declare Query CB Functions
 int GB_CRPS_Query_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);

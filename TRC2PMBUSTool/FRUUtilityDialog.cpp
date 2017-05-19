@@ -33,7 +33,7 @@
 FRUUtilityDialog::FRUUtilityDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned int *currentIO) : wxDialog(parent, wxID_ANY, wxString(wxT("FRU Utility")), wxDefaultPosition, wxSize(FRU_WRITER_DIALOG_WIDTH, FRU_WRITER_DIALOG_HEIGHT)){
 
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(E2PROM_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(e2prom_16));
 
 	this->SetIcon(icon);
 
@@ -75,7 +75,7 @@ FRUUtilityDialog::FRUUtilityDialog(wxWindow *parent, IOACCESS *ioaccess, unsigne
 	m_fruFileST = new wxStaticText(m_fruWriteSBS->GetStaticBox(), wxID_ANY, wxT("FRU File"), wxDefaultPosition, wxSize(DEF_E2PROM_ST_WIDTH, -1));
 	m_fruFileTC = new wxTextCtrl(m_fruWriteSBS->GetStaticBox(), wxID_ANY, wxT(""), wxDefaultPosition, wxSize(DEF_E2PROM_TC_WIDTH, -1));
 	m_fruFileTC->SetEditable(false);
-	m_floppyLoadBB = new wxBitmapButton(m_fruWriteSBS->GetStaticBox(), CID_BTN_LOAD, wxBITMAP_PNG(FLOPPY_16));
+	m_floppyLoadBB = new wxBitmapButton(m_fruWriteSBS->GetStaticBox(), CID_BTN_LOAD, LOAD_PNG_RESOURCE(floppy_16));
 
 	//m_stline1 = new wxStaticLine(this);
 	//m_stline2 = new wxStaticLine(this);

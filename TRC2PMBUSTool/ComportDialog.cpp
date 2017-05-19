@@ -7,7 +7,7 @@
 ComportDialog::ComportDialog(wxWindow *parent, IOACCESS* ioaccess, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("Com Port"))) {
 
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(COMPLUG_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(complug_16));
 
 	this->SetIcon(icon);
 	this->SetBackgroundColour(wxColour(255, 255, 255));

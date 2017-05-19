@@ -24,7 +24,7 @@ FRUMakerDialog::FRUMakerDialog(wxWindow *parent, IOACCESS *ioaccess, unsigned in
 wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize(FRU_MAKER_DIALOG_WIDTH, FRU_MAKER_DIALOG_HEIGHT)){
 
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(MAKER_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(maker_16));
 
 	this->SetIcon(icon);
 
@@ -221,188 +221,188 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 	// Add Components To Sizer
 	// --- Product Info Area ---
 	/* Product Info Area : Manufacturer Name */
-	m_productInfoAreaFGS->Add(m_piManufacturerNameST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piManufacturerNameTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piManufacturerNameST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piManufacturerNameTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 	
 	//m_productInfoAreaSBS->Add(m_piManufacturerNameBS);
 	/* */
 
 	/* Product Info Area : Product Name */
-	m_productInfoAreaFGS->Add(m_piProductNameST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piProductNameTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductNameST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductNameTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	//m_productInfoAreaSBS->Add(m_piProductNameBS);
 	/* */
 
 	/* Product Info Area : Product Model Number */
-	m_productInfoAreaFGS->Add(m_piProductModelNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piProductModelNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductModelNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductModelNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	//m_productInfoAreaSBS->Add(m_piProductModelNumberBS);
 	/* */
 
 	/* Product Info Area : Product Version */
-	m_productInfoAreaFGS->Add(m_piProductVersionST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piProductVersionTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductVersionST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductVersionTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	//m_productInfoAreaSBS->Add(m_piProductVersionBS);
 	/* */
 
 	/* Product Info Area : Product Seria lNumber */
-	m_productInfoAreaFGS->Add(m_piProductSerialNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piProductSerialNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductSerialNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piProductSerialNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	//m_productInfoAreaSBS->Add(m_piProductSerialNumberBS);
 	/* */
 
 	/* Product Info Area : Asset Tag */
-	m_productInfoAreaFGS->Add(m_piAssetTagST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piAssetTagTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piAssetTagST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piAssetTagTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	//m_productInfoAreaSBS->Add(m_piAssetTagBS);
 	/* */
 
 	/* Product Info Area : FRU File ID */
-	m_productInfoAreaFGS->Add(m_piFRUFileIDST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_productInfoAreaFGS->Add(m_piFRUFileIDTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piFRUFileIDST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_productInfoAreaFGS->Add(m_piFRUFileIDTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	m_productInfoAreaSBS->Add(m_productInfoAreaFGS);
 	/* */
 
 	// --- MultiRecord Area ---
-	m_maPowerSupplyInformationFGS->Add(m_mapsiOverallcapacityST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiOverallcapacityTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiOverallcapacityST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiOverallcapacityTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakVAST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakVATC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakVAST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakVATC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushCurrentST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushCurrentTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushCurrentST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushCurrentTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushIntervalST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushIntervalTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushIntervalST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiInrushIntervalTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputVoltageRange2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputVoltageRange2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputFrequencyRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputFrequencyRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputFrequencyRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiLowEndInputFrequencyRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputFrequencyRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputFrequencyRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputFrequencyRangeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiHighEndInputFrequencyRangeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiACDropoutToleranceST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiACDropoutToleranceTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiACDropoutToleranceST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiACDropoutToleranceTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiBinaryFlagsST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiBinaryFlagsTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiBinaryFlagsST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiBinaryFlagsTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattageHoldUpTimeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattageHoldUpTimeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattageHoldUpTimeST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattageHoldUpTimeTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattagePeakCapacityST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattagePeakCapacityTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattagePeakCapacityST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiPeakWattagePeakCapacityTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage1ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage1TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage2ST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiCombinedWattageVoltage2TC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiTotalCombinedWattageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiTotalCombinedWattageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiTotalCombinedWattageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiTotalCombinedWattageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maPowerSupplyInformationFGS->Add(m_mapsiRPSST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maPowerSupplyInformationFGS->Add(m_mapsiRPSTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiRPSST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maPowerSupplyInformationFGS->Add(m_mapsiRPSTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 	m_powerSupplyInformationSBS->Add(m_maPowerSupplyInformationFGS);
 
-	m_multiRecordAreaSBS->Add(m_powerSupplyInformationSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+	m_multiRecordAreaSBS->Add(m_powerSupplyInformationSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	
-	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1NominalVoltageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1NominalVoltageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1NominalVoltageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1NominalVoltageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumNegativeVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumNegativeVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumNegativeVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumNegativeVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumPositiveVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumPositiveVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumPositiveVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumPositiveVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1RippleAndNoiseST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1RippleAndNoiseTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1RippleAndNoiseST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1RippleAndNoiseTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1MinimumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1MinimumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MinimumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MinimumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput1FGS->Add(m_maDCOutput1MaximumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 	
 	m_dcOutput1SBS->Add(m_maDCOutput1FGS);
 
-	m_multiRecordAreaSBS->Add(m_dcOutput1SBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+	m_multiRecordAreaSBS->Add(m_dcOutput1SBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2StandbyCB, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2OutputNumberTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2NominalVoltageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2NominalVoltageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2NominalVoltageST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2NominalVoltageTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumNegativeVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumNegativeVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumNegativeVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumNegativeVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumPositiveVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumPositiveVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumPositiveVoltageDeviationST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumPositiveVoltageDeviationTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2RippleAndNoiseST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2RippleAndNoiseTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2RippleAndNoiseST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2RippleAndNoiseTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2MinimumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2MinimumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MinimumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MinimumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
-	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumCurrentDrawST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
+	m_maDCOutput2FGS->Add(m_maDCOutput2MaximumCurrentDrawTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0));
 
 
 	m_dcOutput2SBS->Add(m_maDCOutput2FGS);
 
-	m_multiRecordAreaSBS->Add(m_dcOutput2SBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+	m_multiRecordAreaSBS->Add(m_dcOutput2SBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 
-	m_makeSBS->Add(m_makeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxDirection::wxALL, 5));
+	m_makeSBS->Add(m_makeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxALL, 5));
 
-	m_writeSBS->Add(m_slaveAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
-	m_writeSBS->Add(m_slaveAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
-	m_writeSBS->Add(m_importBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxDirection::wxALL, 5));
-	m_writeSBS->Add(m_writeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxDirection::wxALL, 5));
+	m_writeSBS->Add(m_slaveAddressST, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 5));
+	m_writeSBS->Add(m_slaveAddressTC, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 5));
+	m_writeSBS->Add(m_importBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 5));
+	m_writeSBS->Add(m_writeBTN, wxSizerFlags(1).Align(wxALIGN_CENTER_VERTICAL).Expand().Border(wxALL, 5));
 
-	m_operationSBS->Add(m_makeSBS, wxSizerFlags(1).Border(wxDirection::wxALL, 5));
-	m_operationSBS->Add(m_writeSBS, wxSizerFlags(1).Border(wxDirection::wxALL, 5));
+	m_operationSBS->Add(m_makeSBS, wxSizerFlags(1).Border(wxALL, 5));
+	m_operationSBS->Add(m_writeSBS, wxSizerFlags(1).Border(wxALL, 5));
 
 	//m_logSBS->Add(m_logTC, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
 	
-	m_topLevelSizer->Add(m_productInfoAreaSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
-	m_topLevelSizer->Add(m_multiRecordAreaSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
+	m_topLevelSizer->Add(m_productInfoAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_topLevelSizer->Add(m_multiRecordAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	//m_topLevelSizer->Add(m_makeBTN, wxSizerFlags(0).Expand());
-	m_topLevelSizer->Add(m_operationSBS, wxSizerFlags(0).Expand().Border(wxDirection::wxALL, 5));
-	//m_topLevelSizer->Add(m_logSBS, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
+	m_topLevelSizer->Add(m_operationSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	//m_topLevelSizer->Add(m_logSBS, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	SetSizer(m_topLevelSizer);
 
@@ -606,14 +606,14 @@ void FRUMakerDialog::MakeFRU(void){
 	// === Start of Power Supply Information ===
 	fru->MultiRecord_Area->power_supply_info = (unsigned char*)x_calloc(1, 5 + 24);// Header + Record Size
 	fru->MultiRecord_Area->power_supply_info[0] = 0x00;// Power Supply Information (Record Type 0x00)
-	fru->MultiRecord_Area->power_supply_info[1] = 0x02;// 7:7 ¡V End of list 6:4 ¡V Reserved, write as 000b 3:0 ¡V Record Format version(= 2h unless otherwise specified)
+	fru->MultiRecord_Area->power_supply_info[1] = 0x02;// 7:7 \A1V End of list 6:4 \A1V Reserved, write as 000b 3:0 \A1V Record Format version(= 2h unless otherwise specified)
 	fru->MultiRecord_Area->power_supply_info[2] = 0x18;// Record Length (Bytes)
 	//fru->MultiRecord_Area->power_supply_info[3] = 0x00;// Record Checksum Determine Later
 	//fru->MultiRecord_Area->power_supply_info[4] = 0x00;// Header Checksum Determine Later
 
 	/*
 	Offset 0, Length 2, Overall capacity (watts) (LSB First)
-	15:12 ¡V Reserved, write as 0000b
+	15:12 V Reserved, write as 0000b
 	11:0 - Overall capacity (watts) (LSB First)
 	*/
 	unsigned short OverallCapacity = (unsigned short)wxAtoi(this->m_mapsiOverallcapacityTC->GetValue());
@@ -703,10 +703,10 @@ void FRUMakerDialog::MakeFRU(void){
 
 	/*
 	Offset 17, Length 1, Binary flags
-	7:5 ¡V Reserved, write as 0000b
-	4:4 ¡V Tachometer pulses per rotation/Predictive fail polarity
-	3:3 ¡V Hot Swap Support
-	2:2 ¡V Autoswitch
+	7:5 V Reserved, write as 0000b
+	4:4 V Tachometer pulses per rotation/Predictive fail polarity
+	3:3 V Hot Swap Support
+	2:2 V Autoswitch
 	1:1 - Power factor correction
 	*/
 	unsigned char BinaryFlags = (unsigned short)wxAtoi(this->m_mapsiBinaryFlagsTC->GetValue());
@@ -716,8 +716,8 @@ void FRUMakerDialog::MakeFRU(void){
 
 	/*
 	Offset 18, Length 2, Peak Wattage.
-	15:12 ¡V Hold up time in seconds
-	11:0  ¡V Peak capacity (watts) (LSB First)
+	15:12 V Hold up time in seconds
+	11:0  V Peak capacity (watts) (LSB First)
 	*/
 	unsigned char HoldUpTimeInTimes = (unsigned char)wxAtoi(this->m_mapsiPeakWattageHoldUpTimeTC->GetValue());
 	unsigned short PeakCapacity = (unsigned short)wxAtoi(this->m_mapsiPeakWattagePeakCapacityTC->GetValue());
@@ -732,8 +732,8 @@ void FRUMakerDialog::MakeFRU(void){
 	/*
 	Offset 20, Length 3, Combined Wattage
 	Byte 1:
-	7:4 ¡V Voltage 1
-	3:0 ¡V Voltage 2
+	7:4 V Voltage 1
+	3:0 V Voltage 2
 	Byte 2:3
 	Total Combined Wattage (LSB First)
 	*/
@@ -765,16 +765,16 @@ void FRUMakerDialog::MakeFRU(void){
 	// === Start of DC Output 1 ===
 	fru->MultiRecord_Area->supplies[0] = (unsigned char*)x_calloc(1, 5 + 13);// Header + Record Size
 	fru->MultiRecord_Area->supplies[0][0] = 0x01;// DC Output (Record Type 0x01)
-	fru->MultiRecord_Area->supplies[0][1] = 0x02;// 7:7 ¡V End of list 6:4 ¡V Reserved, write as 000b 3:0 ¡V Record Format version(= 2h unless otherwise specified)
+	fru->MultiRecord_Area->supplies[0][1] = 0x02;// 7:7 V End of list 6:4 V Reserved, write as 000b 3:0 V Record Format version(= 2h unless otherwise specified)
 	fru->MultiRecord_Area->supplies[0][2] = 0x0D;// Record Length (Bytes)
 	fru->MultiRecord_Area->supplies[0][3] = 0x00;// Record Checksum Determine Later
 	fru->MultiRecord_Area->supplies[0][4] = 0x00;// Header Checksum Determine Later
 
 	/*
 	Offset 0, Length 1, Output information
-	7:7 ¡V Standby
-	6:4 ¡V Reserved, write as 000b
-	3:0 ¡V Output number
+	7:7 V Standby
+	6:4 V Reserved, write as 000b
+	3:0 V Output number
 	*/
 	unsigned char OutputInformation = (unsigned char)wxAtoi(this->m_maDCOutput1OutputNumberTC->GetValue());
 
@@ -840,16 +840,16 @@ void FRUMakerDialog::MakeFRU(void){
 
 	fru->MultiRecord_Area->supplies[1] = (unsigned char*)x_calloc(1, 5 + 13);// Header + Record Size
 	fru->MultiRecord_Area->supplies[1][0] = 0x01;// DC Output (Record Type 0x01)
-	fru->MultiRecord_Area->supplies[1][1] = 0x02;// 7:7 ¡V End of list 6:4 ¡V Reserved, write as 000b 3:0 ¡V Record Format version(= 2h unless otherwise specified)
+	fru->MultiRecord_Area->supplies[1][1] = 0x02;// 7:7 V End of list 6:4 V Reserved, write as 000b 3:0 \A1V Record Format version(= 2h unless otherwise specified)
 	fru->MultiRecord_Area->supplies[1][2] = 0x0D;// Record Length (Bytes)
 	fru->MultiRecord_Area->supplies[1][3] = 0x00;// Record Checksum Determine Later
 	fru->MultiRecord_Area->supplies[1][4] = 0x00;// Header Checksum Determine Later
 
 	/*
 	Offset 0, Length 1, Output information
-	7:7 ¡V Standby
-	6:4 ¡V Reserved, write as 000b
-	3:0 ¡V Output number
+	7:7 V Standby
+	6:4 V Reserved, write as 000b
+	3:0 V Output number
 	*/
 	unsigned char OutputInformation2 = (unsigned char)wxAtoi(this->m_maDCOutput2OutputNumberTC->GetValue());
 

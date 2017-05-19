@@ -15,7 +15,7 @@ using namespace std;
 #define DEFAULT_PID 0x3f/**< Default PID */
 #define MAX_STR 255
 
-hid_device *handle;/**< HID Device Handle */
+static hid_device *handle;/**< HID Device Handle */
 
 wchar_t wstr[MAX_STR];
 wchar_t productString[MAX_STR] = L"USB";
@@ -117,7 +117,7 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Manufacturer String: %ls", wstr);
 		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Manufacturer : %ls", wstr);
 
-		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_vendor_name, wstr, 255);
+		COPY_WIDE_CHARACTERS(PMBUSHelper::GetUSBInfo()->m_vendor_name, wstr, 255);
 
 		// Read the Product String
 		wstr[0] = 0x0000;
@@ -127,7 +127,7 @@ int OpenHIDDevice(BOOL *array, unsigned int sizeofArray, PORT_SETTING_t* portSet
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Product String: %ls", wstr);
 		PSU_DEBUG_PRINT(MSG_ALERT, "HID Device Product Name : %ls", wstr);
 
-		lstrcpynW(PMBUSHelper::GetUSBInfo()->m_product_name, wstr, 255);
+		COPY_WIDE_CHARACTERS(PMBUSHelper::GetUSBInfo()->m_product_name, wstr, 255);
 
 		// Read the Serial Number String
 		wstr[0] = 0x0000;

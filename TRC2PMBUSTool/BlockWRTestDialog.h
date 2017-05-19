@@ -17,7 +17,7 @@
 #include <wx/statline.h>
 
 #include "CommonDef.h"
-#include "IOACCESS.h"
+#include "IOAccess.h"
 #include "PMBUSHelper.h"
 #include "PMBUSLogTextCtrl.h"
 #include "version.h"

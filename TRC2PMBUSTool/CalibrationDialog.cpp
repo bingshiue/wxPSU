@@ -79,7 +79,7 @@ DATA_RESOLUTION_t CalibrationDialog::m_dataResolution[CALIBRATION_ITEM_SIZE] = {
 CalibrationDialog::CalibrationDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentIO, bool* monitor_running, bool* monitor_pause, std::vector<PMBUSSendCOMMAND_t>* sendCMDVector) : wxDialog(parent, wxID_ANY, wxString(wxT("Calibration")), wxDefaultPosition, wxSize(CALIBRATION_DIALOG_WIDTH, CALIBRATION_DIALOG_HEIGHT))
 {
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(CALIBRATION_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(calibration_16));
 
 	this->SetIcon(icon);
 

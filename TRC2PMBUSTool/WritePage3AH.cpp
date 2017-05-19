@@ -25,7 +25,7 @@ WritePage3AH::WritePage3AH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
 
-	wxString hexString = wxString::Format("%02lx", DEFAULT_VALUE);
+	wxString hexString = wxString::Format("%02x", DEFAULT_VALUE);
 	this->m_inputValue->SetValue(hexString);
 
 	// Set Validator

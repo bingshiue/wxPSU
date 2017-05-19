@@ -134,7 +134,7 @@ int Coefficients_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int size
 
 	//
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 

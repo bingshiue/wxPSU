@@ -9,6 +9,8 @@
 #include <wx/wx.h>
 #endif
 
+wxDECLARE_EVENT(wxEVT_COMMAND_MONITOR_START, wxThreadEvent); /**< Declare Monitor Start Event */
+
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent); /**< Declare Thread Start Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent); /**< Declare Thread Compelete Event */
 wxDECLARE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent); /**< Declare Thread Update Event */
