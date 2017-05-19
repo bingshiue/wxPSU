@@ -7,7 +7,7 @@
 USBSettingsDialog::USBSettingsDialog(wxWindow *parent, IOACCESS* ioaccess, unsigned int* currentUseIO, AppSettings_t* appSettings, PMBUSStatusBar* pmbusStatusBar) : wxDialog(parent, wxID_ANY, wxString(wxT("USB Settings")), wxDefaultPosition) {
 
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(USB_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(usb_16));
 
 	this->SetIcon(icon);
 	this->SetBackgroundColour(wxColour(255, 255, 255));

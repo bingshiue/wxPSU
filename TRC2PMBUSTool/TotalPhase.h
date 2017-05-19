@@ -4,7 +4,10 @@
 #ifndef _TOTALPHASE_H_
 #define _TOTALPHASE_H_
 
+#ifdef _WIN32
 #include<Windows.h>
+#endif
+
 #include<stdio.h>
 #include<stdlib.h>
 #include "CommonDef.h"
@@ -15,7 +18,7 @@
 #include <wx/wx.h>
 #endif
 
-#include "aardvark/aardvark.h"
+#include "Aardvark/aardvark.h"
 
 /**
  * @brief Enumerate Available Total Phase Device.

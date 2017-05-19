@@ -140,10 +140,10 @@ unsigned int ISPSequenceThread::ProductSendBuffer(unsigned char* buffer){
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 wxThread::ExitCode ISPSequenceThread::Entry() {
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Address = %x", this->m_startAddress);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "End Address   = %x", this->m_endAddress);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range = %d", this->m_addressRange);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Data Bytes    = %d", this->m_dataBytes);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Start Address = %lx", this->m_startAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "End Address   = %lx", this->m_endAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range = %ld", this->m_addressRange);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Data Bytes    = %ld", this->m_dataBytes);
 
 	/*** Prpare Send Data Buffer ***/
 	unsigned char SendBuffer[64];
@@ -206,13 +206,13 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 
 		if (this->m_developerMode == Generic_Enable)
 		{			
-			information += wxString::Format("Current Process Address : %08x", currentAddress);
+			information += wxString::Format("Current Process Address : %08lx", currentAddress);
 			information += wxT("\n");
 		}
 
 		// Show Processed Bytes
 		unsigned long processed_bytes = ((currentAddress - this->m_startAddress) + 1UL) * 2;
-		information += wxString::Format("Current Processed Bytes : (%d/%d)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
+		information += wxString::Format("Current Processed Bytes : (%ld/%ld)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
 
 		// Compute Percentage (Percentage = processed bytes / total bytes)
 		percentage = ((double)processed_bytes / this->m_dataBytes);
@@ -250,11 +250,11 @@ wxThread::ExitCode ISPSequenceThread::Entry() {
 					information += wxT("\n");
 
 					if (this->m_developerMode == Generic_Enable){
-						information += wxString::Format("Current Process Address : %08x", currentAddress);
+						information += wxString::Format("Current Process Address : %08lx", currentAddress);
 						information += wxT("\n");
 					}
 
-					information += wxString::Format("Current Processed Bytes : (%d/%d)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
+					information += wxString::Format("Current Processed Bytes : (%ld/%ld)(%.2f%%)", processed_bytes, this->m_dataBytes, ((float)processed_bytes / (float)this->m_dataBytes) * 100);
 				}
 			}
 			else{

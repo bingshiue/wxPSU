@@ -5,7 +5,10 @@
 #ifndef _SERIALPORT_H_
 #define _SERIALPORT_H_
 
+#ifdef _WIN32
 #include<Windows.h>
+#endif
+
 #include<stdio.h>
 #include<stdlib.h>
 #include "CommonDef.h"

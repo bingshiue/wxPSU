@@ -77,7 +77,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string,
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }

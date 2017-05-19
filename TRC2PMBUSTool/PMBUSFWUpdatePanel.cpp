@@ -32,7 +32,7 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_writeCount = 0;
 
 	tiHexFileStat->begin();
-    this->m_startAddress = tiHexFileStat->currentAddress();
+    	this->m_startAddress = tiHexFileStat->currentAddress();
 
 	tiHexFileStat->end();
 	this->m_endAddress = tiHexFileStat->currentAddress();
@@ -43,10 +43,10 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_dvlRowCount = (this->m_addressRange % 16 == 0) ? this->m_addressRange / 16 : (this->m_addressRange / 16) + 1;
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "StartAddress = 0x%08x", this->m_startAddress);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "EndAddress   = 0x%08x", this->m_endAddress);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range= %d", this->m_addressRange);
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Total Data Bytes   = %d", this->m_dataBytes);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "StartAddress = 0x%08lx", this->m_startAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "EndAddress   = 0x%08lx", this->m_endAddress);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range= %ld", this->m_addressRange);
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Total Data Bytes   = %ld", this->m_dataBytes);
 
 	this->m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_statisticSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("File Description"));
@@ -71,21 +71,21 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		// Start Address
 		this->m_startAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("START Address : "));
 		this->m_startAddressST->SetFont(font);
-		wxString StartAddress = wxString::Format("0x%08x", this->m_startAddress);
+		wxString StartAddress = wxString::Format("0x%08lx", this->m_startAddress);
 		this->m_startAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, StartAddress);
 
 		this->m_startAddressTC->SetEditable(false);
 
 		this->m_endAddressST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("End Address : "));
 		this->m_endAddressST->SetFont(font);
-		wxString EndAddress = wxString::Format("0x%08x", this->m_endAddress);
+		wxString EndAddress = wxString::Format("0x%08lx", this->m_endAddress);
 		this->m_endAddressTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, EndAddress);
 
 		this->m_endAddressTC->SetEditable(false);
 
 		this->m_addressRangeST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Address Range : "));
 		this->m_addressRangeST->SetFont(font);
-		wxString AddressRange = wxString::Format("%d", this->m_addressRange);
+		wxString AddressRange = wxString::Format("%ld", this->m_addressRange);
 		this->m_addressRangeTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, AddressRange);
 
 		this->m_addressRangeTC->SetEditable(false);
@@ -94,16 +94,16 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 	this->m_dataBytesST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Total Data Bytes : "));
 	this->m_dataBytesST->SetFont(font);
-	wxString DataBytes = wxString::Format("%d", this->m_dataBytes);
+	wxString DataBytes = wxString::Format("%ld", this->m_dataBytes);
 	this->m_dataBytesTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, DataBytes);
 
 	this->m_dataBytesTC->SetEditable(false);
 
 	this->m_writeButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_WRITE_BUTTON, wxT("WRITE"));
-	this->m_writeButton->SetBitmap(wxBITMAP_PNG(MEMORY_32));
+	this->m_writeButton->SetBitmap(LOAD_PNG_RESOURCE(memory_32));
 
 	this->m_closeButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_CLOSE_BUTTON, wxT("CLOSE"));
-	this->m_closeButton->SetBitmap(wxBITMAP_PNG(CLOSE_32));
+	this->m_closeButton->SetBitmap(LOAD_PNG_RESOURCE(close_32));
 
 #ifdef HAVE_RELOAD_BUTTON
 	this->m_reloadButton = new wxButton(this->m_statisticSBS->GetStaticBox(), CID_RELOAD_BUTTON, wxT("RELOAD"));
@@ -145,11 +145,11 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 #endif
 
 		this->m_RunInSizer = new wxBoxSizer(wxHORIZONTAL);
-		this->m_RunInCheckBox = new wxCheckBox(this, CID_RUN_IN_CHECKBOX, wxT("Run In Test"));
+		this->m_RunInCheckBox = new wxCheckBox(this->m_statisticSBS->GetStaticBox(), CID_RUN_IN_CHECKBOX, wxT("Run In Test"));
 		//this->m_RunInPaddingST = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
-		this->m_RunInTimesST = new wxStaticText(this, wxID_ANY, wxT("Run In Times :"));
-		this->m_RunInTimesTC = new wxTextCtrl(this, wxID_ANY, wxString::Format("%d", DEFAULT_RUNIN_TIMES));
+		this->m_RunInTimesST = new wxStaticText(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxT("Run In Times :"));
+		this->m_RunInTimesTC = new wxTextCtrl(this->m_statisticSBS->GetStaticBox(), wxID_ANY, wxString::Format("%d", DEFAULT_RUNIN_TIMES));
 		this->m_RunInTimesTC->Enable(false);
 
 		wxString DecimalCharIncludes = wxT("0123456789");
@@ -190,7 +190,7 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		this->m_popupMenu = new wxMenu();
 		this->m_saveHexMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_SAVEHEX, wxT("Save Hex"), wxT("Save Hex"), wxITEM_NORMAL);
 
-		this->m_saveHexMenuItem->SetBitmap(wxBITMAP_PNG(HEX_16));
+		this->m_saveHexMenuItem->SetBitmap(LOAD_PNG_RESOURCE(hex_16));
 
 		this->m_popupMenu->Append(this->m_saveHexMenuItem);
 	}
@@ -312,6 +312,8 @@ unsigned int PMBUSFWUpdatePanel::ProductSendBuffer(unsigned char* buffer){
 
 #define CMD_F0H_BYTES_TO_READ  6/**< Bytes To Read */
 void PMBUSFWUpdatePanel::OnWriteButton(wxCommandEvent& event){
+
+	PSU_DEBUG_PRINT(MSG_DEBUG, "OnWriteButton");
 
 #if 0
 	/*** Check if Monitor is Running ***/
@@ -1013,13 +1015,13 @@ void PMBUSFWUpdatePanel::OnReloadHexFile(wxThreadEvent& event){
 
 	// Update UI
 	if (this->m_developerMode == Generic_Enable){
-		wxString StartAddress = wxString::Format("0x%08x", this->m_startAddress);
+		wxString StartAddress = wxString::Format("0x%08lx", this->m_startAddress);
 		this->m_startAddressTC->SetValue(StartAddress);
 
-		wxString EndAddress = wxString::Format("0x%08x", this->m_endAddress);
+		wxString EndAddress = wxString::Format("0x%08lx", this->m_endAddress);
 		this->m_endAddressTC->SetValue(EndAddress);
 
-		wxString AddressRange = wxString::Format("%d", this->m_addressRange);
+		wxString AddressRange = wxString::Format("%ld", this->m_addressRange);
 		this->m_addressRangeTC->SetValue(AddressRange);
 	}
 
@@ -1056,7 +1058,7 @@ void PMBUSFWUpdatePanel::OnFileSystemEvent(wxFileSystemWatcherEvent& event){
 	static DWORD now_ticks = 0;
 
 	// Get Now Ticks
-	now_ticks = GetTickCount();
+	now_ticks = PMBUSHelper::GetTickCount();
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnFileSystemEvent: Ticks = %d", now_ticks);
 	// Get Event Type
@@ -1080,7 +1082,7 @@ void PMBUSFWUpdatePanel::OnFileSystemEvent(wxFileSystemWatcherEvent& event){
 				PSU_DEBUG_PRINT(MSG_ALERT, "Content of HEX File Has Been Changed !");
 
 				// Get Now Ticks
-				now_ticks = GetTickCount();
+				now_ticks = PMBUSHelper::GetTickCount();
 
 				// Emit Thread Event
 				wxThreadEvent* threadReloadHexFileEvt;

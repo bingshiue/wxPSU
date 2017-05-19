@@ -85,12 +85,12 @@ int ReceiveISPEndCMDTask::Main(double elapsedTime){
 		switch (PMBUSHelper::getCurrentISPTarget()){
 
 		case UPDATE_PRIMARY_FW_TARGET:// PFC
-			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait PFC Reboot, Wait %d Milliseconds", PMBUSHelper::GetAppSettings()->m_ISPPFCWaitRootTime);
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait PFC Reboot, Wait %ld Milliseconds", PMBUSHelper::GetAppSettings()->m_ISPPFCWaitRootTime);
 			wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ISPPFCWaitRootTime);
 			break;
 	
 		case UPDATE_SECONDARY_FW_TARGET:// DD
-			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DD Reboot, Wait %d Milliseconds", PMBUSHelper::GetAppSettings()->m_ISPDDWaitRootTime);
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait DD Reboot, Wait %ld Milliseconds", PMBUSHelper::GetAppSettings()->m_ISPDDWaitRootTime);
 			wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ISPDDWaitRootTime);
 			break;
 

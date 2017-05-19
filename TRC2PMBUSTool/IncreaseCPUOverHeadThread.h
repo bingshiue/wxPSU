@@ -9,6 +9,10 @@
 #include <wx/wx.h>
 #endif
 
+#ifdef __GNUC__
+#define wxOVERRIDE   
+#endif
+
 /**
  * @brief Increase CPU OverHead Thread.
  */

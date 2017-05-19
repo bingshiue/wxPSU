@@ -13,7 +13,7 @@ PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString ti
 
 	// Setup Icon
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(QUERY_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(query_16));
 
 	this->SetIcon(icon);
 

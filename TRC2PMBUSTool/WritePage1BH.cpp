@@ -37,10 +37,10 @@ WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
 
-	wxString hexString = wxString::Format("%02lx", DEFAULT_CODE);
+	wxString hexString = wxString::Format("%02x", DEFAULT_CODE);
 	this->m_codeInputValue->SetValue(hexString);
 
-	wxString hexString2 = wxString::Format("%02lx", DEFAULT_MASK);
+	wxString hexString2 = wxString::Format("%02x", DEFAULT_MASK);
 	this->m_maskInputValue->SetValue(hexString2);
 
 	// Set Validator

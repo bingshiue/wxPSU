@@ -3,7 +3,7 @@
  */
 
 #include "Task.h"
-#include "pec.h"
+#include "PEC.h"
 
 SendISPWriteDataTask::SendISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_SendISPWriteDataTask;
@@ -765,7 +765,7 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Count of Task = %d", cnt);
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Current Address = %08x", this->m_tiHexFileStat->currentAddress());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "Current Address = %08lx", this->m_tiHexFileStat->currentAddress());
 
 	unsigned short data = 0x0000;
 

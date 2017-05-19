@@ -78,32 +78,32 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* c
 
 	m_digitalOutputSB = new wxStaticBoxSizer(wxHORIZONTAL, this, wxT("Digital Output"));
 
-	m_digiOutputLight1 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_1_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight1 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_1_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB1ToolTip = new wxToolTip(wxT("D/O #5"));
 	m_DOB1ToolTip->Enable(true);
 	m_digiOutputLight1->SetToolTip(m_DOB1ToolTip);
 
-	m_digiOutputLight2 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_2_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight2 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_2_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB2ToolTip = new wxToolTip(wxT("D/O #4"));
 	m_DOB2ToolTip->Enable(true);
 	m_digiOutputLight2->SetToolTip(m_DOB2ToolTip);
 	
-	m_digiOutputLight3 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_3_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight3 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_3_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB3ToolTip = new wxToolTip(wxT("D/O #3"));
 	m_DOB3ToolTip->Enable(true);
 	m_digiOutputLight3->SetToolTip(m_DOB3ToolTip);
 	
-	m_digiOutputLight4 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_4_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight4 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_4_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB4ToolTip = new wxToolTip(wxT("D/O #2"));
 	m_DOB4ToolTip->Enable(true);
 	m_digiOutputLight4->SetToolTip(m_DOB4ToolTip);
 	
-	m_digiOutputLight5 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_5_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight5 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_5_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB5ToolTip = new wxToolTip(wxT("D/O #1"));
 	m_DOB5ToolTip->Enable(true);
 	m_digiOutputLight5->SetToolTip(m_DOB5ToolTip);
 	
-	m_digiOutputLight6 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_6_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiOutputLight6 = new PMBUSBitmapButton(m_digitalOutputSB->GetStaticBox(), CID_DIGITAL_OUTPUT_6_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DOB6ToolTip = new wxToolTip(wxT("D/O #0"));
 	m_DOB6ToolTip->Enable(true);
 	m_digiOutputLight6->SetToolTip(m_DOB6ToolTip);
@@ -124,84 +124,84 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* c
 
 	m_digitalInputSB = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Digital Input"));
 
-	m_digiInputLight1 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_1_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight1 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_1_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB1ToolTip = new wxToolTip(wxT("D/I #7"));
 	m_DIB1ToolTip->Enable(true);
 	m_digiInputLight1->SetToolTip(m_DIB1ToolTip);
 	
-	m_digiInputLight2 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_2_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight2 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_2_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB2ToolTip = new wxToolTip(wxT("D/I #6"));
 	m_DIB2ToolTip->Enable(true);
 	m_digiInputLight2->SetToolTip(m_DIB2ToolTip);
 	
-	m_digiInputLight3 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_3_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight3 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_3_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB3ToolTip = new wxToolTip(wxT("D/I #5"));
 	m_DIB3ToolTip->Enable(true);
 	m_digiInputLight3->SetToolTip(m_DIB3ToolTip);
 	
-	m_digiInputLight4 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_4_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight4 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_4_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB4ToolTip = new wxToolTip(wxT("D/I #4"));
 	m_DIB4ToolTip->Enable(true);
 	m_digiInputLight4->SetToolTip(m_DIB4ToolTip);
 	
-	m_digiInputLight5 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_5_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight5 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_5_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB5ToolTip = new wxToolTip(wxT("D/I #3"));
 	m_DIB5ToolTip->Enable(true);
 	m_digiInputLight5->SetToolTip(m_DIB5ToolTip);
 	
-	m_digiInputLight6 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_6_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight6 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_6_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB6ToolTip = new wxToolTip(wxT("D/I #2"));
 	m_DIB6ToolTip->Enable(true);
 	m_digiInputLight6->SetToolTip(m_DIB6ToolTip);
 	
-	m_digiInputLight7 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_7_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight7 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_7_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB7ToolTip = new wxToolTip(wxT("D/I #1"));
 	m_DIB7ToolTip->Enable(true);
 	m_digiInputLight7->SetToolTip(m_DIB7ToolTip);
 	
-	m_digiInputLight8 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_8_BUTTON, wxBITMAP_PNG(GREENBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight8 = new wxBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_8_BUTTON, LOAD_PNG_RESOURCE(green_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIB8ToolTip = new wxToolTip(wxT("D/I #0"));
 	m_DIB8ToolTip->Enable(true);
 	m_digiInputLight8->SetToolTip(m_DIB8ToolTip);
 
 	m_digiInputSL = new wxStaticLine(m_digitalInputSB->GetStaticBox(), wxID_ANY);
 
-	m_digiInputLight1_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_1_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight1_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_1_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB1ToolTip = new wxToolTip(wxT("D/I Polarity #7"));
 	m_DIPB1ToolTip->Enable(true);
 	m_digiInputLight1_Polarity->SetToolTip(m_DIPB1ToolTip);
 	
-	m_digiInputLight2_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_2_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight2_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_2_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB2ToolTip = new wxToolTip(wxT("D/I Polarity #6"));
 	m_DIPB2ToolTip->Enable(true);
 	m_digiInputLight2_Polarity->SetToolTip(m_DIPB2ToolTip);
 	
-	m_digiInputLight3_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_3_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight3_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_3_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB3ToolTip = new wxToolTip(wxT("D/I Polarity #5"));
 	m_DIPB3ToolTip->Enable(true);
 	m_digiInputLight3_Polarity->SetToolTip(m_DIPB3ToolTip);
 	
-	m_digiInputLight4_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_4_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight4_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_4_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB4ToolTip = new wxToolTip(wxT("D/I Polarity #4"));
 	m_DIPB4ToolTip->Enable(true);
 	m_digiInputLight4_Polarity->SetToolTip(m_DIPB4ToolTip);
 	
-	m_digiInputLight5_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_5_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight5_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_5_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB5ToolTip = new wxToolTip(wxT("D/I Polarity #3"));
 	m_DIPB5ToolTip->Enable(true);
 	m_digiInputLight5_Polarity->SetToolTip(m_DIPB5ToolTip);
 	
-	m_digiInputLight6_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_6_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight6_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_6_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB6ToolTip = new wxToolTip(wxT("D/I Polarity #2"));
 	m_DIPB6ToolTip->Enable(true);
 	m_digiInputLight6_Polarity->SetToolTip(m_DIPB6ToolTip);
 	
-	m_digiInputLight7_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_7_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight7_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_7_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB7ToolTip = new wxToolTip(wxT("D/I Polarity #1"));
 	m_DIPB7ToolTip->Enable(true);
 	m_digiInputLight7_Polarity->SetToolTip(m_DIPB7ToolTip);
 	
-	m_digiInputLight8_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_8_POLARITY_BUTTON, wxBITMAP_PNG(GRAYBALL_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_digiInputLight8_Polarity = new PMBUSBitmapButton(m_digitalInputSB->GetStaticBox(), CID_DIGITAL_INPUT_8_POLARITY_BUTTON, LOAD_PNG_RESOURCE(gray_ball_16), wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_DIPB8ToolTip = new wxToolTip(wxT("D/I Polarity #0"));
 	m_DIPB8ToolTip->Enable(true);
 	m_digiInputLight8_Polarity->SetToolTip(m_DIPB8ToolTip);
@@ -253,7 +253,7 @@ USBGPIOPanel::USBGPIOPanel(wxWindow* parent, IOACCESS* ioaccess, unsigned int* c
 	m_pwmFGSizer->Add(m_dutyST, wxSizerFlags(7).Border().Align(wxALIGN_CENTER_VERTICAL));
 	m_pwmFGSizer->Add(m_dutyTC, wxSizerFlags(7).Border().Align(wxALIGN_CENTER_VERTICAL));
 
-	m_pwmWriteBB = new wxBitmapButton(this, CID_PWM_WRITE_BUTTON, wxBITMAP_PNG(WRITE_32), wxDefaultPosition, wxSize(48, 48));
+	m_pwmWriteBB = new wxBitmapButton(this, CID_PWM_WRITE_BUTTON, LOAD_PNG_RESOURCE(write_32), wxDefaultPosition, wxSize(48, 48));
 
 	m_pwmTopLevelSizer->Add(m_pwmFGSizer, wxSizerFlags(1).Border().Align(wxALIGN_CENTER_VERTICAL));
 	m_pwmTopLevelSizer->Add(m_pwmWriteBB, wxSizerFlags(0).Border().Align(wxALIGN_CENTER_VERTICAL));
@@ -360,12 +360,12 @@ void USBGPIOPanel::OnDigitalOutputButton1(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_1_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_1_MASK);
 
-		this->m_digiOutputLight1->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight1->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_1_MASK;
 
-		this->m_digiOutputLight1->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight1->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -382,12 +382,12 @@ void USBGPIOPanel::OnDigitalOutputButton2(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_2_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_2_MASK);
 
-		this->m_digiOutputLight2->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight2->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_2_MASK;
 
-		this->m_digiOutputLight2->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight2->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -404,12 +404,12 @@ void USBGPIOPanel::OnDigitalOutputButton3(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_3_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_3_MASK);
 
-		this->m_digiOutputLight3->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight3->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_3_MASK;
 
-		this->m_digiOutputLight3->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight3->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -426,12 +426,12 @@ void USBGPIOPanel::OnDigitalOutputButton4(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_4_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_4_MASK);
 
-		this->m_digiOutputLight4->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight4->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_4_MASK;
 
-		this->m_digiOutputLight4->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight4->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -448,12 +448,12 @@ void USBGPIOPanel::OnDigitalOutputButton5(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_5_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_5_MASK);
 
-		this->m_digiOutputLight5->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight5->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_5_MASK;
 
-		this->m_digiOutputLight5->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight5->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -470,12 +470,12 @@ void USBGPIOPanel::OnDigitalOutputButton6(wxCommandEvent& event){
 	if (this->m_digitalOutput & DIGITAL_OUTPUT_6_MASK){
 		this->m_digitalOutput &= ~(DIGITAL_OUTPUT_6_MASK);
 
-		this->m_digiOutputLight6->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiOutputLight6->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 	}
 	else{
 		this->m_digitalOutput |= DIGITAL_OUTPUT_6_MASK;
 
-		this->m_digiOutputLight6->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+		this->m_digiOutputLight6->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 	}
 
 	m_digiOutputTC->SetValue(wxString::Format("%2x", this->m_digitalOutput).Upper());
@@ -524,13 +524,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton1(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_1_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_1_MASK);
 
-		this->m_digiInputLight1_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight1_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(0, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_1_MASK;
 
-		this->m_digiInputLight1_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight1_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(0, Polarity_Positive);
 	}
 
@@ -544,13 +544,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton2(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_2_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_2_MASK);
 
-		this->m_digiInputLight2_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight2_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(1, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_2_MASK;
 
-		this->m_digiInputLight2_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight2_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(1, Polarity_Positive);
 	}
 
@@ -565,13 +565,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton3(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_3_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_3_MASK);
 
-		this->m_digiInputLight3_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight3_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(2, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_3_MASK;
 
-		this->m_digiInputLight3_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight3_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(2, Polarity_Positive);
 	}
 
@@ -585,13 +585,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton4(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_4_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_4_MASK);
 
-		this->m_digiInputLight4_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight4_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(3, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_4_MASK;
 
-		this->m_digiInputLight4_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight4_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(3, Polarity_Positive);
 	}
 
@@ -605,13 +605,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton5(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_5_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_5_MASK);
 
-		this->m_digiInputLight5_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight5_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(4, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_5_MASK;
 
-		this->m_digiInputLight5_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight5_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(4, Polarity_Positive);
 	}
 
@@ -625,13 +625,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton6(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_6_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_6_MASK);
 
-		this->m_digiInputLight6_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight6_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(5, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_6_MASK;
 
-		this->m_digiInputLight6_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight6_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(5, Polarity_Positive);
 	}
 
@@ -645,13 +645,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton7(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_7_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_7_MASK);
 
-		this->m_digiInputLight7_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight7_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(6, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_7_MASK;
 
-		this->m_digiInputLight7_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight7_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(6, Polarity_Positive);
 	}
 
@@ -665,13 +665,13 @@ void USBGPIOPanel::OnDigitalInputPolarityButton8(wxCommandEvent& event){
 	if (this->m_digitalInputPolarity & DIGITAL_INPUT_POLARITY_8_MASK){
 		this->m_digitalInputPolarity &= ~(DIGITAL_INPUT_POLARITY_8_MASK);
 
-		this->m_digiInputLight8_Polarity->SetBitmap(wxBITMAP_PNG(REDBALL_16));
+		this->m_digiInputLight8_Polarity->SetBitmap(LOAD_PNG_RESOURCE(red_ball_16));
 		this->SetDigitalInputLight(7, Polarity_Negative);
 	}
 	else{
 		this->m_digitalInputPolarity |= DIGITAL_INPUT_POLARITY_8_MASK;
 
-		this->m_digiInputLight8_Polarity->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+		this->m_digiInputLight8_Polarity->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		this->SetDigitalInputLight(7, Polarity_Positive);
 	}
 
@@ -733,10 +733,10 @@ void USBGPIOPanel::SetDigitalInputLight(unsigned int index, unsigned char polari
 	case Polarity_Negative:
 
 		if (this->m_digitalInput & digitalInputMask[index]){
-			BBArray[index]->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+			BBArray[index]->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		}
 		else{
-			BBArray[index]->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+			BBArray[index]->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 		}
 
 		break;
@@ -744,10 +744,10 @@ void USBGPIOPanel::SetDigitalInputLight(unsigned int index, unsigned char polari
 	case Polarity_Positive:
 
 		if (this->m_digitalInput & digitalInputMask[index]){
-			BBArray[index]->SetBitmap(wxBITMAP_PNG(GREENBALL_16));
+			BBArray[index]->SetBitmap(LOAD_PNG_RESOURCE(green_ball_16));
 		}
 		else{
-			BBArray[index]->SetBitmap(wxBITMAP_PNG(GRAYBALL_16));
+			BBArray[index]->SetBitmap(LOAD_PNG_RESOURCE(gray_ball_16));
 		}
 
 		break;

@@ -4,7 +4,10 @@
 #ifndef _APPSETTINGS_H_
 #define _APPSETTINGS_H_
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+
 #include <wx/wx.h>
 
 #include "Customers.h"
@@ -79,6 +82,12 @@ enum {
 #define DEFAULT_QUERY_CMD_BEFORE_POLLING  (unsigned long)Generic_Enable
 
 #define DEFAULT_INCREASE_CPU_OVERHEAD     (unsigned long)Generic_Disable
+
+#ifdef __GNUC__
+#define CBR_9600     9600
+#define ONESTOPBIT      1 
+#define NOPARITY        0
+#endif
 
 #define DEFAULT_COMPORT_NUM           0x01
 #define DEFAULT_COMPORT_BUADRATE      CBR_9600

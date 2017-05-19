@@ -19,13 +19,13 @@ PMBUSLogTextCtrl::PMBUSLogTextCtrl(wxWindow* parent, wxWindowID id) : wxTextCtrl
 	this->m_popupMenu = new wxMenu();
 
 	this->m_selectAllMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_SELECTALL, wxT("Selec ALL"), wxT("Selec ALL"), wxITEM_NORMAL);
-	this->m_selectAllMenuItem->SetBitmap(wxBITMAP_PNG(SELECT_ALL_16));
+	this->m_selectAllMenuItem->SetBitmap(LOAD_PNG_RESOURCE(select_all_16));
 
 	this->m_copyMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_COPY, wxT("Copy"), wxT("Copy"), wxITEM_NORMAL);
-	this->m_copyMenuItem->SetBitmap(wxBITMAP_PNG(COPY_16));
+	this->m_copyMenuItem->SetBitmap(LOAD_PNG_RESOURCE(copy_16));
 
 	this->m_clearMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_CLEAR, wxT("Clear"), wxT("Clear"), wxITEM_NORMAL);
-	this->m_clearMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
+	this->m_clearMenuItem->SetBitmap(LOAD_PNG_RESOURCE(clear_16));
 
 	// Append
 	this->m_popupMenu->Append(this->m_selectAllMenuItem);

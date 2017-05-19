@@ -8,7 +8,7 @@
 #include "PMBUSCBCoefficients.h"
 #include "PMBUSCBCook.h"
 #include "PMBUSCBRaw.h"
-#include "Generic_MODEL.h"
+#include "Generic_Model.h"
 
 CMDQueryCBFunc g_Generic_CMDQueryCBFunc[GENERIC_CMD_TABLE_SIZE] = {
 	Query_d9H,

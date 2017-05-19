@@ -15,7 +15,7 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 {
 	// Setup Icon
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(CHIP_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(chip_16));
 
 	this->SetIcon(icon);
 
@@ -51,7 +51,13 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	// Initialize GUI Component
 
+#ifdef _WIN32	
 	m_gauge = new wxGauge(this, CID_GAUGE_PROGRES, range, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH | wxGA_PROGRESS);
+#else
+#ifdef __GNUC__
+	m_gauge = new wxGauge(this, CID_GAUGE_PROGRES, range, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH);
+#endif
+#endif
 
 	m_okCancelButton = new wxButton(this, CID_BTN_CANCELOK, wxT("Cancel"), wxDefaultPosition, wxSize(250, -1));
 
@@ -77,8 +83,10 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	SetEscapeId(wxID_CLOSE);
 
-    // Start Timer
-	this->m_timer.Start();
+#if wxUSE_TIMER
+	// Start Timer
+	this->m_timer.Start(1000);
+#endif
 
 	// Save Begin Time
 	this->m_beginTime = wxDateTime::Now();

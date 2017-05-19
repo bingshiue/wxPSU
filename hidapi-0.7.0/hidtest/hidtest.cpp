@@ -950,14 +950,24 @@ int main(int argc, char* argv[])
 		}
 
 #endif
+		
+
+#ifdef WIN32
 		Sleep(1);
+#else
+		usleep(100 * 1000);
+#endif
 
 		// Read requested state. hid_read() has been set to be
 		// non-blocking by the call to hid_set_nonblocking() above.
 		// This loop demonstrates the non-blocking nature of hid_read().
 		readData(handle, recvBuffer);
 
+#ifdef WIN32
 		Sleep(1);
+#else
+		usleep(100 * 1000);
+#endif
 
 		if (sendTimes >= LOOP_TIIMES){
 			printf("SendTimes = %d, Break Loop  \n", sendTimes);

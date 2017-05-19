@@ -17,7 +17,7 @@ int Raw_03H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 	wxString wxstr("");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
  
 	return EXIT_SUCCESS; 
 }
@@ -100,7 +100,7 @@ int Raw_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -183,7 +183,7 @@ int Raw_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -271,7 +271,7 @@ int Raw_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength)
 	}
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 
@@ -401,7 +401,7 @@ int Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLeng
 #endif
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }

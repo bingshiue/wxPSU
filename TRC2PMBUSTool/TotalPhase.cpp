@@ -5,7 +5,7 @@
 #include "TotalPhase.h"
 
 // Global Parameters
-Aardvark handle;
+static Aardvark handle;
 u16 ports[16];
 int port;
 u32 unique_ids[16];

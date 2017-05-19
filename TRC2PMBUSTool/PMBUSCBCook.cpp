@@ -19,7 +19,7 @@ bool Check_Have_CheckSum_Error(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned i
 		wxstr += wxString::Format("CheckSum Error");
 
 		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+		COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 		result = true;
 		return result;
@@ -42,7 +42,7 @@ int Cook_00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	PMBUSHelper::GetPMBusStatus()->m_currentPage = page;
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS; 
 }
@@ -60,7 +60,7 @@ int Cook_01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%d", operation);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -78,7 +78,7 @@ int Cook_02H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%d", pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -137,7 +137,7 @@ int Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 		wxstr += wxString::Format("Not Support ");
 
 		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+		COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 		PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -253,7 +253,7 @@ int Cook_1aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "End Update Data Format in CMD");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -275,7 +275,7 @@ int Cook_1bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%02x", pmbuscmd->m_recvBuff.m_dataBuff[1]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -328,7 +328,7 @@ int Cook_20H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Mode=%s, Exponent:=%d", Mode_Name[mode], parameter);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS; 
 }
@@ -393,7 +393,7 @@ int Cook_30H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 
 	//
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -532,7 +532,7 @@ int Cook_3aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += L"]";
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -555,7 +555,7 @@ int Cook_3bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%ld (RPM)", (long)rpm);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -578,7 +578,7 @@ int Cook_51H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.1fC", temperature);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -601,7 +601,7 @@ int Cook_5dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dA", (long)iin);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -622,7 +622,7 @@ int Cook_6aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dW", (long)pout);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -644,7 +644,7 @@ int Cook_6bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Value : %5.2f(W)", pin);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -704,7 +704,7 @@ int Cook_78H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -790,7 +790,7 @@ int Cook_79H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -860,7 +860,7 @@ int Cook_7aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -932,7 +932,7 @@ int Cook_7bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1003,7 +1003,7 @@ int Cook_7cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1073,7 +1073,7 @@ int Cook_7dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1143,7 +1143,7 @@ int Cook_7eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1214,7 +1214,7 @@ int Cook_7fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1302,7 +1302,7 @@ int Cook_81H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" ]");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1376,7 +1376,7 @@ int Cook_86H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1437,7 +1437,7 @@ int Cook_87H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("Energy: %d, Sample : %d", Energy_Count, samples_of_input_power);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1460,7 +1460,7 @@ int Cook_88H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.5fV (Max:%4.1f, Min:%4.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VIN_Max, PMBUSHelper::GetPMBusStatus()->m_VIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1483,7 +1483,7 @@ int Cook_89H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.5fA (Max:%4.5f, Min:%4.5f)", current, PMBUSHelper::GetPMBusStatus()->m_IIN_Max, PMBUSHelper::GetPMBusStatus()->m_IIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1506,7 +1506,7 @@ int Cook_8aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.0fV (Max:%.1f, Min:%.1f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VCAP_Max, PMBUSHelper::GetPMBusStatus()->m_VCAP_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1531,7 +1531,7 @@ int Cook_8b00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fV (Max:%4.2f, Min:%4.2f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VOUT_Max, PMBUSHelper::GetPMBusStatus()->m_VOUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1553,7 +1553,7 @@ int Cook_8c00H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.3fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IOUT_Max, PMBUSHelper::GetPMBusStatus()->m_IOUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1579,7 +1579,7 @@ int Cook_8b01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fV (Max:%4.2f, Min:%4.2f)", voltage, PMBUSHelper::GetPMBusStatus()->m_VoSBY_Max, PMBUSHelper::GetPMBusStatus()->m_VoSBY_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1601,7 +1601,7 @@ int Cook_8c01H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.8fA (Max:%4.3f, Min:%4.3f)", current, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Max, PMBUSHelper::GetPMBusStatus()->m_IoSBY_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1624,7 +1624,7 @@ int Cook_8dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.0fC (Max:%.1f, Min:%.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Max, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1647,7 +1647,7 @@ int Cook_8eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.0fC (Max:%.1f, Min:%.1f)", temperature, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Max, PMBUSHelper::GetPMBusStatus()->m_SEC_8E_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1670,7 +1670,7 @@ int Cook_8fH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.0fC (Max:%.0f, Min:%.0f)", temperature, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Max, PMBUSHelper::GetPMBusStatus()->m_PRI_8F_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1693,7 +1693,7 @@ int Cook_90H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.0fRPM (Max:%4.0f, Min:%4.0f)", rpm, PMBUSHelper::GetPMBusStatus()->m_FAN1_Max, PMBUSHelper::GetPMBusStatus()->m_FAN1_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1715,7 +1715,7 @@ int Cook_96H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_POUT_Max, PMBUSHelper::GetPMBusStatus()->m_POUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1737,7 +1737,7 @@ int Cook_97H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.2fW (Max:%4.1f, Min:%4.1f)", watt, PMBUSHelper::GetPMBusStatus()->m_PIN_Max, PMBUSHelper::GetPMBusStatus()->m_PIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1810,7 +1810,7 @@ int Cook_98H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	}
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1827,7 +1827,7 @@ int Cook_99H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1844,7 +1844,7 @@ int Cook_9aH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1861,7 +1861,7 @@ int Cook_9bH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1878,7 +1878,7 @@ int Cook_9cH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1895,7 +1895,7 @@ int Cook_9dH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1912,7 +1912,7 @@ int Cook_9eH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 	
@@ -1933,7 +1933,7 @@ int Cook_a0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dV", voltage);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1954,7 +1954,7 @@ int Cook_a1H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dV", voltage);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -1975,7 +1975,7 @@ int Cook_a2H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fA", iin_max);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -1998,7 +1998,7 @@ int Cook_a3H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dW", watt);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2019,7 +2019,7 @@ int Cook_a4H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fV", vout_min);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -2042,7 +2042,7 @@ int Cook_a5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fV", vout_max);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -2065,7 +2065,7 @@ int Cook_a6H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%4.4fA", iout_max);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -2088,7 +2088,7 @@ int Cook_a7H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%dW", pout_max);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2109,7 +2109,7 @@ int Cook_a8H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.1fC", temperature);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -2132,7 +2132,7 @@ int Cook_a9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%.1fC", temperature);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	//PMBUSHelper::GetPMBusStatus()->m_POUT = temperature;
 
@@ -2181,7 +2181,7 @@ int Cook_aaH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" %ld%%,", (long)result);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2229,7 +2229,7 @@ int Cook_abH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" %ld%%,", (long)result);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2246,7 +2246,7 @@ int Cook_d0H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("%02xh", pmbuscmd->m_recvBuff.m_dataBuff[0]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2269,7 +2269,7 @@ int Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2296,7 +2296,7 @@ int Cook_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr.UpperCase();
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS; 
 }
@@ -2343,7 +2343,7 @@ int Cook_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format(" FAN12 : %02xh,", pmbuscmd->m_recvBuff.m_dataBuff[10]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2360,7 +2360,7 @@ int Cook_ddH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2382,7 +2382,7 @@ int Cook_f5H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxstr += wxString::Format("SEC : %d.%d", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2399,7 +2399,7 @@ int Cook_faH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -2416,7 +2416,7 @@ int Cook_fcH(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	wxString wxstr("----------");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 

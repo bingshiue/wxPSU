@@ -16,6 +16,8 @@
 #include <wx/animate.h>
 #include <wx/statline.h>
 
+#include "CommonDef.h"
+
 class PMBUSVerificationPanel : public wxScrolledWindow {
 public:
 	/**

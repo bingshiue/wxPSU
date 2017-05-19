@@ -16,7 +16,7 @@ PMBUSBlockWRTestTask::PMBUSBlockWRTestTask(IOACCESS* ioaccess, unsigned int* cur
 	this->m_running = true;
 	this->runningIndex = 0;
 
-	this->startTick = GetTickCount();
+	this->startTick = PMBUSHelper::GetTickCount();
 }
 
 PMBUSBlockWRTestTask::~PMBUSBlockWRTestTask(void){
@@ -340,7 +340,7 @@ int PMBUSBlockWRTestTask::Main(double elapsedTime){
 	else{
 		PSU_DEBUG_PRINT(MSG_ALERT, "End To Send Read CMD");
 
-		stopTick = GetTickCount();
+		stopTick = PMBUSHelper::GetTickCount();
 		DWORD totalTime = stopTick - startTick;
 		PSU_DEBUG_PRINT(MSG_ALERT, "Elapsed Time = %ld, Send %d CMDS, Average 1 Second Send %.2f CMDS", totalTime, totalSendTimes, ((float)totalSendTimes / ((float)totalTime / 1000)));
 

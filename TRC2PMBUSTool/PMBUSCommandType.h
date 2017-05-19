@@ -71,7 +71,7 @@ enum {
 	rw_read_coefficients = 1,
 };
 
-typedef struct pmbuscmd_t;
+typedef struct pmbuscmd_t PMBUSCOMMAND_t;
 
 /**
  * @brief Struct for Receive Buff 
@@ -121,14 +121,14 @@ typedef struct dataFormat_t {
 
 	dataFormat_t(){
 		this->m_formatType = 0;// 0 is the linear data format
-		this->m_ReadCoefficients = {};
-		this->m_WriteCoefficients = {};
+		//this->m_ReadCoefficients = {};
+		//this->m_WriteCoefficients = {};
 	}
 
 	dataFormat_t(int init){
 		this->m_formatType = 0;// 0 is the linear data format
-		this->m_ReadCoefficients = {};
-		this->m_WriteCoefficients = {};
+		//this->m_ReadCoefficients = {};
+		//this->m_WriteCoefficients = {};
 	}
 
 }DataFormat_t;

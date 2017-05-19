@@ -19,7 +19,7 @@ static bool Check_Have_CheckSum_Error(pmbuscmd_t* pmbuscmd, wchar_t* string, uns
 		wxstr += wxString::Format("CheckSum Error");
 
 		tmp_wchar = wxstr.wc_str();
-		lstrcpyn(string, tmp_wchar, 256);
+		COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 		result = true;
 		return result;
@@ -46,7 +46,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Cook_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, u
 	//wxstr += wxString::Format("SEC : %02x.%02x", pmbuscmd->m_recvBuff.m_dataBuff[3], pmbuscmd->m_recvBuff.m_dataBuff[4]);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -73,7 +73,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Cook_dbH(pmbuscmd_t* pmbuscmd, wchar_t* string, u
 	wxstr.UpperCase();
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	return EXIT_SUCCESS;
 }
@@ -95,7 +95,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Cook_dcH(pmbuscmd_t* pmbuscmd, wchar_t* string, u
 	wxstr += wxString::Format("TRIM Step:%d", TRIM_STEP);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -116,7 +116,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Cook_ecH(pmbuscmd_t* pmbuscmd, wchar_t* string, u
 	wxstr += wxString::Format("Set Point : %04x (%d)", SetPoint, SetPoint);
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
@@ -134,7 +134,7 @@ int ACBEL_RFWE_24_28_1200W_SCP_Cook_Not_Implement(pmbuscmd_t* pmbuscmd, wchar_t*
 	wxstr += wxT("");
 
 	tmp_wchar = wxstr.wc_str();
-	lstrcpyn(string, tmp_wchar, 256);
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 

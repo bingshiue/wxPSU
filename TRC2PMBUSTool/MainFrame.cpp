@@ -7,7 +7,9 @@
 #include "PMBUSCMDCB.h"
 #include "Acbel.xpm"
 #include "sample.xpm"
+#include "appico.xpm"
 
+wxDEFINE_EVENT(wxEVT_COMMAND_MONITOR_START, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_START, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_SENDTHREAD_UPDATE, wxThreadEvent);
@@ -33,9 +35,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {	
 	wxInitAllImageHandlers();
 
+#ifdef _WIN32
 	RegisterDeviceChangeNotify();
+#endif
 
 	CheckAndLoadConfig();
+
+	this->m_cmdListDVC = NULL;
+	this->m_monitor_running = false;
 
 	this->m_customerList = customerList;
 	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
@@ -56,16 +63,34 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_hbox = new wxBoxSizer(wxHORIZONTAL);
 
 	// Load Bitmaps
+#ifdef __GNUC__
+	this->m_monitorBitmap_Instance = wxBITMAP_PNG_FROM_DATA(monitor_32);
+	this->m_pauseBitmap_Instance = wxBITMAP_PNG_FROM_DATA(pause_32);
+
+	this->m_monitor16Bitmap_Instance = wxBITMAP_PNG_FROM_DATA(monitor_16);
+	this->m_pause16Bitmap_Instance= wxBITMAP_PNG_FROM_DATA(pause_16);
+
+	this->m_monitorBitmap = &this->m_monitorBitmap_Instance;
+	this->m_pauseBitmap = &this->m_pauseBitmap_Instance;
+
+	this->m_monitor16Bitmap = &this->m_monitor16Bitmap_Instance;
+	this->m_pause16Bitmap = &this->m_pause16Bitmap_Instance;
+#else
 	this->m_monitorBitmap = new wxBitmap(wxT("MONITOR_32"), wxBITMAP_TYPE_PNG_RESOURCE);
 	this->m_pauseBitmap = new wxBitmap(wxT("PAUSE_32"), wxBITMAP_TYPE_PNG_RESOURCE);
 
 	this->m_monitor16Bitmap = new wxBitmap(wxT("MONITOR_16"), wxBITMAP_TYPE_PNG_RESOURCE);
 	this->m_pause16Bitmap = new wxBitmap(wxT("PAUSE_16"), wxBITMAP_TYPE_PNG_RESOURCE);
+#endif
 
 	// Setup Icon
+#ifdef _WIN32
 	SetIcon(wxICON(APP_ICON));//Acbel_xpm);
+#else
+	SetIcon(wxICON(app_ico));
+#endif
 
-	// Setup Model
+	// Setup Modeld
 	SetupModel();
 
 	// Setup PMBusCommand Data
@@ -79,8 +104,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_popupFontMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_FONT, wxT("Font"), wxT("Font"), wxITEM_NORMAL);
 	this->m_popupPrintScreenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_POPUP_PRINT_SCREEN, wxT("Print Screen"), wxT("Print Screen"), wxITEM_NORMAL);
 
-	this->m_popupFontMenuItem->SetBitmap(wxBITMAP_PNG(FONT_16));
-	this->m_popupPrintScreenMenuItem->SetBitmap(wxBITMAP_PNG(PRINTSCREEN_16));
+	this->m_popupFontMenuItem->SetBitmap(LOAD_PNG_RESOURCE(font_16));
+	this->m_popupPrintScreenMenuItem->SetBitmap(LOAD_PNG_RESOURCE(printscreen_16));
 
 	this->m_cmdListPopupMenu->Append(this->m_popupFontMenuItem);
 	this->m_cmdListPopupMenu->Append(this->m_popupPrintScreenMenuItem);
@@ -261,6 +286,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_destroying = 0;
 	m_sendThreadStopFlag = true;
 	m_increaseCPUOverHeadThreadStopFlag = true;
+	this->m_increaseCPUOverHeadThread = NULL;
+	this->m_logFileFFileOutputStream = NULL;
+	this->m_logFileTextOutputStream = NULL;
 
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);
@@ -355,6 +383,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// Put Window in Center
 	Centre();
 
+	// Debug Print
+	for(unsigned int idx=0; idx<PMBUSHelper::GetCurrentCMDTableSize(); idx++){
+		PSU_DEBUG_PRINT(MSG_DEBUG, "CMD=%02x, %p", this->m_PMBusData[idx].m_register ,this->m_PMBusData[idx].m_writePage);
+	}
+
 }
 
 MainFrame::~MainFrame()
@@ -363,6 +396,7 @@ MainFrame::~MainFrame()
 }
 
 void MainFrame::SetupMenuBar(void){
+	
 	// Create Menu Bar and Its Components
 	// File Menu
 	/*
@@ -375,13 +409,13 @@ void MainFrame::SetupMenuBar(void){
 	this->m_fileMenu = new wxMenu();
 
 	this->m_transFWMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("Transform Hex To Binary"), wxT("Transform Hex To Binary"), wxITEM_NORMAL);
-	this->m_transFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+	this->m_transFWMenuItem->SetBitmap(LOAD_PNG_RESOURCE(binary_16));
 
 	this->m_transPrimaryFWMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Primary_Firmware, wxT("Transform Primary Firmware Hex To Binary"), "Select Primary Firmware", wxITEM_NORMAL);
-	this->m_transPrimaryFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+	this->m_transPrimaryFWMenuItem->SetBitmap(LOAD_PNG_RESOURCE(binary_16));
 
 	this->m_transSecondaryFWMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Secondary_Firmware, wxT("Transform Secondary Firmware Hex To Binary"), "Select Secondary Firmware", wxITEM_NORMAL);
-	this->m_transSecondaryFWMenuItem->SetBitmap(wxBITMAP_PNG(BINARY_16));
+	this->m_transSecondaryFWMenuItem->SetBitmap(LOAD_PNG_RESOURCE(binary_16));
 
 	this->m_hexToBinMenu = new wxMenu();
 
@@ -396,10 +430,9 @@ void MainFrame::SetupMenuBar(void){
 	this->m_exitMenuItem = new wxMenuItem((wxMenu*)0, wxID_EXIT, wxT("Exit"),
 		wxT("Exit"), wxITEM_NORMAL);
 
-	this->m_exitMenuItem->SetBitmap(wxBITMAP_PNG(EXIT_16));
+	this->m_exitMenuItem->SetBitmap(LOAD_PNG_RESOURCE(exit_16));
 
 	this->m_fileMenu->Append(m_exitMenuItem);
-
 
 	// Run Menu
 	/*
@@ -431,13 +464,13 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_inSystemProgrammingMenuItem = new wxMenuItem((wxMenu*)0, wxID_ANY, wxT("In System Programming"), wxT("In System Programming"), wxITEM_NORMAL);
 
-	this->m_inSystemProgrammingMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+	this->m_inSystemProgrammingMenuItem->SetBitmap(LOAD_PNG_RESOURCE(chip_16));
 
 	this->m_updatePrimaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Primary_Firmware, wxT("Load Primary Firmware...\tCTRL+P"), "Load Primary Firmware", wxITEM_NORMAL);
-	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+	this->m_updatePrimaryFirmwareMenuItem->SetBitmap(LOAD_PNG_RESOURCE(chip_16));
 
 	this->m_updateSecondaryFirmwareMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Update_Secondary_Firmware, wxT("Load Secondary Firmware...\tCTRL+S"), "Load Secnondary Firmware", wxITEM_NORMAL);
-	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(wxBITMAP_PNG(CHIP_16));
+	this->m_updateSecondaryFirmwareMenuItem->SetBitmap(LOAD_PNG_RESOURCE(chip_16));
 
 	this->m_ispMenu = new wxMenu();
 
@@ -458,8 +491,9 @@ void MainFrame::SetupMenuBar(void){
 
 	//this->m_runMenu->Append(m_stopProgrammingMenuItem);
 
+
 	this->m_queryAllCommandsMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Query_All_Commands, wxT("Query ALL PMBUS Commands"), wxT("Query ALL PMBUS Commands"), wxITEM_NORMAL);
-	this->m_queryAllCommandsMenuItem->SetBitmap(wxBITMAP_PNG(QUERY_16));
+	this->m_queryAllCommandsMenuItem->SetBitmap(LOAD_PNG_RESOURCE(query_16));
 	this->m_runMenu->Append(m_queryAllCommandsMenuItem);
 
 	this->m_runMenu->AppendSeparator();
@@ -468,27 +502,27 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_EnableChecksumMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Enable_Checksum, wxT("Enable Checksum"), wxT("Enable Checksum"), wxITEM_CHECK);
 
-	if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
-		this->m_EnableChecksumMenuItem->Check(true);
-	}
+	//if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
+		//this->m_EnableChecksumMenuItem->Check(true);
+	//}
 
 	this->m_onlyPollingSupportCMDMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Only_Polling_Support_Command, wxT("Only Polling Support Command"), wxT("Only Polling Support Command"), wxITEM_CHECK);
 
-	if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
-		this->m_onlyPollingSupportCMDMenuItem->Check(true);
-	}
+	//if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
+		//this->m_onlyPollingSupportCMDMenuItem->Check(true);
+	//}
 
 	this->m_autoQueryCMDOnIOOpenMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Auto_Query_CMD_On_IO_Open, wxT("Auto Query Command On I/O Open"), wxT("Auto Query Command On I/O Open"), wxITEM_CHECK);
 	
-	if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
-		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
-	}
+	//if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+		//this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
+	//}
 
 	this->m_queryCMDBeforePollingMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Query_CMD_Before_Polling, wxT("Query Command Before Polling"), wxT("Query Command Before Polling"), wxITEM_CHECK);
 
-	if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Enable){
-		this->m_queryCMDBeforePollingMenuItem->Check(true);
-	}
+	//if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Enable){
+		//this->m_queryCMDBeforePollingMenuItem->Check(true);
+	//}
 
 	this->m_runMenu->Append(m_i2cFaultTestMenuItem);
 	this->m_runMenu->Append(m_EnableChecksumMenuItem);
@@ -499,15 +533,15 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_ClearErrorLogMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Clear_Error_Log, wxT("Clear Error Log"), wxT("Clear Error Log"), wxITEM_NORMAL);
 
-	this->m_ClearErrorLogMenuItem->SetBitmap(wxBITMAP_PNG(CLEAR_16));
+	this->m_ClearErrorLogMenuItem->SetBitmap(LOAD_PNG_RESOURCE(clear_16));
 
 	this->m_ResetMaxMinValueMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_MaxMin_Value, wxT("Reset Max./Min/ Value"), wxT("Reset Max./Min/ Value"), wxITEM_NORMAL);
 
-	this->m_ResetMaxMinValueMenuItem->SetBitmap(wxBITMAP_PNG(REFRESH_16));
+	this->m_ResetMaxMinValueMenuItem->SetBitmap(LOAD_PNG_RESOURCE(refresh_16));
 
 	this->m_ResetRunTimeMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Reset_Run_Time, wxT("Reset Run Time"), wxT("Reset Run Time"), wxITEM_NORMAL);
 
-	this->m_ResetRunTimeMenuItem->SetBitmap(wxBITMAP_PNG(TIMER_16));
+	this->m_ResetRunTimeMenuItem->SetBitmap(LOAD_PNG_RESOURCE(timer_16));
 
 	this->m_runMenu->Append(this->m_ClearErrorLogMenuItem);
 	this->m_runMenu->Append(this->m_ResetMaxMinValueMenuItem);
@@ -525,11 +559,11 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_EnableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_EnableCalibration, wxT("Enable Calibration"), wxT("Enable Calibration"), wxITEM_NORMAL);
 
-	this->m_EnableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(ENABLE_16));
+	this->m_EnableCalibrationMenuItem->SetBitmap(LOAD_PNG_RESOURCE(enable_16));
 
 	this->m_DisableCalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_DisableCalibration, wxT("Disable Calibration"), wxT("Disable Calibration"), wxITEM_NORMAL);
 
-	this->m_DisableCalibrationMenuItem->SetBitmap(wxBITMAP_PNG(DISABLE_16));
+	this->m_DisableCalibrationMenuItem->SetBitmap(LOAD_PNG_RESOURCE(disable_16));
 
 	this->m_psuMenu->Append(m_EnableCalibrationMenuItem);
 	this->m_psuMenu->Append(m_DisableCalibrationMenuItem);
@@ -538,7 +572,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_CalibrationMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Calibration, wxT("Calibration"), wxT("Calibration Setting"), wxITEM_NORMAL);
 
-	this->m_CalibrationMenuItem->SetBitmap(wxBITMAP_PNG(CALIBRATION_16));
+	this->m_CalibrationMenuItem->SetBitmap(LOAD_PNG_RESOURCE(calibration_16));
 
 	this->m_psuMenu->Append(m_CalibrationMenuItem);
 
@@ -577,7 +611,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_AdministrantMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Administrant, wxT("Administrant...\tCTRL+A"), wxT("Administrant"), wxITEM_NORMAL);
 
-	this->m_AdministrantMenuItem->SetBitmap(wxBITMAP_PNG(ADMIN_16));
+	this->m_AdministrantMenuItem->SetBitmap(LOAD_PNG_RESOURCE(admin_16));
 
 #if DEFAULT_DONT_ENABLE_ISP == TRUE
 	this->m_AdministrantMenuItem->Enable(false);
@@ -588,7 +622,7 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_I2CInterfaceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_I2C_Interface, wxT("I2C Interface"), wxT("I2C Interface"), wxITEM_NORMAL);
 
-	this->m_I2CInterfaceMenuItem->SetBitmap(wxBITMAP_PNG(HWINFO_16));
+	this->m_I2CInterfaceMenuItem->SetBitmap(LOAD_PNG_RESOURCE(hwinfo_16));
 
 	this->m_optionMenu->Append(this->m_I2CInterfaceMenuItem);
 	this->m_optionMenu->AppendSeparator();
@@ -606,11 +640,7 @@ void MainFrame::SetupMenuBar(void){
 	this->m_optionMenu->AppendSeparator();
 
 	this->m_IncreaseCPUOverheadMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Increase_CPU_Overhead, wxT("Increase CPU Overhead"), wxT("Increase CPU Overhead"), wxITEM_CHECK);
-	
-	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
-		this->m_IncreaseCPUOverheadMenuItem->Check(true);
-	}
-	
+		
 	this->m_optionMenu->Append(this->m_IncreaseCPUOverheadMenuItem);
 
 	this->m_optionMenu->AppendSeparator();
@@ -744,13 +774,13 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_fruMakerMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_MAKER, wxT("FRU Maker"), wxT("FRU Maker"), wxITEM_NORMAL);
 
-	this->m_fruMakerMenuItem->SetBitmap(wxBITMAP_PNG(MAKER_16));
+	this->m_fruMakerMenuItem->SetBitmap(LOAD_PNG_RESOURCE(maker_16));
 
 	this->m_utilityMenu->Append(this->m_fruMakerMenuItem);
 
 	this->m_fruWriterMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_FRU_WRITER, wxT("FRU Utility"), wxT("FRU Utility"), wxITEM_NORMAL);
 
-	this->m_fruWriterMenuItem->SetBitmap(wxBITMAP_PNG(E2PROM_16));
+	this->m_fruWriterMenuItem->SetBitmap(LOAD_PNG_RESOURCE(e2prom_16));
 
 	this->m_utilityMenu->Append(this->m_fruWriterMenuItem);
 
@@ -764,11 +794,11 @@ void MainFrame::SetupMenuBar(void){
 
 	this->m_aboutMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ABOUT, wxT("About"), wxT("About"), wxITEM_NORMAL);
 
-	this->m_aboutMenuItem->SetBitmap(wxBITMAP_PNG(ABOUT_16));
+	this->m_aboutMenuItem->SetBitmap(LOAD_PNG_RESOURCE(about_16));
 
 	this->m_acbelWebSiteMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_ACBEL_WEBSITE, wxT("ACBEL Website"), wxT("ACBEL Website"), wxITEM_NORMAL);
 
-	this->m_acbelWebSiteMenuItem->SetBitmap(wxBITMAP_PNG(WEB_16));
+	this->m_acbelWebSiteMenuItem->SetBitmap(LOAD_PNG_RESOURCE(web_16));
 
 	this->m_helpMenu->Append(this->m_acbelWebSiteMenuItem);
 
@@ -786,6 +816,27 @@ void MainFrame::SetupMenuBar(void){
 
 	SetMenuBar(this->m_menuBar);
 
+	/* Set Default Check Status */
+
+	if (this->m_appSettings.m_EnableChecksum == Generic_Enable){
+		this->m_EnableChecksumMenuItem->Check(true);
+	}
+
+	if (this->m_appSettings.m_onlyPollingSupportCMD == Generic_Enable){
+		this->m_onlyPollingSupportCMDMenuItem->Check(true);
+	}
+
+	if (this->m_appSettings.m_autoQueryCMDOnIOOpen == Generic_Enable){
+		this->m_autoQueryCMDOnIOOpenMenuItem->Check(true);
+	}
+
+	if (this->m_appSettings.m_queryCMDBeforePolling == Generic_Enable){
+		this->m_queryCMDBeforePollingMenuItem->Check(true);
+	}
+
+	if (this->m_appSettings.m_increaseCPUOverhead == Generic_Enable){
+		this->m_IncreaseCPUOverheadMenuItem->Check(true);
+	}
 }
 
 void MainFrame::SetupToolBar(void){
@@ -797,28 +848,28 @@ void MainFrame::SetupToolBar(void){
 	style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
 
 	// Create Tool Bar Instance
-	m_toolbar = CreateToolBar(style, ID_TOOLBAR);
+	m_toolbar = CreateToolBar(/*style*/wxTB_DEFAULT_STYLE, ID_TOOLBAR);
 
 	// Append Exit Button
-	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, wxBITMAP_PNG(EXIT_32), wxT("Exit Program"), wxITEM_NORMAL);
+	m_toolbar->AddTool(wxID_EXIT, wxEmptyString, LOAD_PNG_RESOURCE(exit_32), wxT("Exit Program"), wxITEM_NORMAL);
 
 	// Append Monitor Button
 	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
 
 	// Append Query All Commands Button
-	m_toolbar->AddTool(MENU_ID_Query_All_Commands, wxEmptyString, wxBITMAP_PNG(QUERY_32), wxT("Query All Commands"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Query_All_Commands, wxEmptyString, LOAD_PNG_RESOURCE(query_32), wxT("Query All Commands"), wxITEM_NORMAL);
 
 	// Append Enable Calibration Button
-	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, wxBITMAP_PNG(ENABLE_32), wxT("Enable Calibration"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_EnableCalibration, wxEmptyString, LOAD_PNG_RESOURCE(enable_32), wxT("Enable Calibration"), wxITEM_NORMAL);
 
 	// Append Reset Run Time Button
-	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, wxBITMAP_PNG(TIMER_32), wxT("Reset Run Time"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Reset_Run_Time, wxEmptyString, LOAD_PNG_RESOURCE(timer_32), wxT("Reset Run Time"), wxITEM_NORMAL);
 
 	// Append Refresh MAX/MIN Button
-	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, wxBITMAP_PNG(REFRESH_32), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Reset_MaxMin_Value, wxEmptyString, LOAD_PNG_RESOURCE(refresh_32), wxT("Reset Max/Min Value"), wxITEM_NORMAL);
 
 	// Append Clear Error Log Button 
-	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, wxBITMAP_PNG(CLEAR_32), wxT("Clear Error Log"), wxITEM_NORMAL);
+	m_toolbar->AddTool(MENU_ID_Clear_Error_Log, wxEmptyString, LOAD_PNG_RESOURCE(clear_32), wxT("Clear Error Log"), wxITEM_NORMAL);
 
 	// Append Separator
 	m_toolbar->AddSeparator();
@@ -827,7 +878,7 @@ void MainFrame::SetupToolBar(void){
 	m_iteration_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("Iteration"));
 	m_toolbar->AddControl(m_iteration_text, wxEmptyString);
 
-	wxString iterations_times = wxString::Format("%d", this->m_appSettings.m_IterationsValue);
+	wxString iterations_times = wxString::Format("%ld", this->m_appSettings.m_IterationsValue);
 
 	m_iteration_input = new wxTextCtrl(m_toolbar, wxID_ANY);
 	m_iteration_input->SetValue(iterations_times);
@@ -891,7 +942,7 @@ void MainFrame::SetupToolBar(void){
 
 	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
 
-	wxString SlaveAddressHex = (wxString::Format("%02lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
+	wxString SlaveAddressHex = (wxString::Format("%2lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
 	m_address_input->SetValue(SlaveAddressHex);
 
 	wxTextValidator hexValidator;
@@ -970,14 +1021,22 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 	this->m_cmdListDVC->AppendTextColumn("Query",
 		PMBUSCMDListModel::Col_QueryText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
+#ifdef __GNUC__
+		150,//wxCOL_WIDTH_AUTOSIZE,
+#else
 		75,//wxCOL_WIDTH_AUTOSIZE,
+#endif
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Coefficients",
 		PMBUSCMDListModel::Col_CoefficientsText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
+#ifdef __GNUC__
+		150,//wxCOL_WIDTH_AUTOSIZE,
+#else
 		75,//wxCOL_WIDTH_AUTOSIZE,
+#endif
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
 
@@ -1070,7 +1129,7 @@ void MainFrame::SetupModel(void){
 	PMBUSHelper::setWinTitleBase(winTitle);
 
 	wxString i2cSA("");
-	i2cSA = wxString::Format("%2x", this->m_appSettings.m_I2CSlaveAddress);
+	i2cSA = wxString::Format("%2lx", this->m_appSettings.m_I2CSlaveAddress);
 	i2cSA.UpperCase();
 
 	winTitle += wxT("  I2C Slave Address : ");
@@ -1632,7 +1691,7 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 			wxThread::ExitCode exitCode;
 			wxThreadError error = this->m_IOPortSendCMDThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
 
-			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread Exit Code = %d", (int)exitCode);
+			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread Exit Code = %d", *((int*)exitCode));
 
 			if (error != wxTHREAD_NO_ERROR){
 				PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
@@ -1654,6 +1713,7 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 	// Wait Until No Tasks
 	while (cnt != 0){
 		
+#if wxCHECK_VERSION(3, 1, 0)
 		if (info == NULL) info = new wxBusyInfo(
 			wxBusyInfoFlags()
 			.Parent(this)
@@ -1665,6 +1725,7 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 			.Background(*wxCYAN)
 			.Transparency(wxALPHA_OPAQUE)// 4 * wxALPHA_OPAQUE / 5)
 			);
+#endif
 
 		PSU_DEBUG_PRINT(MSG_ALERT, "cnt = %d", cnt);
 
@@ -2451,6 +2512,8 @@ void MainFrame::OnInfoBarTimer(wxTimerEvent& WXUNUSED(event)){
 	if (this->m_infoBar->IsShown() == true){
 		this->m_infoBar->Dismiss();
 	}
+
+	this->Refresh();
 }
 
 void MainFrame::StartMonitor(void){
@@ -2493,20 +2556,39 @@ void MainFrame::StartMonitor(void){
 	
 	this->m_monitor_running = true;
 
-	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);
+
+#ifdef _WIN32
+	
+	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_pauseBitmap);	
+	
 	this->m_monitorMenuItem->SetBitmap(*m_pause16Bitmap);
+
+#else
+#ifdef __GNUC__
+	
+	wxToolBarToolBase *tool = this->m_toolbar->RemoveTool(MENU_ID_Monitor);
+
+	tool->SetNormalBitmap(*this->m_pauseBitmap);
+
+	this->m_toolbar->InsertTool(1, tool);
+
+#endif
+#endif
+
 	this->m_toolbar->Realize();
 
 	this->m_readTestMenuItem->Enable(false);
 	this->m_writeTestMenuItem->Enable(false);
 	this->m_blockWRTestMenuItem->Enable(false);
 
-	(this->m_status_bar->getTimer())->Start();
+	(this->m_status_bar->getTimer())->Start(1000);
 	this->m_status_bar->getBeginDateTime() = wxDateTime::Now();
+
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Start Send Data Thread");
 	this->m_IOPortSendCMDThread = new IOPortSendCMDThread(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_rxTxSemaphore, &this->m_appSettings, &this->m_polling_time, this->m_PMBusData, &this->m_IOPortRecvBuff, &m_cmdListModel, this->m_status_bar, this->m_stdPage, PMBusStatusPanel, PMBusStatusDCHPanel, &this->m_sendCMDVector);
-	//this->m_serialPortSendCommandThread->SetPriority(wxPRIORITY_MIN);
+	
+	//this->m_IOPortSendCMDThread->SetPriority(wxPRIORITY_MIN);
 
 	// If Create Thread Success
 	if (this->m_IOPortSendCMDThread->Create() != wxTHREAD_NO_ERROR){
@@ -2522,13 +2604,30 @@ void MainFrame::StartMonitor(void){
 		this->m_IOPortSendCMDThread->Run();
 		this->m_sendThreadStopFlag = false;
 	}
+
 }
 
 void MainFrame::StopMonitor(void){
 	this->m_monitor_running = false;
 
+#ifdef _WIN32	
+	
 	this->m_toolbar->FindById(MENU_ID_Monitor)->SetNormalBitmap(*this->m_monitorBitmap);
+	
 	this->m_monitorMenuItem->SetBitmap(*m_monitor16Bitmap);
+
+#else
+#ifdef __GNUC__
+
+	wxToolBarToolBase *tool = this->m_toolbar->RemoveTool(MENU_ID_Monitor);
+
+	tool->SetNormalBitmap(*m_monitorBitmap);
+
+	this->m_toolbar->InsertTool(1, tool);
+
+#endif
+#endif
+
 	this->m_toolbar->Realize();
 
 	(this->m_status_bar->getTimer())->Stop();
@@ -2538,37 +2637,12 @@ void MainFrame::StopMonitor(void){
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
 	
-	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
-	PSU_DEBUG_PRINT(MSG_DETAIL, "m_monitor_running = %d", this->m_monitor_running);
-	PSU_DEBUG_PRINT(MSG_DEBUG,  "m_ispSequenceThread = %p", this->m_ispSequenceThread);
+	/*** Send Monitor Start Event To Handler Function ***/
+	wxThreadEvent *threadMonitorStart_evt;
 
-	int loop = 0;
-
-	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
-
-	/*** If User Cancel ISP Sequence Previous ***/
-	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){
-		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"
-			"Due to Previous ISP Sequence Has been Canceled !", UserCancelISP_POST_DELAY_TIME / 1000);
-
-		wxMessageBox(content,
-			wxT("Please Wait !"),  // caption
-			wxOK | wxICON_WARNING);
-
-		return;
-	}
-
-
-	// If IO Device not Open, Open IO Device Here
-	this->OpenIODevice();
-
-	// Start Send Data Thread
-	if (this->m_monitor_running == false){
-		this->StartMonitor();
-	}
-	else{ // One Send Command Thread is Running
-		this->StopMonitor();
-	}
+	threadMonitorStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_MONITOR_START);
+	threadMonitorStart_evt->SetString(wxT("Monitor Start"));
+	wxQueueEvent(this->GetEventHandler(), threadMonitorStart_evt);
 
 }
 
@@ -2644,7 +2718,8 @@ void MainFrame::DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRe
 		wxDateTime(info.timestamp).FormatISOTime(),
 		info.threadId == wxThread::GetMainId()
 		? wxString("main")
-		: wxString::Format("%lx", info.threadId),
+		//: wxString::Format("%lx", info.threadId),
+		: wxString::Format("%04x", (int)info.threadId),
 		msg + "\n"
 	);
 
@@ -2713,21 +2788,6 @@ void MainFrame::OnDVItemActivated(wxDataViewEvent &event){
 void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 {
 
-#if 0
-	//wxString title;// = m_list_model->GetTitle(event.GetItem());
-	//if (title.empty())
-		//title = "None";
-
-	PSU_DEBUG_PRINT(MSG_DETAIL, "m_subNotebook Get PageCount: %d", this->m_subNotebook->GetPageCount());
-	if (this->m_subNotebook->GetPageCount() == 3){
-		this->m_subNotebook->RemovePage(2);
-	}
-	else{
-		this->m_subNotebook->AddPage(this->WritePanel, "Write");
-	}
-#endif
-
-
 	wxDataViewItem item = event.GetItem();
 
 	//PSUDataViewListModel* model = (PSUDataViewListModel*)this->m_dataViewCtrl->GetModel();
@@ -2795,65 +2855,6 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	page_counts = this->m_subNotebook->GetPageCount();
 	this->m_subNotebook->SetSelection(page_counts-1);
 
-#if 0
-	switch (this->m_PMBusData[row].m_access){
-
-	case cmd_access_read:
-	case cmd_access_br:
-	case cmd_access_bwr_read:
-		if (this->m_subNotebook->GetPageCount() == 3){
-			this->m_subNotebook->RemovePage(2);
-		}
-
-		this->m_subNotebook->SetSelection(0);
-
-		break;
-
-	case cmd_access_write:
-	case cmd_access_bw:
-	case cmd_access_readwrite:
-	case cmd_access_brbw:
-	case cmd_access_bwr_readwrite:
-
-		switch (this->m_subNotebook->GetPageCount()){
-		
-		case 2:
-			if (this->m_PMBusData[row].m_writePage != NULL){
-				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
-				this->m_subNotebook->SetSelection(2);
-			}
-			else{
-				this->m_subNotebook->SetSelection(0);
-			}
-
-			break;
-
-		case 3:
-
-			this->m_subNotebook->RemovePage(2);
-			if (this->m_PMBusData[row].m_writePage != NULL){
-				this->m_subNotebook->AddPage(this->m_PMBusData[row].m_writePage, "Write");
-				this->m_subNotebook->SetSelection(2);
-			}
-			else{
-				this->m_subNotebook->SetSelection(0);
-			}
-
-			break;
-
-		default:
-			PSU_DEBUG_PRINT(MSG_ALERT, "Page Count = %d", this->m_subNotebook->GetPageCount());
-			break;
-		}
-
-		break;
-
-	default:
-		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error Occurs, Access=%d", this->m_PMBusData[row].m_access);
-		break;
-	}
-
-#endif
 }
 
 void MainFrame::OnDVValueChanged(wxDataViewEvent &event){
@@ -3028,7 +3029,7 @@ void MainFrame::UpdateStatusBarIOSettingFiled(wxString io_string){
 }
 
 void MainFrame::UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed){
-	wxString i2cBitRateString = wxString::Format("%d", i2cBitRateSpeed);
+	wxString i2cBitRateString = wxString::Format("%ld", i2cBitRateSpeed);
 	i2cBitRateString += wxT("kHz");
 
 	this->m_status_bar->SetStatusText(i2cBitRateString, PMBUSStatusBar::Field_I2C_Clock);
@@ -3318,6 +3319,43 @@ void MainFrame::TaskInit(void){
 	// Task Init 
 }
 
+
+void MainFrame::OnMonitorStart(wxThreadEvent& event){
+	
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "Polling Time = %d", this->m_polling_time);
+	PSU_DEBUG_PRINT(MSG_DETAIL, "m_monitor_running = %d", this->m_monitor_running);
+	PSU_DEBUG_PRINT(MSG_DEBUG,  "m_ispSequenceThread = %p", this->m_ispSequenceThread);
+
+	int loop = 0;
+
+	//PSU_DEBUG_PRINT("Available = %d", this->m_list_model.get()->getAvailable()[0]);
+
+	/*** If User Cancel ISP Sequence Previous ***/
+	if (TaskEx::GetCount(task_ID_UserCancelISPPostDelayTask) > 0){
+		wxString content = wxString::Format("Need To Wait %d Seconds ! \n"
+			"Due to Previous ISP Sequence Has been Canceled !", UserCancelISP_POST_DELAY_TIME / 1000);
+
+		wxMessageBox(content,
+			wxT("Please Wait !"),  // caption
+			wxOK | wxICON_WARNING);
+
+		return;
+	}
+
+
+	// If IO Device not Open, Open IO Device Here
+	this->OpenIODevice();
+
+	// Start Send Data Thread
+	if (this->m_monitor_running == false){
+		this->StartMonitor();
+	}
+	else{ // One Send Command Thread is Running
+		this->StopMonitor();
+	}
+
+}
+
 void MainFrame::OnSendThreadStart(wxThreadEvent& event){
 	// Thread Start
 	this->m_status_bar->getGauge()->Pulse();
@@ -3397,6 +3435,10 @@ void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
 
 	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_RawText);
 	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RawText);
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
+
+	this->m_status_bar->getGauge()->Pulse();
+
 }
 
 void MainFrame::OnSendThreadUpdateQuery(wxThreadEvent& event){
@@ -4724,6 +4766,7 @@ void MainFrame::HexToBin(void){
 	fileOutStream.Sync();
 }
 
+#ifdef _WIN32
 void MainFrame::RegisterDeviceChangeNotify(void){
 	
 	const GUID GuidInterfaceList[] =
@@ -4819,7 +4862,9 @@ void  MainFrame::DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned
 	}
 
 }
+#endif
 
+#ifdef _WIN32
 WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam){
 	
 	bool processed = false;
@@ -4964,6 +5009,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 		return wxFrame::MSWWindowProc(nMsg, wParam, lParam);
 	}
 }
+#endif
 
 void MainFrame::StartInCreaseCPUOverHeadThread(void){
 	// Start IncreaseCPUOverHead Thread
@@ -4989,7 +5035,7 @@ void MainFrame::StopInCreaseCPUOverHeadThread(void){
 	if (this->m_increaseCPUOverHeadThreadStopFlag == false){
 		wxThreadError error = this->m_increaseCPUOverHeadThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "IncreaseCPUOverHeadThread Exit Code = %d", (int)exitCode);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "IncreaseCPUOverHeadThread Exit Code = %d", *((int*)exitCode));
 
 		if (error != wxTHREAD_NO_ERROR){
 			PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
@@ -5228,6 +5274,14 @@ void MainFrame::DoDisableCalibration(void){
 	}
 }
 
+void MainFrame::OnUpdateUI(wxUpdateUIEvent& event){
+	event.Check(true);
+}
+
+void MainFrame::OnIdle(wxIdleEvent& event){
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "%s", __FUNCTION__);
+}
+
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 EVT_MENU(MENU_ID_Primary_Firmware, MainFrame::OnPrimaryFirmware)
 EVT_MENU(MENU_ID_Secondary_Firmware, MainFrame::OnSecondaryFirmware)
@@ -5294,10 +5348,15 @@ EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_SUMMARY, MainFrame::OnSendThreadUpdat
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_STDPAGE, MainFrame::OnSendThreadUpdateSTDPage)
 EVT_THREAD(wxEVT_COMMAND_SENDTHREAD_UPDATE_STATUSPAGE, MainFrame::OnSendThreadUpdateSTATUSPage)
 
+EVT_THREAD(wxEVT_COMMAND_MONITOR_START, MainFrame::OnMonitorStart)
 EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 //EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_THREAD(wxEVT_COMMAND_QUERY_SEQUENCE_START, MainFrame::OnQUERYSequenceStart)
 
+EVT_UPDATE_UI(CID_CMDLIST_DVC, MainFrame::OnUpdateUI)
+EVT_IDLE(MainFrame::OnIdle)
+
 EVT_CLOSE(MainFrame::OnWindowClose)
 wxEND_EVENT_TABLE()
+

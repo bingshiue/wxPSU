@@ -3,7 +3,7 @@
  */
 
 #include "ModelSelectDialog.h"
-#include "acbel_large.xpm"
+#include "Acbel_large.xpm"
 
 
 ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(450, 160)){

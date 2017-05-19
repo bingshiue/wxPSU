@@ -113,13 +113,13 @@ WritePage05H::WritePage05H(wxWindow* parent, wxString& label, bool* monitor_runn
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
 
-	wxString hexString3 = wxString::Format("%02lx", DEFAULT_CMD);
+	wxString hexString3 = wxString::Format("%02x", DEFAULT_CMD);
 	this->m_cmdTC->SetValue(hexString3);
 
-	wxString hexString = wxString::Format("%02lx", DEFAULT_DATA1);
+	wxString hexString = wxString::Format("%02x", DEFAULT_DATA1);
 	this->m_data1InputValue->SetValue(hexString);
 
-	wxString hexString2 = wxString::Format("%02lx", DEFAULT_DATA2);
+	wxString hexString2 = wxString::Format("%02x", DEFAULT_DATA2);
 	this->m_data2InputValue->SetValue(hexString2);
 
 	// Set Validator

@@ -9,7 +9,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	int defAdaptorSelect = defaultAdaptorSelect;
 
 	wxIcon icon;
-	icon.CopyFromBitmap(wxBITMAP_PNG(HWINFO_16));
+	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(hwinfo_16));
 
 	this->SetIcon(icon);
 	this->SetBackgroundColour(wxColour(255, 255, 255));
@@ -149,10 +149,10 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	m_OkButton = new wxButton(this, CID_OK_BUTTOUN, wxT("OK"), wxDefaultPosition, wxSize(80, -1));
 	m_CancelButton = new wxButton(this, CID_CANCEL_BUTTON, wxT("Cancel"), wxDefaultPosition, wxSize(80, -1));
 	m_ComportButton = new wxButton(this, CID_COMPORT_BUTTOUN, wxT("Comport"), wxDefaultPosition, wxSize(80, -1));
-	m_ComportButton->SetBitmap(wxBITMAP_PNG(COMPLUG_16));
+	m_ComportButton->SetBitmap(LOAD_PNG_RESOURCE(complug_16));
 
 	m_USBSettingButton = new wxButton(this, CID_USB_SETTINGS_BUTTON, wxT("Setting"), wxDefaultPosition, wxSize(80, -1));
-	m_USBSettingButton->SetBitmap(wxBITMAP_PNG(USB_16));
+	m_USBSettingButton->SetBitmap(LOAD_PNG_RESOURCE(usb_16));
 
 	if (module_select != I2C_AdaptorModuleBoard_R90000_9271_USB){
 		m_USBSettingButton->Enable(false);
@@ -291,7 +291,7 @@ void I2CInterfaceDialog::UpdateStatusBarIOSettingFiled(wxString io_string){
 }
 
 void I2CInterfaceDialog::UpdateStatusBarIOSettingFiled(unsigned long i2cBitRateSpeed){
-	wxString i2cBitRateString = wxString::Format("%d", i2cBitRateSpeed);
+	wxString i2cBitRateString = wxString::Format("%ld", i2cBitRateSpeed);
 	i2cBitRateString += wxT("kHz");
 	
 	this->m_pmbusStatusBar->SetStatusText(i2cBitRateString, PMBUSStatusBar::Field_I2C_Clock);

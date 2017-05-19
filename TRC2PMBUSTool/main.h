@@ -43,6 +43,10 @@
 #include <wx/busyinfo.h>
 #include <wx/snglinst.h>
 
+#ifdef __GNUC__
+#define wxOVERRIDE  
+#endif
+
 #define APP_NAME "TRC2 PMBUS Tool"
 
 class WXPSU : public wxApp

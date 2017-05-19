@@ -24,6 +24,9 @@ BaseWritePage::BaseWritePage(wxWindow* parent, wxString& label) : wxPanel(parent
 	// Set Background Color
 	this->SetBackgroundColour(wxColour(248, 168, 133));//255, 94, 25
 
+	// Set Coifficients Static Text
+	this->m_coefficientsST = NULL;
+
 }
 
 

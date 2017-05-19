@@ -4,8 +4,13 @@
 #ifndef _MAINFRAME_H_
 #define _MAINFRAME_H_
 
+#ifdef _WIN32
 #include <windows.h>
 #include <dbt.h>
+#endif
+
+#include <wx/busyinfo.h>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -144,7 +149,9 @@ public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, CUSTOMER_TYPE_t* customerList);
 	virtual ~MainFrame();
 
+#ifdef _WIN32
 	DEV_BROADCAST_DEVICEINTERFACE dbch;
+#endif
 
 	CUSTOMER_TYPE_t* m_customerList;/**< Support Customer List */
 	MODEL_TYPE_t* m_modelList;/**< Support Model List */
@@ -195,6 +202,12 @@ public:
 
 	wxBitmap *m_monitor16Bitmap;
 	wxBitmap *m_pause16Bitmap;
+
+	wxBitmap m_monitorBitmap_Instance;
+	wxBitmap m_pauseBitmap_Instance;
+
+	wxBitmap m_monitor16Bitmap_Instance;
+	wxBitmap m_pause16Bitmap_Instance;
 
 	//wxPanel* m_parent;/**< Parent Panel */
 	wxSizer* m_topVeriticalSizer;/**< Top Level Sizer */
@@ -363,7 +376,9 @@ public:
 	*/
 	wxSemaphore *m_rxTxSemaphore;
 
+#ifdef _WIN32
 	HDEVNOTIFY NotificationHandle;
+#endif
 
 	unsigned int getCurrentUseIOInterface(void);
 
@@ -376,7 +391,9 @@ public:
 protected:
 	virtual void DoLogRecord(wxLogLevel level, const wxString& msg, const wxLogRecordInfo& info) wxOVERRIDE;
 
+#ifdef _WIN32
 	WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) wxOVERRIDE;
+#endif
 
 	TIHexFileParser m_PrimaryTIHexFileStat;
 	TIHexFileParser m_SecondaryTIHexFileStat;
@@ -469,6 +486,8 @@ private:
 
 	void OnContextMenu(wxDataViewEvent &event);
 
+	void OnMonitorStart(wxThreadEvent& event);
+
 	void OnSendThreadStart(wxThreadEvent& event);
 	void OnSendThreadCompletion(wxThreadEvent& event);
 
@@ -522,8 +541,10 @@ private:
 
 	void HexToBin(void);
 
+#ifdef _WIN32
 	void RegisterDeviceChangeNotify(void);
 	void DeviceChangeHandler(unsigned int Event, unsigned Type, unsigned int pid, unsigned int vid);
+#endif
 
 	void StartInCreaseCPUOverHeadThread(void);
 	void StopInCreaseCPUOverHeadThread(void);
@@ -536,6 +557,9 @@ private:
 
 	void UpdateSTDPage(unsigned int index);
 	void UpdateSTATUSPanel(unsigned int index);
+
+	void OnUpdateUI(wxUpdateUIEvent& event);
+	void OnIdle(wxIdleEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

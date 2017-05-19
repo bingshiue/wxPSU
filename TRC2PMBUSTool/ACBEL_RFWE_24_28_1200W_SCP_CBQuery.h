@@ -11,7 +11,7 @@
 
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
-#include "pec.h"
+#include "PEC.h"
 
 // Declare Query CB Functions
 int ACBEL_RFWE_24_28_1200W_SCP_Query_d9H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);

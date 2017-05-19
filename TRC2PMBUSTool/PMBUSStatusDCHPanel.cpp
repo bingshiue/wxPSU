@@ -9,8 +9,8 @@
 
 PMBUSStatusDCHPanel::PMBUSStatusDCHPanel(wxWindow* parent) : wxScrolledWindow(parent) {
 	// Load Bitmap
-	m_green = new wxBitmap(wxBITMAP_PNG(GREENLIGHT_24));//green_xpm);
-	m_red = new wxBitmap(wxBITMAP_PNG(REDLIGHT_24));//red_xpm);
+	m_green = new wxBitmap(LOAD_PNG_RESOURCE(green_light_24));//green_xpm);
+	m_red = new wxBitmap(LOAD_PNG_RESOURCE(red_light_24));//red_xpm);
 
 	// Status_WORD
 	this->m_statusWordSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("STATUS_WORD"));
