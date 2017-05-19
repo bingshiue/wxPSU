@@ -177,10 +177,10 @@ public :
 	 * @brief Get Send Vector Critical Section Object.
 	 */
 	static wxCriticalSection* getSendVectorCriticalSectionObject(void);
-        /**
-         * @brief Get GetTickCount.
-         */
-        static unsigned long GetTickCount(void);
+    /**
+     * @brief Get GetTickCount.
+     */
+    static unsigned long GetTickCountHAL(void);
 
 protected :
 

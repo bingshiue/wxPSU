@@ -2079,7 +2079,7 @@ wxString& PMBUSHelper::getDefaultMFR_SERIAL(void){
 	return m_default_mfr_serial;
 }
 
-unsigned long PMBUSHelper::GetTickCount(void){
+unsigned long PMBUSHelper::GetTickCountHAL(void){
 #ifdef __GNUC__
         struct timeval tv;
         if(gettimeofday(&tv, NULL) != 0)

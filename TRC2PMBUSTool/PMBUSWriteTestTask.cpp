@@ -16,7 +16,7 @@ PMBUSWriteTestTask::PMBUSWriteTestTask(IOACCESS* ioaccess, unsigned int* current
 	this->m_running = true;
 	this->runningIndex = 0;
 
-	this->startTick = PMBUSHelper::GetTickCount();
+	this->startTick = PMBUSHelper::GetTickCountHAL();
 }
 
 PMBUSWriteTestTask::~PMBUSWriteTestTask(void){
@@ -260,7 +260,7 @@ int PMBUSWriteTestTask::Main(double elapsedTime){
 	else{
 		PSU_DEBUG_PRINT(MSG_ALERT, "End To Send Write CMD");
 
-		stopTick = PMBUSHelper::GetTickCount();
+		stopTick = PMBUSHelper::GetTickCountHAL();
 		DWORD totalTime = stopTick - startTick;
 		PSU_DEBUG_PRINT(MSG_ALERT, "Elapsed Time = %ld, Send %d CMDS, Average 1 Second Send %.2f CMDS", totalTime, totalSendTimes, ((float)totalSendTimes / ((float)totalTime / 1000)));
 
