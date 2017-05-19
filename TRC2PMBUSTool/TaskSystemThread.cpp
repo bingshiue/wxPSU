@@ -21,7 +21,7 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 	double delta;
 	// Tick Parameter
 	DWORD nowTick, previousTick;
-	nowTick = previousTick = PMBUSHelper::GetTickCount();
+	nowTick = previousTick = PMBUSHelper::GetTickCountHAL();
 
 	unsigned int TaskCnts = 0;
 	unsigned int previousTaskCnts = 0;
@@ -30,7 +30,7 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 
 		//PSU_DEBUG_PRINT(MSG_DEBUG, "TaskCnt = %d", Task::GetCount());
 
-		nowTick = PMBUSHelper::GetTickCount();
+		nowTick = PMBUSHelper::GetTickCountHAL();
 
 		delta = nowTick - previousTick;
 		previousTick = nowTick;

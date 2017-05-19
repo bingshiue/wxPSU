@@ -151,10 +151,10 @@ public :
 	 * @brief Get MFR_SERIAL.
 	 */
 	static wxString& getDefaultMFR_SERIAL(void);
-        /**
-         * @brief Get GetTickCount.
-         */
-        static unsigned long GetTickCount(void);
+    /**
+     * @brief Get GetTickCount.
+     */
+    static unsigned long GetTickCountHAL(void);
 
 protected :
 

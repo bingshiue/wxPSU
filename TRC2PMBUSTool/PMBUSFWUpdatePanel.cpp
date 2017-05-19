@@ -1058,7 +1058,7 @@ void PMBUSFWUpdatePanel::OnFileSystemEvent(wxFileSystemWatcherEvent& event){
 	static DWORD now_ticks = 0;
 
 	// Get Now Ticks
-	now_ticks = PMBUSHelper::GetTickCount();
+	now_ticks = PMBUSHelper::GetTickCountHAL();
 
 	PSU_DEBUG_PRINT(MSG_DEBUG, "OnFileSystemEvent: Ticks = %d", now_ticks);
 	// Get Event Type
@@ -1082,7 +1082,7 @@ void PMBUSFWUpdatePanel::OnFileSystemEvent(wxFileSystemWatcherEvent& event){
 				PSU_DEBUG_PRINT(MSG_ALERT, "Content of HEX File Has Been Changed !");
 
 				// Get Now Ticks
-				now_ticks = PMBUSHelper::GetTickCount();
+				now_ticks = PMBUSHelper::GetTickCountHAL();
 
 				// Emit Thread Event
 				wxThreadEvent* threadReloadHexFileEvt;
