@@ -226,11 +226,16 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 }
 
 PMBUSFWUpdatePanel::~PMBUSFWUpdatePanel(){
-	// Free File System Watcher
-	wxFileName hexFileFullPath(this->m_hexFilePath);
 
-	m_watcher->Remove(hexFileFullPath.GetPathWithSep());
+	//wxFileName hexFileFullPath(this->m_hexFilePath);
+	//m_watcher->Remove(hexFileFullPath.GetPathWithSep());
 
+	// Remove All File System Watcher Paths (Only Do When Count Of Watcher > 0)
+	if(m_watcher->GetWatchedPathsCount() > 0){
+		m_watcher->RemoveAll();
+	}
+
+	// Delete File System Watcher
 	wxDELETE(m_watcher);
 }
 
