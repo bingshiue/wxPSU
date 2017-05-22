@@ -1,5 +1,7 @@
 Debug/
 Release/
+Build/
+build/
 psu.ini
 wxWidgetsPSU.sdf
 wxWidgetsPSU.opensdf
