@@ -6,7 +6,7 @@
 #include "AboutDialog.h"
 #include "Acbel_large.xpm"
 
-AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About")), wxDefaultPosition, wxSize(300, 300))
+AboutDialog::AboutDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, wxString(wxT("About")), wxDefaultPosition, wxSize(350, 350))
 {
 	wxIcon icon;
 	icon.CopyFromBitmap(LOAD_PNG_RESOURCE(about_16));

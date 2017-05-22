@@ -8,7 +8,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
-PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread, IOACCESS* ioaccess, unsigned int* currentIO) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 400))
+PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, int range, unsigned char* ispStatus, IncreaseCPUOverHeadThread* increaseCPUOverHeadThread, IOACCESS* ioaccess, unsigned int* currentIO) : wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(600, 500))
 #if wxUSE_TIMER
 , m_timer(this)
 #endif
@@ -68,10 +68,10 @@ PMBUSFWProgressDialog::PMBUSFWProgressDialog(wxWindow *parent, wxString title, i
 
 	// Add Sizer To Top Level Sizer
 	//this->m_topLevelSizer->Add(this->m_infoST, wxSizerFlags(0).Border());
-	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(0).Border().Expand());
+	this->m_topLevelSizer->Add(m_statisticsSB, wxSizerFlags(4).Border().Expand());
 
 	//this->m_topLevelSizer->Add(this->m_logTC, wxSizerFlags(1).Border().Expand());
-	this->m_topLevelSizer->Add(m_logSB, wxSizerFlags(1).Border().Expand());
+	this->m_topLevelSizer->Add(m_logSB, wxSizerFlags(6).Border().Expand());
 
 	this->m_topLevelSizer->Add(this->m_gauge, wxSizerFlags().Border().Expand());
 
