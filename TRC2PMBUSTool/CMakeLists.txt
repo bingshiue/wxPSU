@@ -51,9 +51,9 @@ target_compile_options(TRC2PMBUSTool PRIVATE "-D__WXGTK__")
 #target_compile_options(TRC2PMBUSTool PRIVATE "-D_DEBUG")
 endif()
 
-#if(UNIX)
+if(UNIX)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -D_DEBUG")
-#endif()
+endif()
 
 #set_target_properties(TRC2PMBUSTool PROPERTIES
                       #COMPILE_DEFINITIONS "_CRT_SECURE_NO_DEPRECATE")
