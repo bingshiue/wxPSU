@@ -198,8 +198,9 @@ int SendReadCMDTask::Main(double elapsedTime){
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
 
 	// Prepare Send Data Buffer
-	unsigned int SendLength = 0;
-	unsigned char SendBuffer[64] = { 0 };
+	// Declare As Static For Avoid Stack Corrupt
+	static unsigned int SendLength = 0;
+	static unsigned char SendBuffer[64] = { 0 };
 
 	SendLength = this->ProductReadCMDBuffer(&this->m_pmbusReadCommand, SendBuffer, this->m_CurrentIO);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "SendLength=%d", SendLength);
