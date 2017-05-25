@@ -356,7 +356,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		// Get Pointer
 		buffer[INDEX_POINTER] = 
-		(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | 0x0f;
 
 		// Data 1
 		value1 = 0;
@@ -436,7 +436,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		// Get Pointer
 		buffer[INDEX_POINTER_HID] =
-			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | 0x0f;
 
 		// Data 1
 		value1 = 0;
@@ -525,7 +525,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		// Get Pointer
 		buffer[INDEX_POINTER_PICKIT] =
-			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | 0x0f;
 
 		// Data 1
 		value1 = 0;
@@ -587,7 +587,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		// Get Pointer
 		buffer[INDEX_POINTER_TOTALPHASE] =
-			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : 0x1f;
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | 0x0f;
 
 		// Data 1
 		value1 = 0;
@@ -649,8 +649,9 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	if (result == false) return;
 	
 	// Send Buffer
-	unsigned int SendLength = 0;
-	unsigned char SendBuffer[64] = { 0 };
+	// Declare As Static For Avoid Stack Corrupt
+	static unsigned int SendLength = 0;
+	static unsigned char SendBuffer[64] = { 0 };
 
 	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]));
 
@@ -762,8 +763,8 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t calibrationItem;
 
-	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	calibrationItem.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ + 1;
+	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//(*this->m_currentIO == IOACCESS_SERIALPORT) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
+	calibrationItem.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CALIBRATION_ITEM_BYTES_TO_READ);//(*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ + 1;
 	for (unsigned idx = 0; idx < SendLength; idx++){
 		calibrationItem.m_sendData[idx] = SendBuffer[idx];
 	}
@@ -838,8 +839,9 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	if (result == false) return;
 
 	// Send Buffer
-	unsigned int SendLength = 0;
-	unsigned char SendBuffer[64] = { 0 };
+	// Declare As Static For Avoid Stack Corrupt
+	static unsigned int SendLength = 0;
+	static unsigned char SendBuffer[64] = { 0 };
 
 	SendLength = this->ProductSendBuffer(SendBuffer, sizeof(SendBuffer)/sizeof(SendBuffer[0]), true);
 
@@ -951,7 +953,7 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 	PMBUSSendCOMMAND_t calibrationItem;
 
 	calibrationItem.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? SendLength : 64;//sizeof(SendBuffer) / sizeof(SendBuffer[0]);
-	calibrationItem.m_bytesToRead = (*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ+1;
+	calibrationItem.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CALIBRATION_ITEM_BYTES_TO_READ);//(*this->m_currentIO == IOACCESS_SERIALPORT) ? CALIBRATION_ITEM_BYTES_TO_READ : CALIBRATION_ITEM_BYTES_TO_READ+1;
 	for (unsigned idx = 0; idx < SendLength; idx++){
 		calibrationItem.m_sendData[idx] = SendBuffer[idx];
 	}
