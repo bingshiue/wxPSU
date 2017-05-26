@@ -1704,7 +1704,7 @@ void MainFrame::OnWindowClose(wxCloseEvent& event){
 			wxThread::ExitCode exitCode;
 			wxThreadError error = this->m_IOPortSendCMDThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
 
-			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread Exit Code = %d", *((int*)exitCode));
+			PSU_DEBUG_PRINT(MSG_ALERT, "IOPortSendCMDThread Exit Code = %p", ((int*)exitCode));
 
 			if (error != wxTHREAD_NO_ERROR){
 				PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
@@ -5122,7 +5122,7 @@ void MainFrame::StopInCreaseCPUOverHeadThread(void){
 	if (this->m_increaseCPUOverHeadThreadStopFlag == false){
 		wxThreadError error = this->m_increaseCPUOverHeadThread->Delete(&exitCode, wxTHREAD_WAIT_YIELD);
 
-		PSU_DEBUG_PRINT(MSG_DEBUG, "IncreaseCPUOverHeadThread Exit Code = %d", *((int*)exitCode));
+		PSU_DEBUG_PRINT(MSG_DEBUG, "IncreaseCPUOverHeadThread Exit Code = %p", ((int*)exitCode));
 
 		if (error != wxTHREAD_NO_ERROR){
 			PSU_DEBUG_PRINT(MSG_ERROR, "wxThreadError = %d", error);
