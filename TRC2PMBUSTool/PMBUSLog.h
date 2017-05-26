@@ -32,24 +32,43 @@ enum DEBUG_MSG_LEVEL {
 
 #define DEFAULT_DEBUG_MSG_LEVEL  MSG_DEBUG /**< Default Debug Message Level */
 
-
+#ifdef __VISUALC__
 #define PSU_DEBUG_PRINT(level,fmt, ...)                                             \
 		if(level <= DEFAULT_DEBUG_MSG_LEVEL){                                       \
-				if(level == MSG_FATAL)                                              \
+		    if(level == MSG_FATAL)                                              \
 			wxLogFatalError("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);   \
-                else if(level == MSG_ERROR)                                         \
-		    wxLogError("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
-				else if(level == MSG_ALERT)                                         \
-		    wxLogMessage("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
-				else if(level == MSG_DEBUG)                                         \
-		    wxLogDebug("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
-				else if(level == MSG_DETAIL)                                        \
-		    wxLogVerbose("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
+                    else if(level == MSG_ERROR)                                         \
+		        wxLogError("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
+		    else if(level == MSG_ALERT)                                         \
+		        wxLogMessage("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
+		    else if(level == MSG_DEBUG)                                         \
+		        wxLogDebug("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
+		    else if(level == MSG_DETAIL)                                        \
+		        wxLogVerbose("%-20s %s():%d:"##fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
 		}
+#else
+#ifdef __GNUC__
+#define PSU_DEBUG_PRINT(level,fmt, ...)                                             \
+		if(level <= DEFAULT_DEBUG_MSG_LEVEL){                                       \
+		    if(level == MSG_FATAL)                                              \
+			wxLogFatalError("%-20s %s():%d:"fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);   \
+                    else if(level == MSG_ERROR)                                         \
+		        wxLogError("%-20s %s():%d:"fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
+		    else if(level == MSG_ALERT)                                         \
+		        wxLogMessage("%-20s %s():%d:"fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
+		    else if(level == MSG_DEBUG)                                         \
+		        wxLogDebug("%-20s %s():%d:"fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);        \
+		    else if(level == MSG_DETAIL)                                        \
+		        wxLogVerbose("%-20s %s():%d:"fmt,PMBUSHelper::GetNowTimeString().c_str(),__FUNCTION__,__LINE__,## __VA_ARGS__);      \
+		}
+#endif
+#endif
+
 
 #else
 #define DEFAULT_DEBUG_MSG_LEVEL  MSG_ALERT /**< Default Debug Message Level */
 
+#ifdef __VISUALC__
 #define PSU_DEBUG_PRINT(level,fmt, ...)         \
 		if(level <= DEFAULT_DEBUG_MSG_LEVEL){   \
 				if(level == MSG_FATAL)          \
@@ -63,6 +82,23 @@ enum DEBUG_MSG_LEVEL {
 				else if(level == MSG_DETAIL)    \
 		    wxLogVerbose("%-20s"##fmt,PMBUSHelper::GetNowTimeString().c_str(),## __VA_ARGS__);      \
 		}
+#else
+#ifdef __GNUC__
+#define PSU_DEBUG_PRINT(level,fmt, ...)         \
+		if(level <= DEFAULT_DEBUG_MSG_LEVEL){   \
+		    if(level == MSG_FATAL)          \
+			wxLogFatalError("%-20s"fmt,PMBUSHelper::GetNowTimeString().c_str(), ## __VA_ARGS__);   \
+		    else if(level == MSG_ERROR)     \
+		        wxLogError("%-20s"fmt,PMBUSHelper::GetNowTimeString().c_str(),## __VA_ARGS__);        \
+		    else if(level == MSG_ALERT)     \
+		        wxLogMessage("%-20s"fmt,PMBUSHelper::GetNowTimeString().c_str(),## __VA_ARGS__);      \
+		    else if(level == MSG_DEBUG)     \
+		        wxLogDebug("%-20s"fmt,PMBUSHelper::GetNowTimeString().c_str(),## __VA_ARGS__);        \
+		    else if(level == MSG_DETAIL)    \
+		        wxLogVerbose("%-20s"fmt,PMBUSHelper::GetNowTimeString().c_str(),## __VA_ARGS__);      \
+		}
+#endif
+#endif
 
 #endif // #ifdef PSU_DEBUG_MSG
 
