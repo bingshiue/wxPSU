@@ -45,7 +45,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.19       |     Add FRU Maker/Writer/Reader                                |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.20       |     Suppport CMAKE                                             |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.19" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.20" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif

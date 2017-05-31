@@ -5212,13 +5212,13 @@ void MainFrame::UpdateSTDPage(unsigned int index){
 
 	// FAN1
 	if (index == this->findPMBUSCMDIndex(0x90)){
-		wxString fan1 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
+		wxString fan1 = wxString::Format("%.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN1);
 		this->m_stdPage->m_tcFAN1->SetValue(fan1);
 	}
 
 	// FAN2
 	if (index == this->findPMBUSCMDIndex(0x91)){
-		wxString fan2 = wxString::Format("%-5.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN2);
+		wxString fan2 = wxString::Format("%.1f", (double)PMBUSHelper::GetPMBusStatus()->m_FAN2);
 		this->m_stdPage->m_tcFAN2->SetValue(fan2);
 	}
 

@@ -2,11 +2,18 @@
  * @file ModelSelectDialog.cpp
  */
 
+#include "version.h"
 #include "ModelSelectDialog.h"
 #include "Acbel_large.xpm"
 
 
-ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Model Selection")), wxDefaultPosition, wxSize(450, 160)){
+ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customerList, unsigned int customerListSize) : wxDialog(parent, wxID_ANY, wxString(wxT("Select Device")), wxDefaultPosition, wxSize(450, 160)){
+
+	// Append Version Number
+	wxString label = this->GetLabel();
+	label += L"  ";
+	label += wxString::Format("(%s)", VERSION_STRING);
+	this->SetLabel(label);
 
 	this->m_customerList = customerList;
 	this->m_customerListSize = customerListSize;
