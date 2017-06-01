@@ -4466,8 +4466,13 @@ void MainFrame::CheckIfModelChange(void){
 	else{
 		dateString += wxString::Format("0%d", datetime.GetMonth() + 1);
 	}
-	
-	dateString += wxString::Format("%2d", datetime.GetDay());
+
+	if (datetime.GetDay() >= 10) {
+		dateString += wxString::Format("%2d", datetime.GetDay());
+	}
+	else {
+		dateString += wxString::Format("0%d", datetime.GetDay());
+	}
 
 	PMBUSHelper::getDefaultMFR_DATE() = wxString::Format("%s", dateString.c_str());
 
