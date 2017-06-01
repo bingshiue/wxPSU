@@ -44,6 +44,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	CheckAndLoadConfig();
 
 	this->m_cmdListDVC = NULL;
+	this->PMBusPrimaryFWUpdatePanel = NULL;
+	this->PMBusSecondaryFWUpdatePanel = NULL;
 	this->m_monitor_running = false;
 	this->m_monitor_pause = false;
 
