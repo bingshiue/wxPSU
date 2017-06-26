@@ -27,6 +27,10 @@ which use HIDAPI.
 #include <unistd.h>
 #endif
 
+// mbed usbhid VID & PID
+#define MBED_VID 0x1234 
+#define MBED_PID 0x0006
+
 int sendData(hid_device *handle, unsigned char* buffer, unsigned int sizeOfBuffer){
 	int res = 0;
 	
@@ -56,24 +60,28 @@ int sendData(hid_device *handle, unsigned char* buffer, unsigned int sizeOfBuffe
 int readData(hid_device *handle, unsigned char* buffer){
 	int readBytes = 0;
 	int reTry = 0;
+	int sleep_times[5] = { 1, 3, 5, 10, 100 };// Milliseconds
 
 	readBytes = 0;
 	while (readBytes == 0) {
-		readBytes = hid_read(handle, buffer, 256);
+		readBytes = hid_read(handle, buffer, 64);// Read 64 Bytes For Test NXP LPC 1768
 		if (readBytes == 0){
-			printf("waiting...\n");
-			reTry++;
-
-			if (reTry >= 3){
+			
+			if (reTry >= 5){
 				printf("Retry = %d, Break \n", reTry);
 				break;
 			}
 
+			printf("waiting...\n");
+
 #ifdef WIN32
 			Sleep(5);
 #else
-			usleep(500 * 1000);
+			usleep(100 * 10 * sleep_times[reTry]);//500 * 100);// Sleep 1/20 Sec
 #endif
+
+			reTry++;
+
 		}
 		if (readBytes < 0)
 			printf("Unable to read()\n");
@@ -777,6 +785,7 @@ int main(int argc, char* argv[])
 	int times = 0;
 	int sendTimes = 0;
 	unsigned int offset = 0;
+	bool write_data_flag = false;
 
 #ifdef WIN32
 	UNREFERENCED_PARAMETER(argc);
@@ -788,7 +797,7 @@ int main(int argc, char* argv[])
 	memset(recvBuffer, 0, 256);
 
 #if 1
-	devs = hid_enumerate(0x4d8, 0x036);
+	devs = hid_enumerate(MBED_VID, MBED_PID);
 	cur_dev = devs;
 	while (cur_dev) {
 		printf("Device Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls", cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
@@ -814,7 +823,7 @@ int main(int argc, char* argv[])
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
 	//handle = hid_open(0x4d8, 0x3f, L"12345");
-	handle = hid_open(0x4d8, 0x36, NULL);
+	handle = hid_open(MBED_VID, MBED_PID, NULL);
 	if (!handle) {
 		printf("unable to open device\n");
 		return 1;
@@ -888,33 +897,56 @@ int main(int argc, char* argv[])
 #endif
 
 	// Initialize Pickit
-	InitPicKit(handle, buf, recvBuffer);
+	//InitPicKit(handle, buf, recvBuffer);
 
 	// Infinite Loop
 	for (;;){
 
+		memset(recvBuffer, 1, 256);
+
 		printf("SendTimes =%d \n", sendTimes);
 		sendTimes++;
 
-		if (sendTimes % 2 == 0){
+		if (sendTimes % 3 == 0){
 
 #if 1   //01020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 			offset = 0;
 
 			buf[offset++] = 0x00;
+			buf[offset++] = 0x02;// Group
+			buf[offset++] = 0x01;// Interface
+			buf[offset++] = 0x51;// Action : Write
+			buf[offset++] = 0x5B;// Data Package Start, Slave Address
+			buf[offset++] = 0x03;//    Write Length
+			buf[offset++] = 0x00;//    Read Length
+			buf[offset++] = 0x00;// Write Data Start 
+			buf[offset++] = (write_data_flag == true) ? 0x00 : 0x01;//00,97 01,90
+			buf[offset++] = (write_data_flag == true) ? 0x97 : 0x90;
+			write_data_flag = !write_data_flag;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x1f;
+			buf[offset++] = 0x77;
+
+			/*
+			buf[offset++] = 0x00;
 			buf[offset++] = 0x01;
 			buf[offset++] = 0x02;
+			*/
 
 			for (int idx = offset; idx < 65; idx++){
 				buf[idx] = 0;
 			}
 
 			// Send 
-			sendData(handle, buf, 3);
+			sendData(handle, buf, 17);
 
 #endif
 		}
-		else
+		else if (sendTimes % 3 == 1)
 		{
 #if 1	//03 0e 81 84 02 b6 ec 83 84 01 b7 89 03 82 1f 77 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 		//Response As Below
@@ -924,20 +956,20 @@ int main(int argc, char* argv[])
 			offset = 0;
 
 			buf[offset++] = 0x00;
-			buf[offset++] = 0x03;
-			buf[offset++] = 0x0e;
-			buf[offset++] = 0x81;
-			buf[offset++] = 0x84;
-			buf[offset++] = 0x02;
-			buf[offset++] = 0xb6;
-			buf[offset++] = 0xec;
-			buf[offset++] = 0x83;
-			buf[offset++] = 0x84;
+			buf[offset++] = 0x02;// Group
+			buf[offset++] = 0x01;// Interface
+			buf[offset++] = 0x53;// Action : MWR
+			buf[offset++] = 0x5B;// Data Package Start, Slave Address
+			buf[offset++] = 0x03;//    Write Length
+			buf[offset++] = 0x03;//    Read Length
+			buf[offset++] = 0x1a;// Write Data Start    
 			buf[offset++] = 0x01;
-			buf[offset++] = 0xb7;
-			buf[offset++] = 0x89;
-			buf[offset++] = 0x03;
-			buf[offset++] = 0x82;
+			buf[offset++] = 0x87;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
 			buf[offset++] = 0x1f;
 			buf[offset++] = 0x77;
 
@@ -948,6 +980,37 @@ int main(int argc, char* argv[])
 			// Send 
 			sendData(handle, buf, 17);
 		}
+		else if (sendTimes % 3 == 2){
+
+			offset = 0;
+
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x02;// Group
+			buf[offset++] = 0x01;// Interface
+			buf[offset++] = 0x52;// Action : Read
+			buf[offset++] = 0x5B;// Data Package Start, Slave Address
+			buf[offset++] = 0x01;//    Write Length
+			buf[offset++] = 0x02;//    Read Length
+			buf[offset++] = 0x00;// Write Data Start    
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x00;
+			buf[offset++] = 0x1f;
+			buf[offset++] = 0x77;
+
+			for (int idx = offset; idx < 65; idx++){
+				buf[idx] = 0;
+			}
+
+			// Send 
+			sendData(handle, buf, 17);
+
+
+		}
 
 #endif
 		
@@ -955,7 +1018,7 @@ int main(int argc, char* argv[])
 #ifdef WIN32
 		Sleep(1);
 #else
-		usleep(100 * 1000);
+		//usleep(1);//* 100);// Sleep 1/100 Second
 #endif
 
 		// Read requested state. hid_read() has been set to be
@@ -966,7 +1029,7 @@ int main(int argc, char* argv[])
 #ifdef WIN32
 		Sleep(1);
 #else
-		usleep(100 * 1000);
+		//usleep(1);// * 100);// Sleep 1/100 Second
 #endif
 
 		if (sendTimes >= LOOP_TIIMES){
