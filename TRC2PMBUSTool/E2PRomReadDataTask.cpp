@@ -94,7 +94,7 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 
 
 	// Read Data From E2PRom
-	while (offset <MAX_FRU_FILE_READ_LENGTH){//for (unsigned int offset = 0; offset < MAX_FRU_FILE_READ_LENGTH; offset++){
+	while (offset < MAX_FRU_FILE_READ_LENGTH){//for (unsigned int offset = 0; offset < MAX_FRU_FILE_READ_LENGTH; offset++){
 
 		// Prepare Read Operation Send Data Buffer
 		int sendDataLength = 0;
@@ -119,7 +119,8 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 			sendDataLength = HID_SEND_DATA_SIZE;
 			break;
 
-		case IOACCESS_PICKIT :
+		case IOACCESS_PICKIT:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE + 1;
 			break;
 
@@ -269,6 +270,29 @@ int E2PRomReadDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* curr
 			this->m_e2pRomContent[offset] = recvBuffer[0];
 			offset++;
 			readRetry = 0;
+
+			break;
+
+		case IOACCESS_TRC2_I2C_ADAPTER:
+
+			if (recvLength == 0){
+				readRetry++;
+				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
+				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
+					continue;
+				}
+				else{
+					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data From E2PRom Retry Still Failed !");
+					offset++;
+					readRetry = 0;
+					continue;
+				}
+			}
+
+			this->m_e2pRomContent[offset] = recvBuffer[0];
+			offset++;
+			readRetry = 0;
+
 
 			break;
 

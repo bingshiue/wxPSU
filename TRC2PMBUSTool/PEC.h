@@ -35,4 +35,10 @@ return EXIT_SUCCESS;
 }
 */
 
+/**
+ * @brief Compute PEC Code, Source is Discontinuity two buffers.
+ */
+unsigned short PMBusSlave_Crc8MakeBitwiseDiscont(unsigned char* src_buffer1, unsigned char src_len1, unsigned char* src_buffer2, unsigned char src_len2);
+
+
 #endif

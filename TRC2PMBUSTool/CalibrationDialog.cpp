@@ -313,7 +313,13 @@ wxEND_EVENT_TABLE()
 #define INDEX_POINTER_TOTALPHASE            5
 #define INDEX_DATA_1_START_TOTALPHASE       6
 #define INDEX_DATA_2_START_TOTALPHASE       8
-#define INDEX_PEC_TOTALPHASE               10 
+#define INDEX_PEC_TOTALPHASE               10
+
+#define INDEX_CALIBRATION_ITEM_TRC2I2C_ADAPTER   8
+#define INDEX_POINTER_TRC2I2C_ADAPTER            9
+#define INDEX_DATA_1_START_TRC2I2C_ADAPTER      10
+#define INDEX_DATA_2_START_TRC2I2C_ADAPTER      12
+#define INDEX_PEC_TRC2I2C_ADAPTER               14
 
 #define CALIBRATION_STATUS_DATA_SIZE        1
 
@@ -629,6 +635,64 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		buffer[0] = 0x00;
+		buffer[1] = 0x02;// Group
+		buffer[2] = 0x01;// Interface
+		buffer[3] = 0x51;// Action : Write
+		buffer[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[5] = 1+1+6;//    Write Length 1+1+ : slave address command + pec
+		buffer[6] = 0x00;//    Read Length
+		buffer[7] = 0xCB;// Write Data Start Command 0xCB
+
+		// Get Calibration Item Command
+		buffer[INDEX_CALIBRATION_ITEM_TRC2I2C_ADAPTER] = calibrationItemCommand[this->m_calibrationItemCB->GetSelection()];
+
+		// Get Pointer
+		buffer[INDEX_POINTER_TRC2I2C_ADAPTER] =
+			(done == false) ? calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | calibrationItemPointerValue[this->m_pointerCB->GetSelection()] : calibrationItemPointerMask[this->m_calibrationItemCB->GetSelection()] | 0x0f;
+
+		// Data 1
+		value1 = 0;
+		this->m_data1TC->GetValue().ToDouble(&value1);
+
+		resolution1 = 0;
+		this->m_resolution1TC->GetValue().ToDouble(&resolution1);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_1_START_TRC2I2C_ADAPTER, value1, resolution1);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_1_START_TRC2I2C_ADAPTER, value1, resolution1);
+#endif
+
+		// Data 2
+		value2 = 0;
+		this->m_data2TC->GetValue().ToDouble(&value2);
+
+		resolution2 = 0;
+		this->m_resolution2TC->GetValue().ToDouble(&resolution2);
+
+#ifdef USE_LINEAR_DATA_FORMAT
+		PMBUSHelper::ProductLinearData(buffer + INDEX_DATA_2_START_TRC2I2C_ADAPTER, value2, resolution2);
+#else
+		PMBUSHelper::ProductFakeLinearData(buffer + INDEX_DATA_2_START_TRC2I2C_ADAPTER, value2, resolution2);
+#endif
+
+		// Compute PEC
+		separate_pec = 0;
+
+		separate_pec = PMBusSlave_Crc8MakeBitwiseDiscont(&PMBUSHelper::GetSlaveAddress(), 1, buffer+7, 1+6);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", separate_pec);
+
+
+		buffer[INDEX_PEC_TRC2I2C_ADAPTER] = separate_pec;
+				//PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 4, 2 + pmBusWriteCMD->m_numOfSendBytes);
+
+		active_index = INDEX_PEC_TRC2I2C_ADAPTER + 1;
+
+		break;
+
 	default:
 
 		break;
@@ -697,6 +761,18 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
 			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
 			SendBuffer[INDEX_POINTER_TOTALPHASE],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		msg += wxString::Format("Apply : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_TRC2I2C_ADAPTER],
 			value1,
 			value2);
 
@@ -774,7 +850,7 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 				
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(calibrationItem);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %ld", this->m_sendCMDVector->size());
 		}
 	}
 	else{
@@ -815,7 +891,7 @@ void CalibrationDialog::OnBtnApply(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		//if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(cmdCAH);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %ld", this->m_sendCMDVector->size());
 		//}
 	}
 	else{
@@ -885,6 +961,18 @@ void CalibrationDialog::OnBtnDone(wxCommandEvent& event){
 		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
 			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
 			SendBuffer[INDEX_POINTER_TOTALPHASE],
+			value1,
+			value2);
+
+		PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		msg += wxString::Format("Done  : Item=%s, Pointer=%02xH, Data1=%.4f, Data2=%.4f",
+			m_calibrationItemString[this->m_calibrationItemCB->GetSelection()].c_str(),
+			SendBuffer[INDEX_POINTER_TRC2I2C_ADAPTER],
 			value1,
 			value2);
 

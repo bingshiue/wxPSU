@@ -150,6 +150,33 @@ int PMBUSWriteTestTask::ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, un
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[0] = 0x00;
+		sendBuffer[1] = 0x02;// Group
+		sendBuffer[2] = 0x01;// Interface
+		sendBuffer[3] = 0x51;// Action : Write
+		sendBuffer[4] = (pmBusWriteCMD->m_slaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[5] = 1+1+pmBusWriteCMD->m_numOfSendBytes;//    Write Length 1+1+ :  command + pec
+		sendBuffer[6] = 0x00;//    Read Length
+		sendBuffer[7] = pmBusWriteCMD->m_cmd;// Write Data Start
+
+		// Data start from index 8
+		for (unsigned int idx = 0; idx < pmBusWriteCMD->m_numOfSendBytes; idx++){
+			sendBuffer[8 + idx] = pmBusWriteCMD->m_sendBytes[idx];
+			pec_start_index = (8 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		sendBuffer[pec_start_index] = PMBusSlave_Crc8MakeBitwiseDiscont(&pmBusWriteCMD->m_slaveAddr, 1, sendBuffer+7, 1+pmBusWriteCMD->m_numOfSendBytes);
+				//PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 4, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", sendBuffer[pec_start_index]);
+
+		pec_start_index++;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;

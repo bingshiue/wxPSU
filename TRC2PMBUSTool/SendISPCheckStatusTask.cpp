@@ -97,6 +97,19 @@ unsigned int SendISPCheckStatusTask::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x02;// Group
+		buffer[active_index++] = 0x01;// Interface
+		buffer[active_index++] = 0x52;// Action : Read
+		buffer[active_index++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[active_index++] = 0x01;//    Write Length
+		buffer[active_index++] = 0x02;//    Read Length
+		buffer[active_index++] = PMBUSHelper::getFWUploadStatusCMD();// Write Data Start
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;

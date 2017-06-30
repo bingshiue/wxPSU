@@ -54,6 +54,12 @@ int SendWriteCMDTask::Main(double elapsedTime){
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		writeCMD = this->m_pmbusSendCommand.m_sendData[7];
+
+		break;
+
 	default:
 
 		break;

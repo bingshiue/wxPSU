@@ -398,10 +398,10 @@ wxDialog(parent, wxID_ANY, wxString(wxT("FRU Maker")), wxDefaultPosition, wxSize
 
 	//m_logSBS->Add(m_logTC, wxSizerFlags(1).Expand().Border(wxDirection::wxALL, 5));
 	
-	m_topLevelSizer->Add(m_productInfoAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	m_topLevelSizer->Add(m_multiRecordAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_topLevelSizer->Add(m_productInfoAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 0));
+	m_topLevelSizer->Add(m_multiRecordAreaSBS, wxSizerFlags(0).Expand().Border(wxALL, 0));
 	//m_topLevelSizer->Add(m_makeBTN, wxSizerFlags(0).Expand());
-	m_topLevelSizer->Add(m_operationSBS, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	m_topLevelSizer->Add(m_operationSBS, wxSizerFlags(0).Expand().Border(wxALL, 0));
 	//m_topLevelSizer->Add(m_logSBS, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	SetSizer(m_topLevelSizer);
@@ -916,7 +916,7 @@ void FRUMakerDialog::MakeFRU(void){
 
 	m_pFRUBinaryContent = build_FRU_blob(fru, &len, false);
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "Length of FRU Binary is %d", len);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Length of FRU Binary is %ld", len);
 	PSU_DEBUG_PRINT(MSG_ALERT, "E2PROM CONTENT :");
 	PMBUSHelper::PrintFRUContent(this->m_pFRUBinaryContent, 256);
 

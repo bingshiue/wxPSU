@@ -150,6 +150,24 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		m_writePageSendBuff[0] = 0x00;
+		m_writePageSendBuff[1] = 0x02;// Group
+		m_writePageSendBuff[2] = 0x01;// Interface
+		m_writePageSendBuff[3] = 0x51;// Action : Write
+		m_writePageSendBuff[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		m_writePageSendBuff[5] = 3;//    Write Length : slave address + command + data
+		m_writePageSendBuff[6] = 0x00;//    Read Length
+		m_writePageSendBuff[7] = 0x00;// Write Data Start Command
+		m_writePageSendBuff[8] = cmdPageValue;// Data
+		// Compute PEC
+		m_writePageSendBuff[9] = PMBusSlave_Crc8MakeBitwiseDiscont(&PMBUSHelper::GetSlaveAddress(), 1, m_writePageSendBuff+7, 2);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", m_writePageSendBuff[9]);
+
+
+		break;
+
 	default:
 
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
@@ -565,6 +583,55 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 
 			//buffer_len = baseIndex;
 
+		}
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+
+		switch(this->m_pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData){
+
+		case cmd_normal_read_data:
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x02;// Group
+			this->m_sendBuff[baseIndex++] = 0x01;// Interface
+			this->m_sendBuff[baseIndex++] = 0x52;// Action : Read
+			this->m_sendBuff[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			this->m_sendBuff[baseIndex++] = 0x01;//    Write Length
+			this->m_sendBuff[baseIndex++] = responseDataLength;//    Read Length
+			this->m_sendBuff[baseIndex++] = command;// Write Data Start
+
+			//buffer_len = baseIndex;
+
+
+			break;
+
+		case cmd_also_send_write_data:
+
+			this->m_sendBuff[baseIndex++] = 0x00;
+			this->m_sendBuff[baseIndex++] = 0x02;// Group
+			this->m_sendBuff[baseIndex++] = 0x01;// Interface
+			this->m_sendBuff[baseIndex++] = 0x53;// Action : MWR
+			this->m_sendBuff[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 1;// Write Length +1 : Including 'Command' Field
+			this->m_sendBuff[baseIndex++] = responseDataLength;//    Read Length
+			this->m_sendBuff[baseIndex++] = command;// Write Data Start
+
+			// Write Data
+			for (unsigned int len = 0; len < (this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength); len++){
+				this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+			}
+
+			//buffer_len = baseIndex;
+
+			break;
+
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error !");
+			break;
 		}
 
 		break;
@@ -1804,6 +1871,14 @@ void IOPortSendCMDThread::productDataBuff(unsigned int cmdIndex, unsigned int re
 		break;
 
 	case IOACCESS_TOTALPHASE:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
+		}
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
 			this->m_pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = this->m_pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];

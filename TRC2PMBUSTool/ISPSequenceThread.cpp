@@ -128,6 +128,25 @@ unsigned int ISPSequenceThread::ProductSendBuffer(unsigned char* buffer){
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		buffer[active_index++] = 0x00;
+		buffer[active_index++] = 0x02;// Group
+		buffer[active_index++] = 0x01;// Interface
+		buffer[active_index++] = 0x51;// Action : Write
+		buffer[active_index++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[active_index++] = 1+1+1;//    Write Length 1+1+ : slave command + pec
+		buffer[active_index++] = 0x00;//    Read Length
+		buffer[active_index++] = PMBUSHelper::getFWUploadModeCMD();// Write Data Start
+		buffer[active_index++] = this->m_target;
+
+		// Compute PEC
+		buffer[active_index++] = PMBusSlave_Crc8MakeBitwiseDiscont(&PMBUSHelper::GetSlaveAddress(), 1, buffer+7, 1+1);
+				//PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 4, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buffer[active_index-1]);
+
+		break;
+
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error");

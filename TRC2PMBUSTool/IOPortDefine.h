@@ -15,7 +15,7 @@
 #define SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT  1000/**< Timeout of Serial Port Send Semaphore */
 #define SERIAL_PORT_SEND_POLLING_INTERVAL  20/**< Interval of Serial Port Send Polling (Milliseconds) */
 
-#define IO_SIZE  4/**< Current 3 Kinds : 1.Serial Port 2.USBHID 3.Total Phase I2C Host Adaptor 4.Pickit */
+#define IO_SIZE  5/**< Current 3 Kinds : 1.Serial Port 2.USBHID 3.Total Phase I2C Host Adaptor 4.Pickit 5.TRC2 I2C Adapter */
 
 #define BASE_RESPONSE_DATA_LENGTH 6
 
@@ -27,6 +27,7 @@ enum {
 	IOACCESS_HID,/**< I/O is USB HID */
 	IOACCESS_TOTALPHASE,/**< I/O is Total Phase I2C Host Adaptor */
 	IOACCESS_PICKIT,/**< I/O is Pickit Serial Analyzer */
+	IOACCESS_TRC2_I2C_ADAPTER,/**< I/O is TRC2 I2C Adapter */
 };
 
 /**

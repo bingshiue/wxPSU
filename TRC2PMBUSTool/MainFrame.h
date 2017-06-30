@@ -28,6 +28,7 @@
 #include "HID.h"
 #include "TotalPhase.h"
 #include "Pickit.h"
+#include "TRC2_I2C_Adapter.h"
 #include "IOAccess.h"
 #include "PMBUSCMDListModel.h"
 #include "PMBUSStatusBar.h"

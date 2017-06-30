@@ -46,6 +46,7 @@ enum {
 	I2C_AdaptorModuleBoard_R90000_95611,
 	I2C_AdaptorModuleBoard_R90000_9271_USB,
 	I2C_AdaptorModuleBoard_TOTALPHASE,
+	I2C_AdaptorModuleBoard_TRC2I2CAdapter
 };
 
 enum {

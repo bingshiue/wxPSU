@@ -742,6 +742,54 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		switch(pmBusCommand[idx].m_cmdStatus.m_alsoSendWriteData){
+
+		case cmd_normal_read_data:
+
+			sendBuffer[baseIndex++] = 0x00;
+			sendBuffer[baseIndex++] = 0x02;// Group
+			sendBuffer[baseIndex++] = 0x01;// Interface
+			sendBuffer[baseIndex++] = 0x52;// Action : Read
+			sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			sendBuffer[baseIndex++] = 0x01;//    Write Length
+			sendBuffer[baseIndex++] = responseDataLength;//    Read Length
+			sendBuffer[baseIndex++] = command;// Write Data Start
+
+			buffer_len = baseIndex;
+
+
+			break;
+
+		case cmd_also_send_write_data:
+
+			sendBuffer[baseIndex++] = 0x00;
+			sendBuffer[baseIndex++] = 0x02;// Group
+			sendBuffer[baseIndex++] = 0x01;// Interface
+			sendBuffer[baseIndex++] = 0x53;// Action : MWR
+			sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 1;// Write Length +1 : Including 'Command' Field
+			sendBuffer[baseIndex++] = responseDataLength;//    Read Length
+			sendBuffer[baseIndex++] = command;// Write Data Start
+
+			// Write Data
+			for (unsigned int len = 0; len < (pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength); len++){
+				sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalData[len];
+			}
+
+			buffer_len = baseIndex;
+
+			break;
+
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error !");
+			break;
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
@@ -909,6 +957,21 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned cha
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;// Group
+		sendBuffer[baseIndex++] = 0x01;// Interface
+		sendBuffer[baseIndex++] = 0x52;// Action : Read
+		sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = 0x01;//    Write Length
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;//    Read Length
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Write Data Start
+
+		buffer_len = baseIndex;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
@@ -1055,6 +1118,33 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		buff[0] = 0x00;
+		buff[1] = 0x02;// Group
+		buff[2] = 0x01;// Interface
+		buff[3] = 0x51;// Action : Write
+		buff[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buff[5] = 1+1+sizeOfDataBuffer;//    Write Length 1+1+ : slave command + pec
+		buff[6] = 0x00;//    Read Length
+		buff[7] = cmd;// Write Data Start
+
+		// Data start from index 8
+		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
+			buff[8 + idx] = dataBuffer[idx];
+			pec_start_index = (8 + idx);
+		}
+
+		// Compute PEC
+		pec_start_index += 1;
+		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwiseDiscont(&PMBUSHelper::GetSlaveAddress(), 1, buff+7, 1+sizeOfDataBuffer);
+				//PMBusSlave_Crc8MakeBitwise(0, 7, sendBuffer + 4, 2 + pmBusWriteCMD->m_numOfSendBytes);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+
+		pec_start_index++;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;
@@ -1102,6 +1192,14 @@ void PMBUSHelper::ProductDataBuffer(unsigned char* DestBuff, unsigned int* curre
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			DestBuff[idx] = SourceBuff[idx];
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Wrong !");
 		break;
@@ -1140,6 +1238,14 @@ void PMBUSHelper::ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* 
 		break;
 
 	case IOACCESS_TOTALPHASE:
+		// Copy Only The Data Bytes To DataBuff
+		for (unsigned int idx = 0; idx < responseDataLength; idx++){
+			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
+		}
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
 		// Copy Only The Data Bytes To DataBuff
 		for (unsigned int idx = 0; idx < responseDataLength; idx++){
 			pmBusCommand[cmdIndex].m_recvBuff.m_dataBuff[idx] = pmBusCommand[cmdIndex].m_recvBuff.m_recvBuff[idx];
@@ -1281,6 +1387,15 @@ unsigned char PMBUSHelper::IsISPRebootCheckResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		if (buffer[0] != REBOOT_OK){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Data Mismatch, Return Code = %02xh", buffer[0]);
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "ISP Reboot Check Response Something Error");
 		break;
@@ -1332,6 +1447,15 @@ unsigned char PMBUSHelper::IsISPStartVerifyResponseOK(unsigned int *currentIO, u
 		break;
 
 	case IOACCESS_TOTALPHASE:
+
+		if (buffer[0] != target){
+			result = response_ng;
+			PSU_DEBUG_PRINT(MSG_ERROR, "ISP Start Verify Response Data Mismatch, Return Code = %02xh", buffer[0]);
+		}
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
 
 		if (buffer[0] != target){
 			result = response_ng;
@@ -1397,6 +1521,15 @@ unsigned char PMBUSHelper::IsISPCheckStatusResponseOK(unsigned int *currentIO, u
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		if (buffer[0] != 0x30){
+			result = response_ng;
+			PrintISPCheckStatusError(buffer[0]);
+		}
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
 		break;
@@ -1415,6 +1548,7 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 	unsigned char ok_buffer[6] = { 0x0d, 0x0a, 0x4f, 0x4b, 0x0d, 0x0a };
 	unsigned char ok_hid_buffer[9] = { 0x15, 0x07, 0x41, 0x43, 0x02, 0x4f, 0x4b, 0x0d, 0x0a };
 	unsigned char ok_pickit_buffer[6] = { 0x86, 0x04, 0x80, 0x81, 0x1c, 0x77 };
+	unsigned char ok_trc2_i2c_adapter_buffer[3] = { 0x02, 0x4f, 0x4b };
 	unsigned char result = response_ok;
 
 #ifndef IGNORE_ISP_RESPONSE_ERROR
@@ -1470,9 +1604,27 @@ unsigned char PMBUSHelper::IsResponseOK(unsigned int *currentIO, unsigned char *
 		break;
 
 	case IOACCESS_TOTALPHASE:
+
 		if (PMBUSHelper::getTotalPhaseWriteReadLastError() != 0){
 			result = response_ng;
 		}
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		if (sizeOfBuffer < sizeof(ok_trc2_i2c_adapter_buffer) / sizeof(ok_trc2_i2c_adapter_buffer[0])){
+			result = response_ng;
+			return result;
+		}
+
+		for (int idx = 0; idx < sizeof(ok_trc2_i2c_adapter_buffer) / sizeof(ok_trc2_i2c_adapter_buffer[0]); idx++){
+			if (buffer[idx] != ok_trc2_i2c_adapter_buffer[idx]){
+				result = response_ng;
+				break;
+			}
+		}
+
 		break;
 	
 	default:
@@ -1525,6 +1677,14 @@ unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsign
 
 	case IOACCESS_TOTALPHASE:
 		// Do Handle When I/O is Serial Port
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		if (SizeOfBuffer == 0){
+			result = response_ng;
+		}
+
 		break;
 
 	default:
@@ -1706,6 +1866,10 @@ int PMBUSHelper::getExpectedDataLengthByIO(unsigned int CurrentUseIO, unsigned i
 		length = CMDResponseDataLength;
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+		length = CMDResponseDataLength;
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
 		break;
@@ -1822,6 +1986,20 @@ int PMBUSHelper::ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned c
 
 		// Update Write Bytes For Write CMD
 		sendBuffer[0] = current_index - 3;
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[current_index++] = 0x00;
+		sendBuffer[current_index++] = 0x02;// Group
+		sendBuffer[current_index++] = 0x01;// Interface
+		sendBuffer[current_index++] = 0x51;// Action : Write
+		sendBuffer[current_index++] = (fruSlaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[current_index++] = 1+1;//    Write Length 1+1 : IDX + DATA
+		sendBuffer[current_index++] = 0x00;//    Read Length
+		sendBuffer[current_index++] = idx;// Write Data Start, Indicates Start Write Offset
+		sendBuffer[current_index++] = fruContentBuffer[idx];
 
 		break;
 
@@ -1969,6 +2147,19 @@ int PMBUSHelper::ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned in
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;// Group
+		sendBuffer[baseIndex++] = 0x01;// Interface
+		sendBuffer[baseIndex++] = 0x52;// Action : Read
+		sendBuffer[baseIndex++] = (fruSlaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = 0x01;//    Write Length
+		sendBuffer[baseIndex++] = 0x01;//    Read Length
+		sendBuffer[baseIndex++] = idx;// Write Data Start, Address offset
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;
@@ -2013,6 +2204,7 @@ bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUs
 	case IOACCESS_SERIALPORT:
 	case IOACCESS_HID:
 	case IOACCESS_PICKIT:
+	case IOACCESS_TRC2_I2C_ADAPTER:
 		// Don't Update Original Result
 		break;
 
@@ -2045,6 +2237,12 @@ unsigned int PMBUSHelper::GetBytesToReadOfWriteCMD(unsigned int CurrentUseIO, un
 
 	case IOACCESS_PICKIT:
 		BytesToRead = 0;// Fill 0 If IO is Pickit
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		BytesToRead = 3 + BaseLength;// 02 4f 4b
+
 		break;
 
 	default:
@@ -2303,6 +2501,10 @@ unsigned int PMBUSHelper::getIndexOfCMDFieldInSendBuffer(unsigned int* currentUs
 
 	case IOACCESS_TOTALPHASE:
 		return   3;
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+		return   7;
 		break;
 
 	default:

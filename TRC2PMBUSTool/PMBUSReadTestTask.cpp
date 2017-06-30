@@ -182,6 +182,21 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 
 		break;
 
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;// Group
+		sendBuffer[baseIndex++] = 0x01;// Interface
+		sendBuffer[baseIndex++] = 0x52;// Action : Read
+		sendBuffer[baseIndex++] = (pmBusReadCMD->m_slaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = 0x01;//    Write Length
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;//    Read Length
+		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Write Data Start
+
+		buffer_len = baseIndex;
+
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error !");
 		break;

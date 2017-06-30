@@ -44,7 +44,7 @@ wxThread::ExitCode IOPortReadCMDThread::Entry()
 		ret = this->m_rxTxSemaphore->Post();
 
 		if (ret != wxSEMA_NO_ERROR){
-			PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore Post Failed, Errot = %d", ret);
+			PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore Post Failed, Error = %d", ret);
 		}
 
 	//};

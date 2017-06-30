@@ -24,6 +24,10 @@ QUERYSequenceThread::QUERYSequenceThread(
 
 	this->m_rxTxSemaphore = new wxSemaphore(0, 0);
 
+	this->m_IOPortReadCMDThread = NULL;
+
+	this->m_running = false;
+
 	// Reset Query Status
 	for (unsigned int idx = 0; idx < PMBUSHelper::GetCurrentCMDTableSize(); idx++){
 		PMBUSHelper::getPMBUSCMDData()[idx].m_cmdStatus.m_queried = cmd_query_not_yet;
@@ -120,14 +124,14 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 
 						}
 						else{
-#ifdef OUTPUT_SEND_DATA
+//#ifdef OUTPUT_SEND_DATA
 							wxString sentData(wxT("Sent Data : "));
 							for (int idx = 0; idx < sendDataLength; idx++){
-								sentData += wxString::Format(" %02x ", this->m_sendBuff[idx]);
+								sentData += wxString::Format(" %02x ", this->m_sendBuffer[idx]);
 							}
 							PSU_DEBUG_PRINT(MSG_DEBUG, "%s", sentData.c_str());
-#endif
-							PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success");
+//#endif
+							PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Success, sendResult=%d", sendResult);
 						}
 
 					} while (sendResult <= 0);
@@ -181,7 +185,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 								PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_recvBuff.m_length = this->m_recvBuff.m_length;
 								for (unsigned int idx2 = 0; idx2 < this->m_recvBuff.m_length; idx2++){
 									PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2] = this->m_recvBuff.m_recvBuff[idx2];
-									PSU_DEBUG_PRINT(MSG_DETAIL, "%d,%d", PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff.m_recvBuff[idx2]);
+									PSU_DEBUG_PRINT(MSG_DEBUG, "%02x,%02x", PMBUSHelper::getPMBUSCMDData()[QueryCMDIndex].m_recvBuff.m_recvBuff[idx2], this->m_recvBuff.m_recvBuff[idx2]);
 								}
 
 								// Prepare Data Buffer
@@ -322,7 +326,7 @@ wxThread::ExitCode QUERYSequenceThread::Entry() {
 													break;
 												}
 
-												// Read Quert Result
+												// Read Query Result
 												unsigned int bytesToRead = PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
 												this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_ioaccess, this->m_currentIO, this->m_rxTxSemaphore, &PMBUSHelper::getPMBUSCMDData()[CoefficientsCMDIndex], &this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 

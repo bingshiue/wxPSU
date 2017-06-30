@@ -35,12 +35,15 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 	m_moduleNameCB->Append("R90000-95611");
 	m_moduleNameCB->Append("R90000-9271(USB)");
 	m_moduleNameCB->Append("TOTAL PHASE");
+	m_moduleNameCB->Append("TRC2 I2C Adapter");
 
-	unsigned long adaptorArray[4] = {
+
+	unsigned long adaptorArray[5] = {
 		I2C_AdaptorModuleBoard_PICKIT_SERIAL,
 		I2C_AdaptorModuleBoard_R90000_95611,
 		I2C_AdaptorModuleBoard_R90000_9271_USB,
-		I2C_AdaptorModuleBoard_TOTALPHASE
+		I2C_AdaptorModuleBoard_TOTALPHASE,
+		I2C_AdaptorModuleBoard_TRC2I2CAdapter
 	};
 	unsigned int module_select = 0;
 	for (unsigned int idx = 0; idx < sizeof(adaptorArray) / sizeof(adaptorArray[0]); idx++){
@@ -66,7 +69,7 @@ I2CInterfaceDialog::I2CInterfaceDialog(wxWindow *parent, IOACCESS* ioaccess, uns
 
 	m_RegisterAddrLengthST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Register Addr Length"));
 	m_MaxReadBytesST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Max Read Bytes"));
-	m_MaxWriteBytesST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Mzx Write Bytes"));
+	m_MaxWriteBytesST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Max Write Bytes"));
 	m_TrasmitTimeoutST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Transmit Timeout (ms)"));
 	m_WriteCycleTimeST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Write Cycle Time (ms)"));
 	m_PollingCycleTimeST = new wxStaticText(m_generalPanel, wxID_ANY, wxT("Polling Cycle Time (ms)"));
@@ -222,6 +225,10 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_TOTALPHASE;
 		break;
 
+	case I2C_AdaptorModuleBoard_TRC2I2CAdapter:
+		this->m_appSettings->m_I2CAdaptorModuleBoard = I2C_AdaptorModuleBoard_TRC2I2CAdapter;
+		break;
+
 	default:
 		PSU_DEBUG_PRINT(MSG_ALERT, "Save I2C Adaptor Module Board Error");
 		break;
@@ -251,6 +258,12 @@ void I2CInterfaceDialog::OnOKButton(wxCommandEvent& event){
 	case I2C_AdaptorModuleBoard_TOTALPHASE:
 
 		*this->m_currentUseIO = IOACCESS_TOTALPHASE;
+
+		break;
+
+	case I2C_AdaptorModuleBoard_TRC2I2CAdapter:
+
+		*this->m_currentUseIO = IOACCESS_TRC2_I2C_ADAPTER;
 
 		break;
 
@@ -483,6 +496,15 @@ int I2CInterfaceDialog::OpenIODevice(void){
 				wxString pickitSerialDeviceName(wxT("PICKIT Serial"));
 
 				this->UpdateStatusBarIOSettingFiled(pickitSerialDeviceName);
+
+				// Update I2C Clock Speed Field
+				this->UpdateStatusBarIOSettingFiled(100);
+
+			}else if(*this->m_currentUseIO == IOACCESS_TRC2_I2C_ADAPTER){
+
+				wxString trc2I2CAdapterDeviceName(wxT("TRC2 I2C Adapter"));
+
+				this->UpdateStatusBarIOSettingFiled(trc2I2CAdapterDeviceName);
 
 				// Update I2C Clock Speed Field
 				this->UpdateStatusBarIOSettingFiled(100);

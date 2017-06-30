@@ -366,6 +366,23 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 				delete comportDialog;
 			}
+			// If Find TRC2 I2C Adapter
+			else if (this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_EnumerateAvailableDevice(this->m_enumIOPort, IO_PORT_MAX_COUNT) > 0){
+
+				// Hint User Can Use USB Adaptor Device
+				wxMessageBox(wxT("Found TRC2 I2C Adaptor Board \n\nYou Can Setup I/O to Use TRC2 I2C Adaptor Board in Next Popup Setting Window"),
+					wxT("Found Acbel TRC2 I2C Adaptor Board !"),  // caption
+					wxOK | wxICON_INFORMATION);
+
+				// Popup I2C Interface Dialog
+				I2CInterfaceDialog* i2cIFDialog = new I2CInterfaceDialog(this, this->m_IOAccess, &this->m_CurrentUseIOInterface, &this->m_appSettings, this->m_status_bar, true, I2C_AdaptorModuleBoard_TRC2I2CAdapter);
+				i2cIFDialog->Centre(wxCENTER_ON_SCREEN);
+				i2cIFDialog->ShowModal();
+
+				delete i2cIFDialog;
+
+			}
+
 
 			// If I/O Device Opened Success in Previous Operation
 			if (this->m_IOAccess[this->m_CurrentUseIOInterface].m_GetDeviceStatus() == IODEVICE_OPEN){
@@ -3039,6 +3056,17 @@ void MainFrame::DoSetupIOAccess(void){
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceSendDataExtra = TotalPhaseSendDataExtra;
 	this->m_IOAccess[IOACCESS_TOTALPHASE].m_DeviceReadDataExtra = TotalPhaseReadDataExtra;
 
+	// TRC2 I2C Adapter
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_EnumerateAvailableDevice = EnumerateAvailableTRC2I2CAdapterDevice;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_GetDeviceStatus = GetTRC2I2CAdapterDeviceStatus;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_GetOpenDeviceName = GetTRC2I2CAdapterOpenDeviceName;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_OpenDevice = OpenTRC2I2CAdapterDevice;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_CloseDevice = CloseTRC2I2CAdapterDevice;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_DeviceSendData = TRC2I2CAdapterSendData;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_DeviceReadData = TRC2I2CAdapterReadData;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_DeviceSendDataExtra = TRC2I2CAdapterSendDataExtra;
+	this->m_IOAccess[IOACCESS_TRC2_I2C_ADAPTER].m_DeviceReadDataExtra = TRC2I2CAdapterReadDataExtra;
+
 	// Current Use IO
 	switch (this->m_appSettings.m_I2CAdaptorModuleBoard){
 
@@ -3063,6 +3091,12 @@ void MainFrame::DoSetupIOAccess(void){
 	case I2C_AdaptorModuleBoard_TOTALPHASE:
 
 		this->m_CurrentUseIOInterface = IOACCESS_TOTALPHASE;
+
+		break;
+
+	case I2C_AdaptorModuleBoard_TRC2I2CAdapter:
+
+		this->m_CurrentUseIOInterface = IOACCESS_TRC2_I2C_ADAPTER;
 
 		break;
 
@@ -3283,6 +3317,15 @@ int MainFrame::OpenIODevice(void){
 						wxMilliSleep(10);
 					};
 
+				}else if(this->m_CurrentUseIOInterface == IOACCESS_TRC2_I2C_ADAPTER){
+
+					wxString trc2I2CAdapterDeviceName(wxT("TRC2 I2C Adapter"));
+
+					this->UpdateStatusBarIOSettingFiled(trc2I2CAdapterDeviceName);
+
+					// Update I2C Clock Speed Field
+					this->UpdateStatusBarIOSettingFiled(100);
+
 				}
 		
 				//
@@ -3476,6 +3519,11 @@ void MainFrame::OnSendThreadUpdate(wxThreadEvent& event)
 		}
 	}
 
+#ifndef _WIN32
+	// For Update Icon Color To Yellow
+	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
+#endif
+
 }
 
 void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
@@ -3485,7 +3533,10 @@ void MainFrame::OnSendThreadUpdateRaw(wxThreadEvent& event){
 
 	this->m_cmdListModel.get()->SetValueByRow(variantRaw, event.GetInt(), PMBUSCMDListModel::Col_RawText);
 	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RawText);
+
+#ifndef _WIN32
 	this->m_cmdListModel.get()->RowValueChanged(event.GetInt(), PMBUSCMDListModel::Col_RegisterIconText);
+#endif
 
 	this->m_status_bar->getGauge()->Pulse();
 

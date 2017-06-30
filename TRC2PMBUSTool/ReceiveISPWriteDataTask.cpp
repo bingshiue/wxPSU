@@ -58,6 +58,8 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 		case IOACCESS_SERIALPORT:
 		case IOACCESS_HID:
+		case IOACCESS_PICKIT:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data Failed, Receive Data Length = %d", this->m_recvBuff.m_length);
 			isp_response_error = true;
 			break;
@@ -102,6 +104,8 @@ int ReceiveISPWriteDataTask::Main(double elapsedTime){
 
 			case IOACCESS_SERIALPORT:
 			case IOACCESS_HID:
+			case IOACCESS_PICKIT:
+			case IOACCESS_TRC2_I2C_ADAPTER:
 
 				if (PMBUSHelper::GetAppSettings()->m_pfcIspF3CMDDelayTime > 0){
 					// Sleep (For wait primary chip return correct reponse ) 

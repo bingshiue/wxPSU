@@ -37,3 +37,38 @@ unsigned short PMBusSlave_Crc8MakeBitwise(unsigned char PMBusSlave_CRC, unsigned
 
 	return(PMBusSlave_CRC);
 }
+
+unsigned short PMBusSlave_Crc8MakeBitwiseDiscont(unsigned char* src_buffer1, unsigned char src_len1, unsigned char* src_buffer2, unsigned char src_len2){
+
+	unsigned short pec = 0x00;
+	unsigned char op_buffer[256];
+	unsigned char op_buffer_idx = 0;
+
+	for(unsigned int idx=0; idx<sizeof(op_buffer)/sizeof(op_buffer[0]); idx++){
+		op_buffer[idx] = 0;
+	}
+
+	// Check Length
+	if((src_len1+src_len2) > 256){
+		return pec;
+	}
+
+	// Make OP Buffer
+	for(unsigned int idx=0; idx<src_len1; idx++){
+		op_buffer[idx] = *(src_buffer1+idx);
+		op_buffer_idx = idx;
+	}
+
+	op_buffer_idx++;
+
+	for(unsigned int idx=0; idx<src_len2; idx++,op_buffer_idx++){
+		op_buffer[op_buffer_idx] = *(src_buffer2+idx);
+	}
+
+	op_buffer_idx++;
+
+	pec = PMBusSlave_Crc8MakeBitwise(0, 7, op_buffer, (src_len1+src_len2));
+
+	return pec;
+
+}

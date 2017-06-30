@@ -233,6 +233,7 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 		switch (*this->m_CurrentIO){
 
 		case IOACCESS_PICKIT:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE + 1;
 			break;
 
@@ -382,6 +383,28 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 			this->m_e2pRomContent[offset] = recvBuffer[0];
 			offset++;
 			readRetry = 0;
+			break;
+
+		case IOACCESS_TRC2_I2C_ADAPTER:
+
+			if (recvLength == 0){
+				readRetry++;
+				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Data From E2PRom NG, Retry %d !", readRetry);
+				if (readRetry < MAX_E2PROM_READ_RETRY_TIMES){
+					continue;
+				}
+				else{
+					PSU_DEBUG_PRINT(MSG_ERROR, "Receive Data From E2PRom Retry Still Failed !");
+					offset++;
+					readRetry = 0;
+					continue;
+				}
+			}
+
+			this->m_e2pRomContent[offset] = recvBuffer[0];
+			offset++;
+			readRetry = 0;
+
 			break;
 
 		default:

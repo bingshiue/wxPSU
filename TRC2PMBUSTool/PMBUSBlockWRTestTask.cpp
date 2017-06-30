@@ -224,8 +224,30 @@ int PMBUSBlockWRTestTask::ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockW
 
 		baseIndex++;
 
-		//Update Write Data Bytes Length For Block Wrire - Block Read Commands
+		//Update Write Data Bytes Length For Block Write - Block Read Commands
 		sendBuffer[0] = baseIndex - 3;
+
+		buffer_len = baseIndex;
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		sendBuffer[baseIndex++] = 0x00;
+		sendBuffer[baseIndex++] = 0x02;// Group
+		sendBuffer[baseIndex++] = 0x01;// Interface
+		sendBuffer[baseIndex++] = 0x53;// Action : MWR
+		sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfWriteBytes + 1 + 1;// Write Length +1 +1: 1a [01] 87
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfReadBytes;;//    Read Length
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_cmd;// Write Data Start
+
+		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfWriteBytes;// 01
+
+		// Write Data
+		for (unsigned int len = 0; len < (pmBusBlockWRCMD->m_numOfWriteBytes); len++){
+			sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_writeBytes[len];
+		}
 
 		buffer_len = baseIndex;
 
