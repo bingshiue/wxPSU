@@ -8,7 +8,7 @@
 WritePage9AH::WritePage9AH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"MFR_MODEL: "), wxDefaultPosition, wxSize(80, -1));
-	m_inputValue = new wxTextCtrl(this, wxID_ANY);
+	m_inputValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(100, -1));
 
 	m_loadDefaultBTN = new wxButton(this, CID_BUTTON_LOADDEFAULT, wxT("Load Default"));
 
@@ -106,7 +106,7 @@ void WritePage9AH::OnButtonWrite(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(CMD9AH);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %ld", this->m_sendCMDVector->size());
 		}
 	}
 	else{

@@ -250,6 +250,7 @@ private:
 	void dump_MULTIRECORD(struct MULTIRECORD_INFO *fru);
 
 	bool isHaveEmptyField(void);
+	void ResetTCBGToWhite(void);
 
 	wxDECLARE_EVENT_TABLE();
 };

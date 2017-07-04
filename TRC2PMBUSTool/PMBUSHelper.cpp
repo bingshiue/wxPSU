@@ -1642,6 +1642,7 @@ unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsign
 	unsigned int result = response_ok;
 	unsigned int chk_cnt = 0;
 	unsigned char usbhid_no_ack[9] = { 0x15, 0x07, 0x41, 0x43, 0x02, 0x4e, 0x47, 0x0d, 0x0a };
+	unsigned char trc2_i2c_adapter_no_ack[3] = { 0x02, 0x4e, 0x47 };
 
 	switch (*currentIO){
 
@@ -1683,6 +1684,21 @@ unsigned int PMBUSHelper::IsI2CBusNotAcknowlwdge(unsigned int *currentIO, unsign
 
 		if (SizeOfBuffer == 0){
 			result = response_ng;
+			break;
+		}
+
+		if(buffer[0] == trc2_i2c_adapter_no_ack[0]){
+
+			for(unsigned char idx=1, cnt=0; idx<sizeof(trc2_i2c_adapter_no_ack)/sizeof(trc2_i2c_adapter_no_ack[0]); idx++){
+				if(buffer[idx] == trc2_i2c_adapter_no_ack[idx]){
+					cnt++;
+
+					if(cnt >= 2){
+						result = response_ng;
+						break;
+					}
+				}
+			}
 		}
 
 		break;

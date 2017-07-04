@@ -157,14 +157,13 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 		m_writePageSendBuff[2] = 0x01;// Interface
 		m_writePageSendBuff[3] = 0x51;// Action : Write
 		m_writePageSendBuff[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
-		m_writePageSendBuff[5] = 3;//    Write Length : slave address + command + data
+		m_writePageSendBuff[5] = 0x03;//    Write Length : slave address + command + data
 		m_writePageSendBuff[6] = 0x00;//    Read Length
 		m_writePageSendBuff[7] = 0x00;// Write Data Start Command
 		m_writePageSendBuff[8] = cmdPageValue;// Data
 		// Compute PEC
 		m_writePageSendBuff[9] = PMBusSlave_Crc8MakeBitwiseDiscont(&PMBUSHelper::GetSlaveAddress(), 1, m_writePageSendBuff+7, 2);
 		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", m_writePageSendBuff[9]);
-
 
 		break;
 
@@ -1229,7 +1228,8 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 							}
 
 							// Create IOPortReadCMDThread
-							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, BASE_RESPONSE_DATA_LENGTH);
+							this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE,
+									PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_CurrentIO, BASE_RESPONSE_DATA_LENGTH));
 
 							// If Create Thread Success
 							if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
@@ -1261,6 +1261,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 									case IOACCESS_SERIALPORT:
 									case IOACCESS_HID:
 									case IOACCESS_PICKIT:
+									case IOACCESS_TRC2_I2C_ADAPTER:
 										PSU_DEBUG_PRINT(MSG_ERROR, "Response Length of Write Page CMD is %d", this->m_recvBuff->m_length);
 										break;
 

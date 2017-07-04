@@ -512,6 +512,99 @@ bool FRUMakerDialog::isHaveEmptyField(void){
 	return false;
 }
 
+void FRUMakerDialog::ResetTCBGToWhite(void){
+
+	wxTextCtrl* TCArray[39] = {
+		// 0
+		m_piManufacturerNameTC,
+		// 1
+		m_piProductNameTC,
+		// 2
+		m_piProductModelNumberTC,
+		// 3
+		m_piProductVersionTC,
+		// 4
+		m_piProductSerialNumberTC,
+		// 5
+		m_piAssetTagTC,
+		// 6
+		m_piFRUFileIDTC,
+
+		// 7
+		m_mapsiOverallcapacityTC,
+		// 8
+		m_mapsiPeakVATC,
+		// 9
+		m_mapsiInrushCurrentTC,
+		// 10
+		m_mapsiInrushIntervalTC,
+		// 11
+		m_mapsiLowEndInputVoltageRange1TC,
+		// 12
+		m_mapsiHighEndInputVoltageRange1TC,
+		// 13
+		m_mapsiLowEndInputVoltageRange2TC,
+		// 14
+		m_mapsiHighEndInputVoltageRange2TC,
+		// 15
+		m_mapsiLowEndInputFrequencyRangeTC,
+		// 16
+		m_mapsiHighEndInputFrequencyRangeTC,
+		// 17
+		m_mapsiACDropoutToleranceTC,
+		// 18
+		m_mapsiBinaryFlagsTC,
+		// 19
+		m_mapsiPeakWattageHoldUpTimeTC,
+		// 20
+		m_mapsiPeakWattagePeakCapacityTC,
+		// 21
+		m_mapsiCombinedWattageVoltage1TC,
+		// 22
+		m_mapsiCombinedWattageVoltage2TC,
+		// 23
+		m_mapsiTotalCombinedWattageTC,
+		// 24
+		m_mapsiRPSTC,
+
+
+		// 25
+		m_maDCOutput1OutputNumberTC,
+		// 26
+		m_maDCOutput1NominalVoltageTC,
+		// 27
+		m_maDCOutput1MaximumNegativeVoltageDeviationTC,
+		// 28
+		m_maDCOutput1MaximumPositiveVoltageDeviationTC,
+		// 29
+		m_maDCOutput1RippleAndNoiseTC,
+		// 30
+		m_maDCOutput1MinimumCurrentDrawTC,
+		// 31
+		m_maDCOutput1MaximumCurrentDrawTC,
+
+
+		// 32
+		m_maDCOutput2OutputNumberTC,
+		// 33
+		m_maDCOutput2NominalVoltageTC,
+		// 34
+		m_maDCOutput2MaximumNegativeVoltageDeviationTC,
+		// 35
+		m_maDCOutput2MaximumPositiveVoltageDeviationTC,
+		// 36
+		m_maDCOutput2RippleAndNoiseTC,
+		// 37
+		m_maDCOutput2MinimumCurrentDrawTC,
+		// 38
+		m_maDCOutput2MaximumCurrentDrawTC
+	};
+
+	for (unsigned int idx = 0; idx < sizeof(TCArray) / sizeof(TCArray[0]); idx++){
+		TCArray[idx]->SetBackgroundColour(wxColour( 255, 255, 255));
+	}
+}
+
 void FRUMakerDialog::MakeFRU(void){
 
 	size_t len;
@@ -1068,6 +1161,8 @@ void FRUMakerDialog::OnE2PRomWriteEnd(wxThreadEvent& event){
 	this->m_importBTN->Enable(true);
 	this->m_writeBTN->Enable(true);
 
+	this->ResetTCBGToWhite();
+
 	wxMessageBox(wxT("Write & Verify E2PROM Success"),
 		wxT("Write E2PROM Success"),  // caption
 		wxOK | wxICON_INFORMATION);
@@ -1142,7 +1237,6 @@ void FRUMakerDialog::OnE2PRomReadInterrupt(wxThreadEvent& event){
 		wxT("Read E2PROM Failed"),  // caption
 		wxOK | wxICON_ERROR);
 }
-
 
 void FRUMakerDialog::OnDialogClose(wxCloseEvent& event){
 

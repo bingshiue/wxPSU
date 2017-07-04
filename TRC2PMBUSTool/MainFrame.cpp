@@ -95,7 +95,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	SetIcon(wxICON(app_ico));
 #endif
 
-	// Setup Modeld
+	// Setup Model
 	SetupModel();
 
 	// Setup PMBusCommand Data
@@ -1033,22 +1033,32 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		PMBUSCMDListModel::Col_RegisterIconText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
+		wxALIGN_CENTER_HORIZONTAL,//wxALIGN_NOT,
 		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Name",
 		PMBUSCMDListModel::Col_NameText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_NOT,
-		wxDATAVIEW_COL_SORTABLE);
+		//wxCOL_WIDTH_AUTOSIZE,
+#ifdef __GNUC__
+		150,//wxCOL_WIDTH_AUTOSIZE,
+#else
+		75,//wxCOL_WIDTH_AUTOSIZE,
+#endif
+		wxALIGN_CENTER_HORIZONTAL,//wxALIGN_NOT,
+		wxCOL_RESIZABLE);//wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Access",
 		PMBUSCMDListModel::Col_AccessText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
-		wxCOL_WIDTH_AUTOSIZE,
+		//wxCOL_WIDTH_AUTOSIZE,
+#ifdef __GNUC__
+		150,//wxCOL_WIDTH_AUTOSIZE,
+#else
+		75,//wxCOL_WIDTH_AUTOSIZE,
+#endif
 		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);//wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Query",
 		PMBUSCMDListModel::Col_QueryText,

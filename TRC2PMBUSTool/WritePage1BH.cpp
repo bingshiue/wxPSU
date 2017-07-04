@@ -9,10 +9,10 @@
 
 WritePage1BH::WritePage1BH(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_code = new wxStaticText(this, wxID_ANY, wxString(L"STATUS_x CMD"), wxDefaultPosition, wxSize(-1, -1));
+	m_code = new wxStaticText(this, wxID_ANY, wxString(L"STATUS_x CMD"), wxDefaultPosition, wxSize(100, -1));
 	m_codeInputValue = new wxTextCtrl(this, wxID_ANY);
 
-	m_mask = new wxStaticText(this, wxID_ANY, wxString(L"Mask"), wxDefaultPosition, wxSize(-1, -1));
+	m_mask = new wxStaticText(this, wxID_ANY, wxString(L"Mask"), wxDefaultPosition, wxSize(100, -1));
 	m_maskInputValue = new wxTextCtrl(this, wxID_ANY);
 
 	m_padding = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(100, 10));
@@ -173,7 +173,7 @@ void WritePage1BH::OnButtonWrite(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(CMD1BH);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %ld", this->m_sendCMDVector->size());
 		}
 	}
 	else{

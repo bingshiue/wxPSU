@@ -344,7 +344,7 @@ void PMBUSFWProgressDialog::OnBtnCancelOK(wxCommandEvent& event) {
 
 	while (Task::GetCount() > 0){		
 		// If Task Count > 0, Wait
-		PSU_DEBUG_PRINT(MSG_DEBUG, "Wait For Remain Task End, Task Count = %d", Task::GetCount());
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Wait For Remain Task End, Task Count = %ld", Task::GetCount());
 
 		wxMilliSleep(10);
 	};

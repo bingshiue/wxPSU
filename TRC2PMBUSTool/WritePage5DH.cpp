@@ -13,8 +13,8 @@ WritePage5DH::WritePage5DH(wxWindow* parent, wxString& label, bool* monitor_runn
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
 	m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Exponent"), wxDefaultPosition, wxSize(80, -1));
-	m_inputValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
-	m_scaleValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
+	m_inputValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(70, -1));
+	m_scaleValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(70, -1));
 
 	wxString default_scale = wxString::Format("%1.5f", DEFAULT_SCALE_VALUE);
 	m_scaleValue->SetValue(default_scale);
@@ -266,7 +266,7 @@ void WritePage5DH::OnButtonWrite(wxCommandEvent& event){
 	if (*this->m_monitor_running == true){
 		if (this->m_sendCMDVector->size() == 0){
 			this->m_sendCMDVector->push_back(CMD5DH);
-			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %d", this->m_sendCMDVector->size());
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Size of m_sendCMDVector is %ld", this->m_sendCMDVector->size());
 		}
 	}
 	else{
