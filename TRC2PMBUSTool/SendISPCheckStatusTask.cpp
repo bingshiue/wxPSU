@@ -103,7 +103,7 @@ unsigned int SendISPCheckStatusTask::ProductSendBuffer(unsigned char* buffer){
 		buffer[active_index++] = 0x02;// Group
 		buffer[active_index++] = 0x01;// Interface
 		buffer[active_index++] = 0x52;// Action : Read
-		buffer[active_index++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		buffer[active_index++] = 0x01;//    Write Length
 		buffer[active_index++] = 0x02;//    Read Length
 		buffer[active_index++] = PMBUSHelper::getFWUploadStatusCMD();// Write Data Start

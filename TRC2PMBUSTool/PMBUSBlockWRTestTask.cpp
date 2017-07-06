@@ -237,7 +237,7 @@ int PMBUSBlockWRTestTask::ProductBlockWRCMDBuffer(PMBUSBlockWRCMD_t* pmBusBlockW
 		sendBuffer[baseIndex++] = 0x02;// Group
 		sendBuffer[baseIndex++] = 0x01;// Interface
 		sendBuffer[baseIndex++] = 0x53;// Action : MWR
-		sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfWriteBytes + 1 + 1;// Write Length +1 +1: 1a [01] 87
 		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_numOfReadBytes;;//    Read Length
 		sendBuffer[baseIndex++] = pmBusBlockWRCMD->m_cmd;// Write Data Start

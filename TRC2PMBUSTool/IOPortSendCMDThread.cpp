@@ -156,7 +156,7 @@ void IOPortSendCMDThread::productWritePageSendBuff(char cmdPageValue){
 		m_writePageSendBuff[1] = 0x02;// Group
 		m_writePageSendBuff[2] = 0x01;// Interface
 		m_writePageSendBuff[3] = 0x51;// Action : Write
-		m_writePageSendBuff[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		m_writePageSendBuff[4] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		m_writePageSendBuff[5] = 0x03;//    Write Length : slave address + command + data
 		m_writePageSendBuff[6] = 0x00;//    Read Length
 		m_writePageSendBuff[7] = 0x00;// Write Data Start Command
@@ -597,7 +597,7 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x02;// Group
 			this->m_sendBuff[baseIndex++] = 0x01;// Interface
 			this->m_sendBuff[baseIndex++] = 0x52;// Action : Read
-			this->m_sendBuff[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 			this->m_sendBuff[baseIndex++] = 0x01;//    Write Length
 			this->m_sendBuff[baseIndex++] = responseDataLength;//    Read Length
 			this->m_sendBuff[baseIndex++] = command;// Write Data Start
@@ -613,7 +613,7 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x02;// Group
 			this->m_sendBuff[baseIndex++] = 0x01;// Interface
 			this->m_sendBuff[baseIndex++] = 0x53;// Action : MWR
-			this->m_sendBuff[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 			this->m_sendBuff[baseIndex++] = this->m_pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 1;// Write Length +1 : Including 'Command' Field
 			this->m_sendBuff[baseIndex++] = responseDataLength;//    Read Length
 			this->m_sendBuff[baseIndex++] = command;// Write Data Start

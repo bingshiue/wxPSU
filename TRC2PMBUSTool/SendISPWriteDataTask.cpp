@@ -756,7 +756,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		buffer[active_index++] = 0x02;// Group
 		buffer[active_index++] = 0x01;// Interface
 		buffer[active_index++] = 0x51;// Action : Write
-		buffer[active_index++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[active_index++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		buffer[active_index++] = 1+1+20;//    Write Length 1+1+ : slave command + pec
 		buffer[active_index++] = 0x00;//    Read Length
 		buffer[active_index++] = PMBUSHelper::getFWUploadCMD();// Write Data Start

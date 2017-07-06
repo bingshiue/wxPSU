@@ -60,6 +60,7 @@
 #define TP_E2PRomReadDataTask (0.5f)
 #define TP_SendReadCMDTask (0.5f)
 #define TP_ReceiveReadCMDTask (0.5f)
+#define TP_FindAvailableSlaveI2CDeviceTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -92,6 +93,7 @@ enum {
 	task_ID_E2PRomReadDataTask,
 	task_ID_SendReadCMDTask,
 	task_ID_ReceiveReadCMDTask,
+	task_ID_FindAvailableSlaveI2CDeviceTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -1294,6 +1296,48 @@ public:
 	 * @retval success or failure
 	 */
 	int Main(double elapsedTime);
+};
+
+#define MAX_SLAVE_DEVICES 128
+class FindAvailableSlaveI2CDeviceTask : public TaskEx {
+	wxEvtHandler *m_evtHandler;
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+	unsigned char m_SlaveAddr;/**< Slave Address */
+	unsigned char m_AvailableSlaveDevices[MAX_SLAVE_DEVICES];/**< Available Slave Devices */
+	unsigned char* m_pAvailableSlaveDevices;/**< Pointer of Available Slave Devices */
+
+public:
+
+	bool m_running;
+	bool* m_outputLog;
+
+	/**
+	* @brief Constructor.
+	*/
+	FindAvailableSlaveI2CDeviceTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler, unsigned char* availableSlaveDevices,bool* outputLog);
+
+	/**
+	* @brief Deconstructor.
+	*/
+	~FindAvailableSlaveI2CDeviceTask(void);
+
+	/**
+	* @brief Draw function.
+	*/
+	void Draw(void);
+
+	/**
+	* @brief Main update function.
+	*
+	* @param elapsedTime elapsed time
+	* @retval success or failure
+	*/
+	int Main(double elapsedTime);
+
 };
 
 #endif

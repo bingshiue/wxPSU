@@ -641,7 +641,7 @@ int CalibrationDialog::ProductSendBuffer(unsigned char* buffer, unsigned int Siz
 		buffer[1] = 0x02;// Group
 		buffer[2] = 0x01;// Interface
 		buffer[3] = 0x51;// Action : Write
-		buffer[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buffer[4] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		buffer[5] = 1+1+6;//    Write Length 1+1+ : slave address command + pec
 		buffer[6] = 0x00;//    Read Length
 		buffer[7] = 0xCB;// Write Data Start Command 0xCB

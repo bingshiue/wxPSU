@@ -76,6 +76,8 @@ public :
 	static int ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned int idx, unsigned char* sendBuffer, unsigned int* currentIO);
 	static void PrintFRUContent(unsigned char* contentBuffer, unsigned int dumpSize);
 
+	static int ProductI2CWriteSingleByteBuffer(unsigned char slaveAddr, unsigned char *buff, unsigned int* currentIO);
+
 	static long HexToDecimal(wxString string);
 
 	static void GetNowDateTimeString(wxString& string);

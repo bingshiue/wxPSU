@@ -80,6 +80,7 @@ public:
 		MENU_ID_Update_Secondary_Firmware,
 		MENU_ID_Stop_Programming,
 		MENU_ID_Query_All_Commands,
+		MENU_ID_Find_Available_I2C_Slave_Device,
 		MENU_ID_I2C_Fault_Test,
 		MENU_ID_Enable_Checksum,
 		MENU_ID_Only_Polling_Support_Command,
@@ -190,7 +191,9 @@ public:
 
 	RECVBUFF_t m_IOPortRecvBuff;/**< Receive Data Buffer */
 
-	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vectorfor Send Write CMD */
+	vector<PMBUSSendCOMMAND_t> m_sendCMDVector; /**< Vector for Send Write CMD */
+
+	unsigned char m_available_i2c_slave_devices[128];/**< Available I2C Slave Address */
 
 	// Splitter Window
 	wxSplitterWindow* m_splitterWindow;
@@ -284,6 +287,7 @@ public:
 	wxMenuItem  *m_updateSecondaryFirmwareMenuItem;
 	wxMenuItem  *m_stopProgrammingMenuItem;
 	wxMenuItem  *m_queryAllCommandsMenuItem;
+	wxMenuItem  *m_findAvailableI2CSlaveDeviceMenuItem;
 	wxMenuItem  *m_i2cFaultTestMenuItem;
 	wxMenuItem  *m_EnableChecksumMenuItem;
 	wxMenuItem  *m_onlyPollingSupportCMDMenuItem;
@@ -433,6 +437,7 @@ private:
 	void OnUpdateSecondaryFirmware(wxCommandEvent& event);
 	void OnStopProgramming(wxCommandEvent& event);
 	void OnQueryAllCommands(wxCommandEvent& event);
+	void OnFindAvailableI2CSlaveDevice(wxCommandEvent& event);
 	void OnI2CFaultTest(wxCommandEvent& event);
 	void OnEnableChecksum(wxCommandEvent& event);
 	void OnOnlyPollingSupportCommand(wxCommandEvent& event);

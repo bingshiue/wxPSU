@@ -156,7 +156,7 @@ int PMBUSWriteTestTask::ProductWriteCMDBuffer(PMBUSWriteCMD_t* pmBusWriteCMD, un
 		sendBuffer[1] = 0x02;// Group
 		sendBuffer[2] = 0x01;// Interface
 		sendBuffer[3] = 0x51;// Action : Write
-		sendBuffer[4] = (pmBusWriteCMD->m_slaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[4] = pmBusWriteCMD->m_slaveAddr;// Data Package Start, Slave Address
 		sendBuffer[5] = 1+1+pmBusWriteCMD->m_numOfSendBytes;//    Write Length 1+1+ :  command + pec
 		sendBuffer[6] = 0x00;//    Read Length
 		sendBuffer[7] = pmBusWriteCMD->m_cmd;// Write Data Start

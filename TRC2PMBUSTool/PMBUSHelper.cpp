@@ -752,7 +752,7 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 			sendBuffer[baseIndex++] = 0x02;// Group
 			sendBuffer[baseIndex++] = 0x01;// Interface
 			sendBuffer[baseIndex++] = 0x52;// Action : Read
-			sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 			sendBuffer[baseIndex++] = 0x01;//    Write Length
 			sendBuffer[baseIndex++] = responseDataLength;//    Read Length
 			sendBuffer[baseIndex++] = command;// Write Data Start
@@ -768,7 +768,7 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned cha
 			sendBuffer[baseIndex++] = 0x02;// Group
 			sendBuffer[baseIndex++] = 0x01;// Interface
 			sendBuffer[baseIndex++] = 0x53;// Action : MWR
-			sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 			sendBuffer[baseIndex++] = pmBusCommand[idx].m_cmdStatus.m_AddtionalDataLength + 1;// Write Length +1 : Including 'Command' Field
 			sendBuffer[baseIndex++] = responseDataLength;//    Read Length
 			sendBuffer[baseIndex++] = command;// Write Data Start
@@ -963,7 +963,7 @@ int PMBUSHelper::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned cha
 		sendBuffer[baseIndex++] = 0x02;// Group
 		sendBuffer[baseIndex++] = 0x01;// Interface
 		sendBuffer[baseIndex++] = 0x52;// Action : Read
-		sendBuffer[baseIndex++] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		sendBuffer[baseIndex++] = 0x01;//    Write Length
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;//    Read Length
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Write Data Start
@@ -1124,7 +1124,7 @@ int PMBUSHelper::ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *b
 		buff[1] = 0x02;// Group
 		buff[2] = 0x01;// Interface
 		buff[3] = 0x51;// Action : Write
-		buff[4] = (PMBUSHelper::GetSlaveAddress() >> 1);// Data Package Start, Slave Address
+		buff[4] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
 		buff[5] = 1+1+sizeOfDataBuffer;//    Write Length 1+1+ : slave command + pec
 		buff[6] = 0x00;//    Read Length
 		buff[7] = cmd;// Write Data Start
@@ -2011,7 +2011,7 @@ int PMBUSHelper::ProductE2PRomWriteBuffer(unsigned char fruSlaveAddr, unsigned c
 		sendBuffer[current_index++] = 0x02;// Group
 		sendBuffer[current_index++] = 0x01;// Interface
 		sendBuffer[current_index++] = 0x51;// Action : Write
-		sendBuffer[current_index++] = (fruSlaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[current_index++] = fruSlaveAddr;// Data Package Start, Slave Address
 		sendBuffer[current_index++] = 1+1;//    Write Length 1+1 : IDX + DATA
 		sendBuffer[current_index++] = 0x00;//    Read Length
 		sendBuffer[current_index++] = idx;// Write Data Start, Indicates Start Write Offset
@@ -2169,7 +2169,7 @@ int PMBUSHelper::ProductE2PRomReadBuffer(unsigned char fruSlaveAddr, unsigned in
 		sendBuffer[baseIndex++] = 0x02;// Group
 		sendBuffer[baseIndex++] = 0x01;// Interface
 		sendBuffer[baseIndex++] = 0x52;// Action : Read
-		sendBuffer[baseIndex++] = (fruSlaveAddr >> 1);// Data Package Start, Slave Address
+		sendBuffer[baseIndex++] = fruSlaveAddr;// Data Package Start, Slave Address
 		sendBuffer[baseIndex++] = 0x01;//    Write Length
 		sendBuffer[baseIndex++] = 0x01;//    Read Length
 		sendBuffer[baseIndex++] = idx;// Write Data Start, Address offset
@@ -2209,6 +2209,131 @@ void PMBUSHelper::PrintFRUContent(unsigned char* contentBuffer, unsigned int dum
 	}
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "-------------------------------------------------------------");
+}
+
+int PMBUSHelper::ProductI2CWriteSingleByteBuffer(unsigned char slaveAddr, unsigned char *buff, unsigned int* currentIO){
+
+	int buffer_length = 0;
+
+	switch (*currentIO){
+
+	case IOACCESS_SERIALPORT:
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		buff[buffer_length++] = 0x41;
+		buff[buffer_length++] = 0x54;
+		buff[buffer_length++] = slaveAddr; // Slave Address
+		buff[buffer_length++] = 0x00;      // Write Byte 1
+
+		// Fill Last 2
+		buff[buffer_length++] = 0x0D;
+		buff[buffer_length++] = 0x0A;
+
+		break;
+
+	case IOACCESS_HID:
+
+		// 0x41, 0x54, PMBUSHelper::GetSlaveAddress(), 0x00, cmdPageValue, 0x00, 0x0D, 0x0A
+		buff[0] = 0x05;
+
+		buffer_length = 2;
+		buff[buffer_length++] = 0x41;
+		buff[buffer_length++] = 0x54;
+		buff[buffer_length++] = slaveAddr; // Slave Address
+		buff[buffer_length++] = 0x00;      // Write Byte 1
+
+		buff[buffer_length++] = 0x0D;
+		buff[buffer_length++] = 0x0A;
+
+		// Fill Length
+		buff[1] = buffer_length - 2;
+
+		break;
+
+	case IOACCESS_PICKIT:
+		/*
+		 At present, Can't Judge I/O operation Success/Failure by using PICKIT to issue "I2C Write Byte".(Caused by PICKIT Always
+		 Response OK for the 'write' action)
+		 Therefore issue "SMBUS Read Byte" instead.
+
+87e30700   14:35:10.210         Main():59:Send Data :  00  03  08  81  84  02  [b6]  00  82  1f  77
+87e30700   14:35:10.211         PickitSendData():177:bytes_write of hid_write is 65
+87e30700   14:35:10.211         Main():94:IO Send Success
+87e30700   14:35:10.221         PickitReadData():210:BytesToRead = 4, retry = 0
+87e30700   14:35:10.225         dumpReceiveBuffer():1907:Data : 86 04 80 81 1c 77 80 77 80 0a ff 00 00 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 00 31 83 00 02 00 00 00 00 01 f7 00 00 00 00 00 00 00 00 00 c4 c3 31 84 00 ff 00 ff 00 ff 80 b6 d6 3d de 35
+87e30700   14:35:10.225         PickitReadData():237:readOffset = 6
+87e30700   14:35:10.225         dumpReceiveBuffer():1907:Data : 86 04 80 81 1c 77
+87e30700   14:35:10.225         Main():126:Receive Data :
+87e30700   14:35:10.225         Main():169:Receive Response OK
+87e30700   14:35:10.225         Main():59:Send Data :  00  03  08  81  84  02  [b8]  00  82  1f  77
+87e30700   14:35:10.227         PickitSendData():177:bytes_write of hid_write is 65
+87e30700   14:35:10.227         Main():94:IO Send Success
+87e30700   14:35:10.237         PickitReadData():210:BytesToRead = 4, retry = 0
+87e30700   14:35:10.241         dumpReceiveBuffer():1907:Data : 86 04 80 81 1c 77 80 77 80 0a ff 00 00 00 01 31 20 00 ff 3f 00 00 03 06 00 00 00 00 00 31 83 00 02 00 00 00 00 01 f7 00 00 00 00 00 00 00 00 00 c4 c3 31 84 00 ff 00 ff 00 ff 80 b6 d6 3d de 35
+87e30700   14:35:10.241         PickitReadData():237:readOffset = 6
+87e30700   14:35:10.241         dumpReceiveBuffer():1907:Data : 86 04 80 81 1c 77
+87e30700   14:35:10.241         Main():126:Receive Data :
+
+		 */
+		buff[0] = 0x00;
+		buff[1] = 0x03;
+
+		buffer_length = 3;
+		buff[buffer_length++] = 0x81;
+		buff[buffer_length++] = 0x84;
+		buff[buffer_length++] = 1+1;//1+ 3;
+		buff[buffer_length++] = slaveAddr; // Slave Address
+		buff[buffer_length++] = 0x00;      // Write Byte 1
+
+		buff[buffer_length++] = 0x83;
+		buff[buffer_length++] = 0x84;
+		buff[buffer_length++] = 0x01;
+		buff[buffer_length++] = slaveAddr | 0x01;
+		buff[buffer_length++] = 0x89;
+		buff[buffer_length++] = 1; // Response Data Length
+
+		// Fill Last 3
+		buff[buffer_length++] = 0x82;
+		buff[buffer_length++] = 0x1f;
+		buff[buffer_length++] = 0x77;
+
+		// Fill Total Length
+		buff[2] = buffer_length - 3;
+
+		break;
+
+	case IOACCESS_TOTALPHASE:
+
+		buff[buffer_length++] = 1; // Write Bytes
+		buff[buffer_length++] = 0; // Read  Bytes
+		buff[buffer_length++] = slaveAddr;
+		buff[buffer_length++] = 0x00; // Write Byte 1
+
+
+		// Update Write Bytes For Write CMD
+		buff[0] = buffer_length - 3;
+
+		break;
+
+	case IOACCESS_TRC2_I2C_ADAPTER:
+
+		buff[buffer_length++] = 0x00;
+		buff[buffer_length++] = 0x02;// Group
+		buff[buffer_length++] = 0x01;// Interface
+		buff[buffer_length++] = 0x51;// Action : Write
+		buff[buffer_length++] = slaveAddr;//(slaveAddr >> 1);// Data Package Start, Slave Address
+		buff[buffer_length++] = 1;   // Write Length : command + data + pec
+		buff[buffer_length++] = 0x00;// Read Length
+		buff[buffer_length++] = 0x00;// Write Byte 1
+
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ALERT, "Something Error");
+		break;
+	}
+
+	return buffer_length;
+
 }
 
 bool PMBUSHelper::ReJudgeIOThreadSendFailure(bool failed, unsigned int CurrentUseIO){
