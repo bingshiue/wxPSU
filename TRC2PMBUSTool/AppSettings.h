@@ -57,7 +57,7 @@ enum {
 #define DEFAULT_CUSTOMER            (unsigned long)Customer_GIGABYTE//Customer_NEC
 #define DEFAULT_MODEL               (unsigned long)GIGABYTE_Model_CRPS001//NEC_Model_FSG003_000G
 
-#define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_95611
+#define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_9271_USB
 #define DEFAULT_I2C_SLAVEADDRESS    0xb6
 #define DEFAULT_RUN_MODE            (unsigned long)(RunMode_Continually)
 #define DEFAULT_POLLING_INTERVAL    20
