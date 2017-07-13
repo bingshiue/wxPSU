@@ -47,7 +47,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.20       |     Suppport CMAKE                                             |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.21       |     Suppport TRC2 I2C Adapter                                  |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.20" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.21" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif
