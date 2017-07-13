@@ -62,6 +62,7 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 		switch (*this->m_CurrentIO){
 
 		case IOACCESS_HID:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE;
 			break;
 
@@ -76,16 +77,17 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 		do{
 			sendResult = this->m_IOAccess[*this->m_CurrentIO].m_DeviceSendDataExtra(sendBuffer, sendDataLength, NULL);
 			if (sendResult <= 0){
-				PSU_DEBUG_PRINT(MSG_ALERT, "IO Send Failed, sendResult=%d", sendResult);
+				PSU_DEBUG_PRINT(MSG_ALERT, "Try Slave Address %02x Failed", (addr * 2));
+				PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Failed, sendResult=%d", sendResult);
 				// Retry
 				retry++;
 				if (retry >= MAX_I2C_WRITE_BYTE_RETRY_TIMES){
-					PSU_DEBUG_PRINT(MSG_ERROR, "Still Send Failed, Retry Times = %d", retry);
+					PSU_DEBUG_PRINT(MSG_ERROR, "Try Slave Address %02x Still Failed, Retry Times = %d", (addr * 2),retry);
 					sendRetryStillFailed = true;
 					break;
 				}
 				else{
-					PSU_DEBUG_PRINT(MSG_ALERT, "Retry Write");
+					PSU_DEBUG_PRINT(MSG_ALERT, "Retry Slave Address %02x", (addr * 2));
 					PSU_DEBUG_PRINT(MSG_DEBUG, "Retry Times = %d", retry);
 				}
 
@@ -98,7 +100,7 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 		} while (sendResult <= 0);
 
 		if (sendRetryStillFailed == true){
-			PSU_DEBUG_PRINT(MSG_ERROR, "Retry Send Still Failed");
+			PSU_DEBUG_PRINT(MSG_ERROR, "Forgive To Try Slave Address %02x", (addr * 2));
 
 			this->m_pAvailableSlaveDevices[addr] = 0;// Device Do Not Exist
 			continue;
@@ -119,7 +121,7 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 		recvLength = this->m_IOAccess[*this->m_CurrentIO].m_DeviceReadDataExtra(recvBuffer, bytesToRead, NULL);
 
 		wxString str("Receive Data :");
-		for (unsigned int idx = 0; idx < bytesToRead; idx++){
+		for (int idx = 0; idx < bytesToRead; idx++){
 			str += wxString::Format(" %02x ", recvBuffer[idx]);
 		}
 
@@ -142,11 +144,11 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 				else{
 					// Verify Receive Data
 					if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, recvBuffer, 256) == PMBUSHelper::response_ok){
-						PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
+						PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response From Slave Address [%02X] OK", (addr * 2));
 						this->m_pAvailableSlaveDevices[addr] = 1;// Device Exist
 					}
 					else {
-						PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+						PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response From Slave Address [%02X] NG", (addr * 2));
 						this->m_pAvailableSlaveDevices[addr] = 0;// Device Do Not Exist
 					}
 				}
@@ -166,11 +168,11 @@ int FindAvailableSlaveI2CDeviceTask::Main(double elapsedTime){
 
 			// Verify Receive Data
 			if (PMBUSHelper::IsResponseOK(this->m_CurrentIO, recvBuffer, 256) == PMBUSHelper::response_ok){
-				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response OK");
+				PSU_DEBUG_PRINT(MSG_ALERT, "Receive Response From Slave Address [%02X] OK", (addr*2));
 				this->m_pAvailableSlaveDevices[addr] = 1;// Device Exist
 			}
 			else {
-				PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response NG");
+				PSU_DEBUG_PRINT(MSG_ERROR, "Receive Response From Slave Address [%02X] NG", (addr*2));
 				this->m_pAvailableSlaveDevices[addr] = 0;// Device Do Not Exist
 
 				// Work-Around For PICKIT.

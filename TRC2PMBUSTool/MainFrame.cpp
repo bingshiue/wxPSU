@@ -29,6 +29,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_START, wxThreadEvent);
 //wxDEFINE_EVENT(wxEVT_COMMAND_ISP_SEQUENCE_END, wxThreadEvent);
 
 wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_START, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_COMMAND_FIND_I2C_SLAVE_START, wxThreadEvent);
 
 wxDEFINE_EVENT(wxEVT_IOTHREAD_REQ_PAUSE, wxThreadEvent);/**< Declare IO Thread Pause */
 wxDEFINE_EVENT(wxEVT_IOTHREAD_REQ_RESUME, wxThreadEvent);/**< Declare IO Thread Resume */
@@ -48,6 +49,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->PMBusSecondaryFWUpdatePanel = NULL;
 	this->m_monitor_running = false;
 	this->m_monitor_pause = false;
+	this->m_pmbusProgressDialog = NULL;
 
 	this->m_customerList = customerList;
 	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
@@ -523,6 +525,7 @@ void MainFrame::SetupMenuBar(void){
 
 
 	this->m_findAvailableI2CSlaveDeviceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Find_Available_I2C_Slave_Device, wxT("Find Available I2C Slave Device"), wxT("Find Available I2C Slave Device"), wxITEM_NORMAL);
+	this->m_findAvailableI2CSlaveDeviceMenuItem->SetBitmap(LOAD_PNG_RESOURCE(BROADCAST_16));
 	this->m_runMenu->Append(m_findAvailableI2CSlaveDeviceMenuItem);
 
 	this->m_runMenu->AppendSeparator();
@@ -894,6 +897,9 @@ void MainFrame::SetupToolBar(void){
 	// Append Monitor Button
 	m_toolbar->AddTool(MENU_ID_Monitor, wxEmptyString, *m_monitorBitmap, wxT("Monitor"), wxITEM_NORMAL);
 
+	// Append Find I2C Slave Device Button
+	m_toolbar->AddTool(MENU_ID_Find_Available_I2C_Slave_Device, wxEmptyString, LOAD_PNG_RESOURCE(broadcast_32), wxT("Find I2C Slave Device"), wxITEM_NORMAL);
+
 	// Append Query All Commands Button
 	m_toolbar->AddTool(MENU_ID_Query_All_Commands, wxEmptyString, LOAD_PNG_RESOURCE(query_32), wxT("Query All Commands"), wxITEM_NORMAL);
 
@@ -978,7 +984,7 @@ void MainFrame::SetupToolBar(void){
 	m_address_text = new wxStaticText(m_toolbar, wxID_ANY, wxT("I2C Slave Address"));
 	m_toolbar->AddControl(m_address_text, wxEmptyString);
 
-	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY);
+	m_address_input = new wxTextCtrl(m_toolbar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(50, -1));
 
 	wxString SlaveAddressHex = (wxString::Format("%2lx", this->m_appSettings.m_I2CSlaveAddress)).Upper();
 	m_address_input->SetValue(SlaveAddressHex);
@@ -1039,7 +1045,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		PMBUSCMDListModel::Col_RegisterIconText,
 		wxDATAVIEW_CELL_ACTIVATABLE,
 		wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_CENTER_HORIZONTAL,//wxALIGN_NOT,
+		wxALIGN_LEFT,// | wxALIGN_CENTER_HORIZONTAL,//wxALIGN_NOT,
 		wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Name",
@@ -1049,10 +1055,10 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 #ifdef __GNUC__
 		150,//wxCOL_WIDTH_AUTOSIZE,
 #else
-		75,//wxCOL_WIDTH_AUTOSIZE,
+		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,//wxALIGN_NOT,
-		wxCOL_RESIZABLE);//wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Access",
 		PMBUSCMDListModel::Col_AccessText,
@@ -1061,7 +1067,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 #ifdef __GNUC__
 		150,//wxCOL_WIDTH_AUTOSIZE,
 #else
-		75,//wxCOL_WIDTH_AUTOSIZE,
+		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);//wxDATAVIEW_COL_SORTABLE);
@@ -1072,10 +1078,10 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 #ifdef __GNUC__
 		150,//wxCOL_WIDTH_AUTOSIZE,
 #else
-		75,//wxCOL_WIDTH_AUTOSIZE,
+		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
-		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
+		wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Coefficients",
 		PMBUSCMDListModel::Col_CoefficientsText,
@@ -1083,7 +1089,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 #ifdef __GNUC__
 		150,//wxCOL_WIDTH_AUTOSIZE,
 #else
-		75,//wxCOL_WIDTH_AUTOSIZE,
+		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
 		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
@@ -2239,59 +2245,13 @@ void MainFrame::OnFindAvailableI2CSlaveDevice(wxCommandEvent& event){
 		}
 	}
 
+	/*** Trigger Find I2C Slave Start Event ***/
+	wxThreadEvent *findI2CSalveStart_evt;
 
-	memset(this->m_available_i2c_slave_devices,0,sizeof(m_available_i2c_slave_devices)/sizeof(m_available_i2c_slave_devices[0]));
-	new(TP_FindAvailableSlaveI2CDeviceTask) FindAvailableSlaveI2CDeviceTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_eventHandler, this->m_available_i2c_slave_devices, NULL);
+	findI2CSalveStart_evt = new wxThreadEvent(wxEVT_THREAD, wxEVT_COMMAND_FIND_I2C_SLAVE_START);
+	findI2CSalveStart_evt->SetString(wxT("Find I2C Slave Start"));
+	wxQueueEvent(this->GetEventHandler(), findI2CSalveStart_evt);
 
-
-	wxBusyInfo *info = NULL;
-
-	while (TaskEx::GetCount(task_ID_FindAvailableSlaveI2CDeviceTask) != 0){
-
-#if wxCHECK_VERSION(3, 1, 0)
-		if (info == NULL) info = new wxBusyInfo(
-			wxBusyInfoFlags()
-			.Parent(this)
-			.Icon(wxArtProvider::GetIcon(wxART_CLOSE,
-			wxART_OTHER, wxSize(64, 64)))
-			.Title("<b>Finding I2C Slave Devices</b>")
-			.Text("Please  wait  ...")
-			.Foreground(*wxBLACK)
-			.Background(*wxCYAN)
-			.Transparency(wxALPHA_OPAQUE)// 4 * wxALPHA_OPAQUE / 5)
-			);
-#endif
-
-		wxMilliSleep(100);
-
-	};
-
-	bool found = false;
-	wxString no_found_msg(wxT("No I2C Slave Device Found"));
-	wxString found_msg(wxT("I2C Slave Device Found : "));
-
-	for(int idx=0; idx<128; idx++){
-		if(this->m_available_i2c_slave_devices[idx] == 1){
-			if(found == false){
-				found = true;
-			}
-
-			found_msg += wxString::Format("%02X ", (idx*2));
-
-		}
-	}
-
-
-	if(found == true){
-		wxMessageBox(found_msg,
-			wxT("I2C Slave Device Found !"),  // caption
-			wxOK | wxICON_INFORMATION);
-
-	}else{
-		wxMessageBox(no_found_msg,
-			wxT("No I2C Slave Device Found !"),  // caption
-			wxOK | wxICON_WARNING);
-	}
 }
 
 void MainFrame::OnI2CFaultTest(wxCommandEvent& event){
@@ -2799,7 +2759,7 @@ void MainFrame::StopMonitor(void){
 
 	(this->m_status_bar->getTimer())->Stop();
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Stop Send Data Thread");
-	if(this->m_IOPortSendCMDThread != NULL) this->m_IOPortSendCMDThread->m_running = false;
+	if(this->m_IOPortSendCMDThread != NULL) this->m_IOPortSendCMDThread->Delete();//this->m_IOPortSendCMDThread->m_running = false;
 }
 
 void MainFrame::OnMonitor(wxCommandEvent& event){
@@ -3961,6 +3921,66 @@ void MainFrame::OnQUERYSequenceStart(wxThreadEvent& event){
 	wxDELETE(m_pmbusQUERYProgressDialog);
 }
 
+void MainFrame::OnFindI2CSlaveStart(wxThreadEvent& event) {
+	
+	memset(this->m_available_i2c_slave_devices, 0, sizeof(m_available_i2c_slave_devices) / sizeof(m_available_i2c_slave_devices[0]));
+	new(TP_FindAvailableSlaveI2CDeviceTask) FindAvailableSlaveI2CDeviceTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_eventHandler, this->m_available_i2c_slave_devices, NULL);
+
+
+	wxBusyInfo *info = NULL;
+
+	while (TaskEx::GetCount(task_ID_FindAvailableSlaveI2CDeviceTask) != 0) {
+
+#if wxCHECK_VERSION(3, 1, 0)
+		if (info == NULL) info = new wxBusyInfo(
+			wxBusyInfoFlags()
+			.Parent(this)
+			.Icon(wxArtProvider::GetIcon(wxART_FIND,
+				wxART_OTHER, wxSize(64, 64)))
+			.Title("<b>Finding I2C Slave Devices</b>")
+			.Text("Please  wait  ...")
+			.Foreground(*wxBLACK)
+			.Background(*wxYELLOW)
+			.Transparency(wxALPHA_OPAQUE)// 4 * wxALPHA_OPAQUE / 5)
+		);
+#endif
+
+		wxMilliSleep(100);
+
+	};
+
+	wxDELETE(info);
+
+	bool found = false;
+	wxString no_found_msg(wxT("No I2C Slave Device Found"));
+	wxString found_msg(wxT("I2C Slave Device Found : "));
+
+	for (int idx = 0; idx<128; idx++) {
+		if (this->m_available_i2c_slave_devices[idx] == 1) {
+			if (found == false) {
+				found = true;
+			}
+
+			found_msg += wxString::Format("[%02X] ", (idx * 2));
+
+		}
+	}
+
+
+	if (found == true) {
+		wxMessageBox(found_msg,
+			wxT("I2C Slave Device Found !"),  // caption
+			wxOK | wxICON_INFORMATION);
+
+	}
+	else {
+		wxMessageBox(no_found_msg,
+			wxT("No I2C Slave Device Found !"),  // caption
+			wxOK | wxICON_WARNING);
+	}
+
+}
+
 void MainFrame::OnIOThreadReqPause(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_ALERT, "OnIOThreadReqPause");
 
@@ -4513,6 +4533,34 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_ISPDDWaitRootTime = ddWaitRebootTime;
 	}
 
+	long pfcStartVerifyDelayTime;
+	if (pConfig->Read(wxT("PFCStartVerifyDelayTime"), &pfcStartVerifyDelayTime) == false) {
+		pConfig->Write(wxT("PFCStartVerifyDelayTime"), ISP_PFC_START_VERIFY_DELAY_TIME);
+		this->m_appSettings.m_ISPPFCStartVerifyDelayTime = ISP_PFC_START_VERIFY_DELAY_TIME;
+	}
+	else {
+		this->m_appSettings.m_ISPPFCStartVerifyDelayTime = pfcStartVerifyDelayTime;
+	}
+
+	long ddStartVerifyDelayTime;
+	if (pConfig->Read(wxT("DDStartVerifyDelayTime"), &ddStartVerifyDelayTime) == false) {
+		pConfig->Write(wxT("DDStartVerifyDelayTime"), ISP_DD_START_VERIFY_DELAY_TIME);
+		this->m_appSettings.m_ISPDDStartVerifyDelayTime = ISP_DD_START_VERIFY_DELAY_TIME;
+	}
+	else {
+		this->m_appSettings.m_ISPDDStartVerifyDelayTime = ddStartVerifyDelayTime;
+	}
+
+	//pConfig->Write(wxT("PFCStartVerifySuccessDelayTime"), this->m_appSettings.m_ISPPFCStartVerifySuccessDelayTime);
+	long pfcStartVerifySuccessDelayTime;
+	if (pConfig->Read(wxT("PFCStartVerifySuccessDelayTime"), &pfcStartVerifySuccessDelayTime) == false) {
+		pConfig->Write(wxT("PFCStartVerifySuccessDelayTime"), DEFAULT_PFC_START_VERIFY_SUCCESS_DELAY_TIME);
+		this->m_appSettings.m_ISPPFCStartVerifySuccessDelayTime = DEFAULT_PFC_START_VERIFY_SUCCESS_DELAY_TIME;
+	}
+	else {
+		this->m_appSettings.m_ISPPFCStartVerifySuccessDelayTime = pfcStartVerifySuccessDelayTime;
+	}
+
 	pConfig->SetPath(wxT("/MFR"));
 
 	// MFR_ID
@@ -4825,6 +4873,11 @@ void MainFrame::SaveConfig(void){
 
 	pConfig->Write(wxT("DDWaitRebootTime"), this->m_appSettings.m_ISPDDWaitRootTime);
 
+	pConfig->Write(wxT("PFCStartVerifyDelayTime"), this->m_appSettings.m_ISPPFCStartVerifyDelayTime);
+
+	pConfig->Write(wxT("DDStartVerifyDelayTime"), this->m_appSettings.m_ISPDDStartVerifyDelayTime);
+
+	pConfig->Write(wxT("PFCStartVerifySuccessDelayTime"), this->m_appSettings.m_ISPPFCStartVerifySuccessDelayTime);
 	
 	pConfig->SetPath(wxT("/MFR"));
 
@@ -5157,6 +5210,11 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam
 			}
 			else if (this->m_CurrentUseIOInterface == IOACCESS_PICKIT){
 				if (pid == PICKIT_SERIAL_USB_PID && vid == PICKIT_SERIAL_USB_VID){
+					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
+				}
+			}
+			else if (this->m_CurrentUseIOInterface == IOACCESS_TRC2_I2C_ADAPTER) {
+				if (pid == TRC2_I2C_ADAPTER_PID && vid == TRC2_I2C_ADAPTER_VID) {
 					this->DeviceChangeHandler(wParam, pHdr->dbch_devicetype, pid, vid);
 				}
 			}
@@ -5602,6 +5660,7 @@ EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_START, MainFrame::OnISPSequenceStart)
 //EVT_THREAD(wxEVT_COMMAND_ISP_SEQUENCE_INTERRUPT, MainFrame::OnISPSequenceInterrupt)
 
 EVT_THREAD(wxEVT_COMMAND_QUERY_SEQUENCE_START, MainFrame::OnQUERYSequenceStart)
+EVT_THREAD(wxEVT_COMMAND_FIND_I2C_SLAVE_START, MainFrame::OnFindI2CSlaveStart)
 
 EVT_UPDATE_UI(CID_CMDLIST_DVC, MainFrame::OnUpdateUI)
 EVT_IDLE(MainFrame::OnIdle)

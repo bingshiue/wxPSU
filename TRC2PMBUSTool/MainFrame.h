@@ -516,6 +516,7 @@ private:
 	//void OnISPSequenceInterrupt(wxThreadEvent& event);
 
 	void OnQUERYSequenceStart(wxThreadEvent& event);
+	void OnFindI2CSlaveStart(wxThreadEvent& event);
 
 	void OnIOThreadReqPause(wxThreadEvent& event);
 	void OnIOThreadReqResume(wxThreadEvent& event);

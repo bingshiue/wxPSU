@@ -192,8 +192,10 @@ int ReceiveISPStartVerifyCMDTask::Main(double elapsedTime){
 
 #ifdef ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY
 		if (this->m_target == UPDATE_PRIMARY_FW_TARGET){
-			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait %.1f Sec For Start Update Primary FW", (double)ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME/1000);
-			wxMilliSleep(ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME);
+			//PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait %.1f Sec For Start Update Primary FW", (double)ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME/1000);
+			//wxMilliSleep(ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME);
+			PSU_DEBUG_PRINT(MSG_ALERT, "ISP Wait %.1f Sec For Start Update PFC FW", (double)(PMBUSHelper::GetAppSettings()->m_ISPPFCStartVerifySuccessDelayTime)/1000);
+			wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ISPPFCStartVerifySuccessDelayTime);
 		}
 #endif
 

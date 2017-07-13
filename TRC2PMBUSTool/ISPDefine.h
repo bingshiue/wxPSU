@@ -17,7 +17,8 @@
 
 #define ISP_HANDLE_0D /**< Handle '0x0d' as special character in ISP */
 
-#define DELAY_READ_ISP_START_VERIFY_RESPONSE  50 /**< Delay Read ISP Start Verify Response */
+#define ISP_PFC_START_VERIFY_DELAY_TIME    100/**< ISP PFC Start Verify Delay Time */
+#define ISP_DD_START_VERIFY_DELAY_TIME     100/**< ISP DD Start Verify Delay Time */
 
 //#define ISP_SLEEP /**< Sleep Between F3(F1) Command */
 #ifdef ISP_SLEEP
@@ -34,7 +35,7 @@
 
 #define ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY /**< Delay After Primary Firmware Receive Start Verify CMD Success */
 #ifdef ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY
-#define ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME  2500 /**< Delay Time After Primary Firmware Receive Start Verify CMD Success */
+#define ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME  4500 /**< Delay Time After Primary Firmware Receive Start Verify CMD Success */
 #endif
 
 #define ISP_CHECK_STATUS_RETRY  5 /**< ISP Check Status(F3) Command Fail Retry Times */

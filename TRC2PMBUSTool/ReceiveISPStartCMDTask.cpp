@@ -31,9 +31,27 @@ int ReceiveISPStartCMDTask::Main(double elapsedTime){
 
 	bool isp_response_error = false;
 
-	PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d Milliseconds", DELAY_READ_ISP_START_VERIFY_RESPONSE);
+	// Delay To Send Start Verify Command
 
-	wxMilliSleep(DELAY_READ_ISP_START_VERIFY_RESPONSE);
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "Sleep %d Milliseconds", DELAY_READ_ISP_START_VERIFY_RESPONSE);
+	//wxMilliSleep(DELAY_READ_ISP_START_VERIFY_RESPONSE);
+
+	switch (this->m_target) {
+
+	case UPDATE_PRIMARY_FW_TARGET:
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP PFC Start Verify CMD Delay Time = %d", PMBUSHelper::GetAppSettings()->m_ISPPFCStartVerifyDelayTime);
+		wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ISPPFCStartVerifyDelayTime);
+		break;
+
+	case UPDATE_SECONDARY_FW_TARGET:
+		PSU_DEBUG_PRINT(MSG_ALERT, "ISP DD Start Verify CMD Delay Time = %d", PMBUSHelper::GetAppSettings()->m_ISPDDStartVerifyDelayTime);
+		wxMilliSleep(PMBUSHelper::GetAppSettings()->m_ISPDDStartVerifyDelayTime);
+		break;
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs, Target = %02xH", this->m_target);
+		break;
+	}
 
 	// Receive Data 
 

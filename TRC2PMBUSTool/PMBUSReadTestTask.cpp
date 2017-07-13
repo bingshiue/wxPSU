@@ -237,6 +237,7 @@ int PMBUSReadTestTask::Main(double elapsedTime){
 		break;
 
 	case IOACCESS_HID:
+	case IOACCESS_TRC2_I2C_ADAPTER:
 		sendDataLength = HID_SEND_DATA_SIZE;
 		break;
 

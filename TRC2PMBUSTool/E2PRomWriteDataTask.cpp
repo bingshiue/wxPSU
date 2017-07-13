@@ -74,6 +74,7 @@ int E2PRomWriteDataTask::Main(double elapsedTime){
 		switch (*this->m_CurrentIO){
 
 		case IOACCESS_HID:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE;
 			break;
 
@@ -233,11 +234,11 @@ int E2PRomWriteDataTask::DumpE2PROM(unsigned char* RecvBuffer, unsigned int* cur
 		switch (*this->m_CurrentIO){
 
 		case IOACCESS_PICKIT:
-		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE + 1;
 			break;
 
 		case IOACCESS_HID:
+		case IOACCESS_TRC2_I2C_ADAPTER:
 			sendDataLength = HID_SEND_DATA_SIZE;
 			break;
 

@@ -76,6 +76,11 @@ enum {
 #define DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME                   25// 6 //(Unit : millisecond)
 #define DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME        30//12 //(Unit : millisecond)
 
+#define DEFAULT_PFC_START_VERIFY_DELAY_TIME          ISP_PFC_START_VERIFY_DELAY_TIME/**< Default ISP PFC Start Verify Delay Time */
+#define DEFAULT_DD_START_VERIFY_DELAY_TIME           ISP_DD_START_VERIFY_DELAY_TIME/**< Default DD Start Verify Delay Time */
+
+#define DEFAULT_PFC_START_VERIFY_SUCCESS_DELAY_TIME  ISP_PRIMARY_FW_UPDATE_VERIFY_SUCCESS_DELAY_TIME/* Default ISP Primary FW Update Verify Success Delay Time  */
+
 #define DEFAULT_RUNIN_TIMES  10
 
 #define DEFAULT_ONLY_POLLING_SUPPORT_CMD       (unsigned long)Generic_Disable
@@ -314,6 +319,9 @@ typedef struct appSettings_t {
 	unsigned long m_pfcIspF3CMDTotalPhaseDelayTime;/**< PFC ISP F3 CMD Total Phase Delay Time */
 	unsigned long m_onlyPollingSupportCMD;/**< Only Polling Support CMD */
 	unsigned long m_clearLogBeforeMonitorRun;/**< Clear Log Before Monitor Run */
+	unsigned long m_ISPPFCStartVerifyDelayTime;/**< PFC Start Verify Delay Time */
+	unsigned long m_ISPDDStartVerifyDelayTime;/**< DD Start Verify Delay Time */
+	unsigned long m_ISPPFCStartVerifySuccessDelayTime;/**< PFC Start Verify Success Delay Time */
 	unsigned long m_ISPPFCWaitRootTime; /**< ISP PFC Wait Reboot Time */
 	unsigned long m_ISPDDWaitRootTime;/**< ISP DD Wait Reboot Time */
 	unsigned long m_autoQueryCMDOnIOOpen;/**< Auto Query Command On I/O Open */
@@ -362,6 +370,11 @@ typedef struct appSettings_t {
 
 		this->m_pfcIspF3CMDDelayTime = DEFAULT_PFC_ISP_F3_CMD_DELAY_SLEEP_TIME;
 		this->m_pfcIspF3CMDTotalPhaseDelayTime = DEFAULT_PFC_ISP_F3_CMD_TOTALPHASE_DELAY_SLEEP_TIME;
+
+		this->m_ISPPFCStartVerifyDelayTime = ISP_PFC_START_VERIFY_DELAY_TIME;
+		this->m_ISPDDStartVerifyDelayTime = ISP_DD_START_VERIFY_DELAY_TIME;
+
+		this->m_ISPPFCStartVerifySuccessDelayTime = DEFAULT_PFC_START_VERIFY_SUCCESS_DELAY_TIME;
 
 		this->m_onlyPollingSupportCMD = DEFAULT_ONLY_POLLING_SUPPORT_CMD;
 		this->m_clearLogBeforeMonitorRun = DEFAULT_CLEAR_LOG_BEFORE_MONITOR_RUN;

@@ -57,6 +57,9 @@
 #define PICKIT_SERIAL_USB_PID  0x0036 /**< PICKIT Serial USB PID */
 #define PICKIT_SERIAL_USB_VID  0x04D8 /**< PICKIT Serial USB VID */
 
+#define TRC2_I2C_ADAPTER_VID 0x1234/**< Default TRC2 I2C Adapter VID */
+#define TRC2_I2C_ADAPTER_PID 0x0006/**< Default TRC2 I2C Adapter PID */
+
 #define RELOAD_USB_ADAPTOR_SETTINGS_APP_RESTART  /**< Reload USB Adaptor's Setting when APP restart */
 
 /**

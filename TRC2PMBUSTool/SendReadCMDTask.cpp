@@ -194,6 +194,12 @@ int SendReadCMDTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned
 
 		buffer_len = baseIndex;
 
+		for (int local = baseIndex; local<65; local++) {
+			sendBuffer[local] = 0;
+		}
+
+		buffer_len = 64;// For HID
+
 		break;
 
 	default:

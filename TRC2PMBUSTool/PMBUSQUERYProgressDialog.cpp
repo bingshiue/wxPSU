@@ -9,7 +9,7 @@ wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_INTERRUPT, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_QUERY_SEQUENCE_END, wxThreadEvent);
 
 PMBUSQUERYProgressDialog::PMBUSQUERYProgressDialog(wxWindow *parent, wxString title, IOACCESS* ioaccess, unsigned int* currentIO) : 
-	wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(200,80)){
+	wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(200,100)){
 
 	// Setup Icon
 	wxIcon icon;
