@@ -43,16 +43,25 @@ int sendData(hid_device *handle, unsigned char* buffer, unsigned int sizeOfBuffe
 	}
 	printf("\n");
 	
+	//int write_size = 0;
+	
+	//for(write_size=1; write_size<=65; write_size++){
+	
+	//printf("write_size=%d ", write_size);
+	
 	res = hid_write(handle, buffer, 65);
 	printf("res=%d \n", res);
 	if (res < 0){
 		printf("Unable to write() (2)\n");
-		wprintf(L"ERROR : %ls", hid_error(handle));
+		wprintf(L"ERR : %ls", hid_error(handle));
 		printf("\n");
 	}
 	else{
 		printf("write() (2) Success \n");
 	}
+	
+	
+	//}
 
 	return res;
 }
@@ -816,8 +825,8 @@ int main(int argc, char* argv[])
 
 	// Set up the command buffer.
 	memset(buf, 0x00, sizeof(buf));
-	buf[0] = 0x01;
-	buf[1] = 0x81;
+	//buf[0] = 0x01;
+	//buf[1] = 0x81;
 
 
 	// Open the device using the VID, PID,
@@ -827,6 +836,10 @@ int main(int argc, char* argv[])
 	if (!handle) {
 		printf("unable to open device\n");
 		return 1;
+	}
+	else {
+		printf("open device successfully \n");
+		system("pause");
 	}
 
 #if 1
