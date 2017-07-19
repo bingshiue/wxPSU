@@ -61,6 +61,8 @@
 #define TP_SendReadCMDTask (0.5f)
 #define TP_ReceiveReadCMDTask (0.5f)
 #define TP_FindAvailableSlaveI2CDeviceTask (0.5f)
+#define TP_TRC2AdapterGetFWVersionTask (0.5f)
+#define TP_TRC2AdapterSetI2CBitRateTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -94,6 +96,8 @@ enum {
 	task_ID_SendReadCMDTask,
 	task_ID_ReceiveReadCMDTask,
 	task_ID_FindAvailableSlaveI2CDeviceTask,
+	task_ID_TRC2AdapterGetFWVersionTask,
+	task_ID_TRC2AdapterSetI2CBitRateTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -1336,6 +1340,71 @@ public:
 	* @param elapsedTime elapsed time
 	* @retval success or failure
 	*/
+	int Main(double elapsedTime);
+
+};
+
+class TRC2AdapterGetFWVersionTask : public TaskEx {
+	wxEvtHandler *m_evtHandler;
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	TRC2AdapterGetFWVersionTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~TRC2AdapterGetFWVersionTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+};
+
+class TRC2AdapterSetI2CBitRateTask : public TaskEx {
+	wxEvtHandler *m_evtHandler;
+	double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS     *m_IOAccess;/**< IO Access */
+	unsigned int *m_CurrentIO;/**< Current IO */
+
+public:
+	/**
+	 * @brief Constructor.
+	 */
+	TRC2AdapterSetI2CBitRateTask(IOACCESS* ioaccess, unsigned int* currentIO, wxEvtHandler* evtHandler);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~TRC2AdapterSetI2CBitRateTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
 	int Main(double elapsedTime);
 
 };

@@ -3385,8 +3385,11 @@ int MainFrame::OpenIODevice(void){
 
 					this->UpdateStatusBarIOSettingFiled(trc2I2CAdapterDeviceName);
 
+					// Create TRC2AdapterGetFWVersion Task
+					new(TP_TRC2AdapterGetFWVersionTask) TRC2AdapterGetFWVersionTask(this->m_IOAccess, &this->m_CurrentUseIOInterface, this->m_eventHandler);
+
 					// Update I2C Clock Speed Field
-					this->UpdateStatusBarIOSettingFiled(100);
+					this->UpdateStatusBarIOSettingFiled(PMBUSHelper::GetAppSettings()->m_trc2Adapter_I2C_Bitrate);
 
 				}
 		
@@ -4484,6 +4487,7 @@ void MainFrame::CheckAndLoadConfig(void){
 #endif
 
 	pConfig->SetPath(wxT("/TOTALPHASE"));
+
 	long totalPhaseI2CBitrate;
 	if (pConfig->Read(wxT("TotalPhaseI2CBitrate"), &totalPhaseI2CBitrate) == false){
 		pConfig->Write(wxT("TotalPhaseI2CBitrate"), DEFAULT_TOTALPHASE_I2C_BITRATE);
@@ -4493,6 +4497,16 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_totalPhase_I2C_Bitrate = totalPhaseI2CBitrate;
 	}
 
+	pConfig->SetPath(wxT("/TRC2ADAPTER"));
+
+	long trc2AdapterI2CBitrate;
+	if (pConfig->Read(wxT("TRC2AdapterI2CBitrate"), &trc2AdapterI2CBitrate) == false) {
+		pConfig->Write(wxT("TRC2AdapterI2CBitrate"), DEFAULT_TRC2_ADAPTER_I2C_BITRATE);
+		this->m_appSettings.m_trc2Adapter_I2C_Bitrate = DEFAULT_TRC2_ADAPTER_I2C_BITRATE;
+	}
+	else {
+		this->m_appSettings.m_trc2Adapter_I2C_Bitrate = trc2AdapterI2CBitrate;
+	}
 
 	pConfig->SetPath(wxT("/ISP"));
 	
@@ -4861,6 +4875,11 @@ void MainFrame::SaveConfig(void){
 	// Total Phase I2C Bit Rate
 	pConfig->Write(wxT("TotalPhaseI2CBitrate"), this->m_appSettings.m_totalPhase_I2C_Bitrate);
 
+
+	pConfig->SetPath(wxT("/TRC2ADAPTER"));
+
+	// TRC2 Adapter Phase I2C Bit Rate
+	pConfig->Write(wxT("TRC2AdapterI2CBitrate"), this->m_appSettings.m_trc2Adapter_I2C_Bitrate);
 
 	pConfig->SetPath(wxT("/ISP"));
 

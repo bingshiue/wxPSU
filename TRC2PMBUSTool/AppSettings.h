@@ -54,6 +54,12 @@ enum {
 	TOTALPHASE_I2C_BITRATE_400KHZ = 400
 };
 
+enum {
+	TRC2_ADAPTER_I2C_BITRATE_100KHZ = 100,
+	TRC2_ADAPTER_I2C_BITRATE_400KHZ = 400
+};
+
+
 #define DEFAULT_CUSTOMER            (unsigned long)Customer_GIGABYTE//Customer_NEC
 #define DEFAULT_MODEL               (unsigned long)GIGABYTE_Model_CRPS001//NEC_Model_FSG003_000G
 
@@ -103,6 +109,7 @@ enum {
 #define DEFAULT_COMPORT_PARITYCHECK   NOPARITY
 
 #define DEFAULT_TOTALPHASE_I2C_BITRATE (unsigned long)TOTALPHASE_I2C_BITRATE_100KHZ
+#define DEFAULT_TRC2_ADAPTER_I2C_BITRATE (unsigned long)TRC2_ADAPTER_I2C_BITRATE_100KHZ
 
 /* --- USB ADAPTOR Setting ---- */
 #define DEFAULT_USB_ADAPTOR_I2C_BIT_RATE_SPEED            100
@@ -328,6 +335,7 @@ typedef struct appSettings_t {
 	unsigned long m_queryCMDBeforePolling;/**< Query CMD Before Polling */
 	unsigned long m_increaseCPUOverhead;/**< Increase CPU Overhead */
 	unsigned long m_totalPhase_I2C_Bitrate;/**< Total Phase I2C Bitrate */
+	unsigned long m_trc2Adapter_I2C_Bitrate;/**< TRC2 Adapter I2C Bitrate */
 
 	USB_ADAPTOR_I2C_SETTING_t m_usbAdaptorI2CSetting;
 	USB_ADAPTOR_SPI_SETTING_t m_usbAdaptorSPISetting;
@@ -385,6 +393,7 @@ typedef struct appSettings_t {
 		this->m_ISPDDWaitRootTime = WAIT_DD_REBOOT_TIME;
 
 		this->m_totalPhase_I2C_Bitrate = DEFAULT_TOTALPHASE_I2C_BITRATE;
+		this->m_trc2Adapter_I2C_Bitrate = DEFAULT_TRC2_ADAPTER_I2C_BITRATE;
 
 		this->m_usbAdaptorI2CSetting.Reset();
 		this->m_usbAdaptorSPISetting.Reset();

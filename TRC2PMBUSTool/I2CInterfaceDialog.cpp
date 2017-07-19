@@ -506,8 +506,11 @@ int I2CInterfaceDialog::OpenIODevice(void){
 
 				this->UpdateStatusBarIOSettingFiled(trc2I2CAdapterDeviceName);
 
+				// Create TRC2AdapterGetFWVersion Task
+				new(TP_TRC2AdapterGetFWVersionTask) TRC2AdapterGetFWVersionTask(this->m_ioaccess, this->m_currentUseIO, this->m_eventHandler);
+
 				// Update I2C Clock Speed Field
-				this->UpdateStatusBarIOSettingFiled(100);
+				this->UpdateStatusBarIOSettingFiled(PMBUSHelper::GetAppSettings()->m_trc2Adapter_I2C_Bitrate);
 
 			}
 
