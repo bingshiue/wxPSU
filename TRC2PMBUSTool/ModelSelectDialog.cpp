@@ -33,7 +33,7 @@ ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customer
 
 	m_acbelLogoSB = new wxStaticBitmap(this, wxID_ANY, wxBitmap(Acbel_large_xpm));
 
-	m_byCustomerPNCheckBox = new wxCheckBox(this, CID_CHKBOX_BYCUSTOMERPN, wxT("Buy Customer P/N"));
+	//m_byCustomerPNCheckBox = new wxCheckBox(this, CID_CHKBOX_BYCUSTOMERPN, wxT("Buy Customer P/N"));
 
 	m_btnOK = new wxButton(this, CID_BTN_OK, wxT("OK"));
 
@@ -54,8 +54,8 @@ ModelSelectDialog::ModelSelectDialog(wxWindow *parent, CUSTOMER_TYPE_t* customer
 	this->m_buttonSizer->Add(m_btnCancel, wxSizerFlags().Expand().Border(wxALL, 2));
 
 	this->m_line1Sizer->Add(m_acbelLogoSB, wxSizerFlags().Border(wxALL,17).Align(wxALIGN_CENTER_VERTICAL));
-	this->m_line1Sizer->Add(m_byCustomerPNCheckBox, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL));
-	this->m_line1Sizer->Add(m_paddingST, wxSizerFlags(1).Expand().Border(wxRIGHT, 50));
+	//this->m_line1Sizer->Add(m_byCustomerPNCheckBox, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL));
+	this->m_line1Sizer->Add(m_paddingST, wxSizerFlags(1).Expand().Border(wxRIGHT, 175));
 	this->m_line1Sizer->Add(m_buttonSizer, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL));
 
 	this->m_customerSizer->Add(m_customerST);
