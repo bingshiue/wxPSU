@@ -525,7 +525,7 @@ void MainFrame::SetupMenuBar(void){
 
 
 	this->m_findAvailableI2CSlaveDeviceMenuItem = new wxMenuItem((wxMenu*)0, MENU_ID_Find_Available_I2C_Slave_Device, wxT("Find Available I2C Slave Device"), wxT("Find Available I2C Slave Device"), wxITEM_NORMAL);
-	this->m_findAvailableI2CSlaveDeviceMenuItem->SetBitmap(LOAD_PNG_RESOURCE(BROADCAST_16));
+	this->m_findAvailableI2CSlaveDeviceMenuItem->SetBitmap(LOAD_PNG_RESOURCE(broadcast_16));
 	this->m_runMenu->Append(m_findAvailableI2CSlaveDeviceMenuItem);
 
 	this->m_runMenu->AppendSeparator();
