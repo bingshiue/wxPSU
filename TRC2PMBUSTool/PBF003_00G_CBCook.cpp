@@ -288,7 +288,7 @@ int PFB003_00G_Cook_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
 
 
-	EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 
 int PFB003_00G_Cook_Not_Implement(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
