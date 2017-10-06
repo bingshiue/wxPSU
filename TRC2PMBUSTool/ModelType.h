@@ -15,6 +15,7 @@ typedef struct model_type_t {
 	CMDCoefficientsCBFunc* m_cmdCoefficientsFunc;/**< CMD Coefficients Function */
 	CMDCookCBFunc* m_cmdCookCBFunc;/**< CMD Cook Function */
 	CMDRawCBFunc* m_cmdRawCBFunc;/**< CMD Raw Function */
+	PMBUSCMDBufferProvider_t  m_pmbusCMDbufferProvider;/**< PMBUS CMD Buffer Provider */
 
 } MODEL_TYPE_t;
 

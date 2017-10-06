@@ -14,6 +14,7 @@
 #include "PMBUSCommandType.h"
 #include "AppSettings.h"
 #include "USBInfoType.h"
+#include "ModelType.h"
 
 class PMBUSHelper {
 public :
@@ -64,9 +65,13 @@ public :
 	static int ProductLinearData(unsigned char *dest, double value, double scale);
 
 	static int ProductReadCMDBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer,unsigned int* currentIO,unsigned int idx, unsigned int command, unsigned int responseDataLength);
+	static int ProductReadCMDBuffer2BytesLengthCMD(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer,unsigned int* currentIO,unsigned int idx, unsigned int command, unsigned int responseDataLength);
+
 	static int ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsigned char* sendBuffer, unsigned int* currentIO);
 
-	static int ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned char cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+	static int ProductWriteCMDBuffer(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned int cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+	static int ProductWriteCMDBuffer2BytesLengthCMD(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned int cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+
 
 	static void ProductDataBuffer(unsigned char* DestBuff, unsigned int* currentIO, unsigned char* SourceBuff, unsigned int responseDataLength);
 	static void ProductDataBuffer(PMBUSCOMMAND_t* pmBusCommand, unsigned int* currentIO, unsigned int cmdIndex, unsigned int responseDataLength);
@@ -183,6 +188,14 @@ public :
      * @brief Get GetTickCount.
      */
     static unsigned long GetTickCountHAL(void);
+    /**
+     * @brief Get Current Use Model.
+     */
+    static MODEL_TYPE_t* GetCurrentUseModel(void);
+    /**
+     * @brief Set Current Use Model.
+     */
+    static void SetCurrentUseModel(MODEL_TYPE_t* model);
 
 protected :
 
@@ -222,6 +235,8 @@ private :
 	static wxString m_default_mfr_serial;
 
 	static wxCriticalSection m_SendVectorCritsect;
+
+	static MODEL_TYPE_t* m_current_use_model;
 
 };
 

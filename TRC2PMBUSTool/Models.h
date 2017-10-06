@@ -37,6 +37,8 @@ enum ACBEL_MODEL {
 
 	ACBEL_RFWE_24_28_1200W_SCP = 0,
 
+	ACBEL_PBF003_00G,
+
 #if (HAVE_GENERIC_MODEL == TRUE)
 	ACBEL__Model_Generic,
 #endif

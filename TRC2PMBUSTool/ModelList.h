@@ -21,6 +21,11 @@
 // FSG003-000G
 #include "FSG003_000G.h"
 #include "FSG003_000G_CMDCB.h"
+
+// PBF003-00G
+#include "PBF003_00G.h"
+#include "PBF003_00G_CMDCB.h"
+
 // Generic Model (For Test Purpose)
 #include "Generic_Model.h"
 #include "Generic_CMDCB.h"
@@ -75,8 +80,20 @@ MODEL_TYPE_t g_ACBELModelList[ACBEL_MODEL_LIST_SIZE] = {
 		g_ACBEL_RFWE_24_28_1200W_SCP_CMDRawCBFunc
 	}
 
+
+	// [1] PBF003-00G
+	,{
+		PBF003_00G_MODEL_NAME,
+		g_PBF003_00G_CMDTable,
+		PBF003_00G_CMD_TABLE_SIZE,
+		g_PBF003_00G_CMDQueryCBFunc,
+		g_PBF003_00G_CMDCoefficientsCBFunc,
+		g_PBF003_00G_CMDCookCBFunc,
+		g_PBF003_00G_CMDRawCBFunc
+	}
+
 #if (HAVE_GENERIC_MODEL == TRUE)
-	// [1] Generic Model (For Test Purpose)
+	// [2] Generic Model (For Test Purpose)
 	, {
 		GENERIC_MODEL_NAME,
 		g_Generic_CMDTable,

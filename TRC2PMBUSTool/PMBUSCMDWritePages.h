@@ -1174,4 +1174,183 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
+/* 0900H VOLTAGE_ADJUST */
+class WritePage0900H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage0900H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
+	enum {
+		CID_TEXTCTRL_TARGET_VOLTAGE = 0x3300
+	};
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	//wxStaticText *m_scale;
+
+	wxStaticText *m_computedVoltage;
+
+	wxStaticText *m_cmdDescription;
+
+	wxTextCtrl *m_targetVoltage;
+
+
+	//wxTextCtrl *m_highByteValue;
+	//wxTextCtrl *m_lowByteValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnTargetVoltage(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* 0909H VOLTAGE_RESET */
+class WritePage0909H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage0909H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage0909H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxStaticText *m_cmdDescription;
+
+	//wxTextCtrl *m_highByteValue;
+	//wxTextCtrl *m_lowByteValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	//void OnRadioButtonCook(wxCommandEvent& event);
+
+	//void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* 0920H VIN_CALIBRATION */
+class WritePage0920H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage0920H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage0920H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxStaticText *m_cmdDescription;
+
+	wxTextCtrl *m_highByteValue;
+	wxTextCtrl *m_lowByteValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+/* 0921H VOUT_CALIBRATION */
+class WritePage0921H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage0921H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxStaticText *m_cmdDescription;
+
+	wxTextCtrl *m_highByteValue;
+	wxTextCtrl *m_lowByteValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
 #endif

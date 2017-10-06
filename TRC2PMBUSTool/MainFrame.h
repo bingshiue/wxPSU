@@ -424,6 +424,7 @@ private:
 	void SetupPMBusCommandData(void);
 	void SetupPMBusCommandWritePage(void);
 	void SetupPMBusCommandReadPage(void);
+	void SetupPMBUSCommandBufferProvider(void);
 
 	void SetupMenuBar(void);
 	void SetupToolBar(void);

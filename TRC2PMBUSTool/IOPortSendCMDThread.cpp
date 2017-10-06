@@ -598,9 +598,10 @@ int IOPortSendCMDThread::productSendBuff(unsigned int idx, unsigned int command,
 			this->m_sendBuff[baseIndex++] = 0x01;// Interface
 			this->m_sendBuff[baseIndex++] = 0x52;// Action : Read
 			this->m_sendBuff[baseIndex++] = PMBUSHelper::GetSlaveAddress();// Data Package Start, Slave Address
-			this->m_sendBuff[baseIndex++] = 0x01;//    Write Length
+			this->m_sendBuff[baseIndex++] = 0x01 + 1;//    Write Length
 			this->m_sendBuff[baseIndex++] = responseDataLength;//    Read Length
-			this->m_sendBuff[baseIndex++] = command;// Write Data Start
+			this->m_sendBuff[baseIndex++] = (command & 0xff00) >> 8;// Write Data Start
+			this->m_sendBuff[baseIndex++] = (command & 0x00ff);
 
 			//buffer_len = baseIndex;
 
@@ -837,7 +838,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
 								if (ret != wxSEMA_NO_ERROR){
-									PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
+									PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timeout occurs : error = %d", ret);
 								}
 								else{
 
@@ -998,7 +999,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 																break;
 															}
 
-															// Read Quert Result
+															// Read Query Result
 															unsigned int bytesToRead = this->m_pmBusCommand[CoefficientsCMDIndex].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
 															this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[CoefficientsCMDIndex], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
 
@@ -1298,7 +1299,16 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						//this->m_dataViewListCtrl->get()->RowValueChanged(idx, PMBUSCMDListModel::Col_RegisterIconText);
 
 						// Prepare Send Buffer
-						uartSendDataLength = this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
+						//uartSendDataLength = this->productSendBuff(idx, this->m_pmBusCommand[idx].m_register, this->m_pmBusCommand[idx].m_responseDataLength);
+						uartSendDataLength = PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker(
+								this->m_pmBusCommand,
+								this->m_sendBuff,
+								this->m_CurrentIO,
+								idx,
+								this->m_pmBusCommand[idx].m_register,
+								this->m_pmBusCommand[idx].m_responseDataLength
+
+						);
 
 						PSU_DEBUG_PRINT(MSG_DEBUG, "Prepare To Send");
 						// Sleep Polling Time

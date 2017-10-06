@@ -109,6 +109,12 @@ typedef struct directFormatCoefficients_t {
 		m_R = 0;
 	}
 
+	directFormatCoefficients_t(short M, short B, char R){
+		m_M = M;
+		m_B = B;
+		m_R = R;
+	}
+
 }DirectFormatCoefficients_t;
 
 /**
@@ -129,6 +135,13 @@ typedef struct dataFormat_t {
 		this->m_formatType = 0;// 0 is the linear data format
 		//this->m_ReadCoefficients = {};
 		//this->m_WriteCoefficients = {};
+	}
+
+	// For <brace-enclosed initializer list>
+	dataFormat_t(unsigned char formatType, DirectFormatCoefficients_t ReadCoefficients, DirectFormatCoefficients_t m_WriteCoefficients){
+		this->m_formatType = formatType;// 0 is the linear data format
+		this->m_ReadCoefficients = ReadCoefficients;
+		this->m_WriteCoefficients = m_WriteCoefficients;
 	}
 
 }DataFormat_t;
@@ -260,5 +273,26 @@ typedef struct pmbusBlockWRCMD_t {
 	unsigned char m_numOfReadBytes;/**< Number Of Read Bytes */
 
 } PMBUSBlockWRCMD_t;
+
+/**
+ * @brief PMBUS Read CMD Buffer Maker Function.
+ */
+typedef int (*PMBUSReadCMDBufferMakerFunc)(PMBUSCOMMAND_t* pmBusCommand, unsigned char* sendBuffer, unsigned int* currentIO, unsigned int idx, unsigned int command, unsigned int responseDataLength);
+
+/**
+ * @brief PMBUS Write CMD Buffer Maker Function.
+ */
+typedef int (*PMBUSWriteCMDBufferMakerFunc)(unsigned int *currentIO, unsigned char *buff, unsigned int sizeOfBuffer, unsigned int cmd, unsigned char *dataBuffer, unsigned int sizeOfDataBuffer);
+
+/**
+ * @brief PMBUS CMD Buffer Provider.
+ */
+typedef struct pmbusCMDBufferProvider_t {
+
+	PMBUSReadCMDBufferMakerFunc m_pmbusdReadCMDBufferMaker;
+
+	PMBUSWriteCMDBufferMakerFunc m_pmbusdWriteCMDBufferMaker;
+
+} PMBUSCMDBufferProvider_t;
 
 #endif

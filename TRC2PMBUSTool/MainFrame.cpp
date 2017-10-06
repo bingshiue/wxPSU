@@ -54,6 +54,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	this->m_customerList = customerList;
 	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
 
+	// Save Current Use Model's Structure Pointer
+	PMBUSHelper::SetCurrentUseModel(
+			&this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList[PMBUSHelper::GetAppSettings()->m_currentUseModel]);
+
+	// Setup PMBUS Command Buffer Provider
+	SetupPMBUSCommandBufferProvider();
+
 	//this->m_ioDeviceOpen = false;
 
 	// Reset AppSettings
@@ -1081,7 +1088,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
-		wxDATAVIEW_COL_SORTABLE);
+		wxCOL_RESIZABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Coefficients",
 		PMBUSCMDListModel::Col_CoefficientsText,
@@ -1215,10 +1222,102 @@ void MainFrame::SetupPMBusCommandData(void){
 		this->m_PMBusData[idx].m_cmdCBFunc.m_coefficientsCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdCoefficientsFunc[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_cookCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdCookCBFunc[idx];
 		this->m_PMBusData[idx].m_cmdCBFunc.m_rawCBFunc = this->m_modelList[this->m_appSettings.m_currentUseModel].m_cmdRawCBFunc[idx];
-
+		this->m_PMBusData[idx].m_dataFormat.m_formatType = this->m_modelList[this->m_appSettings.m_currentUseModel].m_modelCMDTable->m_dataFormat.m_formatType;
 	}
 
 	PMBUSHelper::setPMBUSCMDData(this->m_PMBusData);
+}
+
+void MainFrame::SetupPMBUSCommandBufferProvider(void){
+	// Setup Model's PMBUS CMD Buffer Provider
+	switch (this->m_appSettings.m_currentUseCustomer){
+
+	case Customer_GIGABYTE:
+
+		switch (this->m_appSettings.m_currentUseModel){
+
+		case GIGABYTE_Model_CRPS001:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup GIGABYTE_Model_CRPS001 PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+
+		case GIGABYTE_Model_CRPS001_ALL_PMBUS_COMMANDS:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup GIGABYTE_Model_CRPS001_ALL_PMBUS_COMMANDS PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+		case GIGABYTE_Model_Generic:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup GIGABYTE_Model_Generic PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+#endif
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
+
+		break;
+
+	case Customer_ACBEL:
+
+		switch (this->m_appSettings.m_currentUseModel){
+
+		case ACBEL_RFWE_24_28_1200W_SCP:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup ACBEL_RFWE_24_28_1200W_SCP PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+
+		case ACBEL_PBF003_00G:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup ACBEL_PBF003_00G PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer2BytesLengthCMD;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer2BytesLengthCMD;
+			break;
+
+#if (HAVE_GENERIC_MODEL == TRUE)
+		case ACBEL__Model_Generic:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup ACBEL__Model_Generic PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+#endif
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
+
+		break;
+
+#if (HAVE_GENERIC_CUSTOMER == TRUE)
+	case Customer_Generic:
+
+		switch (this->m_appSettings.m_currentUseModel){
+
+		case GENERIC_Model_Generic:
+			PSU_DEBUG_PRINT(MSG_DEBUG, "Setup GENERIC_Model_Generic PMBUSCommandBufferProvider");
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdReadCMDBufferMaker = PMBUSHelper::ProductReadCMDBuffer;
+			PMBUSHelper::GetCurrentUseModel()->m_pmbusCMDbufferProvider.m_pmbusdWriteCMDBufferMaker = PMBUSHelper::ProductWriteCMDBuffer;
+			break;
+
+		default:
+			PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+			break;
+		}
+
+		break;
+#endif
+
+	default:
+		PSU_DEBUG_PRINT(MSG_ERROR, "Something Error Occurs");
+		break;
+	}
+
 }
 
 // Create Write Page Instance
@@ -1348,6 +1447,19 @@ BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 	// FAH Firmware_Update_Command
 	case 0xfa:
 		page = (BaseWritePage*)NEW_WRITEPAGE(FA);
+		break;
+	// Below were For PBF003-00G
+	case 0x0900:
+		page = (BaseWritePage*)NEW_WRITEPAGE(0900);
+		break;
+	case 0x0909:
+		page = (BaseWritePage*)NEW_WRITEPAGE(0909);
+		break;
+	case 0x0920:
+		page = (BaseWritePage*)NEW_WRITEPAGE(0920);
+		break;
+	case 0x0921:
+		page = (BaseWritePage*)NEW_WRITEPAGE(0921);
 		break;
 
 	default:
@@ -2951,6 +3063,8 @@ void MainFrame::OnDVSelectionChanged(wxDataViewEvent &event)
 	// Add Write Pages 
 	if (this->m_PMBusData[row].m_writePage != NULL){
 		
+		PSU_DEBUG_PRINT(MSG_DEBUG, "this->m_PMBusData[row].m_dataFormat.m_formatType = %d", this->m_PMBusData[row].m_dataFormat.m_formatType);
+
 		switch (this->m_PMBusData[row].m_dataFormat.m_formatType){
 
 		case cmd_data_format_LinearData_Format:
@@ -4740,6 +4854,10 @@ void MainFrame::CheckIfModelChange(void){
 
 				break;
 
+			case ACBEL_PBF003_00G:
+
+				break;
+
 #if (HAVE_GENERIC_MODEL == TRUE)
 			case ACBEL__Model_Generic:
 
@@ -5393,8 +5511,18 @@ void MainFrame::UpdateSTDPage(unsigned int index){
 		this->m_stdPage->m_tcVIN->SetValue(vin);
 	}
 
+	if(index == this->findPMBUSCMDIndex(0x0904)){
+		wxString vin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VIN);
+		this->m_stdPage->m_tcVIN->SetValue(vin);
+	}
+
 	// IIN
 	if (index == this->findPMBUSCMDIndex(0x89)){
+		wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
+		this->m_stdPage->m_tcIIN->SetValue(iin);
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x0905)){
 		wxString iin = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IIN);
 		this->m_stdPage->m_tcIIN->SetValue(iin);
 	}
@@ -5405,8 +5533,18 @@ void MainFrame::UpdateSTDPage(unsigned int index){
 		this->m_stdPage->m_tcVOUT->SetValue(vout);
 	}
 
+	if (index == this->findPMBUSCMDIndex(0x0906)){
+		wxString vout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_VOUT);
+		this->m_stdPage->m_tcVOUT->SetValue(vout);
+	}
+
 	// IOUT
 	if (index == this->findPMBUSCMDIndex(0x8c, 0)){
+		wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
+		this->m_stdPage->m_tcIOUT->SetValue(iout);
+	}
+
+	if (index == this->findPMBUSCMDIndex(0x0907, 0)){
 		wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
 		this->m_stdPage->m_tcIOUT->SetValue(iout);
 	}
