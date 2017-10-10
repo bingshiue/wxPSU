@@ -880,7 +880,8 @@ int PMBUSHelper::ProductReadCMDBuffer2BytesLengthCMD(PMBUSCOMMAND_t* pmBusComman
 			sendBuffer[baseIndex++] = 0x41;
 			sendBuffer[baseIndex++] = 0x44;
 			sendBuffer[baseIndex++] = PMBUSHelper::GetSlaveAddress();
-			sendBuffer[baseIndex++] = command;        // Command
+			sendBuffer[baseIndex++] = (command & 0xff00) >> 8;// Command
+			sendBuffer[baseIndex++] = (command & 0x00ff);
 
 			// May Have 0x0d Command
 			if (sendBuffer[baseIndex - 1] == 0x0d){
@@ -1626,17 +1627,19 @@ int PMBUSHelper::ProductWriteCMDBuffer2BytesLengthCMD(unsigned int *currentIO, u
 		buff[2] = 0x41;
 		buff[3] = 0x54;
 		buff[4] = PMBUSHelper::GetSlaveAddress(); // Slave Address
-		buff[5] = cmd; // CMD
-		// Data start from index 6
+		buff[5] = (cmd & 0xff00) >> 8;// CMD
+		buff[6] = (cmd & 0x00ff);
+
+		// Data start from index 7
 		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
-			buff[6 + idx] = dataBuffer[idx];
-			pec_start_index = (6 + idx);
+			buff[7 + idx] = dataBuffer[idx];
+			pec_start_index = (7 + idx);
 		}
 
 		// Compute PEC
-		pec_start_index += 1;
-		buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 4, 2 + sizeOfDataBuffer);
-		PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
+		//pec_start_index += 1;
+		//buff[pec_start_index] = PMBusSlave_Crc8MakeBitwise(0, 7, buff + 4, 2 + sizeOfDataBuffer);
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "separate_pec = %02xh", buff[pec_start_index]);
 
 		// Fill Last 2
 		pec_start_index++;

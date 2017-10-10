@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file WritePage0900H.cpp
  */
 
@@ -22,11 +22,12 @@ WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_
 	m_computedVoltage->SetForegroundColour(wxColour(0,0,255));
 
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, wxString(
-	L"读写,单位 0.1V;整型,高位在前,低位在后 \n"
-	"通过 I2C 控制可以调整 AC/DC 电源模块的输出电压 \n"
-	"范围为: 18V~31V,与电源模块输出电压 Vout 与 DAC \n"
-	"控制字 Vc 的关系为 Vout=(13/4095)*Vc+18V \n"
-	"其中 Vc 表示 DAC 的量化值,范围是 0~4095"), wxDefaultPosition, wxSize(-1, -1));
+	    L"讀寫,單位 0.1V,高位在前,低位在後 \n"
+	     "通過 I2C 控制可以調整 AC/DC 電源模塊的輸出電壓 \n"
+	     "範圍為 18V~31V,與電源模塊輸出電壓 VOut 與 DAC \n"
+	     "控制字 Vc 的關係為 Vout=(13/4095)*Vc + 18V \n"
+	     "其中 Vc 表示 DAC 的量化植,範圍為 0~4095"),
+	 wxDefaultPosition, wxSize(-1, -1));
 
 	m_targetVoltage = new wxTextCtrl(this, CID_TEXTCTRL_TARGET_VOLTAGE, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 
