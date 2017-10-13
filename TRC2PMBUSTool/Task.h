@@ -577,11 +577,18 @@ class SendWriteCMDTask : public TaskEx {
 
 	BOOL m_enumIOPort[IO_PORT_MAX_COUNT];
 
+	bool m_nonPMBUSStandard;
+
 public:
 	/**
 	 * @brief Constructor.
 	 */
 	SendWriteCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand);
+
+	/**
+	 * @brief Constructor.
+	 */
+	SendWriteCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, bool NonPMBUSStandard);
 
 	/**
 	 * @brief Deconstructor.

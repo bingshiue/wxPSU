@@ -19,6 +19,7 @@ int PFB003_00G_Cook_0909H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 int PFB003_00G_Cook_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Cook_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Cook_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int PFB003_00G_Cook_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Cook_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 

@@ -243,6 +243,8 @@ typedef struct pmbusSendcmd_t {
 
 	unsigned int m_bytesToRead;
 
+	unsigned short m_sendCommand;
+
 } PMBUSSendCOMMAND_t;
 
 typedef struct pmbusReadCMD_t {
@@ -292,6 +294,11 @@ typedef struct pmbusCMDBufferProvider_t {
 	PMBUSReadCMDBufferMakerFunc m_pmbusdReadCMDBufferMaker;
 
 	PMBUSWriteCMDBufferMakerFunc m_pmbusdWriteCMDBufferMaker;
+
+	pmbusCMDBufferProvider_t(PMBUSReadCMDBufferMakerFunc readCMDBufferMakerFunc, PMBUSWriteCMDBufferMakerFunc writeCMDBufferMakerFunc) {
+		m_pmbusdReadCMDBufferMaker = readCMDBufferMakerFunc;
+		m_pmbusdWriteCMDBufferMaker = writeCMDBufferMakerFunc;
+	}
 
 } PMBUSCMDBufferProvider_t;
 

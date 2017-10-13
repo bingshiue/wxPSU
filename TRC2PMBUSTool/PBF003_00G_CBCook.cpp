@@ -291,6 +291,24 @@ int PFB003_00G_Cook_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 	return EXIT_SUCCESS;
 }
 
+int PFB003_00G_Cook_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr) {
+
+	const wchar_t* tmp_wchar;
+	unsigned short latestAdjustCommand = 0;
+
+	wxString wxstr("");
+
+	latestAdjustCommand = (pmbuscmd->m_recvBuff.m_dataBuff[0] << 8) | pmbuscmd->m_recvBuff.m_dataBuff[1];
+
+	wxstr += wxString::Format("SET POINT : %04X", latestAdjustCommand);
+
+	tmp_wchar = wxstr.wc_str();
+	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
+
+	return EXIT_SUCCESS;
+
+}
+
 int PFB003_00G_Cook_Not_Implement(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 	// Check have checksum error ?
 	if (Check_Have_CheckSum_Error(pmbuscmd, string, sizeOfstr) == true) return EXIT_FAILURE;

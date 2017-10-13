@@ -419,6 +419,8 @@ private:
 
 	unsigned int m_CurrentUseIOInterface;/**< Current Use IO Interface */
 	unsigned int m_polling_time;/**< Polling Time for Running PM Bus Command */
+	unsigned int m_defaultI2CAddress;/**< Default I2C Address */
+	unsigned int m_defaultPollingTime;/**< Default Polling Time */
 
 	void SetupModel(void);
 	void SetupPMBusCommandData(void);

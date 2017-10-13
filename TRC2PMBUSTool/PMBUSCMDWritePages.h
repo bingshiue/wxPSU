@@ -1283,6 +1283,10 @@ public:
 
 	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
+	enum {
+		CID_TEXTCTRL_TARGET_VALUE = 0x3301
+	};
+
 protected:
 
 	wxStaticText *m_hintName;
@@ -1305,6 +1309,8 @@ private:
 	void OnRadioButtonCook(wxCommandEvent& event);
 
 	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnTargetValue(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
 
@@ -1325,6 +1331,10 @@ public:
 
 	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
 
+	enum {
+		CID_TEXTCTRL_TARGET_VALUE = 0x3301
+	};
+
 protected:
 
 	wxStaticText *m_hintName;
@@ -1347,6 +1357,8 @@ private:
 	void OnRadioButtonCook(wxCommandEvent& event);
 
 	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnTargetValue(wxCommandEvent& event);
 
 	void OnButtonWrite(wxCommandEvent& event);
 

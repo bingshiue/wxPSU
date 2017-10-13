@@ -1088,7 +1088,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
-		wxCOL_RESIZABLE);
+		PMBUSHelper::GetCurrentUseModel()->m_isStandardPMBUSModel==true ? wxCOL_RESIZABLE : wxCOL_HIDDEN);//wxCOL_RESIZABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Coefficients",
 		PMBUSCMDListModel::Col_CoefficientsText,
@@ -1099,7 +1099,7 @@ void MainFrame::SetupCMDListDVL(wxPanel* parent){
 		wxCOL_WIDTH_AUTOSIZE,//75,//wxCOL_WIDTH_AUTOSIZE,
 #endif
 		wxALIGN_CENTER_HORIZONTAL,
-		wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
+		PMBUSHelper::GetCurrentUseModel()->m_isStandardPMBUSModel == true ? wxCOL_RESIZABLE : wxCOL_HIDDEN);// wxCOL_RESIZABLE);// wxDATAVIEW_COL_SORTABLE);
 
 	this->m_cmdListDVC->AppendTextColumn("Cook",
 		PMBUSCMDListModel::Col_CookText,
@@ -4189,8 +4189,8 @@ void MainFrame::CheckAndLoadConfig(void){
 	// Previous Customer
 	long previousCustomer;
 	if (pConfig->Read(wxT("PreviousCustomer"), &previousCustomer) == false){
-		pConfig->Write(wxT("PreviousCustomer"), DEFAULT_CUSTOMER);
-		this->m_appSettings.m_previousUseCustomer = DEFAULT_CUSTOMER;
+		pConfig->Write(wxT("PreviousCustomer"), 0x99);// DEFAULT_CUSTOMER);
+		this->m_appSettings.m_previousUseCustomer = 0x99;// DEFAULT_CUSTOMER;
 	}
 	else{
 		this->m_appSettings.m_previousUseCustomer = previousCustomer;
@@ -4209,8 +4209,8 @@ void MainFrame::CheckAndLoadConfig(void){
 	// Precious Model
 	long previousModel;
 	if (pConfig->Read(wxT("PreviousModel"), &previousModel) == false){
-		pConfig->Write(wxT("PreviousModel"), DEFAULT_MODEL);
-		this->m_appSettings.m_previousUseModel = DEFAULT_MODEL;
+		pConfig->Write(wxT("PreviousModel"), 0x99);// DEFAULT_MODEL);
+		this->m_appSettings.m_previousUseModel = 0x99;// DEFAULT_MODEL;
 	}
 	else{
 		this->m_appSettings.m_previousUseModel = previousModel;
@@ -4218,7 +4218,7 @@ void MainFrame::CheckAndLoadConfig(void){
 
 	/* Check If Model Change */
 	this->CheckIfModelChange();
-
+	
 	// I2C Adaptor Module Board
 	long i2cAdaptorModuleBoard;
 	if (pConfig->Read(wxT("I2CAdaptorModuleBoard"), &i2cAdaptorModuleBoard) == false){
@@ -4232,8 +4232,8 @@ void MainFrame::CheckAndLoadConfig(void){
 	// I2C Slave Address
 	long i2cSlaveAddr;
 	if (pConfig->Read(wxT("I2CSlaveAddress"), &i2cSlaveAddr) == false){
-		pConfig->Write(wxT("I2CSlaveAddress"), DEFAULT_I2C_SLAVEADDRESS);
-		this->m_appSettings.m_I2CSlaveAddress = DEFAULT_I2C_SLAVEADDRESS;
+		pConfig->Write(wxT("I2CSlaveAddress"), this->m_defaultI2CAddress);
+		this->m_appSettings.m_I2CSlaveAddress = this->m_defaultI2CAddress;
 	}
 	else{
 		this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
@@ -4253,8 +4253,8 @@ void MainFrame::CheckAndLoadConfig(void){
 	// Polling Interval
 	long pollingInterval;
 	if (pConfig->Read(wxT("PollingInterval"), &pollingInterval) == false){
-		pConfig->Write(wxT("PollingInterval"), DEFAULT_POLLING_INTERVAL);
-		this->m_appSettings.m_pollingInterval = DEFAULT_POLLING_INTERVAL;
+		pConfig->Write(wxT("PollingInterval"), this->m_defaultPollingTime);
+		this->m_appSettings.m_pollingInterval = this->m_defaultPollingTime;
 	}
 	else{
 		this->m_appSettings.m_pollingInterval = pollingInterval;
@@ -4813,6 +4813,9 @@ void MainFrame::CheckIfModelChange(void){
 	// Setup Default MFR_SERIAL
 	PMBUSHelper::getDefaultMFR_SERIAL() = wxString::Format("%s", DEF_MFR_SERIAL);
 	
+	// Work-Around For Set Default Polling Time by Model
+	this->m_defaultI2CAddress = DEFAULT_I2C_SLAVEADDRESS;
+	this->m_defaultPollingTime = DEFAULT_POLLING_INTERVAL;
 
 	// If Model or Customer Changed
 	if (this->m_appSettings.m_currentUseCustomer != this->m_appSettings.m_previousUseCustomer || this->m_appSettings.m_currentUseModel != this->m_appSettings.m_previousUseModel)
@@ -4855,7 +4858,10 @@ void MainFrame::CheckIfModelChange(void){
 				break;
 
 			case ACBEL_PBF003_00G:
-
+				// Work-Around For Set Default Polling Time by Model
+				this->m_defaultI2CAddress = DEFAULT_I2C_SLAVEADDRESS_PBF003_00G;
+				this->m_defaultPollingTime = DEFAULT_POLLING_INTERVAL_PBF003_00G;
+				
 				break;
 
 #if (HAVE_GENERIC_MODEL == TRUE)

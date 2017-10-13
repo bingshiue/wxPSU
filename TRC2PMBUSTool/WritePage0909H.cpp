@@ -25,7 +25,7 @@ WritePage0909H::WritePage0909H(wxWindow* parent, wxString& label, bool* monitor_
 	m_scale = NULL;
 
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, wxString(
-	L""), wxDefaultPosition, wxSize(-1, -1));
+	L"重置輸出電壓至預設值"), wxDefaultPosition, wxSize(-1, -1));
 
 	//m_highByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 	//m_lowByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
@@ -188,9 +188,9 @@ void WritePage0909H::OnRadioButtonRaw(wxCommandEvent& event){
 void WritePage0909H::OnButtonWrite(wxCommandEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "");
 
-	double highByteValue = 0;
-	double lowByteValue = 0;
-	double scale;
+	//double highByteValue = 0;
+	//double lowByteValue = 0;
+	//double scale;
 
 #if 0
 	if (this->m_rawRadioButton->GetValue() == true){
@@ -212,6 +212,8 @@ void WritePage0909H::OnButtonWrite(wxCommandEvent& event){
 	}
 #endif
 
+	PSU_DEBUG_PRINT(MSG_ALERT, "Reset Voltage To Default");
+
 	unsigned char cmdDATA[2];
 
 	switch (this->m_dataFormat){
@@ -221,8 +223,8 @@ void WritePage0909H::OnButtonWrite(wxCommandEvent& event){
 		break;
 
 	case cmd_data_format_DirectData_Format:
-		cmdDATA[0] = (unsigned char)highByteValue & (0x00ff);
-		cmdDATA[1] = (unsigned char)highByteValue & (0x00ff);
+		//cmdDATA[0] = (unsigned char)highByteValue & (0x00ff);
+		//cmdDATA[1] = (unsigned char)highByteValue & (0x00ff);
 
 		break;
 
@@ -243,6 +245,7 @@ void WritePage0909H::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMD0909H;
 
+	CMD0909H.m_sendCommand = SELF_CMD;
 	CMD0909H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
 	CMD0909H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_0909H_BYTES_TO_READ);
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
@@ -260,7 +263,7 @@ void WritePage0909H::OnButtonWrite(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0909H);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0909H, true);
 	}
 
 }

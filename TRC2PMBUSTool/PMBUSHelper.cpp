@@ -1630,6 +1630,9 @@ int PMBUSHelper::ProductWriteCMDBuffer2BytesLengthCMD(unsigned int *currentIO, u
 		buff[5] = (cmd & 0xff00) >> 8;// CMD
 		buff[6] = (cmd & 0x00ff);
 
+		// Prevent sizeOfDataBuffer == 0
+		pec_start_index = 6;
+
 		// Data start from index 7
 		for (unsigned int idx = 0; idx < sizeOfDataBuffer; idx++){
 			buff[7 + idx] = dataBuffer[idx];

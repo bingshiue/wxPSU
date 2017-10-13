@@ -6,6 +6,9 @@
 
 #include "PMBUSCommandType.h"
 
+#define STANDARD_PMBUS_MODEL  true/**< Standard PMBUS Model */
+#define NON_STANDARD_PMBUS_MODEL  false/**< Non-Standard PMBUS Model */
+
 typedef struct model_type_t {
 	
 	wchar_t* m_modelName;/**< Model Name */
@@ -16,6 +19,7 @@ typedef struct model_type_t {
 	CMDCookCBFunc* m_cmdCookCBFunc;/**< CMD Cook Function */
 	CMDRawCBFunc* m_cmdRawCBFunc;/**< CMD Raw Function */
 	PMBUSCMDBufferProvider_t  m_pmbusCMDbufferProvider;/**< PMBUS CMD Buffer Provider */
+	bool m_isStandardPMBUSModel;/**< Is Standard PMBUS Model */
 
 } MODEL_TYPE_t;
 

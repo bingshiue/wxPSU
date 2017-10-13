@@ -12,6 +12,17 @@ SendWriteCMDTask::SendWriteCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, 
 	this->m_pmbusSendCommand = pmbusSendCommand;
 }
 
+SendWriteCMDTask::SendWriteCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, bool NonPMBUSStandard) {
+	this->m_id = task_ID_SendWriteCMDTask;
+
+	this->m_IOAccess = ioaccess;
+	this->m_CurrentIO = currentIO;
+	this->m_pmbusSendCommand = pmbusSendCommand;
+
+	this->m_nonPMBUSStandard = NonPMBUSStandard;
+
+}
+
 SendWriteCMDTask::~SendWriteCMDTask(void){
 
 }
@@ -26,37 +37,45 @@ int SendWriteCMDTask::Main(double elapsedTime){
 
 	PSU_DEBUG_PRINT(MSG_DETAIL, "Count of Task = %d", cnt);
 
-	unsigned char writeCMD; 
+	unsigned short writeCMD; 
 	
 	switch (*this->m_CurrentIO){
 
 	case IOACCESS_SERIALPORT:
-		
-		writeCMD = this->m_pmbusSendCommand.m_sendData[3];
+		if (this->m_nonPMBUSStandard == false) {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[3];
+		}
 
 		break;
 
 	case IOACCESS_HID:
-
-		writeCMD = this->m_pmbusSendCommand.m_sendData[5];
+		if (this->m_nonPMBUSStandard == false) {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[5];
+		}
+		else {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[5] << 8 | this->m_pmbusSendCommand.m_sendData[6];
+		}
 
 		break;
 
 	case IOACCESS_PICKIT:
-
-		writeCMD = this->m_pmbusSendCommand.m_sendData[7];
+		if (this->m_nonPMBUSStandard == false) {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[7];
+		}
 
 		break;
 
 	case IOACCESS_TOTALPHASE:
-
-		writeCMD = this->m_pmbusSendCommand.m_sendData[3];
+		if (this->m_nonPMBUSStandard == false) {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[3];
+		}
 
 		break;
 
 	case IOACCESS_TRC2_I2C_ADAPTER:
-
-		writeCMD = this->m_pmbusSendCommand.m_sendData[7];
+		if (this->m_nonPMBUSStandard == false) {
+			writeCMD = this->m_pmbusSendCommand.m_sendData[7] << 8 | this->m_pmbusSendCommand.m_sendData[8];
+		}
 
 		break;
 
@@ -66,7 +85,8 @@ int SendWriteCMDTask::Main(double elapsedTime){
 	}
 
 	wxString msg("Send Write Command ");
-	msg += (wxString::Format("%x H", writeCMD).Upper());
+
+	msg += (wxString::Format("%X H", writeCMD).Upper());
 
 	PSU_DEBUG_PRINT(MSG_ALERT, "%s", msg.c_str());
 

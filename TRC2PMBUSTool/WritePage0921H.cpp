@@ -6,21 +6,23 @@
 
 #define SELF_CMD  0x0921/**< Self Command */
 
-#define DEFAULT_HIGH_BYTE_VALUE   0x00/**< Default high byte Value */
+#define DEFAULT_HIGH_BYTE_VALUE   0xfff/**< Default high byte Value */
 #define DEFAULT_LOW_BYTE_VALUE    0x00/**< Default low  byte Value */
 
 #define WRITE_PAGES_0921H_DEFAULT_FORMAT_HEX  FALSE//TRUE//FALSE
 
+#define MAX_INPUT_VALUE  0xffff/**< Max Input Value */
+
 WritePage0921H::WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"High Byte"), wxDefaultPosition, wxSize(80, -1));
-	m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
+	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
+	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
-	m_cmdDescription = new wxStaticText(this, wxID_ANY, wxString(
-	L""), wxDefaultPosition, wxSize(-1, -1));
+	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò 0 ~ %d(%04X)", MAX_INPUT_VALUE, MAX_INPUT_VALUE);
+	m_cmdDescription = new wxStaticText(this, wxID_ANY, descriptionStr, wxDefaultPosition, wxSize(-1, -1));
 
-	m_highByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
-	m_lowByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
+	m_highByteValue = new wxTextCtrl(this, CID_TEXTCTRL_TARGET_VALUE, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
+	//m_lowByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 
 	m_stPadding_6 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 
@@ -32,8 +34,8 @@ WritePage0921H::WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_
 	// Add Components To Sizer
 	this->m_gridSizer_1->Add(m_hintName, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_gridSizer_1->Add(m_highByteValue, 1, wxALIGN_CENTER_VERTICAL, 10);
-	this->m_gridSizer_1->Add(m_scale, 1, wxALIGN_CENTER_VERTICAL, 10);
-	this->m_gridSizer_1->Add(m_lowByteValue, 1, wxALIGN_CENTER_VERTICAL, 10);
+	//this->m_gridSizer_1->Add(m_scale, 1, wxALIGN_CENTER_VERTICAL, 10);
+	//this->m_gridSizer_1->Add(m_lowByteValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	this->m_staticBoxlSizer->Add(this->m_gridSizer_1);
 
 	this->m_staticBoxlSizer->Add(m_stPadding_6);
@@ -48,15 +50,15 @@ WritePage0921H::WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_
 	wxString hexString_high_byte = wxString::Format("%02lx", (long)DEFAULT_HIGH_BYTE_VALUE);
 	this->m_highByteValue->SetValue(hexString_high_byte);
 
-	wxString hexString_low_byte = wxString::Format("%02lx", (long)DEFAULT_LOW_BYTE_VALUE);
-	this->m_lowByteValue->SetValue(hexString_low_byte);
+	//wxString hexString_low_byte = wxString::Format("%02lx", (long)DEFAULT_LOW_BYTE_VALUE);
+	//this->m_lowByteValue->SetValue(hexString_low_byte);
 
 	// Set Validator
 	this->m_highByteValue->SetValidator(this->m_hexValidator);
-	this->m_lowByteValue->SetValidator(this->m_hexValidator);
+	//this->m_lowByteValue->SetValidator(this->m_hexValidator);
 
-	this->m_highByteValue->SetMaxLength(2);
-	this->m_lowByteValue->SetMaxLength(2);
+	this->m_highByteValue->SetMaxLength(4);
+	//this->m_lowByteValue->SetMaxLength(2);
 
 #else
 	// Set Default Value of Radio Buttons
@@ -66,15 +68,15 @@ WritePage0921H::WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_
 	wxString default_high_byte = wxString::Format("%d", DEFAULT_HIGH_BYTE_VALUE);
 	this->m_highByteValue->SetValue(default_high_byte);
 
-	wxString default_low_byte = wxString::Format("%d", DEFAULT_LOW_BYTE_VALUE);
-	m_lowByteValue->SetValue(default_low_byte);
+	//wxString default_low_byte = wxString::Format("%d", DEFAULT_LOW_BYTE_VALUE);
+	//m_lowByteValue->SetValue(default_low_byte);
 
 	// Set Validator
 	this->m_highByteValue->SetValidator(this->m_numberValidator);
-	this->m_lowByteValue->SetValidator(this->m_numberValidator);
+	//this->m_lowByteValue->SetValidator(this->m_numberValidator);
 
-	this->m_highByteValue->SetMaxLength(0);
-	this->m_lowByteValue->SetMaxLength(0);
+	this->m_highByteValue->SetMaxLength(5);
+	//this->m_lowByteValue->SetMaxLength(0);
 #endif
 
 	// Save Member
@@ -132,20 +134,20 @@ void WritePage0921H::OnRadioButtonCook(wxCommandEvent& event){
 
 	long decimal = PMBUSHelper::HexToDecimal(this->m_highByteValue->GetValue().c_str());
 
-	this->m_highByteValue->SetMaxLength(3);
+	this->m_highByteValue->SetMaxLength(5);
 	this->m_highByteValue->SetValue(wxString::Format("%ld", decimal));
 
 	/* --------------------------- */
 
-	if (this->m_lowByteValue->GetValue() == wxEmptyString) return;
+	//if (this->m_lowByteValue->GetValue() == wxEmptyString) return;
 
-	long decimal2 = PMBUSHelper::HexToDecimal(this->m_lowByteValue->GetValue().c_str());
+	//long decimal2 = PMBUSHelper::HexToDecimal(this->m_lowByteValue->GetValue().c_str());
 
-	this->m_lowByteValue->SetMaxLength(3);
-	this->m_lowByteValue->SetValue(wxString::Format("%ld", decimal2));
+	//this->m_lowByteValue->SetMaxLength(3);
+	//this->m_lowByteValue->SetValue(wxString::Format("%ld", decimal2));
 
 	this->m_highByteValue->SetValidator(this->m_numberValidator);
-	this->m_lowByteValue->SetValidator(this->m_numberValidator);
+	//this->m_lowByteValue->SetValidator(this->m_numberValidator);
 
 }
 
@@ -157,21 +159,60 @@ void WritePage0921H::OnRadioButtonRaw(wxCommandEvent& event){
 	double tmp = 0;
 	this->m_highByteValue->GetValue().ToDouble(&tmp);
 	wxString hexString = wxString::Format("%02lx", (long)tmp);
-	this->m_highByteValue->SetMaxLength(2);
+	this->m_highByteValue->SetMaxLength(4);
 	this->m_highByteValue->SetValue(hexString);
 
 	/* --------------------------- */
 
-	if (this->m_lowByteValue->GetValue() == wxEmptyString) return;
+	//if (this->m_lowByteValue->GetValue() == wxEmptyString) return;
 
-	double tmp2 = 0;
-	this->m_lowByteValue->GetValue().ToDouble(&tmp2);
-	wxString hexString2 = wxString::Format("%02lx", (long)tmp2);
-	this->m_lowByteValue->SetMaxLength(2);
-	this->m_lowByteValue->SetValue(hexString2);
+	//double tmp2 = 0;
+	//this->m_lowByteValue->GetValue().ToDouble(&tmp2);
+	//wxString hexString2 = wxString::Format("%02lx", (long)tmp2);
+	//this->m_lowByteValue->SetMaxLength(2);
+	//this->m_lowByteValue->SetValue(hexString2);
 
 	this->m_highByteValue->SetValidator(this->m_hexValidator);
-	this->m_lowByteValue->SetValidator(this->m_hexValidator);
+	//this->m_lowByteValue->SetValidator(this->m_hexValidator);
+
+}
+
+void WritePage0921H::OnTargetValue(wxCommandEvent& event) {
+	PSU_DEBUG_PRINT(MSG_DEBUG, "");
+
+	double inputValue = 0;
+
+	if (this->m_rawRadioButton->GetValue() == true) {
+		inputValue = (unsigned short)PMBUSHelper::HexToDecimal(this->m_highByteValue->GetValue().c_str());
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)inputValue);
+	}
+	else if (this->m_cookRadioButton->GetValue() == true) {
+		this->m_highByteValue->GetValue().ToDouble(&inputValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)inputValue);
+	}
+
+	if (inputValue <= 0) inputValue = 0;
+
+	if (inputValue > MAX_INPUT_VALUE) {
+
+		wxString msg = wxString::Format("Input Value Can't Large Than %d", MAX_INPUT_VALUE);
+
+		wxMessageBox(msg,
+			wxT("Warning ! Input Value Out of Range !"),
+			wxOK | wxICON_WARNING);
+
+		inputValue = DEFAULT_HIGH_BYTE_VALUE;
+
+		if (this->m_rawRadioButton->GetValue() == true) {
+			wxString hexString_target_value = wxString::Format("%02lx", (long)inputValue);
+			this->m_highByteValue->SetValue(hexString_target_value);
+		}
+		else if (this->m_cookRadioButton->GetValue() == true) {
+			wxString hexString_target_value = wxString::Format("%d", (int)inputValue);
+			this->m_highByteValue->SetValue(hexString_target_value);
+		}
+
+	}
 
 }
 
@@ -181,10 +222,10 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 
 	double highByteValue = 0;
 	double lowByteValue = 0;
-	double scale;
+	//double scale;
 
 	if (this->m_rawRadioButton->GetValue() == true){
-		highByteValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_highByteValue->GetValue().c_str());
+		highByteValue = (unsigned short)PMBUSHelper::HexToDecimal(this->m_highByteValue->GetValue().c_str());
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)highByteValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
@@ -192,14 +233,14 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)highByteValue);
 	}
 
-	if (this->m_rawRadioButton->GetValue() == true){
-		lowByteValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_lowByteValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)lowByteValue);
-	}
-	else if (this->m_cookRadioButton->GetValue() == true){
-		this->m_lowByteValue->GetValue().ToDouble(&lowByteValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)lowByteValue);
-	}
+	//if (this->m_rawRadioButton->GetValue() == true){
+		//lowByteValue = (unsigned char)PMBUSHelper::HexToDecimal(this->m_lowByteValue->GetValue().c_str());
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)lowByteValue);
+	//}
+	//else if (this->m_cookRadioButton->GetValue() == true){
+		//this->m_lowByteValue->GetValue().ToDouble(&lowByteValue);
+		//PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)lowByteValue);
+	//}
 
 	unsigned char cmdDATA[2];
 
@@ -210,8 +251,8 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 		break;
 
 	case cmd_data_format_DirectData_Format:
-		cmdDATA[0] = (unsigned char)highByteValue & (0x00ff);
-		cmdDATA[1] = (unsigned char)lowByteValue & (0x00ff);
+		cmdDATA[0] = ((unsigned short)highByteValue & 0xff00) >> 8;
+		cmdDATA[1] = (unsigned short)highByteValue & (0x00ff);
 
 		break;
 
@@ -232,6 +273,7 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMD0921H;
 
+	CMD0921H.m_sendCommand = SELF_CMD;
 	CMD0921H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
 	CMD0921H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_0921H_BYTES_TO_READ);
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
@@ -249,7 +291,7 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0921H);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0921H, true);
 	}
 
 }
@@ -257,5 +299,6 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 wxBEGIN_EVENT_TABLE(WritePage0921H, wxPanel)
 EVT_RADIOBUTTON(CID_RADIO_BOX_COOK, WritePage0921H::OnRadioButtonCook)
 EVT_RADIOBUTTON(CID_RADIO_BOX_RAW, WritePage0921H::OnRadioButtonRaw)
+EVT_TEXT(CID_TEXTCTRL_TARGET_VALUE, WritePage0921H::OnTargetValue)
 EVT_BUTTON(CID_BUTTON_WRITE, WritePage0921H::OnButtonWrite)
 wxEND_EVENT_TABLE()

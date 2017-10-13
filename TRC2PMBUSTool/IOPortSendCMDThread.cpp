@@ -1669,7 +1669,13 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 								//PSU_DEBUG_PRINT(MSG_DEBUG, "IO Send Separate Write CMD Success");
 								// Serial Port & Total Phase is 3, USBHID is 5 , And Pickit is 7
 								int sendCMDIndex = PMBUSHelper::getIndexOfCMDFieldInSendBuffer(this->m_CurrentIO);//(*this->m_CurrentIO == IOACCESS_SERIALPORT) ? 3 : ((*this->m_CurrentIO == IOACCESS_HID) ? 5 : 7);
-								PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %X H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
+								
+								if (PMBUSHelper::GetCurrentUseModel()->m_isStandardPMBUSModel == false) {
+									PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %X H", sendCMDVector_Iterator->m_sendCommand);
+								}
+								else {
+									PSU_DEBUG_PRINT(MSG_ALERT, "Send Write Command %X H", sendCMDVector_Iterator->m_sendData[sendCMDIndex]);
+								}
 							}
 
 						} while (sendResult <= 0);

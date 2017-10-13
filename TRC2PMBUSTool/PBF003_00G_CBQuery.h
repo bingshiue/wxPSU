@@ -26,6 +26,7 @@ int PFB003_00G_Query_0909H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int s
 int PFB003_00G_Query_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Query_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Query_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int PFB003_00G_Query_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Query_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 

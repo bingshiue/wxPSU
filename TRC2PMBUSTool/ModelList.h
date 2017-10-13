@@ -39,7 +39,9 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 		g_GIGABYTE_CRPS001_CMDQueryCBFunc,
 		g_GIGABYTE_CRPS001_CMDCoefficientsCBFunc,
 		g_GIGABYTE_CRPS001_CMDCookCBFunc,
-		g_GIGABYTE_CRPS001_CMDRawCBFunc
+		g_GIGABYTE_CRPS001_CMDRawCBFunc,
+		{NULL,NULL},
+		STANDARD_PMBUS_MODEL
 	}
 
 	// [1]  GIGABYTE CRPS ALL PMBUS COMMANDS
@@ -50,7 +52,9 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 		g_GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDQueryCBFunc,
 		g_GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDCoefficientsCBFunc,
 		g_GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDCookCBFunc,
-		g_GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDRawCBFunc
+		g_GIGABYTE_CRPS_ALL_PMBUS_CMDS_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 
 #if (HAVE_GENERIC_MODEL == TRUE)
@@ -62,7 +66,9 @@ MODEL_TYPE_t g_GIGABYTEModelList[GIGABYTE_MODEL_LIST_SIZE] = {
 		g_Generic_CMDQueryCBFunc,
 		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
-		g_Generic_CMDRawCBFunc
+		g_Generic_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 #endif
 };
@@ -77,7 +83,9 @@ MODEL_TYPE_t g_ACBELModelList[ACBEL_MODEL_LIST_SIZE] = {
 		g_ACBEL_RFWE_24_28_1200W_SCP_CMDQueryCBFunc,
 		g_ACBEL_RFWE_24_28_1200W_SCP_CMDCoefficientsCBFunc,
 		g_ACBEL_RFWE_24_28_1200W_SCP_CMDCookCBFunc,
-		g_ACBEL_RFWE_24_28_1200W_SCP_CMDRawCBFunc
+		g_ACBEL_RFWE_24_28_1200W_SCP_CMDRawCBFunc,
+		{ NULL,NULL },
+		NON_STANDARD_PMBUS_MODEL
 	}
 
 
@@ -89,7 +97,9 @@ MODEL_TYPE_t g_ACBELModelList[ACBEL_MODEL_LIST_SIZE] = {
 		g_PBF003_00G_CMDQueryCBFunc,
 		g_PBF003_00G_CMDCoefficientsCBFunc,
 		g_PBF003_00G_CMDCookCBFunc,
-		g_PBF003_00G_CMDRawCBFunc
+		g_PBF003_00G_CMDRawCBFunc,
+		{ NULL,NULL },
+		NON_STANDARD_PMBUS_MODEL
 	}
 
 #if (HAVE_GENERIC_MODEL == TRUE)
@@ -101,7 +111,9 @@ MODEL_TYPE_t g_ACBELModelList[ACBEL_MODEL_LIST_SIZE] = {
 		g_Generic_CMDQueryCBFunc,
 		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
-		g_Generic_CMDRawCBFunc
+		g_Generic_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 #endif
 };
@@ -116,7 +128,9 @@ MODEL_TYPE_t g_NECModelList[NEC_MODEL_LIST_SIZE] = {
 		g_FSG003_000G_CMDQueryCBFunc,
 		g_FSG003_000G_CMDCoefficientsCBFunc,
 		g_FSG003_000G_CMDCookCBFunc,
-		g_FSG003_000G_CMDRawCBFunc
+		g_FSG003_000G_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 #if (HAVE_GENERIC_MODEL == TRUE)
 	// [1] Generic Model (For Test Purpose)
@@ -127,7 +141,9 @@ MODEL_TYPE_t g_NECModelList[NEC_MODEL_LIST_SIZE] = {
 		g_Generic_CMDQueryCBFunc,
 		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
-		g_Generic_CMDRawCBFunc
+		g_Generic_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 #endif
 };
@@ -141,7 +157,9 @@ MODEL_TYPE_t g_GENERICModelList[GENERIC_MODEL_LIST_SIZE] = {
 		g_Generic_CMDQueryCBFunc,
 		g_Generic_CMDCoefficientsCBFunc,
 		g_Generic_CMDCookCBFunc,
-		g_Generic_CMDRawCBFunc
+		g_Generic_CMDRawCBFunc,
+		{ NULL,NULL },
+		STANDARD_PMBUS_MODEL
 	}
 };
 

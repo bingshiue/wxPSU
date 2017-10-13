@@ -26,6 +26,7 @@ int PFB003_00G_Coefficients_0909H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigne
 int PFB003_00G_Coefficients_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Coefficients_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Coefficients_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
+int PFB003_00G_Coefficients_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 int PFB003_00G_Coefficients_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr);
 
 #endif /* _PBF003_00G_CBCOEFFICIENTS_H_ */

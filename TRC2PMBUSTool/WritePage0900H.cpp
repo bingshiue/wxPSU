@@ -6,7 +6,7 @@
 
 #define SELF_CMD  0x0900/**< Self Command */
 
-#define DEFAULT_TARGET_VOLTAGE    0x277/**< Default Target Voltage */
+#define DEFAULT_TARGET_VOLTAGE    26.5f//0x277/**< Default Target Voltage */
 
 #define DEFAULT_HIGH_BYTE_VALUE   0x00/**< Default high byte Value */
 #define DEFAULT_LOW_BYTE_VALUE    0x00/**< Default low  byte Value */
@@ -15,10 +15,10 @@
 
 WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Vc : "), wxDefaultPosition, wxSize(80, -1));
+	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Vc : "), wxDefaultPosition, wxSize(30, -1));
 	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
-	m_computedVoltage = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(80, -1));
+	m_computedVoltage = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(120, -1));
 	m_computedVoltage->SetForegroundColour(wxColour(0,0,255));
 
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, wxString(
@@ -36,15 +36,15 @@ WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_
 
 	m_stPadding_6 = new wxStaticText(this, wxID_ANY, wxString(" "), wxDefaultPosition, wxSize(PADDING_DEFAULT_WIDTH, PADDING_DEFAULT_HEIGHT));
 
-	this->m_numberValidator.SetCharIncludes(wxT("0123456789"));
+	this->m_numberValidator.SetCharIncludes(wxT("0123456789."));
 
 	// Initial Sizer
 	this->m_gridSizer_1 = new wxGridSizer(1, 4, 0, 0);
 
 	// Add Components To Sizer
-	this->m_gridSizer_1->Add(m_hintName, 1, wxALIGN_CENTER_VERTICAL, 10);
-	this->m_gridSizer_1->Add(m_targetVoltage, 1, wxALIGN_CENTER_VERTICAL, 10);
-	this->m_gridSizer_1->Add(this->m_computedVoltage, 1, wxALIGN_CENTER_VERTICAL, 10);
+	this->m_gridSizer_1->Add(m_hintName, 1, wxALIGN_CENTER_VERTICAL, 3);
+	this->m_gridSizer_1->Add(m_targetVoltage, 1, wxALIGN_CENTER_VERTICAL, 3);
+	this->m_gridSizer_1->Add(this->m_computedVoltage, 1, wxALIGN_CENTER_VERTICAL, 3);
 	//this->m_gridSizer_1->Add(m_highByteValue, 1, wxALIGN_CENTER_VERTICAL, 10);
 	//this->m_gridSizer_1->Add(m_scale, 1, wxALIGN_CENTER_VERTICAL, 10);
 	//this->m_gridSizer_1->Add(m_lowByteValue, 1, wxALIGN_CENTER_VERTICAL, 10);
@@ -84,13 +84,15 @@ WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
 
+	this->m_rawRadioButton->Enable(false);
+
 	//wxString default_high_byte = wxString::Format("%d", DEFAULT_HIGH_BYTE_VALUE);
 	//this->m_highByteValue->SetValue(default_high_byte);
 
 	//wxString default_low_byte = wxString::Format("%d", DEFAULT_LOW_BYTE_VALUE);
 	//m_lowByteValue->SetValue(default_low_byte);
 
-	wxString default_target_voltage = wxString::Format("%d", DEFAULT_TARGET_VOLTAGE);
+	wxString default_target_voltage = wxString::Format("%.1f", DEFAULT_TARGET_VOLTAGE);
 	this->m_targetVoltage->SetValue(default_target_voltage);
 
 	// Set Validator
@@ -233,34 +235,35 @@ void WritePage0900H::OnTargetVoltage(wxCommandEvent& event){
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_targetVoltage->GetValue().ToDouble(&inputValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)inputValue);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %.1f",  inputValue);
 	}
 
 	if(inputValue <= 0) inputValue=0;
 
-	if(inputValue > 4095){
+	if(inputValue > 31.0f){
 
-		wxMessageBox(wxT("Vc Can't Large Than 4095"),
+		wxMessageBox(wxT("Vc Can't Large Than 31 V"),
 			wxT("Warning ! Vc Out of Range !"),
 			wxOK | wxICON_WARNING);
 
-		inputValue = 0x277;
+		inputValue = 26.5f;
 
 		if (this->m_rawRadioButton->GetValue() == true){
 			wxString hexString_target_voltage = wxString::Format("%02lx", (long)inputValue);
 			this->m_targetVoltage->SetValue(hexString_target_voltage);
 		}
 		else if (this->m_cookRadioButton->GetValue() == true){
-			wxString default_target_voltage = wxString::Format("%d", (unsigned short)inputValue);
+			wxString default_target_voltage = wxString::Format("%.1f", inputValue);
 			this->m_targetVoltage->SetValue(default_target_voltage);
 		}
 
 	}
 
-	computedVoltage = inputValue * (13.0f/4095.0f) + 18;
+	//computedVoltage = inputValue * (13.0f/4095.0f) + 18;
+	//this->m_computedVoltage->SetLabel(wxString::Format("= %.1f(V)",computedVoltage));
 
-	this->m_computedVoltage->SetLabel(wxString::Format("= %.1f(V)",computedVoltage));
-
+	computedVoltage = inputValue * 10;
+	this->m_computedVoltage->SetLabel(wxString::Format("(V) = 0x%04x (DAC)", (unsigned short)computedVoltage));
 
 }
 
@@ -271,7 +274,7 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 	double highByteValue = 0;
 	double lowByteValue = 0;
 	double targetVoltage = 0;
-	double scale;
+	//double scale;
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		targetVoltage = (unsigned short)PMBUSHelper::HexToDecimal(this->m_targetVoltage->GetValue().c_str());
@@ -279,7 +282,7 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_targetVoltage->GetValue().ToDouble(&targetVoltage);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)targetVoltage);
+		PSU_DEBUG_PRINT(MSG_ALERT, "Target Voltage = %.1f (V)",   targetVoltage);
 	}
 
 #if 0
@@ -311,8 +314,10 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 		break;
 
 	case cmd_data_format_DirectData_Format:
-		cmdDATA[0] = (((unsigned short)targetVoltage & (0xff00)) >> 8);
-		cmdDATA[1] = (unsigned short)targetVoltage & (0x00ff);
+		cmdDATA[0] = (((unsigned short)(targetVoltage*10) & (0xff00)) >> 8);
+		cmdDATA[1] = (unsigned short)(targetVoltage*10) & (0x00ff);
+
+		PSU_DEBUG_PRINT(MSG_DEBUG, "%02x, %02x", cmdDATA[0], cmdDATA[1]);
 
 		//cmdDATA[0] = (unsigned char)highByteValue & (0x00ff);
 		//cmdDATA[1] = (unsigned char)highByteValue & (0x00ff);
@@ -336,6 +341,7 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 
 	PMBUSSendCOMMAND_t CMD0900H;
 
+	CMD0900H.m_sendCommand = SELF_CMD;
 	CMD0900H.m_sendDataLength = (*this->m_currentIO == IOACCESS_SERIALPORT || *this->m_currentIO == IOACCESS_TOTALPHASE) ? sendDataLength : 64;
 	CMD0900H.m_bytesToRead = PMBUSHelper::GetBytesToReadOfWriteCMD(*this->m_currentIO, CMD_0900H_BYTES_TO_READ);
 	for (unsigned idx = 0; idx < sizeof(SendBuffer) / sizeof(SendBuffer[0]); idx++){
@@ -353,7 +359,7 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 		int cnt = Task::GetCount();
 		if (cnt != 0) return;
 
-		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0900H);
+		new(TP_SendWriteCMDTask) SendWriteCMDTask(m_ioaccess, m_currentIO, CMD0900H, true);
 	}
 
 }

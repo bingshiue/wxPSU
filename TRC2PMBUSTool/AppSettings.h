@@ -65,8 +65,10 @@ enum {
 
 #define DEFAULT_I2C_ADAPTOR_MODULE  (unsigned long)I2C_AdaptorModuleBoard_R90000_9271_USB
 #define DEFAULT_I2C_SLAVEADDRESS    0xb6
+#define DEFAULT_I2C_SLAVEADDRESS_PBF003_00G  0xa8
 #define DEFAULT_RUN_MODE            (unsigned long)(RunMode_Continually)
 #define DEFAULT_POLLING_INTERVAL    20
+#define DEFAULT_POLLING_INTERVAL_PBF003_00G  50
 #define DEFAULT_ITERATIONS_VALUE    10000
 #define DEFAULT_ENABLE_CHECKSUM     (unsigned long)Generic_Enable
 

@@ -1,0 +1,45 @@
+{
+    // 如需此檔案的詳細資訊，請參閱 https://go.microsoft.com//fwlink//?linkid=834763。
+    "configurations": [
+        {
+        "name": "x86-Debug",
+        "generator": "Visual Studio 15 2017",
+        "configurationType" : "Debug",
+        "inheritEnvironments": [ "msvc_x86" ],
+        "buildRoot":  "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+        "cmakeCommandArgs":  "",
+        "buildCommandArgs": "-m -v:minimal",
+        "ctestCommandArgs":  ""
+        },
+      {
+        "name": "x86-Release",
+        "generator": "Visual Studio 15 2017",
+        "configurationType": "RelWithDebInfo",
+        "inheritEnvironments": [ "msvc_x86" ],
+        "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+        "cmakeCommandArgs": "",
+        "buildCommandArgs": "-m -v:minimal",
+        "ctestCommandArgs": ""
+      },
+      {
+        "name": "x64-Debug",
+        "generator": "Visual Studio 15 2017",
+        "configurationType": "Debug",
+        "inheritEnvironments": [ "msvc_x64" ],
+        "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+        "cmakeCommandArgs": "",
+        "buildCommandArgs": "-m -v:minimal",
+        "ctestCommandArgs": ""
+      },
+      {
+        "name": "x64-Release",
+        "generator": "Visual Studio 15 2017",
+        "configurationType": "RelWithDebInfo",
+        "inheritEnvironments": [ "msvc_x64" ],
+        "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+        "cmakeCommandArgs": "",
+        "buildCommandArgs": "-m -v:minimal",
+        "ctestCommandArgs": ""
+      }
+    ]
+}
