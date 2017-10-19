@@ -14,7 +14,7 @@
       {
         "name": "x86-Release",
         "generator": "Visual Studio 15 2017",
-        "configurationType": "RelWithDebInfo",
+        "configurationType": "Release",
         "inheritEnvironments": [ "msvc_x86" ],
         "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
         "cmakeCommandArgs": "",
