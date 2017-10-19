@@ -64,7 +64,7 @@ int PFB003_00G_Cook_0904H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 	PMBUSHelper::GetPMBusStatus()->SaveVIN(inputVoltage);
 
-	wxstr += wxString::Format("%.2f(V)", inputVoltage);
+	wxstr += wxString::Format("%.2f(V) [Max:%.2f(V), Min:%.2f(V)]", inputVoltage, PMBUSHelper::GetPMBusStatus()->m_VIN_Max, PMBUSHelper::GetPMBusStatus()->m_VIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
@@ -85,7 +85,7 @@ int PFB003_00G_Cook_0905H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 	PMBUSHelper::GetPMBusStatus()->SaveIIN(inputCurrent);
 
-	wxstr += wxString::Format("%.2f(A)", inputCurrent);
+	wxstr += wxString::Format("%.2f(A) [Max:%.2f(A), Min:%.2f(A)]", inputCurrent, PMBUSHelper::GetPMBusStatus()->m_IIN_Max, PMBUSHelper::GetPMBusStatus()->m_IIN_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
@@ -106,7 +106,7 @@ int PFB003_00G_Cook_0906H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 	PMBUSHelper::GetPMBusStatus()->SaveVOUT(outputVoltage);
 
-	wxstr += wxString::Format("%.2f(V)", outputVoltage);
+	wxstr += wxString::Format("%.2f(V) [Max:%.2f(V), Min:%.2f(V)]", outputVoltage, PMBUSHelper::GetPMBusStatus()->m_VOUT_Max, PMBUSHelper::GetPMBusStatus()->m_VOUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
@@ -127,7 +127,7 @@ int PFB003_00G_Cook_0907H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 	PMBUSHelper::GetPMBusStatus()->SaveIOUT(outputCurrent);
 
-	wxstr += wxString::Format("%.2f(A)", outputCurrent);
+	wxstr += wxString::Format("%.2f(A) [Max:%.2f(A), Min%.2f(A)]", outputCurrent, PMBUSHelper::GetPMBusStatus()->m_IOUT_Max, PMBUSHelper::GetPMBusStatus()->m_IOUT_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);
@@ -146,7 +146,9 @@ int PFB003_00G_Cook_0908H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 	powerThermal /= 10.0f;
 
-	wxstr += wxString::Format("%.2f(C)", powerThermal);
+	PMBUSHelper::GetPMBusStatus()->SaveAMD_8D(powerThermal);
+
+	wxstr += wxString::Format("%.2f(C) [Max:%.2f(C), Min:%.2f(C)]", powerThermal, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Max, PMBUSHelper::GetPMBusStatus()->m_AMD_8D_Min);
 
 	tmp_wchar = wxstr.wc_str();
 	COPY_WIDE_CHARACTERS(string, tmp_wchar, 256);

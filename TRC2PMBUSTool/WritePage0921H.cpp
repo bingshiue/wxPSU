@@ -6,19 +6,20 @@
 
 #define SELF_CMD  0x0921/**< Self Command */
 
-#define DEFAULT_HIGH_BYTE_VALUE   0xfff/**< Default high byte Value */
+#define DEFAULT_HIGH_BYTE_VALUE    445/**< Default high byte Value */
 #define DEFAULT_LOW_BYTE_VALUE    0x00/**< Default low  byte Value */
 
 #define WRITE_PAGES_0921H_DEFAULT_FORMAT_HEX  FALSE//TRUE//FALSE
 
-#define MAX_INPUT_VALUE  0xffff/**< Max Input Value */
+#define MAX_INPUT_VALUE   1000/**< Max Input Value */
+#define MIN_INPUT_VALUE    100/**< Min Input Value */
 
 WritePage0921H::WritePage0921H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
 	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
-	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò 0 ~ %d(%04X)", MAX_INPUT_VALUE, MAX_INPUT_VALUE);
+	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò : %d(0x%04X) ~ %d(0x%04X)", MIN_INPUT_VALUE, MIN_INPUT_VALUE, MAX_INPUT_VALUE, MAX_INPUT_VALUE);
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, descriptionStr, wxDefaultPosition, wxSize(-1, -1));
 
 	m_highByteValue = new wxTextCtrl(this, CID_TEXTCTRL_TARGET_VALUE, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
@@ -184,13 +185,14 @@ void WritePage0921H::OnTargetValue(wxCommandEvent& event) {
 
 	if (this->m_rawRadioButton->GetValue() == true) {
 		inputValue = (unsigned short)PMBUSHelper::HexToDecimal(this->m_highByteValue->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)inputValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, Value = %d", (int)inputValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true) {
 		this->m_highByteValue->GetValue().ToDouble(&inputValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)inputValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %d", (int)inputValue);
 	}
 
+#if 0
 	if (inputValue <= 0) inputValue = 0;
 
 	if (inputValue > MAX_INPUT_VALUE) {
@@ -213,6 +215,7 @@ void WritePage0921H::OnTargetValue(wxCommandEvent& event) {
 		}
 
 	}
+#endif
 
 }
 
@@ -241,6 +244,29 @@ void WritePage0921H::OnButtonWrite(wxCommandEvent& event){
 		//this->m_lowByteValue->GetValue().ToDouble(&lowByteValue);
 		//PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)lowByteValue);
 	//}
+
+	if (highByteValue <= 0) highByteValue = 0;
+
+	if (highByteValue > MAX_INPUT_VALUE || highByteValue < MIN_INPUT_VALUE) {
+
+		wxString msg = wxString::Format("Warning ! \n\n Input Value Must be in Range of \n %d ~ %d", MIN_INPUT_VALUE, MAX_INPUT_VALUE);
+
+		wxMessageBox(msg,
+			wxT("Warning ! Input Value Out of Range !"),
+			wxOK | wxICON_WARNING);
+
+		highByteValue = DEFAULT_HIGH_BYTE_VALUE;
+
+		if (this->m_rawRadioButton->GetValue() == true) {
+			wxString hexString_target_value = wxString::Format("%02lx", (long)highByteValue);
+			this->m_highByteValue->SetValue(hexString_target_value);
+		}
+		else if (this->m_cookRadioButton->GetValue() == true) {
+			wxString hexString_target_value = wxString::Format("%d", (int)highByteValue);
+			this->m_highByteValue->SetValue(hexString_target_value);
+		}
+
+	}
 
 	unsigned char cmdDATA[2];
 

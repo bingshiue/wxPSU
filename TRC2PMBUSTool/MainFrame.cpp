@@ -4769,6 +4769,9 @@ void MainFrame::CheckAndLoadConfig(void){
 
 void MainFrame::CheckIfModelChange(void){
 
+	// Reset Model Changed Flag
+	this->m_modelChangedFlag = false;
+
 	// Action : Setup Default MFR_XXX
 
 	// Setup Default MFR_ID
@@ -4820,6 +4823,8 @@ void MainFrame::CheckIfModelChange(void){
 	// If Model or Customer Changed
 	if (this->m_appSettings.m_currentUseCustomer != this->m_appSettings.m_previousUseCustomer || this->m_appSettings.m_currentUseModel != this->m_appSettings.m_previousUseModel)
 	{ 
+		this->m_modelChangedFlag = true;
+
 		// Action : Setup MFR_XXX by Specified Customer And Model
 
 		switch (this->m_appSettings.m_currentUseCustomer){
@@ -5550,7 +5555,7 @@ void MainFrame::UpdateSTDPage(unsigned int index){
 		this->m_stdPage->m_tcIOUT->SetValue(iout);
 	}
 
-	if (index == this->findPMBUSCMDIndex(0x0907, 0)){
+	if (index == this->findPMBUSCMDIndex(0x0907)){
 		wxString iout = wxString::Format("%4.3f", (double)PMBUSHelper::GetPMBusStatus()->m_IOUT);
 		this->m_stdPage->m_tcIOUT->SetValue(iout);
 	}
@@ -5578,6 +5583,12 @@ void MainFrame::UpdateSTDPage(unsigned int index){
 		wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
 		this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
 	}
+
+	if (index == this->findPMBUSCMDIndex(0x0908)) {
+		wxString amd_8d = wxString::Format("%4.2f", (double)PMBUSHelper::GetPMBusStatus()->m_AMD_8D);
+		this->m_stdPage->m_tcAMD8D->SetValue(amd_8d);
+	}
+
 
 	// SEC(8E)
 	if (index == this->findPMBUSCMDIndex(0x8e)){

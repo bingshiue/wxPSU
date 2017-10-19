@@ -184,6 +184,7 @@ public:
 
 	bool m_sendThreadStopFlag;
 	bool m_increaseCPUOverHeadThreadStopFlag;
+	bool m_modelChangedFlag;
 
 	unsigned char m_destroying;
 

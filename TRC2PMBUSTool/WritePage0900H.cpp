@@ -8,6 +8,9 @@
 
 #define DEFAULT_TARGET_VOLTAGE    26.5f//0x277/**< Default Target Voltage */
 
+#define MAX_INPUT_VOLTAGE         31.0f/**< Maximum Input Voltage */
+#define MIN_INPUT_VOLTAGE         18.0f/**< MInimum Input Voltage */
+
 #define DEFAULT_HIGH_BYTE_VALUE   0x00/**< Default high byte Value */
 #define DEFAULT_LOW_BYTE_VALUE    0x00/**< Default low  byte Value */
 
@@ -15,7 +18,7 @@
 
 WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO) : BaseWritePage(parent, label){
 	// Initial Input Fields
-	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Vc : "), wxDefaultPosition, wxSize(30, -1));
+	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Target : "), wxDefaultPosition, wxSize(100, -1));
 	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
 	m_computedVoltage = new wxStaticText(this, wxID_ANY, wxString(L""), wxDefaultPosition, wxSize(120, -1));
@@ -25,7 +28,7 @@ WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_
 	    L"讀寫,單位 0.1V,高位在前,低位在後 \n"
 	     "通過 I2C 控制可以調整 AC/DC 電源模塊的輸出電壓 \n"
 	     "範圍為 18V~31V,與電源模塊輸出電壓 VOut 與 DAC \n"
-	     "控制字 Vc 的關係為 Vout=(13/4095)*Vc + 18V \n"
+	     "控制字 Vc 的關係為 VOut=(13/4095)*Vc + 18V \n"
 	     "其中 Vc 表示 DAC 的量化植,範圍為 0~4095"),
 	 wxDefaultPosition, wxSize(-1, -1));
 
@@ -231,22 +234,25 @@ void WritePage0900H::OnTargetVoltage(wxCommandEvent& event){
 
 	if (this->m_rawRadioButton->GetValue() == true){
 		inputValue = (unsigned short)PMBUSHelper::HexToDecimal(this->m_targetVoltage->GetValue().c_str());
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Raw, Value = %d", (int)inputValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Raw, Value = %d", (int)inputValue);
 	}
 	else if (this->m_cookRadioButton->GetValue() == true){
 		this->m_targetVoltage->GetValue().ToDouble(&inputValue);
-		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %.1f",  inputValue);
+		PSU_DEBUG_PRINT(MSG_DEBUG, "Select Cook, Value = %.1f",  inputValue);
 	}
 
+#if 0
 	if(inputValue <= 0) inputValue=0;
 
-	if(inputValue > 31.0f){
+	if(inputValue > MAX_INPUT_VOLTAGE || inputValue <  MIN_INPUT_VOLTAGE){
 
-		wxMessageBox(wxT("Vc Can't Large Than 31 V"),
-			wxT("Warning ! Vc Out of Range !"),
+		wxString warnMSG = wxString::Format("Warning ! Target Voltage Must be in Range of \n %.1f ~ %.1f !", MAX_INPUT_VOLTAGE, MIN_INPUT_VOLTAGE);
+
+		wxMessageBox(warnMSG,
+			wxT("Target Voltage Out of Range !"),
 			wxOK | wxICON_WARNING);
 
-		inputValue = 26.5f;
+		inputValue = DEFAULT_TARGET_VOLTAGE;
 
 		if (this->m_rawRadioButton->GetValue() == true){
 			wxString hexString_target_voltage = wxString::Format("%02lx", (long)inputValue);
@@ -258,6 +264,7 @@ void WritePage0900H::OnTargetVoltage(wxCommandEvent& event){
 		}
 
 	}
+#endif
 
 	//computedVoltage = inputValue * (13.0f/4095.0f) + 18;
 	//this->m_computedVoltage->SetLabel(wxString::Format("= %.1f(V)",computedVoltage));
@@ -304,6 +311,31 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 		PSU_DEBUG_PRINT(MSG_ALERT, "Select Cook, Value = %d", (int)lowByteValue);
 	}
 #endif
+
+	if (targetVoltage <= 0) targetVoltage = 0;
+
+	if (targetVoltage > MAX_INPUT_VOLTAGE || targetVoltage <  MIN_INPUT_VOLTAGE) {
+
+		wxString warnMSG = wxString::Format("Warning ! \n\n Target Voltage Must be in Range of \n %.1f (V) ~ %.1f (V)", MAX_INPUT_VOLTAGE, MIN_INPUT_VOLTAGE);
+
+		wxMessageBox(warnMSG,
+			wxT("Target Voltage Out of Range !"),
+			wxOK | wxICON_WARNING);
+
+		targetVoltage = DEFAULT_TARGET_VOLTAGE;
+
+		if (this->m_rawRadioButton->GetValue() == true) {
+			wxString hexString_target_voltage = wxString::Format("%02lx", (long)targetVoltage);
+			this->m_targetVoltage->SetValue(hexString_target_voltage);
+		}
+		else if (this->m_cookRadioButton->GetValue() == true) {
+			wxString default_target_voltage = wxString::Format("%.1f", targetVoltage);
+			this->m_targetVoltage->SetValue(default_target_voltage);
+		}
+
+		return;
+	}
+
 
 	unsigned char cmdDATA[2];
 

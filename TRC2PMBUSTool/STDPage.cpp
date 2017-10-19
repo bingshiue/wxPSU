@@ -3,6 +3,7 @@
  */
 
 #include "STDPage.h"
+#include "PMBUSHelper.h"
 
 #define PADDING_DEFAULT_WIDTH  50
 #define PADDING_DEFAULT_HEIGHT  2
@@ -79,7 +80,13 @@ STDPage::STDPage(wxWindow* parent) : wxPanel(parent){
 	m_stIoSBY = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("IoSBY"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 
 	m_stVCAP = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("VCAP"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
-	m_stAMD8D = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("AMB(8D)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+
+	wxString AMD8D_Label("AMB");
+	if (PMBUSHelper::GetCurrentUseModel()->m_isStandardPMBUSModel == true) {
+		AMD8D_Label += wxString::Format("(8D)");
+	}
+	m_stAMD8D = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, AMD8D_Label, wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
+
 	m_stSEC8E = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("SEC(8E)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 	m_stPRI8F = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("PRI(8F)"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
 	m_stFAN1 = new wxStaticText(this->m_staticBoxlSizer->GetStaticBox(), wxID_ANY, wxString("FAN1"), wxDefaultPosition, wxSize(TEXT_DEFAULT_WIDTH, TEXT_DEFAULT_HEIGHT));
