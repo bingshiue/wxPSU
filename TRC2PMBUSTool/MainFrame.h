@@ -548,7 +548,7 @@ private:
 
 	int SaveCMDListToFile(wxTextOutputStream& textOutputStream);
 
-	void CheckAndLoadConfig(void);
+	void CheckAndLoadConfig(CUSTOMER_TYPE_t* customerList);
 
 	void SaveConfig(void);
 

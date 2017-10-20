@@ -7,7 +7,9 @@
 #include "PMBUSCommandType.h"
 #include "PMBUSCMDWritePages.h"
 
-#define ACBEL_RFWE_24_28_1200W_SCP_MODEL_NAME      L"RFWE_24_28_1200W_SCP"
+#define ACBEL_RFWE_24_28_1200W_SCP_MODEL_NAME                L"RFWE_24_28_1200W_SCP"
+#define ACBEL_RFWE_24_28_1200W_SCP_DEFAULT_I2C_ADDRESS       0xB6
+#define ACBEL_RFWE_24_28_1200W_SCP_DEFAULT_CMD_POLLING_TIME  20
 
 PMBUSCOMMAND_t g_ACBEL_RFWE_24_28_1200W_SCP_CMDTable[] = {
 	// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t  wxPanel(Write Page) wxPanel(Read Page) DataFormat_t

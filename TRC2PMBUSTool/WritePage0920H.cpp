@@ -19,7 +19,9 @@ WritePage0920H::WritePage0920H(wxWindow* parent, wxString& label, bool* monitor_
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
 	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
-	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò : %d(0x%04X) ~ %d(0x%04X)", MIN_INPUT_VALUE, MIN_INPUT_VALUE, MAX_INPUT_VALUE, MAX_INPUT_VALUE);
+	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò : %d(0x%04X) ~ %d(0x%04X)", 
+		PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMin, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMin, 
+		PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMax, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMax);
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, descriptionStr, wxDefaultPosition, wxSize(-1, -1));
 
 	m_highByteValue = new wxTextCtrl(this, CID_TEXTCTRL_TARGET_VALUE, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
@@ -48,7 +50,7 @@ WritePage0920H::WritePage0920H(wxWindow* parent, wxString& label, bool* monitor_
 	this->m_cookRadioButton->SetValue(false);
 	this->m_rawRadioButton->SetValue(true);
 
-	wxString hexString_high_byte = wxString::Format("%02lx", (long)DEFAULT_HIGH_BYTE_VALUE);
+	wxString hexString_high_byte = wxString::Format("%02lx", (long)PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageInput);//DEFAULT_HIGH_BYTE_VALUE);
 	this->m_highByteValue->SetValue(hexString_high_byte);
 
 	//wxString hexString_low_byte = wxString::Format("%02lx", (long)DEFAULT_LOW_BYTE_VALUE);
@@ -66,7 +68,7 @@ WritePage0920H::WritePage0920H(wxWindow* parent, wxString& label, bool* monitor_
 	this->m_cookRadioButton->SetValue(true);
 	this->m_rawRadioButton->SetValue(false);
 
-	wxString default_high_byte = wxString::Format("%d", DEFAULT_HIGH_BYTE_VALUE);
+	wxString default_high_byte = wxString::Format("%d", PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageInput);//DEFAULT_HIGH_BYTE_VALUE);
 	this->m_highByteValue->SetValue(default_high_byte);
 
 	//wxString default_low_byte = wxString::Format("%d", DEFAULT_LOW_BYTE_VALUE);
@@ -247,15 +249,15 @@ void WritePage0920H::OnButtonWrite(wxCommandEvent& event){
 
 	if (highByteValue <= 0) highByteValue = 0;
 
-	if (highByteValue > MAX_INPUT_VALUE || highByteValue < MIN_INPUT_VALUE) {
+	if (highByteValue > PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMax || highByteValue < PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMin) {
 
-		wxString msg = wxString::Format("Warning ! \n\n Input Value Must be in Range of \n %d ~ %d", MIN_INPUT_VALUE, MAX_INPUT_VALUE);
+		wxString msg = wxString::Format("Warning ! \n\n Input Value Must be in Range of \n %d ~ %d", PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMin, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageMax);
 
 		wxMessageBox(msg,
 			wxT("Warning ! Input Value Out of Range !"),
 			wxOK | wxICON_WARNING);
 
-		highByteValue = DEFAULT_HIGH_BYTE_VALUE;
+		highByteValue = PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageDefaultInput;//DEFAULT_HIGH_BYTE_VALUE;
 
 		if (this->m_rawRadioButton->GetValue() == true) {
 			wxString hexString_target_value = wxString::Format("%02lx", (long)highByteValue);
@@ -267,6 +269,8 @@ void WritePage0920H::OnButtonWrite(wxCommandEvent& event){
 		}
 
 	}
+
+	PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0920WritePageInput = highByteValue;
 
 	unsigned char cmdDATA[2];
 

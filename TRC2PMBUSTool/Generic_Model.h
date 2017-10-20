@@ -7,7 +7,9 @@
 #include "PMBUSCommandType.h"
 #include "PMBUSCMDWritePages.h"
 
-#define GENERIC_MODEL_NAME      L"Generic_Model"
+#define GENERIC_MODEL_NAME                L"Generic_Model"
+#define GENERIC_DEFAULT_I2C_ADDRESS       0xB6
+#define GENERIC_DEFAULT_CMD_POLLING_TIME  20
 
 PMBUSCOMMAND_t g_Generic_CMDTable[] = {
 	// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t  wxPanel(Write Page) DataFormat_t

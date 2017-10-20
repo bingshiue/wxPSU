@@ -7,7 +7,9 @@
 #include "PMBUSCommandType.h"
 #include "PMBUSCMDWritePages.h"
 
-#define GIGABYTE_CRPS001_MODEL_NAME      L"GIGABYTE_CRPS001"
+#define GIGABYTE_CRPS001_MODEL_NAME                L"GIGABYTE_CRPS001"
+#define GIGABYTE_CRPS001_DEFAULT_I2C_ADDRESS       0xB6
+#define GIGABYTE_CRPS001_DEFAULT_CMD_POLLING_TIME  20
 
 PMBUSCOMMAND_t g_GIGABYTE_CRPS001_CMDTable[] = { 
 	// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t  wxPanel(Write Page) wxPanel(Read Page) DataFormat_t

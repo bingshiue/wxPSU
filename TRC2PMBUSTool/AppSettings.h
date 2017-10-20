@@ -148,6 +148,18 @@ enum {
 #define DEFAULT_ADAPTOR_GPIO_PWM_FREQUENCE                0
 #define DEFAULT_ADAPTOR_GPIO_PWM_DUTY                     50
 
+#define DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT            26.5f
+#define DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MAX        31.0f
+#define DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MIN        18.0f
+
+#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT            1056
+#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MAX        2000
+#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN         500
+
+#define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT             445
+#define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX        1000
+#define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN         100
+
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
 	unsigned long m_buadRate;
@@ -303,6 +315,47 @@ typedef struct usb_adaptor_gpio_setting {
 
 }USB_ADAPTOR_GPIO_SETTING_t;
 
+typedef struct pbf003_00g_option_t{
+	double m_0900WritePageInput;
+	double m_0900WritePageDefaultInput;
+	double m_0900WritePageMax;
+	double m_0900WritePageMin;
+
+	unsigned long m_0920WritePageInput;
+	unsigned long m_0920WritePageDefaultInput;
+	unsigned long m_0920WritePageMax;
+	unsigned long m_0920WritePageMin;
+
+	unsigned long m_0921WritePageInput;
+	unsigned long m_0921WritePageDefaultInput;
+	unsigned long m_0921WritePageMax;
+	unsigned long m_0921WritePageMin;
+
+
+	pbf003_00g_option_t() {
+		Reset();
+	}
+
+	void Reset() {
+		m_0900WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT;
+		m_0900WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT;
+		m_0900WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MAX;
+		m_0900WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MIN;
+
+		m_0920WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT;
+		m_0920WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT;
+		m_0920WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MAX;
+		m_0920WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN;
+
+		m_0921WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT;
+		m_0921WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT;
+		m_0921WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX;
+		m_0921WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN;
+
+	}
+
+}PBF003_00G_OPTION_t;
+
 typedef struct appSettings_t {
 
 	unsigned long m_currentUseCustomer;/**< Current Use Customer */
@@ -354,6 +407,8 @@ typedef struct appSettings_t {
 
 	/* ----- Developer Setting ----- */
 	unsigned long m_developerMode;/**< Developer Mode */
+
+	pbf003_00g_option_t m_pbf00300gOption;/**< PBF003-00G  Option */
 
 	void Reset(void){
 		
@@ -408,6 +463,8 @@ typedef struct appSettings_t {
 		this->m_usbAdaptorGPIOSetting.Reset();
 
 		this->m_developerMode = Generic_Disable;
+
+		this->m_pbf00300gOption.Reset();
 	}
 
 } AppSettings_t;

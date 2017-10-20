@@ -95,7 +95,7 @@ WritePage0900H::WritePage0900H(wxWindow* parent, wxString& label, bool* monitor_
 	//wxString default_low_byte = wxString::Format("%d", DEFAULT_LOW_BYTE_VALUE);
 	//m_lowByteValue->SetValue(default_low_byte);
 
-	wxString default_target_voltage = wxString::Format("%.1f", DEFAULT_TARGET_VOLTAGE);
+	wxString default_target_voltage = wxString::Format("%.1f", PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageInput);//DEFAULT_TARGET_VOLTAGE);
 	this->m_targetVoltage->SetValue(default_target_voltage);
 
 	// Set Validator
@@ -314,15 +314,16 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 
 	if (targetVoltage <= 0) targetVoltage = 0;
 
-	if (targetVoltage > MAX_INPUT_VOLTAGE || targetVoltage <  MIN_INPUT_VOLTAGE) {
+	if (targetVoltage > PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageMax || targetVoltage <  PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageMin) {
 
-		wxString warnMSG = wxString::Format("Warning ! \n\n Target Voltage Must be in Range of \n %.1f (V) ~ %.1f (V)", MAX_INPUT_VOLTAGE, MIN_INPUT_VOLTAGE);
+		wxString warnMSG = wxString::Format("Warning ! \n\n Target Voltage Must be in Range of \n %.1f (V) ~ %.1f (V)", 
+			PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageMax, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageMin);
 
 		wxMessageBox(warnMSG,
 			wxT("Target Voltage Out of Range !"),
 			wxOK | wxICON_WARNING);
 
-		targetVoltage = DEFAULT_TARGET_VOLTAGE;
+		targetVoltage = PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageDefaultInput;//DEFAULT_TARGET_VOLTAGE;
 
 		if (this->m_rawRadioButton->GetValue() == true) {
 			wxString hexString_target_voltage = wxString::Format("%02lx", (long)targetVoltage);
@@ -335,6 +336,9 @@ void WritePage0900H::OnButtonWrite(wxCommandEvent& event){
 
 		return;
 	}
+
+	// Save Target Voltage
+	PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0900WritePageInput = targetVoltage;
 
 
 	unsigned char cmdDATA[2];

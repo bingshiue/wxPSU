@@ -42,21 +42,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	RegisterDeviceChangeNotify();
 #endif
 
-	CheckAndLoadConfig();
-
 	this->m_cmdListDVC = NULL;
 	this->PMBusPrimaryFWUpdatePanel = NULL;
 	this->PMBusSecondaryFWUpdatePanel = NULL;
 	this->m_monitor_running = false;
 	this->m_monitor_pause = false;
 	this->m_pmbusProgressDialog = NULL;
+	this->m_logFileFFileOutputStream = NULL;
+	this->m_logFileTextOutputStream = NULL;
 
-	this->m_customerList = customerList;
-	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
-
-	// Save Current Use Model's Structure Pointer
-	PMBUSHelper::SetCurrentUseModel(
-			&this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList[PMBUSHelper::GetAppSettings()->m_currentUseModel]);
+	CheckAndLoadConfig(customerList);
 
 	// Setup PMBUS Command Buffer Provider
 	SetupPMBUSCommandBufferProvider();
@@ -301,8 +296,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	m_sendThreadStopFlag = true;
 	m_increaseCPUOverHeadThreadStopFlag = true;
 	this->m_increaseCPUOverHeadThread = NULL;
-	this->m_logFileFFileOutputStream = NULL;
-	this->m_logFileTextOutputStream = NULL;
 
 	// Disable status bar to show help string
 	this->SetStatusBarPane(-1);
@@ -2035,6 +2028,22 @@ void MainFrame::OnSecondaryFirmware(wxCommandEvent& event)
 
 void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
+	// Check If Model Support ISP
+	int isp_support_confirm = 0;
+	if (PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_isp_support == false) {
+		
+		wxMessageDialog* ispConfirmDialog = new wxMessageDialog(this, wxT("This Model Seems like Not support ISP, Do you want to continue anyway ?"), wxT("Model Not Support ISP"), wxYES_NO | wxICON_WARNING);
+		ispConfirmDialog->Centre();
+		isp_support_confirm = ispConfirmDialog->ShowModal();
+
+		delete ispConfirmDialog;
+
+		if (isp_support_confirm == wxID_NO) {
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel Load FW");
+			return;
+		}
+	}
+
 	// Delete previous primary panel instance
 	if (this->PMBusPrimaryFWUpdatePanel) {
 		// Get index of notebook
@@ -2169,6 +2178,22 @@ void MainFrame::OnUpdatePrimaryFirmware(wxCommandEvent& event){
 
 void MainFrame::OnUpdateSecondaryFirmware(wxCommandEvent& event){
 	
+	// Check If Model Support ISP
+	int isp_support_confirm = 0;
+	if (PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_isp_support == false) {
+
+		wxMessageDialog* ispConfirmDialog = new wxMessageDialog(this, wxT("This Model Seems like Not support ISP, Do you want to continue anyway ?"), wxT("Model Not Support ISP"), wxYES_NO | wxICON_WARNING);
+		ispConfirmDialog->Centre();
+		isp_support_confirm = ispConfirmDialog->ShowModal();
+
+		delete ispConfirmDialog;
+
+		if (isp_support_confirm == wxID_NO) {
+			PSU_DEBUG_PRINT(MSG_DEBUG, "User Cancel Load FW");
+			return;
+		}
+	}
+
 	// Delete previous secondary panel instance
 	if (this->PMBusSecondaryFWUpdatePanel) {
 		// Get index of notebook
@@ -4169,7 +4194,7 @@ int MainFrame::SaveCMDListToFile(wxTextOutputStream& textOutputStream){
 	return EXIT_SUCCESS;
 }
 
-void MainFrame::CheckAndLoadConfig(void){
+void MainFrame::CheckAndLoadConfig(CUSTOMER_TYPE_t* customerList){
 	
 	wxConfigBase::Set(new wxFileConfig(wxT(""), wxT(""), wxT("psu.ini"), wxT(""), wxCONFIG_USE_RELATIVE_PATH));
 
@@ -4216,6 +4241,17 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_previousUseModel = previousModel;
 	}
 
+	// Set AppSettings
+	PMBUSHelper::SetAppSettings(&this->m_appSettings);
+
+	// Set Customer & Model List
+	this->m_customerList = customerList;
+	this->m_modelList = this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList;//modelList;
+	// Save Current Use Model's Structure Pointer
+	PMBUSHelper::SetCurrentUseModel(
+		&this->m_customerList[this->m_appSettings.m_currentUseCustomer].m_modelTypeList[PMBUSHelper::GetAppSettings()->m_currentUseModel]);
+
+
 	/* Check If Model Change */
 	this->CheckIfModelChange();
 	
@@ -4231,12 +4267,40 @@ void MainFrame::CheckAndLoadConfig(void){
 
 	// I2C Slave Address
 	long i2cSlaveAddr;
-	if (pConfig->Read(wxT("I2CSlaveAddress"), &i2cSlaveAddr) == false){
+	if (pConfig->Read(wxT("I2CSlaveAddress"), &i2cSlaveAddr) == false){	
 		pConfig->Write(wxT("I2CSlaveAddress"), this->m_defaultI2CAddress);
 		this->m_appSettings.m_I2CSlaveAddress = this->m_defaultI2CAddress;
 	}
 	else{
-		this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
+		if (this->m_modelChangedFlag == true) {
+			if (i2cSlaveAddr != PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_i2c_address) {
+				
+				int confirm = 0;
+				wxString msg = wxString::Format("Model Changed ! \n\n Would You Reset I2C Adrress To %X ?", PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_i2c_address);
+
+				wxMessageDialog* confirmDialog = new wxMessageDialog(this, msg, wxT("Model Changed"), wxYES_NO | wxICON_INFORMATION);
+				confirmDialog->Centre();
+				confirm = confirmDialog->ShowModal();
+
+				delete confirmDialog;
+
+				if (confirm == wxID_NO) {
+					this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
+					PSU_DEBUG_PRINT(MSG_DEBUG, "User Don't Reset I2C Address, Current I2C Address is %X", this->m_appSettings.m_I2CSlaveAddress);
+				}
+				else {
+					this->m_appSettings.m_I2CSlaveAddress = PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_i2c_address;
+					PSU_DEBUG_PRINT(MSG_DEBUG, "User Reset I2C Address, Current I2C Address is %X", this->m_appSettings.m_I2CSlaveAddress);
+				}
+				
+			}
+			else {
+				this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
+			}
+		}
+		else {
+			this->m_appSettings.m_I2CSlaveAddress = i2cSlaveAddr;
+		}
 	}
 	PMBUSHelper::SetSlaveAddress(this->m_appSettings.m_I2CSlaveAddress);
 
@@ -4257,7 +4321,36 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_pollingInterval = this->m_defaultPollingTime;
 	}
 	else{
-		this->m_appSettings.m_pollingInterval = pollingInterval;
+		if (this->m_modelChangedFlag == true) {
+			if (pollingInterval != PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_cmd_polling_time) {
+
+				int confirm = 0;
+				wxString msg = wxString::Format("Model Changed ! \n\n Would You Reset CMD Polling Time To %d MS ?", PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_cmd_polling_time);
+
+				wxMessageDialog* confirmDialog = new wxMessageDialog(this, msg, wxT("Model Changed"), wxYES_NO | wxICON_INFORMATION);
+				confirmDialog->Centre();
+				confirm = confirmDialog->ShowModal();
+
+				delete confirmDialog;
+
+				if (confirm == wxID_NO) {
+					this->m_appSettings.m_pollingInterval = pollingInterval;
+					PSU_DEBUG_PRINT(MSG_DEBUG, "User Don't Reset CMD Polling Time, Current CMD Polling Time is %d MS", this->m_appSettings.m_pollingInterval);
+				}
+				else {
+					this->m_appSettings.m_pollingInterval = PMBUSHelper::GetCurrentUseModel()->m_modelOption.m_default_cmd_polling_time;
+					PSU_DEBUG_PRINT(MSG_DEBUG, "User Reset CMD Polling Times, Current I2C Address is %d", this->m_appSettings.m_pollingInterval);
+				}
+
+			}
+			else {
+				this->m_appSettings.m_pollingInterval = pollingInterval;
+			}
+		}
+		else {
+			this->m_appSettings.m_pollingInterval = pollingInterval;
+		}
+		
 	}
 
 	// Iterations
@@ -4751,6 +4844,120 @@ void MainFrame::CheckAndLoadConfig(void){
 		this->m_appSettings.m_mfr_serial = wxString::Format("%s", mfr_serial);
 	}
 
+
+	pConfig->SetPath(wxT("/PBF00300G"));
+	
+	//0900 Write Page Option
+	double _0900Input;
+	if (pConfig->Read(wxT("0900Input"), &_0900Input) == false) {
+		pConfig->Write(wxT("0900Input"), DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageInput = _0900Input;
+	}
+
+	double _0900DefaultInput;
+	if (pConfig->Read(wxT("0900DefaultInput"), &_0900DefaultInput) == false) {
+		pConfig->Write(wxT("0900DefaultInput"), DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageDefaultInput = _0900DefaultInput;
+	}
+
+	double _0900MaxInput;
+	if (pConfig->Read(wxT("0900MaxInput"), &_0900MaxInput) == false) {
+		pConfig->Write(wxT("0900MaxInput"), DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MAX);
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MAX;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageMax = _0900MaxInput;
+	}
+
+	double _0900MinInput;
+	if (pConfig->Read(wxT("0900MinInput"), &_0900MinInput) == false) {
+		pConfig->Write(wxT("0900MinInput"), DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MIN);
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MIN;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0900WritePageMin = _0900MinInput;
+	}
+
+	//0920 Write Page Option
+	long _0920Input;
+	if (pConfig->Read(wxT("0920Input"), &_0920Input) == false) {
+		pConfig->Write(wxT("0920Input"), DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageInput = _0920Input;
+	}
+
+	long _0920DefaultInput;
+	if (pConfig->Read(wxT("0920DefaultInput"), &_0920DefaultInput) == false) {
+		pConfig->Write(wxT("0920DefaultInput"), DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageDefaultInput = _0920DefaultInput;
+	}
+
+	long _0920MaxInput;
+	if (pConfig->Read(wxT("0920MaxInput"), &_0920MaxInput) == false) {
+		pConfig->Write(wxT("0920MaxInput"), DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MAX);
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MAX;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageMax = _0920MaxInput;
+	}
+
+	long _0920MinInput;
+	if (pConfig->Read(wxT("0920MinInput"), &_0920MinInput) == false) {
+		pConfig->Write(wxT("0920MinInput"), DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN);
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0920WritePageMin = _0920MinInput;
+	}
+
+	//0921 Write Page Option
+	long _0921Input;
+	if (pConfig->Read(wxT("0921Input"), &_0921Input) == false) {
+		pConfig->Write(wxT("0921Input"), DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageInput = _0921Input;
+	}
+
+	long _0921DefaultInput;
+	if (pConfig->Read(wxT("0921DefaultInput"), &_0921DefaultInput) == false) {
+		pConfig->Write(wxT("0921DefaultInput"), DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageDefaultInput = _0921DefaultInput;
+	}
+
+	long _0921MaxInput;
+	if (pConfig->Read(wxT("0921MaxInput"), &_0921MaxInput) == false) {
+		pConfig->Write(wxT("0921MaxInput"), DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX);
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageMax = _0921MaxInput;
+	}
+
+	long _0921MinInput;
+	if (pConfig->Read(wxT("0921MinInput"), &_0921MinInput) == false) {
+		pConfig->Write(wxT("0921MinInput"), DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN);
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0921WritePageMin = _0921MinInput;
+	}
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;
@@ -4764,7 +4971,7 @@ void MainFrame::CheckAndLoadConfig(void){
 		#endif
 	}
 
-	PMBUSHelper::SetAppSettings(&this->m_appSettings);
+	//PMBUSHelper::SetAppSettings(&this->m_appSettings);
 }
 
 void MainFrame::CheckIfModelChange(void){
@@ -5046,6 +5253,17 @@ void MainFrame::SaveConfig(void){
 
 	// MFR_SERIAL
 	pConfig->Write(wxT("MFRSERIAL"), this->m_appSettings.m_mfr_serial);
+
+	pConfig->SetPath(wxT("/PBF00300G"));
+
+	//0900 Write Page Input
+	pConfig->Write(wxT("0900Input"), this->m_appSettings.m_pbf00300gOption.m_0900WritePageInput);
+
+	//0920 Write Page Input
+	pConfig->Write(wxT("0920Input"), this->m_appSettings.m_pbf00300gOption.m_0920WritePageInput);
+
+	//0921 Write Page Input
+	pConfig->Write(wxT("0921Input"), this->m_appSettings.m_pbf00300gOption.m_0921WritePageInput);
 
 	// Delete wxConfig Object
 	delete wxConfigBase::Set((wxConfigBase *)NULL);

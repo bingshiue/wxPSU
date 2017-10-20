@@ -7,7 +7,10 @@
 #include "PMBUSCommandType.h"
 #include "PMBUSCMDWritePages.h"
 
-#define PBF003_00G_MODEL_NAME      L"PBF003_00G"
+#define PBF003_00G_MODEL_NAME                L"PBF003_00G"
+#define PBF003_00G_DEFAULT_I2C_ADDRESS       0xA8
+#define PBF003_00G_DEFAULT_CMD_POLLING_TIME  50
+
 
 PMBUSCOMMAND_t g_PBF003_00G_CMDTable[] = {
 	// toggle  Label, Register  Name  Access Query  Cook  Raw  ResponseDataLength  RECVBUFF_t  CMDSTATUS_t CMDCBFUNC_t  wxPanel(Write Page) wxPanel(Read Page) DataFormat_t
