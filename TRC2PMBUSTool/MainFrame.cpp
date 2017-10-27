@@ -1454,6 +1454,9 @@ BaseWritePage* MainFrame::getNewWritePage(int index, int register_number){
 	case 0x0921:
 		page = (BaseWritePage*)NEW_WRITEPAGE(0921);
 		break;
+	case 0x0923:
+		page = (BaseWritePage*)NEW_WRITEPAGE(0923);
+		break;
 
 	default:
 		PSU_DEBUG_PRINT(MSG_ERROR, "Can't Setup Write Page of Register %02x", register_number);
@@ -4958,6 +4961,43 @@ void MainFrame::CheckAndLoadConfig(CUSTOMER_TYPE_t* customerList){
 		this->m_appSettings.m_pbf00300gOption.m_0921WritePageMin = _0921MinInput;
 	}
 
+	//0923 Write Page Option
+	long _0923Input;
+	if (pConfig->Read(wxT("0923Input"), &_0923Input) == false) {
+		pConfig->Write(wxT("0923Input"), DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageInput = _0923Input;
+	}
+
+	long _0923DefaultInput;
+	if (pConfig->Read(wxT("0923DefaultInput"), &_0923DefaultInput) == false) {
+		pConfig->Write(wxT("0923DefaultInput"), DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT);
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageDefaultInput = _0923DefaultInput;
+	}
+
+	long _0923MaxInput;
+	if (pConfig->Read(wxT("0923MaxInput"), &_0923MaxInput) == false) {
+		pConfig->Write(wxT("0923MaxInput"), DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MAX);
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MAX;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageMax = _0923MaxInput;
+	}
+
+	long _0923MinInput;
+	if (pConfig->Read(wxT("0923MinInput"), &_0923MinInput) == false) {
+		pConfig->Write(wxT("0923MinInput"), DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MIN);
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MIN;
+	}
+	else {
+		this->m_appSettings.m_pbf00300gOption.m_0923WritePageMin = _0923MinInput;
+	}
+
 	pConfig->SetPath(wxT("/MISC"));
 	
 	bool firstRun;
@@ -5264,6 +5304,9 @@ void MainFrame::SaveConfig(void){
 
 	//0921 Write Page Input
 	pConfig->Write(wxT("0921Input"), this->m_appSettings.m_pbf00300gOption.m_0921WritePageInput);
+
+	//0923 Write Page Input
+	pConfig->Write(wxT("0923Input"), this->m_appSettings.m_pbf00300gOption.m_0923WritePageInput);
 
 	// Delete wxConfig Object
 	delete wxConfigBase::Set((wxConfigBase *)NULL);

@@ -277,6 +277,7 @@ int PFB003_00G_Cook_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int si
 
 int PFB003_00G_Cook_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Cook_Not_Implement(pmbuscmd,string,sizeOfstr); }
 int PFB003_00G_Cook_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Cook_Not_Implement(pmbuscmd,string,sizeOfstr); }
+int PFB003_00G_Cook_0923H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Cook_Not_Implement(pmbuscmd,string,sizeOfstr); }
 
 int PFB003_00G_Cook_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){
 

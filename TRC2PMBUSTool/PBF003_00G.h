@@ -36,9 +36,11 @@ PMBUSCOMMAND_t g_PBF003_00G_CMDTable[] = {
 	{ true, "0920H", 0x0920, "VIN_CALIBRATION", cmd_access_write, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { cmd_data_format_DirectData_Format, {0,0,0}, {0,0,0} } },
 	// 0921h [10]
 	{ true, "0921H", 0x0921, "VOUT_CALIBRATION", cmd_access_write, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, { cmd_data_format_DirectData_Format, {0,0,0}, {0,0,0} } },
-	// 0922h
+	// 0922h [11]
 	{ true, "0922H", 0x0922, "READ_SP_STATUS", cmd_access_read, 0, 0,{ 0 }, 0x02,{ 0 },{ 0 },{ 0 }, NULL, NULL, {} },
-	// 0999h [11]
+	// 0923h [12]
+	{ true, "0923H", 0x0923, "IIN_CALIBRATION", cmd_access_write, 0, 0,{ 0 }, 0x02,{ 0 },{ 0 },{ 0 }, NULL, NULL,{ cmd_data_format_DirectData_Format,{ 0,0,0 },{ 0,0,0 } } },
+	// 0999h [13]
 	{ true, "0999H", 0x0999, "FIRMWARE_VERSION", cmd_access_read, 0, 0, { 0 }, 0x02, { 0 }, { 0 }, { 0 }, NULL, NULL, {} },
 
 };

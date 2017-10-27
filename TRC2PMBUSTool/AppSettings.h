@@ -152,13 +152,17 @@ enum {
 #define DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MAX        31.0f
 #define DEFAULT_PBF00300G_WRITEPAGE_0900_INPUT_MIN        18.0f
 
-#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT            1056
+#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT            1000
 #define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MAX        2000
-#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN         500
+#define DEFAULT_PBF00300G_WRITEPAGE_0920_INPUT_MIN           0
 
 #define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT             445
 #define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX        1000
 #define DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN         100
+
+#define DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT            1000
+#define DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MAX       65535
+#define DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MIN           0
 
 typedef struct comport_setting {
 	unsigned long m_comportNumber;
@@ -331,6 +335,11 @@ typedef struct pbf003_00g_option_t{
 	unsigned long m_0921WritePageMax;
 	unsigned long m_0921WritePageMin;
 
+	unsigned long m_0923WritePageInput;
+	unsigned long m_0923WritePageDefaultInput;
+	unsigned long m_0923WritePageMax;
+	unsigned long m_0923WritePageMin;
+
 
 	pbf003_00g_option_t() {
 		Reset();
@@ -351,6 +360,11 @@ typedef struct pbf003_00g_option_t{
 		m_0921WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT;
 		m_0921WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MAX;
 		m_0921WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0921_INPUT_MIN;
+
+		m_0923WritePageInput = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT;
+		m_0923WritePageDefaultInput = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT;
+		m_0923WritePageMax = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MAX;
+		m_0923WritePageMin = DEFAULT_PBF00300G_WRITEPAGE_0923_INPUT_MIN;
 
 	}
 

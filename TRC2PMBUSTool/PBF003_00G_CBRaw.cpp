@@ -16,7 +16,8 @@ int PFB003_00G_Raw_0909H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dat
 int PFB003_00G_Raw_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int PFB003_00G_Raw_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int PFB003_00G_Raw_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
-int PFB003_00G_Raw_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength) { return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
+int PFB003_00G_Raw_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
+int PFB003_00G_Raw_0923H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
 int PFB003_00G_Raw_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){ return PFB003_00G_Raw_Common(pmbuscmd, string, dataBytesLength); }
 
 int PFB003_00G_Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int dataBytesLength){
@@ -54,7 +55,7 @@ int PFB003_00G_Raw_Common(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int da
 
 	wxstr.UpperCase();
 
-	PSU_DEBUG_PRINT(MSG_ALERT, "%s", wxstr.c_str());
+	PSU_DEBUG_PRINT(MSG_DEBUG, "%s", wxstr.c_str());
 
 #if 0
 	// Check If CheckSum Error

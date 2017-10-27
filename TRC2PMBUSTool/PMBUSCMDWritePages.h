@@ -1365,4 +1365,52 @@ private:
 	wxDECLARE_EVENT_TABLE();
 };
 
+/* 0923H IIN_CALIBRATION */
+class WritePage0923H : public BaseWritePage {
+public:
+	/**
+	* @brief Constructor.
+	*/
+	WritePage0923H(wxWindow* parent, wxString& label, bool* monitor_running, std::vector<PMBUSSendCOMMAND_t> *sendCMDVector, IOACCESS* ioaccess, unsigned int* currentIO);
+	/**
+	* @brief Deconstructor.
+	*/
+	~WritePage0923H();
+
+	virtual void changeLayOutByDataFormat(unsigned int dataFormat, PMBUSCOMMAND_t *pmbuscmd);
+
+	enum {
+		CID_TEXTCTRL_TARGET_VALUE = 0x3301
+	};
+
+protected:
+
+	wxStaticText *m_hintName;
+
+	wxStaticText *m_scale;
+
+	wxStaticText *m_cmdDescription;
+
+	wxTextCtrl *m_highByteValue;
+	wxTextCtrl *m_lowByteValue;
+
+	bool *m_monitor_running;
+	std::vector<PMBUSSendCOMMAND_t> *m_sendCMDVector;
+
+	IOACCESS *m_ioaccess;
+	unsigned int *m_currentIO;
+
+private:
+
+	void OnRadioButtonCook(wxCommandEvent& event);
+
+	void OnRadioButtonRaw(wxCommandEvent& event);
+
+	void OnTargetValue(wxCommandEvent& event);
+
+	void OnButtonWrite(wxCommandEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
 #endif

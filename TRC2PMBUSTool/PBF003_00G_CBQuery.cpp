@@ -17,6 +17,7 @@ int PFB003_00G_Query_0910H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int s
 int PFB003_00G_Query_0920H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Query_Common(pmbuscmd, string, sizeOfstr); }
 int PFB003_00G_Query_0921H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Query_Common(pmbuscmd, string, sizeOfstr); }
 int PFB003_00G_Query_0922H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Query_Common(pmbuscmd, string, sizeOfstr); }
+int PFB003_00G_Query_0923H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Query_Common(pmbuscmd, string, sizeOfstr); }
 int PFB003_00G_Query_0999H(pmbuscmd_t* pmbuscmd, wchar_t* string, unsigned int sizeOfstr){ return PFB003_00G_Query_Common(pmbuscmd, string, sizeOfstr); }
 
 #define CMD_SUPPORT_MASK         (0x80)
