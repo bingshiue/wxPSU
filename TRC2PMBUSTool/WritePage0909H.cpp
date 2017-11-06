@@ -1,4 +1,4 @@
-/**
+Ôªø/**
  * @file WritePage0909H.cpp
  */
 
@@ -25,7 +25,7 @@ WritePage0909H::WritePage0909H(wxWindow* parent, wxString& label, bool* monitor_
 	m_scale = NULL;
 
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, wxString(
-	L"≠´∏møÈ•Xπq¿£¶‹πw≥]≠»"), wxDefaultPosition, wxSize(-1, -1));
+	L"ÈáçÁΩÆËº∏Âá∫ÈõªÂ£ìËá≥È†êË®≠ÂÄº"), wxDefaultPosition, wxSize(-1, -1));
 
 	//m_highByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));
 	//m_lowByteValue = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(60, -1));

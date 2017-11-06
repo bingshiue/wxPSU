@@ -1,4 +1,4 @@
-/**
+ï»¿/**
 * @file WritePage0923H.cpp
 */
 
@@ -19,7 +19,7 @@ WritePage0923H::WritePage0923H(wxWindow* parent, wxString& label, bool* monitor_
 	m_hintName = new wxStaticText(this, wxID_ANY, wxString(L"Value"), wxDefaultPosition, wxSize(80, -1));
 	//m_scale = new wxStaticText(this, wxID_ANY, wxString(L"Low Byte"), wxDefaultPosition, wxSize(80, -1));
 
-	wxString descriptionStr = wxString::Format(L"¿é¤J½d³ò : %d(0x%04X) ~ %d(0x%04X)",
+	wxString descriptionStr = wxString::Format(L"è¼¸å…¥ç¯„åœ : %d(0x%04X) ~ %d(0x%04X)",
 		PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0923WritePageMin, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0923WritePageMin,
 		PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0923WritePageMax, PMBUSHelper::GetAppSettings()->m_pbf00300gOption.m_0923WritePageMax);
 	m_cmdDescription = new wxStaticText(this, wxID_ANY, descriptionStr, wxDefaultPosition, wxSize(-1, -1));
