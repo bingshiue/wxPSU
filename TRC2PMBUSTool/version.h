@@ -49,7 +49,9 @@
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 /* |     1.0.0.21       |     Suppport TRC2 I2C Adapter                                  |*/
 /* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
+/* |     1.0.0.22       |     Add New Model PBF003-00G                                   |*/
+/* ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------*/
 
-#define VERSION_STRING "1.0.0.21" /**< Version String, Shown in About Dialog & Window Title */
+#define VERSION_STRING "1.0.0.22" /**< Version String, Shown in About Dialog & Window Title */
 
 #endif
