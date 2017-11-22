@@ -38,6 +38,7 @@ endif()
 add_subdirectory(hidapi-0.7.0)
 add_subdirectory(hidapi-0.7.0/hidtest)
 add_subdirectory(TaskSystem)
+add_subdirectory(libGIS)
 add_subdirectory(TRC2PMBUSTool)
  
 # Turn on CMake testing capabilities

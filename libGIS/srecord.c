@@ -70,6 +70,13 @@ int Read_SRecord(SRecord *srec, FILE *in) {
 	if (strlen(recordBuff) == 0)
 		return SRECORD_ERROR_NEWLINE;
 
+	/* Print Debug Messages */
+	printf("DEBUG: ");
+	for(i=0; i<16; i++){
+		printf("[%02X] ", recordBuff[i]);
+	}
+	printf("\n");
+
 	/* Size check for type and count fields */
 	if (strlen(recordBuff) < SRECORD_TYPE_LEN + SRECORD_COUNT_LEN)
 		return SRECORD_ERROR_INVALID_RECORD;
