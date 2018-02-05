@@ -50,7 +50,11 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		/* Address */
 		this->m_tiHexFileStat->startAddress(&start_address);
+#ifdef ISP_SEND_FULL_ADDRESS
+		address = this->m_tiHexFileStat->currentAddress();
+#else
 		address = this->m_tiHexFileStat->currentAddress() - start_address;
+#endif
 
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0xff000000) >> 24);
@@ -316,7 +320,11 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		/* Address */
 		this->m_tiHexFileStat->startAddress(&start_address);
+#ifdef ISP_SEND_FULL_ADDRESS
+		address = this->m_tiHexFileStat->currentAddress();
+#else
 		address = this->m_tiHexFileStat->currentAddress() - start_address;
+#endif
 
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		pec_buffer[pec_active_index++] = (unsigned char)((address & 0xff000000) >> 24);
@@ -583,7 +591,11 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		/* Address (4 Bytes) */
 		this->m_tiHexFileStat->startAddress(&start_address);
+#ifdef ISP_SEND_FULL_ADDRESS
+		address = this->m_tiHexFileStat->currentAddress();
+#else
 		address = this->m_tiHexFileStat->currentAddress() - start_address;
+#endif
 
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
@@ -672,7 +684,11 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		/* Address */
 		this->m_tiHexFileStat->startAddress(&start_address);
+#ifdef ISP_SEND_FULL_ADDRESS
+		address = this->m_tiHexFileStat->currentAddress();
+#else
 		address = this->m_tiHexFileStat->currentAddress() - start_address;
+#endif
 
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);
@@ -763,7 +779,11 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		/* Address */
 		this->m_tiHexFileStat->startAddress(&start_address);
+#ifdef ISP_SEND_FULL_ADDRESS
+		address = this->m_tiHexFileStat->currentAddress();
+#else
 		address = this->m_tiHexFileStat->currentAddress() - start_address;
+#endif
 
 		buffer[active_index++] = (unsigned char)((address & 0xff000000) >> 24);
 		buffer[active_index++] = (unsigned char)((address & 0x00ff0000) >> 16);

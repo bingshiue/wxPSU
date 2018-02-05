@@ -52,6 +52,8 @@
 
 #define UserCancelISP_POST_DELAY_TIME 7000 /**< User Cancel ISP Post Delay Time */
 
+#define ISP_SEND_FULL_ADDRESS /**< Send Full Address Instead of Offset */
+
 /* ----- Below is for debug only ------ */
 
 //#define ISP_DONT_WAIT_RESPONSE /**< For debug, Do ISP Sequence without waiting DSP's response */
