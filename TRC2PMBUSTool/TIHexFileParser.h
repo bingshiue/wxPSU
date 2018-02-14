@@ -876,6 +876,7 @@ public:
 
 	void overwriteData(unsigned char data);
 	void overwriteData(unsigned char data, unsigned long address);
+	void overwriteData(unsigned short data, unsigned long address);
 
 	bool blankFill(unsigned char data);
 

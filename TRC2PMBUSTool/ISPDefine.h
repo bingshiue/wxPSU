@@ -54,6 +54,8 @@
 
 #define ISP_SEND_FULL_ADDRESS /**< Send Full Address Instead of Offset */
 
+#define ISP_COMPUTE_SOHO_CHKSUM /**< Compute SOHO Checksum */
+
 /* ----- Below is for debug only ------ */
 
 //#define ISP_DONT_WAIT_RESPONSE /**< For debug, Do ISP Sequence without waiting DSP's response */

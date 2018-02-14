@@ -32,7 +32,7 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	this->m_writeCount = 0;
 
 	tiHexFileStat->begin();
-    	this->m_startAddress = tiHexFileStat->currentAddress();
+    this->m_startAddress = tiHexFileStat->currentAddress();
 
 	tiHexFileStat->end();
 	this->m_endAddress = tiHexFileStat->currentAddress();
@@ -47,6 +47,36 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 	PSU_DEBUG_PRINT(MSG_DEBUG, "EndAddress   = 0x%08lx", this->m_endAddress);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Address Range= %ld", this->m_addressRange);
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Total Data Bytes   = %ld", this->m_dataBytes);
+
+#ifdef ISP_COMPUTE_SOHO_CHKSUM
+	unsigned short *WholeImage;
+	WholeImage = new unsigned short[this->m_addressRange];
+
+	tiHexFileStat->begin();
+
+	for (unsigned int idx = 0; idx < this->m_addressRange; idx++) {
+		
+		this->m_tiHexFileStat->getData(&WholeImage[idx], this->m_tiHexFileStat->currentAddress());
+
+		PSU_DEBUG_PRINT(MSG_DETAIL, "Address=%04X, Data=%04X", this->m_tiHexFileStat->currentAddress(), WholeImage[idx]);
+
+		++(*tiHexFileStat);
+	}
+
+
+	// Coompute CRC8 Checksum
+	unsigned char crc8chk = PMBusSlave_Crc8MakeBitwise(0, 7, (unsigned char*)WholeImage, 0x7F7D);
+	PSU_DEBUG_PRINT(MSG_ALERT, "Image CRC8 Checksum = 0x%02X \n", crc8chk);
+
+	// Write CRC8 Data (Overwrite)
+	//this->m_tiHexFileStat->overwriteData( (unsigned short)(crc8chk<<8 | 0x0000), 0x3F7F7E );
+	this->m_tiHexFileStat->overwriteData((unsigned short)(crc8chk), 0x3F7F7E);
+
+
+	tiHexFileStat->begin();
+	delete[] WholeImage;
+
+#endif
 
 	this->m_topLevelSizer = new wxBoxSizer(wxVERTICAL);
 	this->m_statisticSBS = new wxStaticBoxSizer(wxVERTICAL, this, wxT("File Description"));

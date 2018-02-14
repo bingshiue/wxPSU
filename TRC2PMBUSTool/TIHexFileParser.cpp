@@ -1189,6 +1189,14 @@ ostream& operator<<(ostream& dataOut, TIHexFileParser& ihLocal)
 	return (dataOut);
 }
 
+void TIHexFileParser::overwriteData(unsigned short data, unsigned long address) {
+
+	ihContent.erase(address);
+	ihReturn = ihContent.insert(pair<int, unsigned short>(address, data));
+
+}
+
+
 #define FORCE_ADDRESS_START_FROM_003F4000
 #define FIXED_START_ADDRESS 0x003f4000
 #define ADDR_ALIGN_XXXF
