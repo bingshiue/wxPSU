@@ -58,6 +58,9 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 		
 		this->m_tiHexFileStat->getData(&WholeImage[idx], this->m_tiHexFileStat->currentAddress());
 
+		// Transfer to BIG endian
+		WholeImage[idx] = (unsigned short)((*((unsigned char*)&WholeImage[idx]+0) << 8) | *((unsigned char*)&WholeImage[idx]+1));
+
 		PSU_DEBUG_PRINT(MSG_DETAIL, "Address=%04X, Data=%04X", this->m_tiHexFileStat->currentAddress(), WholeImage[idx]);
 
 		++(*tiHexFileStat);
@@ -65,12 +68,14 @@ PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath,
 
 
 	// Coompute CRC8 Checksum
-	unsigned char crc8chk = PMBusSlave_Crc8MakeBitwise(0, 7, (unsigned char*)WholeImage, 0x7F7D);
+	unsigned int calc_len = ((0x3f7F7D - this->m_startAddress) + 1) * sizeof(unsigned short);
+	PSU_DEBUG_PRINT(MSG_ALERT, "calc_len = %d \n", calc_len);
+	unsigned char crc8chk = PMBusSlave_Crc8MakeBitwise(0, 7, (unsigned char*)WholeImage, calc_len);
 	PSU_DEBUG_PRINT(MSG_ALERT, "Image CRC8 Checksum = 0x%02X \n", crc8chk);
 
 	// Write CRC8 Data (Overwrite)
 	//this->m_tiHexFileStat->overwriteData( (unsigned short)(crc8chk<<8 | 0x0000), 0x3F7F7E );
-	this->m_tiHexFileStat->overwriteData((unsigned short)(crc8chk), 0x3F7F7E);
+	this->m_tiHexFileStat->overwriteData( (unsigned short)(((unsigned short)(crc8chk << 8) & 0xff00) | 0x00ff) , 0x3F7F7E);
 
 
 	tiHexFileStat->begin();

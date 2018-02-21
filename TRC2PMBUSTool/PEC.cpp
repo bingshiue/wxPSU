@@ -3,6 +3,7 @@
  */
 
 #include "PEC.h"
+#include "PMBUSLog.h"
 
 unsigned short PMBusSlave_Crc8MakeBitwise(unsigned char PMBusSlave_CRC, unsigned char PMBusSlave_Poly, unsigned char *PMBusSlave_Pmsg, unsigned int PMBusSlave_MsgSize)
 {
@@ -10,9 +11,11 @@ unsigned short PMBusSlave_Crc8MakeBitwise(unsigned char PMBusSlave_CRC, unsigned
 	unsigned char msg;
 
 	PMBusSlave_CRC = *PMBusSlave_Pmsg++;        	// first byte loaded in "crc"
+	//PSU_DEBUG_PRINT(MSG_DEBUG, "PMBusSlave_Crc8MakeBitwise Start Handle Byte = 0x%02X \n", PMBusSlave_CRC);
 	for (i = 0; i < PMBusSlave_MsgSize - 1; i++)
 	{
 		msg = *PMBusSlave_Pmsg++;                   // next byte loaded in "msg"
+		//PSU_DEBUG_PRINT(MSG_DEBUG, "PMBusSlave_Crc8MakeBitwise Lastest Handle Byte = 0x%02X \n", msg);
 
 		for (j = 0; j < 8; j++)
 		{
