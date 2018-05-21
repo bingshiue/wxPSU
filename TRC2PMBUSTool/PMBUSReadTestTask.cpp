@@ -71,7 +71,7 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 		sendBuffer[baseIndex++] = 0x44;
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;        // Command
-		sendBuffer[baseIndex++] = 0x99;        // Command 0x99
+		//sendBuffer[baseIndex++] = 0x99;        // Command 0x99
 
 		// May Have 0x0d Command
 		if (sendBuffer[baseIndex - 1] == 0x0d){
@@ -190,10 +190,10 @@ int PMBUSReadTestTask::ProductReadCMDBuffer(PMBUSReadCMD_t* pmBusReadCMD, unsign
 		sendBuffer[baseIndex++] = 0x01;// Interface
 		sendBuffer[baseIndex++] = 0x52;// Action : Read
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_slaveAddr;// Data Package Start, Slave Address
-		sendBuffer[baseIndex++] = 0x01 + 0x01;//    Write Length
+		sendBuffer[baseIndex++] = 0x01;//+ 0x01;//    Write Length
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_numOfReadBytes;//    Read Length
 		sendBuffer[baseIndex++] = pmBusReadCMD->m_cmd;// Write Data Start
-		sendBuffer[baseIndex++] = 0x99;               // Command 0x99
+		//sendBuffer[baseIndex++] = 0x99;               // Command 0x99
 
 		buffer_len = baseIndex;
 
