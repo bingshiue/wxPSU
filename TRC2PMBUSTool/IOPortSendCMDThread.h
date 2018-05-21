@@ -22,6 +22,7 @@
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
 #include "PEC.h"
+#include "Task.h"
 
 //#define SERIAL_SEND_DATA_SIZE  10/**< Serial Send Data Size */
 //#define HID_SEND_DATA_SIZE  64/**< HID Send Data Size */

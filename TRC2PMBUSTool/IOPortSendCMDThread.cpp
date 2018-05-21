@@ -5,6 +5,8 @@
 #include "IOPortSendCMDThread.h"
 #include "MainFrame.h"
 
+#define DONT_USE_WXTHREAD_TO_READ
+
 IOPortSendCMDThread::IOPortSendCMDThread(wxSemaphore* semaphore){
 	this->m_rxTxSemaphore = semaphore;
 }
@@ -1369,7 +1371,9 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						// Create IOPortReadCMDThread
 						unsigned int bytesToRead = this->m_pmBusCommand[idx].m_responseDataLength + BASE_RESPONSE_DATA_LENGTH;
+#ifndef DONT_USE_WXTHREAD_TO_READ
 						this->m_IOPortReadCMDThread = new IOPortReadCMDThread(this->m_IOAccess, this->m_CurrentIO, this->m_rxTxSemaphore, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+
 
 						// If Create Thread Success
 						if (this->m_IOPortReadCMDThread->Create() != wxTHREAD_NO_ERROR){
@@ -1378,12 +1382,27 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 						else{
 							this->m_IOPortReadCMDThread->Run();
 						}
+#endif
 
+#ifdef DONT_USE_WXTHREAD_TO_READ
+						new(TP_ReceivePollingCMDTask) ReceivePollingCMDTask(this->m_IOAccess, this->m_CurrentIO, &this->m_pmBusCommand[idx], this->m_recvBuff, SERIALPORT_RECV_BUFF_SIZE, bytesToRead);
+
+						while (TaskEx::GetCount(task_ID_ReceivePollingCMDTask) != 0){
+							//wxMicroSleep(1);
+						}
+#endif
+
+
+#ifndef DONT_USE_WXTHREAD_TO_READ
 						// Semaphore Wait for Read Thread Complete
 						PSU_DEBUG_PRINT(MSG_DEBUG, "Semaphore WaitTimeout, CMD = %02xH", this->m_pmBusCommand[idx].m_register);
 						ret = m_rxTxSemaphore->Wait();//Timeout(SERIAL_PORT_SEND_SEMAPHORE_WAITTIMEOUT);
 
-						if (ret != wxSEMA_NO_ERROR){
+						if (ret != wxSEMA_NO_ERROR)
+#else
+						if (0)
+#endif
+						{
 							PSU_DEBUG_PRINT(MSG_ALERT, "Semaphore wait timout occurs : error = %d", ret);
 						}
 						else{
@@ -1711,6 +1730,7 @@ wxThread::ExitCode IOPortSendCMDThread::Entry()
 
 						}
 						else{
+
 							PSU_DEBUG_PRINT(MSG_DEBUG, "Response Length of Separate Write CMD is %d", this->m_recvBuff->m_length);
 							wxString writePageRes("");
 							for (unsigned int idx = 0; idx < this->m_recvBuff->m_length; idx++){

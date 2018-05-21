@@ -63,6 +63,7 @@
 #define TP_FindAvailableSlaveI2CDeviceTask (0.5f)
 #define TP_TRC2AdapterGetFWVersionTask (0.5f)
 #define TP_TRC2AdapterSetI2CBitRateTask (0.5f)
+#define TP_ReceivePollingCMDTask (0.5f)
 
 enum {
 	task_ID_SendWriteCMDTask = 0,
@@ -98,6 +99,7 @@ enum {
 	task_ID_FindAvailableSlaveI2CDeviceTask,
 	task_ID_TRC2AdapterGetFWVersionTask,
 	task_ID_TRC2AdapterSetI2CBitRateTask,
+	task_ID_ReceivePollingCMDTask,
 };
 
 class SendISPStartCMDTask : public TaskEx {
@@ -1400,6 +1402,51 @@ public:
 	 * @brief Deconstructor.
 	 */
 	~TRC2AdapterSetI2CBitRateTask(void);
+
+	/**
+	 * @brief Draw function.
+	 */
+	void Draw(void);
+
+	/**
+	 * @brief Main update function.
+	 *
+	 * @param elapsedTime elapsed time
+	 * @retval success or failure
+	 */
+	int Main(double elapsedTime);
+
+};
+
+class ReceivePollingCMDTask : public TaskEx {
+
+        double m_elapsedTimer;/**< for compute elapsed time */
+
+	IOACCESS*                 m_ioaccess;
+	unsigned int*             m_currentIO;
+	PMBUSCOMMAND_t*           m_pmBusCommand;
+	RECVBUFF_t*               m_recvBuff;
+	unsigned int              m_recvBuffSize;
+	unsigned int              m_bytesToRead;
+
+public :
+
+	/**
+	 * @brief Constructor.
+	 */
+	ReceivePollingCMDTask(
+		IOACCESS*         ioaccess,
+		unsigned int*     currentIO,
+		PMBUSCOMMAND_t*   pmBusCommand,
+		RECVBUFF_t*       recvBuff,
+		unsigned int      recvBuffSize,
+		unsigned int      bytesToRead
+	);
+
+	/**
+	 * @brief Deconstructor.
+	 */
+	~ReceivePollingCMDTask(void);
 
 	/**
 	 * @brief Draw function.
