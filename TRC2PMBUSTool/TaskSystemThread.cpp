@@ -47,7 +47,7 @@ wxThread::ExitCode TaskSystemThread::Entry() {
 			Task::GetCriticalSectionObject().Leave();
 		}
 		else{
-			wxMilliSleep(100);
+			wxMicroSleep(100);
 		}
 
 		previousTaskCnts = TaskCnts;
