@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-SendRebootCheckTask::SendRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus){
+SendRebootCheckTask::SendRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_SendRebootCheckTask;
 
 	this->m_IOAccess = ioaccess;

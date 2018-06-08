@@ -5,7 +5,7 @@
 #include <string.h>
 #include "Task.h"
 
-ReceiveRebootCheckTask::ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
+ReceiveRebootCheckTask::ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_ReceiveRebootCheckTask;
 
 	this->m_IOAccess = ioaccess;

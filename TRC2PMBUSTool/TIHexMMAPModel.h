@@ -6,7 +6,8 @@
 
 #include "CommonDef.h"
 #include "main.h"
-#include "TIHexFileParser.h"
+//#include "TIHexFileParser.h"
+#include "tihexclass.h"
 
 class TIHexMMAPModel : public wxDataViewVirtualListModel
 {
@@ -34,7 +35,7 @@ public:
 		Col_Max
 	};
 
-	TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat, TIHexFileParser* compareTiHexFileStat);
+	TIHexMMAPModel(unsigned int initSize, tihex<>* tiHexFileStat, tihex<>* compareTiHexFileStat);
 
 	/* Implementation of base class virtuals methods to define model */
 	/**
@@ -73,9 +74,9 @@ protected:
 
 private:
 	
-	TIHexFileParser *m_tiHexFileStat;/**<  TI Hex File Parser */
+	tihex<> *m_tiHexFileStat;/**<  TI Hex File Parser */
 
-	TIHexFileParser *m_compareTiHexFileStat;/**< Compare TI Hex File Parser */
+	tihex<> *m_compareTiHexFileStat;/**< Compare TI Hex File Parser */
 
 	unsigned long m_startAddress;
 

@@ -49,7 +49,8 @@
 #include "I2CInterfaceDialog.h"
 #include "I2CSlaveAddressDialog.h"
 #include "AboutDialog.h"
-#include "TIHexFileParser.h"
+//#include "TIHexFileParser.h"
+#include "tihexclass.h"
 #include "TIHexMMAPModel.h"
 #include "ISPSequenceThread.h"
 #include "IncreaseCPUOverHeadThread.h"
@@ -404,8 +405,8 @@ protected:
 	WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) wxOVERRIDE;
 #endif
 
-	TIHexFileParser m_PrimaryTIHexFileStat;
-	TIHexFileParser m_SecondaryTIHexFileStat;
+	tihex<> m_PrimaryTIHexFileStat;
+	tihex<> m_SecondaryTIHexFileStat;
 
 	//wxProgressDialog *m_progressDialog;
 	PMBUSFWProgressDialog *m_pmbusProgressDialog;

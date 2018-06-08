@@ -4,7 +4,7 @@
 
 #include "TIHexMMAPModel.h"
 
-TIHexMMAPModel::TIHexMMAPModel(unsigned int initSize, TIHexFileParser* tiHexFileStat, TIHexFileParser* compareTiHexFileStat) : wxDataViewVirtualListModel(initSize)
+TIHexMMAPModel::TIHexMMAPModel(unsigned int initSize, tihex<>* tiHexFileStat, tihex<>* compareTiHexFileStat) : wxDataViewVirtualListModel(initSize)
 {
 	this->m_tiHexFileStat = tiHexFileStat;
 
@@ -60,9 +60,9 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 
 		if (address <= this->m_endAddress){
 
-			this->m_tiHexFileStat->getData(&data, this->m_startAddress + (row * 0x10) + (col - 1));
+			this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_startAddress + (row * 0x10) + (col - 1));
 
-			value = wxString::Format("%04x", data);
+			value = wxString::Format("%02x", data);
 
 			value.UpperCase();
 
@@ -82,9 +82,9 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 
 			if (address <= this->m_endAddress){
 
-				this->m_tiHexFileStat->getData(&data, this->m_startAddress + ((row * 0x10) + (idx - 1)));
+				this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_startAddress + ((row * 0x10) + (idx - 1)));
 
-				for (int k = 1; k >=0; k--){
+				for (int k = 1; k > 0; k--){
 
 					PSU_DEBUG_PRINT(MSG_DETAIL, "ascii_index=%d", ascii_index);
 					PSU_DEBUG_PRINT(MSG_DETAIL, "*(data+k)  =%d", *(((char*)&data + k)));
@@ -165,9 +165,9 @@ bool TIHexMMAPModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataView
 
 		if (address <= this->m_endAddress){
 
-			this->m_tiHexFileStat->getData(&data, this->m_startAddress + (row * 0x10) + (col - 1));
+			this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_startAddress + (row * 0x10) + (col - 1));
 
-			this->m_compareTiHexFileStat->getData(&data_compare, this->m_startAddress + (row * 0x10) + (col - 1));
+			this->m_compareTiHexFileStat->getData((unsigned char*)&data_compare, this->m_startAddress + (row * 0x10) + (col - 1));
 
 			if (data != data_compare){
 				attr.SetBackgroundColour(wxColour(255,183,76));
@@ -185,9 +185,9 @@ bool TIHexMMAPModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataView
 
 			if (address <= this->m_endAddress && diff == false){
 
-				this->m_tiHexFileStat->getData(&data, this->m_startAddress + ((row * 0x10) + (idx - 1)));
+				this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_startAddress + ((row * 0x10) + (idx - 1)));
 
-				this->m_compareTiHexFileStat->getData(&data_compare, this->m_startAddress + ((row * 0x10) + (idx - 1)));
+				this->m_compareTiHexFileStat->getData((unsigned char*)&data_compare, this->m_startAddress + ((row * 0x10) + (idx - 1)));
 
 				if (data != data_compare){
 					attr.SetBackgroundColour(wxColour(255, 183, 76));

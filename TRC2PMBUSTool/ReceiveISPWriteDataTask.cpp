@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-ReceiveISPWriteDataTask::ReceiveISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
+ReceiveISPWriteDataTask::ReceiveISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_ReceiveISPWriteDataTask;
 
 	this->m_IOAccess = ioaccess;

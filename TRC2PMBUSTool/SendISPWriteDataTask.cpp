@@ -5,7 +5,7 @@
 #include "Task.h"
 #include "PEC.h"
 
-SendISPWriteDataTask::SendISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus){
+SendISPWriteDataTask::SendISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_SendISPWriteDataTask;
 
 	this->m_IOAccess = ioaccess;
@@ -95,7 +95,8 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		/* Data  16 bytes (8 short datas) */
 		data = 0x0000;
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
+
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -116,7 +117,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -137,7 +138,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -158,7 +159,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -178,7 +179,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -198,7 +199,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -218,7 +219,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -238,7 +239,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -365,7 +366,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		/* Data  16 bytes (8 short datas) */
 		data = 0x0000;
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -386,7 +387,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -407,7 +408,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -428,7 +429,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -449,7 +450,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -470,7 +471,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -491,7 +492,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -512,7 +513,7 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		pec_buffer[pec_active_index++] = (data & 0xff00) >> 8;
 
@@ -605,49 +606,49 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		/* Data  16 bytes (8 short datas) */
 		data = 0x0000;
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
@@ -698,49 +699,49 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		/* Data  16 bytes (8 short datas) */
 		data = 0x0000;
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
@@ -793,49 +794,49 @@ unsigned int SendISPWriteDataTask::ProductSendBuffer(unsigned char *buffer){
 		/* Data  16 bytes (8 short datas) */
 		data = 0x0000;
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
 		++(*this->m_tiHexFileStat);
 
-		this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+		this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 		buffer[active_index++] = (data & 0xff00) >> 8;
 		buffer[active_index++] = data & 0x00ff;
 
@@ -876,7 +877,7 @@ int SendISPWriteDataTask::Main(double elapsedTime){
 
 	unsigned short data = 0x0000;
 
-	this->m_tiHexFileStat->getData(&data, this->m_tiHexFileStat->currentAddress());
+	this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_tiHexFileStat->currentAddress());
 
 	wxString str("Data : ");
 	str += wxString::Format("%04x", data);

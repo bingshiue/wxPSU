@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-ReceiveISPCheckStatusTask::ReceiveISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
+ReceiveISPCheckStatusTask::ReceiveISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_ReceiveISPCheckStatusTask;
 
 	this->m_IOAccess = ioaccess;

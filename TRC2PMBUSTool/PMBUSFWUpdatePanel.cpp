@@ -7,7 +7,7 @@
 wxDEFINE_EVENT(wxEVT_COMMAND_ISP_PROGRESS_UPDATE, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_RELOAD_HEX_FILE, wxThreadEvent);
 
-PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
+PMBUSFWUpdatePanel::PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, tihex<>* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode) : wxPanel(parent) {
 
 	this->m_parent = parent;
 

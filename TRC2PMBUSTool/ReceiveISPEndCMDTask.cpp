@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-ReceiveISPEndCMDTask::ReceiveISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *tiHexFileStat, unsigned char* ispStatus){
+ReceiveISPEndCMDTask::ReceiveISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *tiHexFileStat, unsigned char* ispStatus){
 	this->m_id = task_ID_ReceiveISPEndCMDTask;
 
 	this->m_IOAccess = ioaccess;

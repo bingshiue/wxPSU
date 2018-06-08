@@ -20,7 +20,8 @@
 #include "AppSettings.h"
 #include "PMBUSCommandType.h"
 #include "PMBUSHelper.h"
-#include "TIHexFileParser.h"
+//#include "TIHexFileParser.h"
+#include "tihexclass.h"
 #include "TIHexMMAPModel.h"
 #include "PMBUSLogTextCtrl.h"
 #include "PMBUSFWProgressDialog.h"
@@ -45,7 +46,7 @@ enum {
 class PMBUSFWUpdatePanel : public wxPanel, private wxLog {
 public:
 	
-	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, TIHexFileParser* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode);
+	PMBUSFWUpdatePanel(wxNotebook* parent, wxString hexFilePath, tihex<>* tiHexFileStat, IOACCESS* ioaccess, unsigned int* currentIO, bool* isMonitorRunning, unsigned char target, unsigned long developerMode);
 
 	~PMBUSFWUpdatePanel();
 
@@ -71,9 +72,9 @@ private:
 
 	wxObjectDataPtr<TIHexMMAPModel> m_tiHexMMAPModel;
 
-	TIHexFileParser *m_tiHexFileStat;
-	TIHexFileParser m_ReloadTiHexFileStat;
-	TIHexFileParser m_CompareTiHexFileStat;
+	tihex<> *m_tiHexFileStat;
+	tihex<> m_ReloadTiHexFileStat;
+	tihex<> m_CompareTiHexFileStat;
 
 	IOACCESS *m_ioaccess;
 	

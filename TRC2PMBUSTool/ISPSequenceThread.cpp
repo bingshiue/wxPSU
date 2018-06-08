@@ -6,7 +6,7 @@
 ISPSequenceThread::ISPSequenceThread
 (
 	wxString hexFilePath,
-	TIHexFileParser* tiHexFileStat,
+	tihex<>* tiHexFileStat,
 	IOACCESS*    ioaccess,
 	unsigned int* currentIO,
 	unsigned char target,

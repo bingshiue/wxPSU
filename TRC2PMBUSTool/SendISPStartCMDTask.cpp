@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus, unsigned char target){
+SendISPStartCMDTask::SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, tihex<>* tiHexFileStat, unsigned char* ispStatus, unsigned char target){
 	this->m_id = task_ID_SendISPStartCMDTask;
 
 	this->m_IOAccess = ioaccess;

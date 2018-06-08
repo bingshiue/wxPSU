@@ -13,7 +13,8 @@
 
 #include "IOAccess.h"
 #include "PMBUSCommandType.h"
-#include "TIHexFileParser.h"
+//#include "TIHexFileParser.h"
+#include "tihexclass.h"
 #include "TIHexMMAPModel.h"
 
 #include "Task.h"
@@ -25,7 +26,7 @@ class ISPSequenceThread : public wxThread {
 public:
 	ISPSequenceThread(
 		wxString hexFilePath,
-		TIHexFileParser* tiHexFileStat,
+		tihex<>* tiHexFileStat,
 		IOACCESS*    ioaccess,
 		unsigned int* currentIO,
 		unsigned char target, 
@@ -42,7 +43,7 @@ public:
 
 	wxString m_hexFilePath;
 
-	TIHexFileParser* m_tiHexFileStat;
+	tihex<>* m_tiHexFileStat;
 
 	IOACCESS     *m_ioaccess;/**< IO Access */
 

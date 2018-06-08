@@ -3809,7 +3809,7 @@ void MainFrame::OnISPSequenceStart(wxThreadEvent& event){
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Target = %d", event.GetInt());
 	PSU_DEBUG_PRINT(MSG_DEBUG, "Title  = %s", event.GetString().c_str());
 
-	TIHexFileParser *hexFileParser = NULL;
+	tihex<> *hexFileParser = NULL;
 
 	int target = event.GetInt();
 	wxString dialogTitle = event.GetString();
@@ -5385,7 +5385,7 @@ void MainFrame::HexToBin(void){
 	}
 
 	/* Decode file                                                            */
-	TIHexFileParser tiHexFileStat;
+	tihex<unsigned short> tiHexFileStat;
 	TIHexInput >> tiHexFileStat;//m_SecondaryTIHexFileStat;
 
 	// Check Errors

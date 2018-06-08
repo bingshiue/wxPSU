@@ -4,7 +4,7 @@
 
 #include "Task.h"
 
-SendISPStartVerifyCMDTask::SendISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus, unsigned char target){
+SendISPStartVerifyCMDTask::SendISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* tiHexFileStat, unsigned char* ispStatus, unsigned char target){
 	this->m_id = task_ID_SendISPStartVerifyCMDTask;
 
 	this->m_IOAccess = ioaccess;

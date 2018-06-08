@@ -28,7 +28,8 @@
 #include "IOPortReadCMDThread.h"
 #include "STDPage.h"
 #include "PEC.h"
-#include "TIHexFileParser.h"
+//#include "TIHexFileParser.h"
+#include "tihexclass.h"
 
 #define TP_SendWriteCMDTask (0.5f)
 #define TP_ReceiveWriteCMDTask (0.5f)
@@ -108,7 +109,7 @@ class SendISPStartCMDTask : public TaskEx {
 	PMBUSSendCOMMAND_t m_pmbusSendCommand;/**< Send Command */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned char m_target;
@@ -121,7 +122,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
+	SendISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, tihex<> *m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
 
 	/**
 	* @brief Deconstructor.
@@ -149,7 +150,7 @@ class ReceiveISPStartCMDTask : public TaskEx {
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 	PMBUSSendCOMMAND_t m_pmbusSendCommand;/**< Send Command */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned char m_target;
@@ -164,7 +165,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	ReceiveISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
+	ReceiveISPStartCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, PMBUSSendCOMMAND_t pmbusSendCommand, tihex<>* m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
 
 	/**
 	* @brief Deconstructor.
@@ -191,7 +192,7 @@ class SendISPStartVerifyCMDTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned char m_target;
@@ -204,7 +205,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
+	SendISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
 
 	/**
 	* @brief Deconstructor.
@@ -230,7 +231,7 @@ class ReceiveISPStartVerifyCMDTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned char m_target;
@@ -243,7 +244,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	ReceiveISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
+	ReceiveISPStartVerifyCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* m_tiHexFileStat, unsigned char* ispStatus, unsigned char target);
 
 	/**
 	* @brief Deconstructor.
@@ -275,7 +276,7 @@ class SendISPWriteDataTask : public TaskEx {
 
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	double m_elapsedTimer;/**< for compute elapsed time */
@@ -284,7 +285,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* tiHexFileStat, unsigned char* ispStatus);
+	SendISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -314,7 +315,7 @@ class ReceiveISPWriteDataTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned int m_bytesToRead;/**< Bytes To Read */
@@ -325,7 +326,7 @@ public:
 	/**
 	 * @brief Constructor.
 	 */
-	ReceiveISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus);
+	ReceiveISPWriteDataTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	 * @brief Deconstructor.
@@ -351,7 +352,7 @@ class SendISPCheckStatusTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	double m_elapsedTimer;/**< for compute elapsed time */
@@ -362,7 +363,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus);
+	SendISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -388,7 +389,7 @@ class ReceiveISPCheckStatusTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned int m_bytesToRead;/**< Bytes To Read */
@@ -399,7 +400,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	ReceiveISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus);
+	ReceiveISPCheckStatusTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -425,7 +426,7 @@ class SendISPEndCMDTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	double m_elapsedTimer;/**< for compute elapsed time */
@@ -436,7 +437,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus);
+	SendISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -462,7 +463,7 @@ class ReceiveISPEndCMDTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned int m_bytesToRead;/**< Bytes To Read */
@@ -473,7 +474,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	ReceiveISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus);
+	ReceiveISPEndCMDTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -500,7 +501,7 @@ class SendRebootCheckTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	unsigned char m_sendBuff[SEND_BUFFER_MAX_SIZE];/**< Send Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	double m_elapsedTimer;/**< for compute elapsed time */
@@ -511,7 +512,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	SendRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser *m_tiHexFileStat, unsigned char* ispStatus);
+	SendRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<> *m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
@@ -537,7 +538,7 @@ class ReceiveRebootCheckTask : public TaskEx {
 	unsigned int *m_CurrentIO;/**< Current IO */
 	RECVBUFF_t    m_recvBuff;/**< Receive Buffer */
 
-	TIHexFileParser *m_tiHexFileStat;
+	tihex<> *m_tiHexFileStat;
 	unsigned char *m_ispStatus;
 
 	unsigned int m_bytesToRead;/**< Bytes To Read */
@@ -548,7 +549,7 @@ public:
 	/**
 	* @brief Constructor.
 	*/
-	ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, TIHexFileParser* m_tiHexFileStat, unsigned char* ispStatus);
+	ReceiveRebootCheckTask(IOACCESS* ioaccess, unsigned int* currentIO, tihex<>* m_tiHexFileStat, unsigned char* ispStatus);
 
 	/**
 	* @brief Deconstructor.
