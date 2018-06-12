@@ -26,6 +26,7 @@ void ReceiveISPCheckStatusTask::Draw(void){
 #define ISP_ENDDATA_BYTES_TO_READ  8
 int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 	
+	static unsigned char isp_send_data_repeat = 0;
 	bool isp_response_error = false;
 
 	// Receive Data 
@@ -106,6 +107,18 @@ int ReceiveISPCheckStatusTask::Main(double elapsedTime){
 			}
 			else{
 				PSU_DEBUG_PRINT(MSG_DEBUG, "ISP Sending HEX Data : Current Address = 0x%08lx", this->m_tiHexFileStat->currentAddress());
+
+				PSU_DEBUG_PRINT(MSG_DEBUG, "isp_send_data_repeat = %d", isp_send_data_repeat);
+
+				// Repeat Send ISP Data for Test, Send 1 Address Twice
+				isp_send_data_repeat++;
+				isp_send_data_repeat%=2;
+				if(isp_send_data_repeat%2 == 1){
+					this->m_tiHexFileStat->jumpTo(this->m_tiHexFileStat->currentAddress()-8);
+				}
+
+				PSU_DEBUG_PRINT(MSG_ALERT, "Repeat Send Address = 0x%08lx", this->m_tiHexFileStat->currentAddress());
+
 				new(TP_SendISPWriteDataTask) SendISPWriteDataTask(this->m_IOAccess, this->m_CurrentIO, this->m_tiHexFileStat, this->m_ispStatus);
 			}
 
