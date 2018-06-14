@@ -62,7 +62,11 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 
 			this->m_tiHexFileStat->getData((unsigned char*)&data, this->m_startAddress + (row * 0x10) + (col - 1));
 
-			value = wxString::Format("%02x", data);
+			if(typeid(this->m_tiHexFileStat) == typeid(tihex<unsigned char>*)){
+				value = wxString::Format("%02x", (unsigned char)data);
+			}else if(typeid(this->m_tiHexFileStat) == typeid(tihex<unsigned short>*)){
+				value = wxString::Format("%02x", data);
+			}
 
 			value.UpperCase();
 
@@ -87,9 +91,9 @@ void TIHexMMAPModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigne
 				for (int k = 1; k > 0; k--){
 
 					PSU_DEBUG_PRINT(MSG_DETAIL, "ascii_index=%d", ascii_index);
-					PSU_DEBUG_PRINT(MSG_DETAIL, "*(data+k)  =%d", *(((char*)&data + k)));
+					PSU_DEBUG_PRINT(MSG_DETAIL, "*(data)  =%d", *(((char*)&data + k - 1)));
 
-					ascii[ascii_index++] = *((unsigned char*)&data + k);
+					ascii[ascii_index++] = *((unsigned char*)&data + k -1);
 					bytes_cnt++;
 				}
 			}
